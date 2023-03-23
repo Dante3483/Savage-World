@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 538cfddb439b949448971d8fec0a1edb, type: 3}
+  m_Name: Air
+  m_EditorClassIdentifier: 
+  Type: 0
+  chunkCount: 2
+  defaultWallTile: {fileID: 0}
+  defaultBlock: {fileID: 11400000, guid: 7011b0fd664fc49429972de8ff85dfe3, type: 2}
+  startY: 2400
+  endY: 2599
+  background: {fileID: 0}
+  _holes: []
+  _clusters: []
+  caveFreq: 0
+  caveSize: 0
+  MinGeneratedCaveSize: 0

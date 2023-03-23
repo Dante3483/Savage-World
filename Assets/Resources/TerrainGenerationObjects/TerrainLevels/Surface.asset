@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 538cfddb439b949448971d8fec0a1edb, type: 3}
+  m_Name: Surface
+  m_EditorClassIdentifier: 
+  Type: 1
+  chunkCount: 1
+  defaultWallTile: {fileID: 11400000, guid: 83451f9a291888f4b93d3498469ff263, type: 2}
+  defaultBlock: {fileID: 11400000, guid: e1504499c9e46cb428925ac3733cf4b9, type: 2}
+  startY: 2300
+  endY: 2399
+  background: {fileID: 0}
+  _holes: []
+  _clusters:
+  - {fileID: 11400000, guid: 325ea764571a65147a21aec85c5d67e5, type: 2}
+  - {fileID: 11400000, guid: 97f86e057c8352e4c8b4c2588ecd157c, type: 2}
+  caveFreq: 0
+  caveSize: 0
+  MinGeneratedCaveSize: 0

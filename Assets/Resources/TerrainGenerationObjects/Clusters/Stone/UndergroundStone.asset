@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f06300aa4b8c4e46a10d6aa261907dd, type: 3}
+  m_Name: UndergroundStone
+  m_EditorClassIdentifier: 
+  fillBlock: {fileID: 11400000, guid: 39962fc33c6682248b559341e3d3e711, type: 2}
+  AllowedToSpawnOn:
+  - {fileID: 11400000, guid: e1504499c9e46cb428925ac3733cf4b9, type: 2}
+  size: 0.45
+  freq: 5

@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78a93723a241b1b4f9e58f814895fead, type: 3}
+  m_Name: ConiferousForestGrass
+  m_EditorClassIdentifier: 
+  tiles:
+  - {fileID: 11400000, guid: ae95dbee2451ab24093478ca6b881171, type: 2}
+  - {fileID: 11400000, guid: 909d0767586b9dd4fb03a4604e5094de, type: 2}
+  - {fileID: 11400000, guid: 61c1faaf1f0f68c4587a214f6adbd6e3, type: 2}
+  - {fileID: 11400000, guid: f6dcec3f0186d7146bd474f979f482d3, type: 2}
+  backgroundBlocks: []
+  blockType: 4
+  colorOnMap: {r: 0, g: 0.6603774, b: 0.3518585, a: 1}
+  Drop: {fileID: 0}
+  Durability: 1
+  ID: 18
+  BiomeID: 6
+  levelID: 1
+  IsBiomeSpecified: 1
+  AllowedToSpawnOn:
+  - {fileID: 11400000, guid: a2960e53d62f83a409c6267c4c87729d, type: 2}
+  ChanceToSpawn: 40
+  ChanceToGrow: 0

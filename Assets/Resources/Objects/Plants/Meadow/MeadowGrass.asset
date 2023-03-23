@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78a93723a241b1b4f9e58f814895fead, type: 3}
+  m_Name: MeadowGrass
+  m_EditorClassIdentifier: 
+  tiles:
+  - {fileID: 11400000, guid: 2d7a928b4b8d1d84aa148bb3f1e9c2e3, type: 2}
+  - {fileID: 11400000, guid: 6b63be17164b91448b67111118a5c4ab, type: 2}
+  - {fileID: 11400000, guid: ec567e0c78954954c8f5ca2525858fc4, type: 2}
+  - {fileID: 11400000, guid: e6cd1fd77b5269443bf75cedf921c4db, type: 2}
+  backgroundBlocks: []
+  blockType: 4
+  colorOnMap: {r: 0, g: 1, b: 0.26503706, a: 1}
+  Drop: {fileID: 0}
+  Durability: 1
+  ID: 4
+  BiomeID: 3
+  levelID: 1
+  IsBiomeSpecified: 1
+  AllowedToSpawnOn:
+  - {fileID: 11400000, guid: dca0156b513c52c4fb5d2b69e3049282, type: 2}
+  ChanceToSpawn: 40
+  ChanceToGrow: 0

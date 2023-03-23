@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab612e92662aff54986a89cfb46f5c66, type: 3}
+  m_Name: TerrainConfiguration
+  m_EditorClassIdentifier: 
+  chunkSize: 100
+  horizontalChunksCount: 24
+  VerticalChunksCount: 26
+  Equator: 2349
+  WorldWitdh: 2400
+  WorldHeight: 2600
+  mountainFreq: 0.05
+  heightDesertMountainMultiplier: 20
+  heightPlainsMountainMultiplier: 10
+  heightMeadowMountainMultiplier: 10
+  heightSurfaceAddition: 0
+  levels:
+  - {fileID: 11400000, guid: 57cdd51b76c9c6b4282a58dff666e0d9, type: 2}
+  - {fileID: 11400000, guid: ea200e2074366aa45a9518182dac2ef8, type: 2}
+  - {fileID: 11400000, guid: 06e898a4564677b4d88aeb0c78d45df5, type: 2}
+  - {fileID: 11400000, guid: 82152f9dce68837469ff87f9d8c59ccc, type: 2}
+  EnableOceanGeneration: 1
+  EnableHolesGeneration: 0
+  EnableSurvivalistCavesGeneration: 1
+  EnableCavesGeneration: 1
+  EnableSmoothingWorld: 1
+  EnableBiomGeneration: 1
+  EnableClustersGenration: 1
+  EnableOreGeneration: 1
+  EnablePlanting: 1
+  EnableStructureGeneration: 1
+  EnableLakesGeneration: 1
+  EnableTreeGeneration: 1
+  CountOfOceanChunks: 2
+  CountOfDesertChunks: 6
+  CountOfPlainsChunks: 1
+  CountOfMeadowChunks: 8
+  CountOfForestChunks: 3
+  CountOfSwampChunks: 2
+  CountOfConiferousForestChunks: 2
+  OceanPosition:
+    StartPositionX: 0
+    EndPositionX: 199
+    StartPositionY: 2284
+    EndPositionY: 2349
+  DesertPosition:
+    StartPositionX: 200
+    EndPositionX: 799
+    StartPositionY: 2284
+    EndPositionY: 2369
+  PlainsPosition:
+    StartPositionX: 800
+    EndPositionX: 899
+    StartPositionY: 2284
+    EndPositionY: 2359
+  MeadowPosition:
+    StartPositionX: 900
+    EndPositionX: 1699
+    StartPositionY: 2284
+    EndPositionY: 2359
+  ForestPosition:
+    StartPositionX: 1700
+    EndPositionX: 1999
+    StartPositionY: 2284
+    EndPositionY: 2359
+  SwampPosition:
+    StartPositionX: 2000
+    EndPositionX: 2199
+    StartPositionY: 2284
+    EndPositionY: 2359
+  ConiferousForestPosition:
+    StartPositionX: 2200
+    EndPositionX: 2399
+    StartPositionY: 2284
+    EndPositionY: 2359
+  chanceToSpawnSurvivalistCave: 50
+  ChanceToSpawnLake: 30
+  ChanceToSpawnOasis: 30
+  Ores:
+  - {fileID: 11400000, guid: eb894dfe504088f449bb8183392fe9da, type: 2}
+  - {fileID: 11400000, guid: 3c47332d774e5dd4c8fbd0e41ceceb28, type: 2}
+  Structures:
+  - {fileID: 11400000, guid: 00430e426b0784e4bae20a262cd59216, type: 2}
+  MinDistanceTree: 10

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 323736c04774e1a4aacadb493805d0e2, type: 3}
+  m_Name: MeadowGrass
+  m_EditorClassIdentifier: 
+  tiles:
+  - {fileID: 11400000, guid: e421e992df69a65498d555bd9f985f38, type: 2}
+  backgroundBlocks: []
+  blockType: 1
+  colorOnMap: {r: 0.5642423, g: 0.7830189, b: 0.025115648, a: 1}
+  Drop: {fileID: 11400000, guid: adf2d28ce72a57d4c968a4fa24ef2489, type: 2}
+  Durability: 10
+  id: 3
+  AllowedForConvertation: {fileID: 11400000, guid: e1504499c9e46cb428925ac3733cf4b9, type: 2}

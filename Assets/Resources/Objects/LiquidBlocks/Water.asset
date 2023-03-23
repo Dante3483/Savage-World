@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4301ecc4635f21a419852e88b774a5f4, type: 3}
+  m_Name: Water
+  m_EditorClassIdentifier: 
+  tiles: []
+  backgroundBlocks: []
+  blockType: 2
+  colorOnMap: {r: 0, g: 0.4687152, b: 1, a: 1}
+  Drop: {fileID: 0}
+  Durability: -1
+  id: 0
+  liquidFlowValueTiles:
+  - {fileID: 11400000, guid: 3261d3869a660a0479a2f185b7f0bf78, type: 2}
+  - {fileID: 11400000, guid: f79be1faf1b6e69429a49c64f1e6c2a0, type: 2}
+  - {fileID: 11400000, guid: 803c1e5493a678149b2aa248207e0254, type: 2}
+  - {fileID: 11400000, guid: 78a0e290994985a47bc21500ebfab567, type: 2}
+  - {fileID: 11400000, guid: 4bec56dd43bf047479bd156232e0a628, type: 2}
+  - {fileID: 11400000, guid: 9272be225f350e24bbaf8ad7a6d0b1ae, type: 2}
+  - {fileID: 11400000, guid: c4f7367ad933d9848bb2386c5f6f15bc, type: 2}
+  - {fileID: 11400000, guid: 3323396cb033d5246b0f0ac5730ba7af, type: 2}
+  - {fileID: 11400000, guid: d1dcec98bd723644dafb66a92663180a, type: 2}
+  - {fileID: 11400000, guid: e30622f8fb899fc40af8cbb37d70b729, type: 2}
+  - {fileID: 11400000, guid: 4bcfca57fd4aeb348ad173561cce4ba9, type: 2}

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 538cfddb439b949448971d8fec0a1edb, type: 3}
+  m_Name: PreUnderground
+  m_EditorClassIdentifier: 
+  Type: 2
+  chunkCount: 3
+  defaultWallTile: {fileID: 11400000, guid: 83451f9a291888f4b93d3498469ff263, type: 2}
+  defaultBlock: {fileID: 11400000, guid: e1504499c9e46cb428925ac3733cf4b9, type: 2}
+  startY: 2000
+  endY: 2299
+  background: {fileID: 0}
+  _holes:
+  - {fileID: 11400000, guid: d931ea4cfc1761e439cd02e592a2f1df, type: 2}
+  - {fileID: 11400000, guid: 7f8af27dd6959de48bd2c19722836e29, type: 2}
+  _clusters:
+  - {fileID: 11400000, guid: d5298a8d253d4d945a578e0e0d9bcd17, type: 2}
+  - {fileID: 11400000, guid: eeae30bf903eb3348bda149cfe06f3a2, type: 2}
+  - {fileID: 11400000, guid: 97f86e057c8352e4c8b4c2588ecd157c, type: 2}
+  caveFreq: 20
+  caveSize: 0.5
+  MinGeneratedCaveSize: 1500

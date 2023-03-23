@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78a93723a241b1b4f9e58f814895fead, type: 3}
+  m_Name: Aloe
+  m_EditorClassIdentifier: 
+  tiles:
+  - {fileID: 11400000, guid: 659bf72de795e8b469e0209b3fb61255, type: 2}
+  backgroundBlocks: []
+  blockType: 4
+  colorOnMap: {r: 0.28754002, g: 0.7735849, b: 0.46269134, a: 1}
+  Drop: {fileID: 0}
+  Durability: 1
+  ID: 1
+  BiomeID: 1
+  levelID: 1
+  IsBiomeSpecified: 1
+  AllowedToSpawnOn:
+  - {fileID: 11400000, guid: 91ee5268400784a439d7aa7f0514e6a2, type: 2}
+  ChanceToSpawn: 10
+  ChanceToGrow: 0

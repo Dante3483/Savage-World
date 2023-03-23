@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2252fc192149ef419db994254b17dc6, type: 3}
+  m_Name: Air
+  m_EditorClassIdentifier: 
+  tiles: []
+  backgroundBlocks: []
+  blockType: 0
+  colorOnMap: {r: 0.3433962, g: 0.86208314, b: 1, a: 0}
+  Drop: {fileID: 0}
+  Durability: -1

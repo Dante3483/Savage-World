@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78a93723a241b1b4f9e58f814895fead, type: 3}
+  m_Name: Viola
+  m_EditorClassIdentifier: 
+  tiles:
+  - {fileID: 11400000, guid: b831706cac85c9c4c96a90eddef5249a, type: 2}
+  - {fileID: 11400000, guid: 5e47c32912a0310429ed64276d103c85, type: 2}
+  backgroundBlocks: []
+  blockType: 4
+  colorOnMap: {r: 0.7731668, g: 0.24873616, b: 0.9622642, a: 1}
+  Drop: {fileID: 0}
+  Durability: 1
+  ID: 15
+  BiomeID: 2
+  levelID: 1
+  IsBiomeSpecified: 1
+  AllowedToSpawnOn:
+  - {fileID: 11400000, guid: cb7f79513a853d04cb39664d56f7a4b9, type: 2}
+  ChanceToSpawn: 10
+  ChanceToGrow: 0

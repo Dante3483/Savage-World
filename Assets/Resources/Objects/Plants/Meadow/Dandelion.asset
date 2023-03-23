@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78a93723a241b1b4f9e58f814895fead, type: 3}
+  m_Name: Dandelion
+  m_EditorClassIdentifier: 
+  tiles:
+  - {fileID: 11400000, guid: c623ca904daf7c74ca40d89b83b34614, type: 2}
+  - {fileID: 11400000, guid: bf37e9c90ed13804eb2aaa3032430c80, type: 2}
+  backgroundBlocks: []
+  blockType: 4
+  colorOnMap: {r: 0.9351655, g: 1, b: 0, a: 1}
+  Drop: {fileID: 0}
+  Durability: 1
+  ID: 5
+  BiomeID: 3
+  levelID: 1
+  IsBiomeSpecified: 1
+  AllowedToSpawnOn:
+  - {fileID: 11400000, guid: dca0156b513c52c4fb5d2b69e3049282, type: 2}
+  ChanceToSpawn: 25
+  ChanceToGrow: 0

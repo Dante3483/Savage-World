@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56403293c5548e24ab08f114666db25e, type: 3}
+  m_Name: TestStructure
+  m_EditorClassIdentifier: 
+  StructureTemplate: {fileID: 21300000, guid: 8f633abe884b6c54caa33724eae893f4, type: 3}
+  ClearPrevData: 0
+  colorsAndBlocks:
+  - ColorOnTemplate: {r: 0, g: 0, b: 0, a: 1}
+    BlockOnTemplate: {fileID: 11400000, guid: 39962fc33c6682248b559341e3d3e711, type: 2}
+    CountOfBlocks: 143
+  - ColorOnTemplate: {r: 1, g: 0.45490196, b: 0.043137256, a: 1}
+    BlockOnTemplate: {fileID: 11400000, guid: a98f20daa41101d4dbd61f1b14675a78, type: 2}
+    CountOfBlocks: 19
+  - ColorOnTemplate: {r: 1, g: 0.5058824, b: 0.5058824, a: 1}
+    BlockOnTemplate: {fileID: 11400000, guid: 1af3cf1f3b2e12649babd91a2adc95f4, type: 2}
+    CountOfBlocks: 9
+  - ColorOnTemplate: {r: 1, g: 1, b: 1, a: 1}
+    BlockOnTemplate: {fileID: 11400000, guid: 7011b0fd664fc49429972de8ff85dfe3, type: 2}
+    CountOfBlocks: 294
