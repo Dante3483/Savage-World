@@ -218,7 +218,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 3
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 588c74f1ee9cd7e428c9954c65ee382b, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -277,6 +277,7 @@ MonoBehaviour:
   _capsuleCollider: {fileID: 2094874820942124979}
   _currentAction: 0
   _actionCooldown: 0
+  _world: {fileID: 0}
   _groundLayerMask:
     serializedVersion: 2
     m_Bits: 1024

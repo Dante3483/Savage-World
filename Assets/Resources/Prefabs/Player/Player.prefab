@@ -209,12 +209,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 033c46ddf8061a44585c8fb354238bdc, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 9445e1fb431ce1246928c5ba955561c6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.875, y: 5.625}
+  m_Size: {x: 1.25, y: 4.625}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -233,8 +233,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.09381976, y: -0.49473354}
-  m_Size: {x: 0.839495, y: 4.313965}
+  m_Offset: {x: 0.011422294, y: -0.013602121}
+  m_Size: {x: 1.1915807, y: 4.2501397}
   m_Direction: 0
 --- !u!50 &5883331216944407272
 Rigidbody2D:
@@ -248,7 +248,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 1.7004523
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 5
