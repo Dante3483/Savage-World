@@ -28,6 +28,7 @@ public abstract class ItemSO : ScriptableObject
             _itemType = value;
         }
     }
+
     public bool IsStackable
     {
         get

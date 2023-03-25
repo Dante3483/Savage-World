@@ -29,7 +29,7 @@ public class MouseFollower : MonoBehaviour
 
     public void SetData(Sprite sprite, int quantity)
     {
-        _item.SetData(sprite, quantity);
+        _item.SetData(sprite, quantity, 0);
     }
 
     private void Update()

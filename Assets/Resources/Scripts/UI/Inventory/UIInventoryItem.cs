@@ -9,12 +9,21 @@ using UnityEngine.UI;
 public class UIInventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, 
     IPointerExitHandler
 {
+    #region Private Fields
+    [SerializeField] private ItemType _itemType;
     [SerializeField] private Image _itemImage;
     [SerializeField] private TMP_Text _quantityTxt;
     [SerializeField] private TMP_Text _keyTxt;
     [SerializeField] private bool _isMouseOver;
     [SerializeField] private bool _isRightMouseDown;
+    #endregion
 
+    #region Public Fields
+    public event Action<UIInventoryItem> OnItemChangeCell,
+        OnMouseHover, OnMouseLeave, OnRightMouseDown, OnRightMouseUp;
+    #endregion
+
+    #region Properties
     public TMP_Text KeyTxt
     {
         get
@@ -27,10 +36,9 @@ public class UIInventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnte
             _keyTxt = value;
         }
     }
+    #endregion
 
-    public event Action<UIInventoryItem> OnItemChangeCell, 
-        OnMouseHover, OnMouseLeave, OnRightMouseDown, OnRightMouseUp;
-
+    #region Methods
     public void Awake()
     {
         ResetData();
@@ -38,7 +46,7 @@ public class UIInventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnte
 
     private void Update()
     {
-        if (_isMouseOver)
+        if (_isMouseOver && _itemType != ItemType.Armor)
         {
             if (Input.GetMouseButton(1))
             {
@@ -63,7 +71,7 @@ public class UIInventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnte
         this._itemImage.gameObject.SetActive(false);
     }
 
-    public void SetData(Sprite sprite, int quantity)
+    public void SetData(Sprite sprite, int quantity, ItemType type)
     {
         if (sprite == null)
         {
@@ -73,6 +81,7 @@ public class UIInventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnte
         this._itemImage.gameObject.SetActive(true);
         this._itemImage.sprite = sprite;
         this._quantityTxt.text = quantity + "";
+        this._itemType = type;
     }
 
     public void OnPointerClick(PointerEventData pointerData)
@@ -80,6 +89,11 @@ public class UIInventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnte
         if (pointerData.button == PointerEventData.InputButton.Left)
         {
             OnItemChangeCell?.Invoke(this);
+        }
+        if (pointerData.button == PointerEventData.InputButton.Right &&
+            _itemType == ItemType.Armor)
+        {
+            OnRightMouseDown?.Invoke(this);
         }
     }
 
@@ -104,4 +118,5 @@ public class UIInventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnte
     {
         OnRightMouseUp?.Invoke(this);
     }
+    #endregion
 }

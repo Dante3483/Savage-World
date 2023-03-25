@@ -2,11 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public class InventoryController : MonoBehaviour
 {
     [SerializeField] private UIInventoryPage _inventoryUI;
     [SerializeField] private InventorySO _inventoryData;
+    [Header("RMB clamp")]
     [SerializeField] private float _maxTimeToTakeOne;
     [SerializeField] private float _minTimeToTakeOne;
     [SerializeField] private float _stepTimeToTakeOne;
@@ -34,7 +36,7 @@ public class InventoryController : MonoBehaviour
                     {
                         continue;
                     }
-                    _inventoryUI.UpdateData(item.Key, item.Value.Item.ItemImage, item.Value.Quantity);
+                    _inventoryUI.UpdateItemData(item.Key, item.Value.Item.ItemImage, item.Value.Quantity, item.Value.Item.ItemType);
                 }
             }
             else
@@ -59,9 +61,11 @@ public class InventoryController : MonoBehaviour
         this._inventoryUI.OnDescpriptionRequested += HandleDescriptionRequest;
         this._inventoryUI.OnItemStartChangingCell += HandleBeginDragging;
         this._inventoryUI.OnItemEndChangingCell += HandleEndDragging;
-        this._inventoryUI.OnItemChangeOne += HandleTakeOneItem;
+        this._inventoryUI.OnItemAction += HandleItemAction;
         this._inventoryUI.OnItemStopChangeOne += HandleResetTimer;
         this._inventoryUI.OnItemDrop += HandleDropItem;
+        this._inventoryUI.OnNeedEquipArmor += HandleEquipArmor;
+        this._inventoryUI.OnNeedRemoveArmor += HandleRemoveArmor;
     }
 
     private void PrepareInventoryData()
@@ -78,18 +82,40 @@ public class InventoryController : MonoBehaviour
         }
     }
 
-    private void HandleNeedUpdateUI(Dictionary<int, InventoryItem> inventoryState)
+    private void HandleNeedUpdateUI(Dictionary<int, InventoryItem> inventoryState, List<InventoryItem> armorState)
     {
         foreach (var item in inventoryState)
         {
             if (item.Value.IsEmpty)
             {
-                _inventoryUI.UpdateData(item.Key, null, 0);
+                _inventoryUI.UpdateItemData(item.Key, null, 0, 0);
             }
             else
             {
-                _inventoryUI.UpdateData(item.Key, item.Value.Item.ItemImage, item.Value.Quantity);
+                _inventoryUI.UpdateItemData(item.Key, item.Value.Item.ItemImage, item.Value.Quantity, item.Value.Item.ItemType);
             }
+        }
+
+        List<Sprite> playerView = new List<Sprite>();
+
+        for (int i = 0; i < armorState.Count; i++)
+        {
+            playerView.Add(armorState[i].IsEmpty ? null : (armorState[i].Item as ArmorItemSO).PlayerView);
+            _inventoryUI.UpdateArmorData(i, armorState[i]);
+        }
+
+        for (int i = 0; i < playerView.Count / 2; i++)
+        {
+            _inventoryUI.UpdatePlayerView(playerView[i + armorState.Count / 2] != null ? playerView[i + armorState.Count / 2] : playerView[i], i);
+        }
+
+        if (_inventoryData.ItemInChangeState.IsEmpty)
+        {
+            _inventoryUI.ResetDraggedItem();
+        }
+        else
+        {
+            _inventoryUI.CreateDraggedItem(_inventoryData.ItemInChangeState.Item.ItemImage, _inventoryData.ItemInChangeState.Quantity);
         }
     }
 
@@ -104,14 +130,61 @@ public class InventoryController : MonoBehaviour
         }
     }
 
-    #region Take one item
-    private void HandleTakeOneItem(int itemIndex)
+    private void HandleItemAction(int itemIndex)
     {
         InventoryItem inventoryItem = _inventoryData.GetItemAt(itemIndex);
         if (inventoryItem.IsEmpty)
         {
             return;
         }
+        switch (inventoryItem.Item.ItemType)
+        {
+            case ItemType.Block:
+                {
+                    TakeItem(itemIndex, inventoryItem);
+                    _inventoryUI.ResetTooltipDescription();
+                    _inventoryUI.IsItemChangeCell = true;
+                }
+                break;
+            case ItemType.Tool:
+                break;
+            case ItemType.Weapon:
+                break;
+            case ItemType.Armor:
+                {
+                    if (_inventoryData.ItemInChangeState.IsEmpty)
+                    {
+                        EquipArmor(itemIndex);
+                        _inventoryUI.ResetTooltipDescription();
+                        if (!_inventoryData.GetItemAt(itemIndex).IsEmpty)
+                        {
+                            HandleDescriptionRequest(itemIndex);
+                        }
+                    }
+                }
+                break;
+            case ItemType.Accessory:
+                break;
+            default:
+                break;
+        }
+    }
+
+    #region Take one item
+    private void HandleResetTimer()
+    {
+        _readyToTakeOne = true;
+        _currentTimeToTakeOne = _maxTimeToTakeOne;
+    }
+
+    private IEnumerator CooldownTimer()
+    {
+        yield return new WaitForSeconds(_currentTimeToTakeOne);
+        _readyToTakeOne = true;
+    }
+
+    private void TakeItem(int itemIndex, InventoryItem inventoryItem)
+    {
         if (_inventoryData.ItemInChangeState.IsEmpty)
         {
             _readyToTakeOne = false;
@@ -142,16 +215,9 @@ public class InventoryController : MonoBehaviour
         }
     }
 
-    private void HandleResetTimer()
+    private void EquipArmor(int itemIndex)
     {
-        _readyToTakeOne = true;
-        _currentTimeToTakeOne = _maxTimeToTakeOne;
-    }
-
-    private IEnumerator CooldownTimer()
-    {
-        yield return new WaitForSeconds(_currentTimeToTakeOne);
-        _readyToTakeOne = true;
+        _inventoryData.QuickSetArmor(itemIndex);
     }
     #endregion
 
@@ -194,6 +260,18 @@ public class InventoryController : MonoBehaviour
         }
         ItemSO item = inventoryItem.Item;
         _inventoryUI.CreateTooltipDescription(item.GetDescription());
+    }
+    #endregion
+
+    #region Equip/Remove armor
+    private void HandleEquipArmor(ArmorType type)
+    {
+        _inventoryData.SetArmor(type);
+    }
+
+    private void HandleRemoveArmor(ArmorType type)
+    {
+        _inventoryData.QuickRemoveArmor(type);
     }
     #endregion
 }
