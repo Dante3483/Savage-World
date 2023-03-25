@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIInventoryPage : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class UIInventoryPage : MonoBehaviour
     [SerializeField] private UIAreaToDrop _dropPanel;
     [SerializeField] private List<UIInventoryItem> _listOfUIItems = new List<UIInventoryItem>();
     [SerializeField] private bool _isItemChangeCell = false;
+    [Header("Armor")]
+    [SerializeField] private List<UIInventoryArmor> _armorList;
+    [SerializeField] private List<Image> _playerView;
     [Header("Tooltip")]
     [SerializeField] private Tooltip _tooltip;
     [SerializeField] private Vector3 _tooltipDesctiprionOffset;
@@ -23,12 +27,28 @@ public class UIInventoryPage : MonoBehaviour
     #endregion
 
     #region Public Fields
-    public event Action<int> OnDescpriptionRequested,
-        OnItemStartChangingCell, OnItemEndChangingCell,
-        OnItemChangeOne;
+    public event Action<int> OnDescpriptionRequested, OnItemStartChangingCell,
+        OnItemEndChangingCell, OnItemAction;
 
     public event Action OnItemStopChangeOne, OnItemDrop;
 
+    public event Action<ArmorType> OnNeedEquipArmor, OnNeedRemoveArmor;
+
+    #endregion
+
+    #region Properties
+    public bool IsItemChangeCell
+    {
+        get
+        {
+            return _isItemChangeCell;
+        }
+
+        set
+        {
+            _isItemChangeCell = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -70,11 +90,16 @@ public class UIInventoryPage : MonoBehaviour
                 uiItem.OnItemChangeCell += HandleItemChangeCell;
                 uiItem.OnMouseHover += HandleShowItemTooltip;
                 uiItem.OnMouseLeave += HandleHideItemTooltip;
-                uiItem.OnRightMouseDown += HandleTakeItemChangeCell;
+                uiItem.OnRightMouseDown += HandleRightClickMouse;
                 uiItem.OnRightMouseUp += HandleStopTakeItemChangeCell;
             }
         }
-        
+
+        foreach (var item in _armorList)
+        {
+            item.OnLeftMouseButtonClicked += HandleEquipArmor;
+            item.OnRightMouseButtonClicked += HandleRemoveArmor;
+        }
 
         _dropPanel.OnRightMouseClick += HandleDropItem;
     }
@@ -92,26 +117,49 @@ public class UIInventoryPage : MonoBehaviour
         ResetDraggedItem();
     }
 
-    public void UpdateData(int itemIndex, Sprite itemImage, int itemQuantity)
+    public void UpdateItemData(int itemIndex, Sprite itemImage, int itemQuantity, ItemType type)
     {
         if (_listOfUIItems.Count > itemIndex)
         {
-            _listOfUIItems[itemIndex].SetData(itemImage, itemQuantity);
+            _listOfUIItems[itemIndex].SetData(itemImage, itemQuantity, type);
+        }
+    }
+
+    public void UpdateArmorData(int armorIndex, InventoryItem item)
+    {
+        if (item.IsEmpty)
+        {
+            _armorList[armorIndex].ResetData();
+        }
+        else
+        {
+            _armorList[armorIndex].SetData(item.Item.ItemImage);
+        }
+    }
+
+    public void UpdatePlayerView(Sprite sprite, int index)
+    {
+        if (sprite == null)
+        {
+            _playerView[index].gameObject.SetActive(false);
+        }
+        else
+        {
+            _playerView[index].sprite = sprite;
+            _playerView[index].gameObject.SetActive(true);
         }
     }
     #endregion
 
     #region Action handler
-    private void HandleTakeItemChangeCell(UIInventoryItem inventoryItemUI)
+    private void HandleRightClickMouse(UIInventoryItem inventoryItemUI)
     {
         int index = _listOfUIItems.IndexOf(inventoryItemUI);
         if (index == -1)
         {
             return;
         }
-        OnItemChangeOne?.Invoke(index);
-        ResetTooltipDescription();
-        _isItemChangeCell = true;
+        OnItemAction?.Invoke(index);
     }
 
     private void HandleStopTakeItemChangeCell(UIInventoryItem inventoryItemUI)
@@ -126,16 +174,15 @@ public class UIInventoryPage : MonoBehaviour
         {
             return;
         }
-        if (!_isItemChangeCell)
+        IsItemChangeCell = _mouseFollower.gameObject.activeSelf;
+        if (!IsItemChangeCell)
         {
-            _isItemChangeCell = true;
             ResetTooltipDescription();
             OnItemStartChangingCell?.Invoke(index);
         }
         else
         {
             OnItemEndChangingCell?.Invoke(index);
-            _isItemChangeCell = _mouseFollower.gameObject.activeSelf;
             OnDescpriptionRequested?.Invoke(index);
         }
     }
@@ -159,6 +206,16 @@ public class UIInventoryPage : MonoBehaviour
     {
         OnItemDrop?.Invoke();
     }
+
+    private void HandleEquipArmor(ArmorType type)
+    {
+        OnNeedEquipArmor?.Invoke(type);
+    }
+
+    private void HandleRemoveArmor(ArmorType type)
+    {
+        OnNeedRemoveArmor?.Invoke(type);
+    }
     #endregion
 
     #region Drag and drop
@@ -178,7 +235,8 @@ public class UIInventoryPage : MonoBehaviour
     #region Tooltip
     public void CreateTooltipDescription(string description)
     {
-        if (!_isItemChangeCell)
+        IsItemChangeCell = _mouseFollower.gameObject.activeSelf;
+        if (!IsItemChangeCell)
         {
             _tooltip.Offset = _tooltipDesctiprionOffset;
             _tooltip.Show(description);

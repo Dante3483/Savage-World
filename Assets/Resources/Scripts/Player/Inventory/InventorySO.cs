@@ -10,8 +10,16 @@ public class InventorySO : ScriptableObject
     [SerializeField] private HotbarSO _hotbar;
     [SerializeField] private InventoryItem _itemInChangeState;
     [SerializeField] private int _size = 10;
+    [Header("Armor")]
+    [SerializeField] private InventoryItem _helmet;
+    [SerializeField] private InventoryItem _chestplate;
+    [SerializeField] private InventoryItem _leggings;
+    [Space]
+    [SerializeField] private InventoryItem _helmetDecor;
+    [SerializeField] private InventoryItem _chestplateDecor;
+    [SerializeField] private InventoryItem _leggingsDecor;
 
-    public event Action<Dictionary<int, InventoryItem>> OnInventoryChanged;
+    public event Action<Dictionary<int, InventoryItem>, List<InventoryItem>> OnInventoryChanged;
 
     public int Size
     {
@@ -47,6 +55,12 @@ public class InventorySO : ScriptableObject
             _inventoryItems.Add(InventoryItem.GetEmptyItem());
         }
         ItemInChangeState = InventoryItem.GetEmptyItem();
+        _helmet = InventoryItem.GetEmptyItem();
+        _helmetDecor = InventoryItem.GetEmptyItem();
+        _chestplate = InventoryItem.GetEmptyItem();
+        _chestplateDecor = InventoryItem.GetEmptyItem();
+        _leggings = InventoryItem.GetEmptyItem();
+        _leggingsDecor = InventoryItem.GetEmptyItem();
     }
 
     #region Add item
@@ -248,6 +262,19 @@ public class InventorySO : ScriptableObject
         return returnValue;
     }
 
+    public List<InventoryItem> GetArmorInventoryState()
+    {
+        return new List<InventoryItem>()
+        {
+            _helmet,
+            _chestplate,
+            _leggings,
+            _helmetDecor,
+            _chestplateDecor,
+            _leggingsDecor
+        };
+    }
+
     public Dictionary<int, InventoryItem> GetHotbarInventoryState()
     {
         Dictionary<int, InventoryItem> returnValue = new Dictionary<int, InventoryItem>();
@@ -330,8 +357,242 @@ public class InventorySO : ScriptableObject
 
     private void InformAboutChange()
     {
-        OnInventoryChanged?.Invoke(GetCurrentInventoryState());
+        OnInventoryChanged?.Invoke(GetCurrentInventoryState(), GetArmorInventoryState());
         _hotbar.InformAboutChange(GetHotbarInventoryState());
+    }
+
+    public void QuickSetArmor(int index)
+    {
+        InventoryItem item = GetItemAt(index);
+        ArmorItemSO armor = item.Item as ArmorItemSO;
+        RemoveItemAt(index);
+        switch (armor.ArmorType)
+        {
+            case ArmorType.Helmet:
+                {
+                    if (!_helmet.IsEmpty)
+                    {
+                        AddItemAt(_helmet, index);
+                    }
+                    _helmet = item;
+                }
+                break;
+            case ArmorType.Chestplate:
+                {
+                    if (!_chestplate.IsEmpty)
+                    {
+                        AddItemAt(_chestplate, index);
+                    }
+                    _chestplate = item;
+                }
+                break;
+            case ArmorType.Leggings:
+                {
+                    if (!_leggings.IsEmpty)
+                    {
+                        AddItemAt(_leggings, index);
+                    }
+                    _leggings = item;
+                }
+                break;
+            default:
+                break;
+        }
+        InformAboutChange();
+    }
+
+    public void SetArmor(ArmorType type)
+    {
+        if (ItemInChangeState.IsEmpty)
+        {
+            RemoveArmor(type);
+            return;
+        }
+        InventoryItem item = ItemInChangeState;
+        ArmorItemSO armor = item.Item as ArmorItemSO;
+        if (armor != null)
+        {
+            switch (type)
+            {
+                case ArmorType.Helmet:
+                    {
+                        if (armor.ArmorType == type)
+                        {
+                            ItemInChangeState = InventoryItem.GetEmptyItem();
+                            if (!_helmet.IsEmpty)
+                            {
+                                AddItemInBuffer(_helmet);
+                            }
+                            _helmet = item;
+                        }
+                    }
+                    break;
+                case ArmorType.Chestplate:
+                    {
+                        if (armor.ArmorType == type)
+                        {
+                            ItemInChangeState = InventoryItem.GetEmptyItem();
+                            if (!_chestplate.IsEmpty)
+                            {
+                                AddItemInBuffer(_chestplate);
+                            }
+                            _chestplate = item;
+                        }
+                    }
+                    break;
+                case ArmorType.Leggings:
+                    {
+                        if (armor.ArmorType == type)
+                        {
+                            ItemInChangeState = InventoryItem.GetEmptyItem();
+                            if (!_leggings.IsEmpty)
+                            {
+                                AddItemInBuffer(_leggings);
+                            }
+                            _leggings = item;
+                        }
+                    }
+                    break;
+                case ArmorType.HelmetDecor:
+                    {
+                        if (armor.ArmorType == ArmorType.Helmet)
+                        {
+                            ItemInChangeState = InventoryItem.GetEmptyItem();
+                            if (!_helmetDecor.IsEmpty)
+                            {
+                                AddItemInBuffer(_helmetDecor);
+                            }
+                            _helmetDecor = item;
+                        }
+                    }
+                    break;
+                case ArmorType.ChestplateDecor:
+                    {
+                        if (armor.ArmorType == ArmorType.Chestplate)
+                        {
+                            ItemInChangeState = InventoryItem.GetEmptyItem();
+                            if (!_chestplateDecor.IsEmpty)
+                            {
+                                AddItemInBuffer(_chestplateDecor);
+                            }
+                            _chestplateDecor = item;
+                        }
+                    }
+                    break;
+                case ArmorType.LeggingsDecor:
+                    {
+                        if (armor.ArmorType == ArmorType.Leggings)
+                        {
+                            ItemInChangeState = InventoryItem.GetEmptyItem();
+                            if (!_leggingsDecor.IsEmpty)
+                            {
+                                AddItemInBuffer(_leggingsDecor);
+                            }
+                            _leggingsDecor = item;
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+            InformAboutChange();
+        }
+    }
+
+    public void QuickRemoveArmor(ArmorType type)
+    {
+        if (!IsInventoryFull())
+        {
+            Debug.Log("Not empty");
+            switch (type)
+            {
+                case ArmorType.Helmet:
+                    {
+                        AddItemToFirstFreeSlot(_helmet.Item, 1);
+                        _helmet = InventoryItem.GetEmptyItem();
+                    }
+                    break;
+                case ArmorType.Chestplate:
+                    {
+                        AddItemToFirstFreeSlot(_chestplate.Item, 1);
+                        _chestplate = InventoryItem.GetEmptyItem();
+                    }
+                    break;
+                case ArmorType.Leggings:
+                    {
+                        AddItemToFirstFreeSlot(_leggings.Item, 1);
+                        _leggings = InventoryItem.GetEmptyItem();
+                    }
+                    break;
+                case ArmorType.HelmetDecor:
+                    {
+                        AddItemToFirstFreeSlot(_helmetDecor.Item, 1);
+                        _helmetDecor = InventoryItem.GetEmptyItem();
+                    }
+                    break;
+                case ArmorType.ChestplateDecor:
+                    {
+                        AddItemToFirstFreeSlot(_chestplateDecor.Item, 1);
+                        _chestplateDecor = InventoryItem.GetEmptyItem();
+                    }
+                    break;
+                case ArmorType.LeggingsDecor:
+                    {
+                        AddItemToFirstFreeSlot(_leggingsDecor.Item, 1);
+                        _leggingsDecor = InventoryItem.GetEmptyItem();
+                    }
+                    break;
+                default:
+                    break;
+            }
+            InformAboutChange();
+        }
+    }
+
+    public void RemoveArmor(ArmorType type)
+    {
+        switch (type)
+        {
+            case ArmorType.Helmet:
+                {
+                    AddItemInBuffer(_helmet);
+                    _helmet = InventoryItem.GetEmptyItem();
+                }
+                break;
+            case ArmorType.Chestplate:
+                {
+                    AddItemInBuffer(_chestplate);
+                    _chestplate = InventoryItem.GetEmptyItem();
+                }
+                break;
+            case ArmorType.Leggings:
+                {
+                    AddItemInBuffer(_leggings);
+                    _leggings = InventoryItem.GetEmptyItem();
+                }
+                break;
+            case ArmorType.HelmetDecor:
+                {
+                    AddItemInBuffer(_helmetDecor);
+                    _helmetDecor = InventoryItem.GetEmptyItem();
+                }
+                break;
+            case ArmorType.ChestplateDecor:
+                {
+                    AddItemInBuffer(_chestplateDecor);
+                    _chestplateDecor = InventoryItem.GetEmptyItem();
+                }
+                break;
+            case ArmorType.LeggingsDecor:
+                {
+                    AddItemInBuffer(_leggingsDecor);
+                    _leggingsDecor = InventoryItem.GetEmptyItem();
+                }
+                break;
+            default:
+                break;
+        }
+        InformAboutChange();
     }
 }
 
