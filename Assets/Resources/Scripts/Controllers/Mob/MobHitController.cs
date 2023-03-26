@@ -5,8 +5,8 @@ using static NPC;
 
 public class MobHitController : MonoBehaviour
 {
-    [SerializeField]
-    private NPC _npc;
+    [SerializeField] private NPC _npc;
+    [SerializeField] private float _damage;
 
     private void Start()
     {
@@ -17,8 +17,9 @@ public class MobHitController : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            if (!collision.GetComponent<Movement>().IsHitCooldown)
+            if (!collision.GetComponent<Movement>().CanNewHitCheck())
             {
+                collision.GetComponent<Player>().RemoveHealth(_damage);
                 collision.GetComponent<Movement>().Hit(_npc.transform);
             }
         }
