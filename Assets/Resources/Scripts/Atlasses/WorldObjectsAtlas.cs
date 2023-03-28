@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-[CreateAssetMenu(fileName ="newObjectAtlas", menuName ="Object atlas")]
+[CreateAssetMenu(fileName ="newObjectAtlas", menuName ="Atlasses/World object atlas")]
 //Reminder:
 //1. Add ID
 //2. Add to ObjectAtlas
@@ -14,8 +14,9 @@ public class WorldObjectsAtlas: ScriptableObject
 {
     #region Private fields
     private Sets sets;
-    public Dictionary<ObjectType, BlockSO[]> blocksDictionary;
-    public Dictionary<BiomesID, GameObject[]> treesDictionary;
+    public Dictionary<ObjectType, BlockSO[]> BlocksDictionary;
+    public Dictionary<TreesID, GameObject[]> TreesDictionary;
+    public Dictionary<BiomesID, GameObject[]> BiomesTreesDictionary;
 
     #region Empty blocks
     [Header("Empty Blocks")]
@@ -55,6 +56,10 @@ public class WorldObjectsAtlas: ScriptableObject
 
     #region Trees
     [Header("Trees")]
+    public GameObject[] Pine;
+    public GameObject[] Cactus;
+
+    [Header("Biomes Trees")]
     public GameObject[] OceanTrees;
     public GameObject[] DesertTrees;
     public GameObject[] PlainsTrees;
@@ -74,14 +79,14 @@ public class WorldObjectsAtlas: ScriptableObject
 
     public BlockSO GetBlockByID(ObjectType objectType, object id)
     {
-        return blocksDictionary[objectType].ToList().Find(x => x.GetID() == (int)id);
+        return BlocksDictionary[objectType].ToList().Find(x => x.GetID() == (int)id);
     }
     
     public List<BlockSO> GetBiomesBlocks(ObjectType objectType, BiomesID biomeID)
     {
         if (objectType == ObjectType.Plant)
         {
-            return blocksDictionary[objectType].ToList().FindAll(x => (x as PlantSO).IsBiomeSpecified == true && (x as PlantSO).BiomeID == biomeID);
+            return BlocksDictionary[objectType].ToList().FindAll(x => (x as PlantSO).IsBiomeSpecified == true && (x as PlantSO).BiomeID == biomeID);
         }
         return null;
     }
@@ -90,7 +95,7 @@ public class WorldObjectsAtlas: ScriptableObject
     {
         if (biomeID != BiomesID.NonBiom)
         {
-            return treesDictionary[biomeID].ToList();
+            return BiomesTreesDictionary[biomeID].ToList();
         }
         else
         {
@@ -98,20 +103,25 @@ public class WorldObjectsAtlas: ScriptableObject
         }
     }
 
+    public GameObject GetTreeByID(TreesID id)
+    {
+        return TreesDictionary[id][0];
+    }
+
     public void LoadResources()
     {
-        blocksDictionary = new Dictionary<ObjectType, BlockSO[]>();
+        BlocksDictionary = new Dictionary<ObjectType, BlockSO[]>();
         sets = new Sets();
 
         #region Empty blocks
-        blocksDictionary.Add(ObjectType.Empty, new BlockSO[]
+        BlocksDictionary.Add(ObjectType.Empty, new BlockSO[]
         {
             Air
         });
         #endregion
 
         #region Solid blocks
-        blocksDictionary.Add(ObjectType.SolidBlock, new BlockSO[]
+        BlocksDictionary.Add(ObjectType.SolidBlock, new BlockSO[]
         {
             Dirt,
             Grass[0],
@@ -129,14 +139,14 @@ public class WorldObjectsAtlas: ScriptableObject
         #endregion
 
         #region Dust blocks
-        blocksDictionary.Add(ObjectType.DustBlock, new BlockSO[]
+        BlocksDictionary.Add(ObjectType.DustBlock, new BlockSO[]
         {
             Sand,
         });
         #endregion
 
         #region Liquid blocks
-        blocksDictionary.Add(ObjectType.LiquidBlock, new BlockSO[]
+        BlocksDictionary.Add(ObjectType.LiquidBlock, new BlockSO[]
         {
             Water,
         });
@@ -177,11 +187,16 @@ public class WorldObjectsAtlas: ScriptableObject
 
         plants.Add(Vine);
 
-        blocksDictionary.Add(ObjectType.Plant, plants.ToArray());
+        BlocksDictionary.Add(ObjectType.Plant, plants.ToArray());
         #endregion
 
         #region Trees
-        treesDictionary = new Dictionary<BiomesID, GameObject[]>
+        TreesDictionary = new Dictionary<TreesID, GameObject[]>()
+        {
+            { TreesID.Pine, Pine },
+            { TreesID.Cactus, Cactus },
+        };
+        BiomesTreesDictionary = new Dictionary<BiomesID, GameObject[]>
         {
             { BiomesID.Ocean, OceanTrees },
             { BiomesID.Desert, DesertTrees },

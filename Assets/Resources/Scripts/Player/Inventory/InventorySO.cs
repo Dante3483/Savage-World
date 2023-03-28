@@ -355,7 +355,7 @@ public class InventorySO : ScriptableObject
         }
     }
 
-    private void InformAboutChange()
+    public void InformAboutChange()
     {
         OnInventoryChanged?.Invoke(GetCurrentInventoryState(), GetArmorInventoryState());
         _hotbar.InformAboutChange(GetHotbarInventoryState());
@@ -496,6 +496,45 @@ public class InventorySO : ScriptableObject
                     break;
             }
             InformAboutChange();
+        }
+    }
+
+    public void SetArmorAt(InventoryItem armor, int i)
+    {
+        switch (i)
+        {
+            case 0:
+                {
+                    _helmet = armor;
+                }
+                break;
+            case 1:
+                {
+                    _chestplate = armor;
+                }
+                break;
+            case 2:
+                {
+                    _leggings = armor;
+                }
+                break;
+            case 3:
+                {
+                    _helmetDecor = armor;
+                }
+                break;
+            case 4:
+                {
+                    _chestplateDecor = armor;
+                }
+                break;
+            case 5:
+                {
+                    _leggingsDecor = armor;
+                }
+                break;
+            default:
+                break;
         }
     }
 

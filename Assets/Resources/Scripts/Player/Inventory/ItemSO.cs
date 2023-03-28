@@ -5,6 +5,7 @@ using UnityEngine;
 public abstract class ItemSO : ScriptableObject
 {
     #region Private Fields
+    [SerializeField] private ItemsID _id;
     [SerializeField] private ItemType _itemType;
     [SerializeField] private ItemRaritySO _itemRarity;
     [SerializeField] private bool _isStackable;
@@ -131,6 +132,19 @@ public abstract class ItemSO : ScriptableObject
         set
         {
             _using = value;
+        }
+    }
+
+    public ItemsID Id
+    {
+        get
+        {
+            return _id;
+        }
+
+        set
+        {
+            _id = value;
         }
     }
     #endregion

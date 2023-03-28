@@ -217,7 +217,7 @@ SpriteRenderer:
   m_Size: {x: 1.875, y: 5.625}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!70 &5883331216944407275
@@ -322,12 +322,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _inventoryUI: {fileID: 0}
   _inventoryData: {fileID: 11400000, guid: 33528d86126a88a488146dd484086a23, type: 2}
+  _itemsAtlas: {fileID: 11400000, guid: 7cdc964a1eeadf340806a1e627ea1df8, type: 2}
   _maxTimeToTakeOne: 0.5
   _minTimeToTakeOne: 0.005
   _stepTimeToTakeOne: 0.5
   _currentTimeToTakeOne: 0
   _readyToTakeOne: 0
-  initialItems: []
+  initialItems:
+  - Quantity: 999
+    Item: {fileID: 11400000, guid: 27fc4247a3a82fc4d9ac604bd3e1cffd, type: 2}
 --- !u!114 &15709530942747699
 MonoBehaviour:
   m_ObjectHideFlags: 0

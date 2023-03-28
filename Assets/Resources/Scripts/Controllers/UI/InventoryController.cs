@@ -8,6 +8,7 @@ public class InventoryController : MonoBehaviour
 {
     [SerializeField] private UIInventoryPage _inventoryUI;
     [SerializeField] private InventorySO _inventoryData;
+    [SerializeField] private ItemsAtlas _itemsAtlas;
     [Header("RMB clamp")]
     [SerializeField] private float _maxTimeToTakeOne;
     [SerializeField] private float _minTimeToTakeOne;
@@ -17,10 +18,24 @@ public class InventoryController : MonoBehaviour
 
     public List<InventoryItem> initialItems = new List<InventoryItem>();
 
+    public ItemsAtlas ItemsAtlas
+    {
+        get
+        {
+            return _itemsAtlas;
+        }
+
+        set
+        {
+            _itemsAtlas = value;
+        }
+    }
+
     private void Start()
     {
         PrepareUI();
         PrepareInventoryData();
+        _itemsAtlas.LoadData();
     }
 
     public void Update()
@@ -272,6 +287,14 @@ public class InventoryController : MonoBehaviour
     private void HandleRemoveArmor(ArmorType type)
     {
         _inventoryData.QuickRemoveArmor(type);
+    }
+    #endregion
+
+
+    #region Save/Load
+    public InventorySO GetInventory()
+    {
+        return _inventoryData;
     }
     #endregion
 }

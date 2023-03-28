@@ -33,6 +33,8 @@ public class World : MonoBehaviour
 
     public float _time = 3f;
 
+    public bool IsLoadind;
+
     #endregion
 
     #region Public fields
@@ -427,6 +429,10 @@ public class World : MonoBehaviour
         
         while (true)
         {
+            if (IsLoadind)
+            {
+                yield return null;
+            }
             yield return null;
             SetActiveChunks3x3(currentChunk);
 
@@ -528,6 +534,10 @@ public class World : MonoBehaviour
                         {
                             for (int y = Chunks[chunkX, chunkY].y; y < Chunks[chunkX, chunkY].y + chunkSize; y++)
                             {
+                                if (IsLoadind)
+                                {
+                                    continue;
+                                }
                                 ObjectData block = ObjectsData[x, y];
                                 ObjectData downBlockData = null;
                                 ObjectData leftBlockData = null;
@@ -568,6 +578,40 @@ public class World : MonoBehaviour
                                 }
 
                                 if (block.Type == ObjectType.SolidBlock)
+                                {
+                                    #region Set backgrounds
+                                    //If left block is liquid
+                                    if (leftBlockData != null &&
+                                        leftBlockData.Type == ObjectType.LiquidBlock)
+                                    {
+                                        block.CurrentLiquidBackgroundTile = leftBlockData.CurrentTile;
+                                    }
+
+                                    //If right block is liquid
+                                    if (rightBlockData != null &&
+                                        rightBlockData.Type == ObjectType.LiquidBlock)
+                                    {
+                                        block.CurrentLiquidBackgroundTile = rightBlockData.CurrentTile;
+                                    }
+
+                                    //If top block is liquid
+                                    if (topBlockData != null &&
+                                        topBlockData.Type == ObjectType.LiquidBlock)
+                                    {
+                                        block.CurrentLiquidBackgroundTile = ObjectAtlas.Water.liquidFlowValueTiles[10];
+                                    }
+
+                                    //If left, right and top block is not liquid
+                                    if (leftBlockData != null && leftBlockData.Type != ObjectType.LiquidBlock &&
+                                        rightBlockData != null && rightBlockData.Type != ObjectType.LiquidBlock &&
+                                        topBlockData != null && topBlockData.Type != ObjectType.LiquidBlock)
+                                    {
+                                        block.CurrentLiquidBackgroundTile = null;
+                                    }
+                                    #endregion
+                                }
+
+                                if (block.Type == ObjectType.DustBlock)
                                 {
                                     #region Set backgrounds
                                     //If left block is liquid

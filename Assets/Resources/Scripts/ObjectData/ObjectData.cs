@@ -2,14 +2,15 @@ using System;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+[Serializable]
 public class ObjectData
 {   
     #region Private fields
     //Main
-    private int _id;
-    private int _idBackground;
-    private ObjectType _type;
-    private ObjectType _typeBackground;
+    [SerializeField] private int _id; //Saved
+    [SerializeField] private int _idBackground; //Saved
+    [SerializeField] private ObjectType _type; //Saved
+    [SerializeField] private ObjectType _typeBackground; //Saved
     private Vector3Int _position;
     private Color _colorOnMap = Color.red;
     private Color _backgroundColorOnMap = Color.blue;
@@ -19,7 +20,7 @@ public class ObjectData
     private float _durability = -1;
 
     //Liquid
-    private float _currentFlowValue = 0;
+    [SerializeField] private float _currentFlowValue = 0; //Saved
     private int _countPsevdoFull = 0;
     private DateTime _creationTime;
     private bool _isPsevdoFull = false;
@@ -33,8 +34,8 @@ public class ObjectData
     private int _chanceToGrow;
 
     //Tree
-    private bool _isTreeTrunk;
-    private bool _isTreeFoliage;
+    [SerializeField] private bool _isTreeTrunk; //Saved
+    [SerializeField] private bool _isTreeFoliage; //Saved
     #endregion
 
     #region Properties
@@ -351,6 +352,5 @@ public class ObjectData
     {
         return Type == ObjectType.SolidBlock || Type == ObjectType.DustBlock;
     }
-
     #endregion
 }
