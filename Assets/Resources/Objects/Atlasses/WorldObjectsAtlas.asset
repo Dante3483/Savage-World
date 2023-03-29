@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ba27b88f77e53cb49b6e8f5eff20a4c7, type: 3}
-  m_Name: ObjectAtlas
+  m_Name: WorldObjectsAtlas
   m_EditorClassIdentifier: 
   Air: {fileID: 11400000, guid: 7011b0fd664fc49429972de8ff85dfe3, type: 2}
   Dirt: {fileID: 11400000, guid: e1504499c9e46cb428925ac3733cf4b9, type: 2}
@@ -55,6 +55,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b9a0bd9e5fa5021449dcb71236c01d6a, type: 2}
   - {fileID: 11400000, guid: bbedb6944d26e4c4785a25888a23deb1, type: 2}
   Vine: {fileID: 11400000, guid: 3ea1c10a4c7f7a5488d8f214dbdb131e, type: 2}
+  Pine:
+  - {fileID: 8255332508421466833, guid: f6ef2b9a97b10c045bef45e7153b50d4, type: 3}
+  Cactus:
+  - {fileID: 2338265739705566712, guid: 24808468c13dc5a459afde7c4df066cf, type: 3}
   OceanTrees: []
   DesertTrees:
   - {fileID: 2338265739705566712, guid: 24808468c13dc5a459afde7c4df066cf, type: 3}

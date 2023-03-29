@@ -3,11 +3,10 @@ using System;
 [Serializable]
 public class Chunk
 {
-    public int chunkId;
     public int x;
     public int y;
     public bool isActive = false;
-    private BiomesID _biomeID = BiomesID.NonBiom;
+    private BiomesID _biomeID = BiomesID.NonBiom; //Saved
     public bool isAllowedToSurvivalistCave = true;
     public bool IsAllowedToCave = true;
     public bool IsAllowedToCluster = true;

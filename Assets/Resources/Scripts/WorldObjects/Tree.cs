@@ -13,7 +13,7 @@ public class Tree : MonoBehaviour
     #region Private fields
     [Header("Main Properties")]
     [SerializeField] private bool _updateFields;
-    [SerializeField] private TreesID _id;
+    [SerializeField] private TreesID _id; //Saved
     [SerializeField] private int _width;
     [SerializeField] private int _height;
 

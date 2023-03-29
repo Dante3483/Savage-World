@@ -39,13 +39,28 @@ public class MovementV2 : MonoBehaviour
     #endregion
 
     #region Properties
+    public Rigidbody2D Rigidbody
+    {
+        get
+        {
+            return _rigidbody;
+        }
 
+        set
+        {
+            _rigidbody = value;
+        }
+    }
     #endregion
 
     #region Methods
     // Start is called before the first frame update
     void Start()
     {
+        if (World.IsGameLoaded)
+        {
+            Rigidbody.bodyType = RigidbodyType2D.Static;
+        }
         UpdateData();
     }
 
@@ -67,18 +82,18 @@ public class MovementV2 : MonoBehaviour
 
         if (_isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
-            _rigidbody.velocity = Vector2.up * _jumpForce;
+            Rigidbody.velocity = Vector2.up * _jumpForce;
         }
 
-        if (Input.GetKeyUp(KeyCode.Space) && _rigidbody.velocity.y > 0)
+        if (Input.GetKeyUp(KeyCode.Space) && Rigidbody.velocity.y > 0)
         {
-            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.y * 0.5f);
+            Rigidbody.velocity = new Vector2(Rigidbody.velocity.x, Rigidbody.velocity.y * 0.5f);
         }
     }
 
     private void FixedUpdate()
     {
-        _rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
+        Rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
 
         if (Input.GetKey(KeyCode.LeftShift))
         {
@@ -99,7 +114,7 @@ public class MovementV2 : MonoBehaviour
             {
                 Flip();
             }
-            _rigidbody.velocity = new Vector2(-speed, _rigidbody.velocity.y);
+            Rigidbody.velocity = new Vector2(-speed, Rigidbody.velocity.y);
         }
         else
         {
@@ -109,7 +124,7 @@ public class MovementV2 : MonoBehaviour
                 {
                     Flip();
                 }
-                _rigidbody.velocity = new Vector2(speed, _rigidbody.velocity.y);
+                Rigidbody.velocity = new Vector2(speed, Rigidbody.velocity.y);
             }
             else
             {
@@ -117,10 +132,10 @@ public class MovementV2 : MonoBehaviour
                 // If is not jumping or is not falling freeze X posiotion and set X velocity to 0
                 if (!_isJumping || !_isFalling)
                 {
-                    _rigidbody.velocity = new Vector2(0, _rigidbody.velocity.y);
+                    Rigidbody.velocity = new Vector2(0, Rigidbody.velocity.y);
                     if (_isGrounded)
                     {
-                        _rigidbody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
+                        Rigidbody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
                     }
                 }
             }
@@ -129,7 +144,7 @@ public class MovementV2 : MonoBehaviour
 
     private void UpdateData()
     {
-        _rigidbody = GetComponent<Rigidbody2D>();
+        Rigidbody = GetComponent<Rigidbody2D>();
         _capsuleCollider = GetComponent<CapsuleCollider2D>();
         _isFacingRight = true;
     }
@@ -164,12 +179,12 @@ public class MovementV2 : MonoBehaviour
 
     private bool JumpingCheck()
     {
-        return _rigidbody.velocity.y > 0 && !_isGrounded;
+        return Rigidbody.velocity.y > 0 && !_isGrounded;
     }
 
     private bool FallingCheck()
     {
-        return _rigidbody.velocity.y < 0 && !_isGrounded;
+        return Rigidbody.velocity.y < 0 && !_isGrounded;
     }
 
     private void Flip()

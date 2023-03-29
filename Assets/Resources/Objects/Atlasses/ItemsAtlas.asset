@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87e3f8eb87581984381c94e7a3a25a06, type: 3}
+  m_Name: ItemsAtlas
+  m_EditorClassIdentifier: 
+  DirtBlock: {fileID: 11400000, guid: adf2d28ce72a57d4c968a4fa24ef2489, type: 2}
+  StoneBlock: {fileID: 11400000, guid: 27fc4247a3a82fc4d9ac604bd3e1cffd, type: 2}
+  SandBlock: {fileID: 11400000, guid: 41db4bf173a546f418ed05f4bf33516a, type: 2}
+  ClayBlock: {fileID: 11400000, guid: c71d4d3e4ec9e1f46912fb195570439a, type: 2}
+  IronOreBlock: {fileID: 11400000, guid: 6e3c6781eb7784641bceb0245b0425f1, type: 2}
+  CopperOreBlock: {fileID: 11400000, guid: 870ad0fc20d640341b4d34bcedc334c8, type: 2}

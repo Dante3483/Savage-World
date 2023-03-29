@@ -41,17 +41,27 @@ public class Movement : MonoBehaviour
     public bool IsJumping;
     public bool IsHit;
     public bool IsHitCooldown;
-
     #endregion
 
     #region Properties
+    public Rigidbody2D Rigidbody
+    {
+        get
+        {
+            return _rigidbody;
+        }
 
+        set
+        {
+            _rigidbody = value;
+        }
+    }
     #endregion
 
     #region Methods
     void Start()
     {
-        _rigidbody = GetComponent<Rigidbody2D>();
+        Rigidbody = GetComponent<Rigidbody2D>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _groundCheckCollider = GetComponent<BoxCollider2D>();
         _facingRight = true;
@@ -75,16 +85,16 @@ public class Movement : MonoBehaviour
         {
             if (!IsJumping)
             {
-                _rigidbody.gravityScale = Gravity;
+                Rigidbody.gravityScale = Gravity;
             }
             else
             {
-                _rigidbody.gravityScale = Gravity * GravityScale;
+                Rigidbody.gravityScale = Gravity * GravityScale;
             }
         }
         else
         {
-            _rigidbody.gravityScale = 0f;
+            Rigidbody.gravityScale = 0f;
         }
 
         //Horizontal movement
@@ -137,13 +147,13 @@ public class Movement : MonoBehaviour
         else
         {
             YVelocity = 0f;
-            _rigidbody.bodyType = RigidbodyType2D.Dynamic;
+            Rigidbody.bodyType = RigidbodyType2D.Dynamic;
         }
 
         targetPosition.x += xValue;
         targetPosition.y += yValue;
 
-        _rigidbody.MovePosition(targetPosition);
+        Rigidbody.MovePosition(targetPosition);
 
         //Store the current scale value
         Vector3 currentScale = transform.localScale;
@@ -186,7 +196,7 @@ public class Movement : MonoBehaviour
         if (!IsHit)
         {
             var direction = transform.position - enemy.position;
-            _rigidbody.velocity = direction.normalized * HitStrength;
+            Rigidbody.velocity = direction.normalized * HitStrength;
 
             IsHit = true;
             IsHitCooldown = true;
