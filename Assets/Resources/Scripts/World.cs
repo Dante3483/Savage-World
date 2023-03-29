@@ -14,6 +14,8 @@ public class World : MonoBehaviour
     [SerializeField] private TerrainConfiguration _terrainConfiguration;
     [SerializeField] private WorldObjectsAtlas _objectAtlas;
     [SerializeField] private int _seed;
+    [SerializeField] private SaveLoadSystem _saveLoadManager;
+    private static bool _isGameLoaded;
     private GameObject _terrainGenerationObject;
     private GameObject _dropSection;
     private System.Random _randomVar;
@@ -155,6 +157,8 @@ public class World : MonoBehaviour
         }
     }
 
+    public static global::System.Boolean IsGameLoaded { get => _isGameLoaded; set => _isGameLoaded = value; }
+
     #endregion
 
     #region Methods
@@ -192,7 +196,20 @@ public class World : MonoBehaviour
             TerrainGeneration.World = this;
 
             //Create new world
-            CreateNewWorld();
+            if (!IsGameLoaded)
+            {
+                CreateNewWorld();
+            }
+            else
+            {
+                LoadWorld();
+            }
+            StartCoroutine(UpdateScreen());
+            _updateBlocksDataThread = new Thread(UpdateBlocksData);
+            _updateBlocksDataThread.Start();
+
+            _randomUpdateBlocksDataThread = new Thread(RandomUpdateBlocksData);
+            _randomUpdateBlocksDataThread.Start();
 
             //Create map
             FillMap();
@@ -218,13 +235,11 @@ public class World : MonoBehaviour
         //Seed = 9470;
         Seed = new System.Random().Next(-10000, 10000);
         TerrainGeneration.Generation();
+    }
 
-        StartCoroutine(UpdateScreen());
-        _updateBlocksDataThread = new Thread(UpdateBlocksData);
-        _updateBlocksDataThread.Start();
-
-        _randomUpdateBlocksDataThread = new Thread(RandomUpdateBlocksData);
-        _randomUpdateBlocksDataThread.Start();
+    public void LoadWorld()
+    {
+        _saveLoadManager.LoadAllData();
     }
 
     public void FillMap()
@@ -516,6 +531,11 @@ public class World : MonoBehaviour
             BlockBackgroundTilemap.SetTiles(vectors.ToArray(), blockBackgroundTiles.ToArray());
             PlantTilemap.SetTiles(vectors.ToArray(), plantTiles.ToArray());
             SolidBlocksTilemap.SetTiles(vectors.ToArray(), solidBlocksTiles.ToArray());
+            if (IsGameLoaded)
+            {
+                IsGameLoaded = !IsGameLoaded;
+                GameObject.FindGameObjectWithTag("Player").GetComponent<MovementV2>().Rigidbody.bodyType = RigidbodyType2D.Dynamic;
+            }
         }
     }
 

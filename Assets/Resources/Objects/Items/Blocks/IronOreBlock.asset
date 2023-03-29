@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 876d87b01ef9012488daca68f0f1c504, type: 3}
   m_Name: IronOreBlock
   m_EditorClassIdentifier: 
-  _id: 0
+  _id: 4
   _itemType: 0
   _itemRarity: {fileID: 11400000, guid: 81fbae176e211e54587d5c0ddbd47e98, type: 2}
   _isStackable: 1

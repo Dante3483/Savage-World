@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: TerrainConfiguration
   m_EditorClassIdentifier: 
   chunkSize: 100
-  horizontalChunksCount: 24
+  horizontalChunksCount: 3
   VerticalChunksCount: 26
   Equator: 2349
-  WorldWitdh: 2400
+  WorldWitdh: 300
   WorldHeight: 2600
   mountainFreq: 0.05
   heightDesertMountainMultiplier: 20
@@ -28,58 +28,58 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ea200e2074366aa45a9518182dac2ef8, type: 2}
   - {fileID: 11400000, guid: 06e898a4564677b4d88aeb0c78d45df5, type: 2}
   - {fileID: 11400000, guid: 82152f9dce68837469ff87f9d8c59ccc, type: 2}
-  EnableOceanGeneration: 1
+  EnableOceanGeneration: 0
   EnableHolesGeneration: 0
-  EnableSurvivalistCavesGeneration: 1
-  EnableCavesGeneration: 1
-  EnableSmoothingWorld: 1
-  EnableBiomGeneration: 1
-  EnableClustersGenration: 1
-  EnableOreGeneration: 1
-  EnablePlanting: 1
-  EnableStructureGeneration: 1
-  EnableLakesGeneration: 1
-  EnableTreeGeneration: 1
-  CountOfOceanChunks: 2
-  CountOfDesertChunks: 6
-  CountOfPlainsChunks: 1
-  CountOfMeadowChunks: 8
-  CountOfForestChunks: 3
-  CountOfSwampChunks: 2
-  CountOfConiferousForestChunks: 2
+  EnableSurvivalistCavesGeneration: 0
+  EnableCavesGeneration: 0
+  EnableSmoothingWorld: 0
+  EnableBiomGeneration: 0
+  EnableClustersGenration: 0
+  EnableOreGeneration: 0
+  EnablePlanting: 0
+  EnableStructureGeneration: 0
+  EnableLakesGeneration: 0
+  EnableTreeGeneration: 0
+  CountOfOceanChunks: 0
+  CountOfDesertChunks: 1
+  CountOfPlainsChunks: 0
+  CountOfMeadowChunks: 1
+  CountOfForestChunks: 1
+  CountOfSwampChunks: 0
+  CountOfConiferousForestChunks: 0
   OceanPosition:
     StartPositionX: 0
-    EndPositionX: 199
+    EndPositionX: -1
     StartPositionY: 2284
     EndPositionY: 2349
   DesertPosition:
-    StartPositionX: 200
-    EndPositionX: 799
+    StartPositionX: 0
+    EndPositionX: 99
     StartPositionY: 2284
     EndPositionY: 2369
   PlainsPosition:
-    StartPositionX: 800
-    EndPositionX: 899
+    StartPositionX: 100
+    EndPositionX: 99
     StartPositionY: 2284
     EndPositionY: 2359
   MeadowPosition:
-    StartPositionX: 900
-    EndPositionX: 1699
+    StartPositionX: 100
+    EndPositionX: 199
     StartPositionY: 2284
     EndPositionY: 2359
   ForestPosition:
-    StartPositionX: 1700
-    EndPositionX: 1999
+    StartPositionX: 200
+    EndPositionX: 299
     StartPositionY: 2284
     EndPositionY: 2359
   SwampPosition:
-    StartPositionX: 2000
-    EndPositionX: 2199
+    StartPositionX: 300
+    EndPositionX: 299
     StartPositionY: 2284
     EndPositionY: 2359
   ConiferousForestPosition:
-    StartPositionX: 2200
-    EndPositionX: 2399
+    StartPositionX: 300
+    EndPositionX: 299
     StartPositionY: 2284
     EndPositionY: 2359
   chanceToSpawnSurvivalistCave: 50

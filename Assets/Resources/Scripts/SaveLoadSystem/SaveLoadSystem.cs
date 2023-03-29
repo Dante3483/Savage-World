@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEditor.Progress;
 
 public class SaveLoadSystem : MonoBehaviour
 {
@@ -17,13 +15,9 @@ public class SaveLoadSystem : MonoBehaviour
         {
             SaveAllData();
         }
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            LoadAllData();
-        }
     }
 
-    private void SaveAllData()
+    public void SaveAllData()
     {
         string path = Application.dataPath + Path.AltDirectorySeparatorChar + "SaveData.fun";
         string persistancePath = Application.persistentDataPath + Path.AltDirectorySeparatorChar + "SaveData.fun";
@@ -33,16 +27,21 @@ public class SaveLoadSystem : MonoBehaviour
         using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(path, FileMode.Create)))
         {
             SaveConfigurationData(binaryWriter);
+            Debug.Log("Configuration saved");
             SaveWorldChunks(binaryWriter);
+            Debug.Log("Chunks saved");
             SaveWorldObjectsData(binaryWriter);
-            SaveTrees(binaryWriter);
+            Debug.Log("World saved");
+            //SaveTrees(binaryWriter);
+            Debug.Log("Trees saved");
             SavePlayer(binaryWriter);
+            Debug.Log("Player saved");
         }
 
         Debug.Log("Save Complete");
     }
 
-    private void LoadAllData()
+    public void LoadAllData()
     {
         string path = Application.dataPath + Path.AltDirectorySeparatorChar + "SaveData.fun";
         string persistancePath = Application.persistentDataPath + Path.AltDirectorySeparatorChar + "SaveData.fun";
@@ -53,11 +52,17 @@ public class SaveLoadSystem : MonoBehaviour
 
         using (BinaryReader binaryReader = new BinaryReader(File.Open(path, FileMode.Open)))
         {
-            LoadConfigurationData(binaryReader);    
+            LoadConfigurationData(binaryReader);
+            Debug.Log("Configuration loaded");
+            CreateNewWorldMap();
             LoadWorldChunks(binaryReader);
+            Debug.Log("Chunks loaded");
             LoadWorldObjectsData(binaryReader);
-            LoadTrees(binaryReader);
+            Debug.Log("World loaded");
+            //LoadTrees(binaryReader);
+            Debug.Log("Trees loaded");
             LoadPlayer(binaryReader);
+            Debug.Log("Player loaded");
         }
 
         Debug.Log("Load Complete");
@@ -105,6 +110,10 @@ public class SaveLoadSystem : MonoBehaviour
         {
             for (int y = 0; y < _world.TerrainConfiguration.VerticalChunksCount; y++)
             {
+                Chunk newChunk = new Chunk();
+                newChunk.x = x;
+                newChunk.y = y;
+                _world.Chunks[x, y] = newChunk;
                 byte biomeID = binaryReader.ReadByte();
                 if (biomeID == 128)
                 {
@@ -229,7 +238,6 @@ public class SaveLoadSystem : MonoBehaviour
                 #endregion
             }
         }
-        Debug.Log("Load to saveData complete");
     }
 
     private void LoadWorldObjectsData(BinaryReader binaryReader)
@@ -311,7 +319,7 @@ public class SaveLoadSystem : MonoBehaviour
         byte flags = 0;
         byte[] count = new byte[2];
 
-        count[0] = (byte)(treeCount & 127);
+        count[0] = (byte)(treeCount & 255);
         flags = (byte)(flags | 1);
 
         if (treeCount > 255)
@@ -343,7 +351,9 @@ public class SaveLoadSystem : MonoBehaviour
 
     private void LoadTrees(BinaryReader binaryReader) 
     {
-        GameObject trees = _world.gameObject.transform.Find("Trees").gameObject;
+        GameObject trees = new GameObject("Trees");
+        trees.transform.parent = _world.gameObject.transform;
+
         foreach (Transform child in trees.transform)
         {
             Destroy(child.gameObject);
@@ -370,10 +380,8 @@ public class SaveLoadSystem : MonoBehaviour
             float x = binaryReader.ReadSingle();
             float y = binaryReader.ReadSingle();
             createdCount++;
-            GameObject treeGameObject = Instantiate(_world.ObjectAtlas.GetTreeByID(id));
+            GameObject treeGameObject = Instantiate(_world.ObjectAtlas.GetTreeByID(id), new Vector3(x, y), Quaternion.identity, trees.transform);
             Tree tree = treeGameObject.GetComponent<Tree>();
-            treeGameObject.transform.position = new Vector3(x, y);
-            treeGameObject.transform.parent = trees.transform;
         }
     }
 
@@ -384,7 +392,6 @@ public class SaveLoadSystem : MonoBehaviour
 
         float x = _player.transform.position.x;
         float y = _player.transform.position.y;
-        Debug.Log(new Vector3(x, y));
         byte inventorySize = Convert.ToByte(inventoryData.Size);
 
         binaryWriter.Write(x);
@@ -441,7 +448,6 @@ public class SaveLoadSystem : MonoBehaviour
 
         float x = binaryReader.ReadSingle();
         float y = binaryReader.ReadSingle();
-        Debug.Log(new Vector3(x, y));
         byte inventorySize = binaryReader.ReadByte();
 
         _player.transform.position = new Vector3(x, y);
@@ -493,5 +499,29 @@ public class SaveLoadSystem : MonoBehaviour
         }
 
         inventoryData.InformAboutChange();
+    }
+
+    private void CreateNewWorldMap()
+    {
+        //Initialize blocksData array with specified width and height
+        //Width = count of horizontal chunks * chunk size
+        //Height = count of chunk in specified terrain level * chunk size
+        int width = 0;
+        int height = 0;
+        int chunkSize = _world.TerrainConfiguration.chunkSize;
+        width = _world.TerrainConfiguration.horizontalChunksCount * _world.TerrainConfiguration.chunkSize;
+        foreach (TerrainLevel level in _world.TerrainConfiguration.levels)
+        {
+            height += level.chunkCount * _world.TerrainConfiguration.chunkSize;
+        }
+        _world.Chunks = new Chunk[width / chunkSize, height / chunkSize];
+        _world.ObjectsData = new ObjectData[width, height];
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                _world.ObjectsData[x, y] = new ObjectData(new Vector3Int(x, y));
+            }
+        }
     }
 }

@@ -2618,6 +2618,7 @@ MonoBehaviour:
   _terrainConfiguration: {fileID: 11400000, guid: 5762597554079d54b823deab7ff43f08, type: 2}
   _objectAtlas: {fileID: 11400000, guid: b3ded8ce0e2a09244a50f8f34b72e658, type: 2}
   _seed: 0
+  _saveLoadManager: {fileID: 1121125786}
   _time: 3
   IsLoadind: 0
   BlockTilemap: {fileID: 692230845}
