@@ -140,6 +140,7 @@ GameObject:
   - component: {fileID: 5883331216944407274}
   - component: {fileID: 5883331216944407275}
   - component: {fileID: 5883331216944407272}
+  - component: {fileID: 171048883637076990}
   - component: {fileID: 5883331216944407268}
   - component: {fileID: 748090823}
   - component: {fileID: 1753163003}
@@ -209,12 +210,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 033c46ddf8061a44585c8fb354238bdc, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 9445e1fb431ce1246928c5ba955561c6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.875, y: 5.625}
+  m_Size: {x: 1.25, y: 4.625}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
@@ -233,8 +234,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.09381976, y: -0.49473354}
-  m_Size: {x: 0.839495, y: 4.313965}
+  m_Offset: {x: 0.011422294, y: -0.013602121}
+  m_Size: {x: 1.1915807, y: 4.2501397}
   m_Direction: 0
 --- !u!50 &5883331216944407272
 Rigidbody2D:
@@ -248,7 +249,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 1.7004523
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 5
@@ -257,6 +258,24 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &171048883637076990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5883331216944407273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cc8ebc75ce02624e92d5f60358c9f42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _currentHealth: 0
+  _maxHealth: 100
+  _currentMana: 0
+  _maxMana: 10
+  _currentStamina: 0
+  _maxStamina: 50
 --- !u!114 &5883331216944407268
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -272,6 +291,8 @@ MonoBehaviour:
   _needUpdate: 0
   _rigidbody: {fileID: 5883331216944407272}
   _capsuleCollider: {fileID: 5883331216944407275}
+  _spriteRenderer: {fileID: 0}
+  _player: {fileID: 0}
   _groundLayerMask:
     serializedVersion: 2
     m_Bits: 1024
@@ -282,13 +303,22 @@ MonoBehaviour:
   _isNotGroundedColor: {r: 1, g: 0, b: 0, a: 1}
   _walkSpeed: 4
   _runSpeed: 7
+  _staminaDecreaseRun: 0.1
+  _staminaIncrease: 0.3
   _jumpForce: 15
+  _unHitTime: 0.25
+  _hitCooldownTime: 2
+  _hitStrength: 8
+  _blinkingSpeed: 10
   _isGrounded: 0
   _isJumping: 0
   _isFalling: 0
   _isWalking: 0
   _isRunning: 0
   _isFacingRight: 0
+  _isHit: 0
+  _isHitCooldown: 0
+  _isBlinking: 0
 --- !u!114 &748090823
 MonoBehaviour:
   m_ObjectHideFlags: 0

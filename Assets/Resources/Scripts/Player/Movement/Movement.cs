@@ -1,207 +1,208 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.Tilemaps;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
-[RequireComponent(typeof(Rigidbody2D))]
 public class Movement : MonoBehaviour
 {
-    #region Private fields
-    private Rigidbody2D _rigidbody;
-    private SpriteRenderer _spriteRenderer;
-    private int _horizontalValue;
-    private int _verticalValue;
-    private bool _facingRight;
-    [SerializeField] private bool _nextInline;
-    [SerializeField] private BoxCollider2D _groundCheckCollider;
-    [SerializeField] private LayerMask _layers;
+    #region Private Fields
+    [Header("Main Properties")]
+    [SerializeField] private bool _needUpdate;
+    [SerializeField] private Rigidbody2D _rigidbody;
+    [SerializeField] private CapsuleCollider2D _capsuleCollider;
+    [SerializeField] private SpriteRenderer _spriteRenderer;
+    [SerializeField] private Player _player;
 
-    //For test
-    public Tilemap blocks;
-    public float speedMult;
+    [Header("Ground Checking")]
+    [SerializeField] private LayerMask _groundLayerMask;
+    [SerializeField] private Vector2 _groundCheckSize;
+    [SerializeField] private Vector2 _groundCheckCenterOffset;
+    [SerializeField] private float _extraWidth;
+    [SerializeField] private Color _isGroundedColor;
+    [SerializeField] private Color _isNotGroundedColor;
+
+    [Header("Moving")]
+    [SerializeField] private float _walkSpeed;
+    [SerializeField] private float _runSpeed;
+    [SerializeField] private float _staminaDecreaseRun;
+    [SerializeField] private float _staminaIncrease;
+
+    [Header("Jumping")]
+    [SerializeField] private float _jumpForce;
+
+    [Header("Hit")]
+    [SerializeField] private float _unHitTime;
+    [SerializeField] private float _hitCooldownTime;
+    [SerializeField] private float _hitStrength = 8f;
+    [SerializeField] private float _blinkingSpeed;
+
+    [Header("Flags")]
+    [SerializeField] private bool _isGrounded;
+    [SerializeField] private bool _isJumping;
+    [SerializeField] private bool _isFalling;
+    [SerializeField] private bool _isWalking;
+    [SerializeField] private bool _isRunning;
+    [SerializeField] private bool _isFacingRight;
+    [SerializeField] private bool _isHit;
+    [SerializeField] private bool _isHitCooldown;
+    [SerializeField] private bool _isBlinking;
     #endregion
 
-    #region Public fields
-    public float Speed;
-    public float SpeedMultiplier;
-    public float JumpForce;
-    public float XVelocity;
-    public float YVelocity;
-    public float Gravity;
-    public float GravityScale;
+    #region Public Fields
 
-    [Header("Hit Property")]
-    public float UnHitTime;
-    public float HitCooldownTime;
-    public float HitStrength = 8f;
-
-    [Header("Player Flags")]
-    public bool IsGrounded;
-    public bool IsJumping;
-    public bool IsHit;
-    public bool IsHitCooldown;
     #endregion
 
     #region Properties
-    public Rigidbody2D Rigidbody
-    {
-        get
-        {
-            return _rigidbody;
-        }
 
-        set
-        {
-            _rigidbody = value;
-        }
-    }
     #endregion
 
     #region Methods
-    void Start()
+    private void Awake()
     {
-        Rigidbody = GetComponent<Rigidbody2D>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
-        _groundCheckCollider = GetComponent<BoxCollider2D>();
-        _facingRight = true;
+        _player = GetComponent<Player>();
     }
 
+    // Start is called before the first frame update
+    void Start()
+    {
+    	if (World.IsGameLoaded)
+        {
+            Rigidbody.bodyType = RigidbodyType2D.Static;
+        }
+        UpdateData();
+    }
+
+    private void OnValidate()
+    {
+        if (_needUpdate)
+        {
+            UpdateData();
+            _needUpdate = !_needUpdate;
+        }
+    }
+
+    // Update is called once per frame
     private void Update()
     {
-        //Check if grounded
-        if (_groundCheckCollider.IsTouchingLayers(_layers.value))
+        _isGrounded = GroundCheck();
+        _isJumping = JumpingCheck();
+        _isFalling = FallingCheck();
+
+        if (_isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
-            IsGrounded = true;
-            IsJumping = false;
-        }
-        else
-        {
-            IsGrounded = false;
+            _rigidbody.velocity = Vector2.up * _jumpForce;
         }
 
-        //Set gravity
-        if (!IsGrounded)
+        if (Input.GetKeyUp(KeyCode.Space) && _rigidbody.velocity.y > 0)
         {
-            if (!IsJumping)
-            {
-                Rigidbody.gravityScale = Gravity;
-            }
-            else
-            {
-                Rigidbody.gravityScale = Gravity * GravityScale;
-            }
-        }
-        else
-        {
-            Rigidbody.gravityScale = 0f;
-        }
-
-        //Horizontal movement
-        _horizontalValue = 0;
-        if (Input.GetKey(KeyCode.A))
-        {
-            _horizontalValue = -1;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            _horizontalValue = 1;
-        }
-        if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D))
-        {
-            _horizontalValue = 0;
-        }
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            YVelocity = JumpForce;
-            IsJumping = true;
-            //_rigidbody.bodyType = RigidbodyType2D.Kinematic;
+            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.y * 0.5f);
         }
     }
 
     private void FixedUpdate()
     {
-        if (!IsHit)
-        {
-            _nextInline = CheckInline();
-            Move(_horizontalValue);
-        }
-    }
+        _rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
 
-    private void Move(int direction)
-    {
-        //Move Left/Right
-        float mult = !_nextInline ? 1f : speedMult;
-        float xValue = Speed * direction * SpeedMultiplier * Time.fixedDeltaTime * mult;
-        XVelocity = xValue;
-        Vector2 targetPosition = transform.position;
-        
-
-        //Jumping
-        float yValue = YVelocity * Time.fixedDeltaTime;
-        if (YVelocity > 0f)
+        if (Input.GetKey(KeyCode.LeftShift))
         {
-            YVelocity += -Gravity * Time.fixedDeltaTime;
-            xValue /= mult;
+            if (WalkingCheck())
+            {
+                _isWalking = false;
+                _isRunning = true;
+            }
+            else
+            {
+                _isWalking = true;
+                _isRunning = false;
+            }
         }
         else
         {
-            YVelocity = 0f;
-            Rigidbody.bodyType = RigidbodyType2D.Dynamic;
+            _isWalking = true;
+            _isRunning = false;
         }
+        float speed = 0f;
 
-        targetPosition.x += xValue;
-        targetPosition.y += yValue;
-
-        Rigidbody.MovePosition(targetPosition);
-
-        //Store the current scale value
-        Vector3 currentScale = transform.localScale;
-
-        //If looking right and clicked to the left
-        if (_facingRight && direction < 0)
+        if (_isWalking)
         {
-            currentScale.x *= -1;
-            _facingRight = false;
+            _player.AddStamina(_staminaIncrease);
+            speed = _walkSpeed;
+        }
+        if (_isRunning)
+        {
+            _player.RemoveStamina(_staminaDecreaseRun);
+            if (_player.CanUseStamina())
+            {
+                speed = _runSpeed;
+            }
+            else
+            {
+                speed = _walkSpeed;
+            }
         }
 
-        //If looking left and clicked to the right
-        else if (!_facingRight && direction > 0)
+        if (!_isHit)
         {
-            currentScale.x *= -1;
-            _facingRight = true;
+            if (Input.GetKey(KeyCode.A))
+            {
+                if (_isFacingRight)
+                {
+                    Flip();
+                }
+                _rigidbody.velocity = new Vector2(-speed, _rigidbody.velocity.y);
+            }
+            else
+            {
+                if (Input.GetKey(KeyCode.D))
+                {
+                    if (!_isFacingRight)
+                    {
+                        Flip();
+                    }
+                    _rigidbody.velocity = new Vector2(speed, _rigidbody.velocity.y);
+                }
+                else
+                {
+                    // No keys pressed
+                    // If is not jumping or is not falling freeze X posiotion and set X velocity to 0
+                    if (!_isJumping || !_isFalling)
+                    {
+                        _rigidbody.velocity = new Vector2(0, _rigidbody.velocity.y);
+                        if (_isGrounded)
+                        {
+                            _rigidbody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
+                        }
+                    }
+                }
+            }
         }
-        transform.localScale = currentScale;
     }
 
-    public bool CheckInline()
+    private void UpdateData()
     {
-        Vector3 newCenterPosition = transform.position;
-        int direction = transform.localScale.x > 0f ? 1 : -1;
-        newCenterPosition.x -= 0.5f * direction;
-
-        newCenterPosition.y -= 1.75f;
-        Vector3Int intPosition = blocks.WorldToCell(newCenterPosition);
-        intPosition.x += direction;
-
-        if (blocks.GetTile(intPosition) != null)
-        {
-            return true;
-        }
-        return false;
+        _rigidbody = GetComponent<Rigidbody2D>();
+        _capsuleCollider = GetComponent<CapsuleCollider2D>();
+        _isFacingRight = true;
     }
 
+    #region Hit
     public void Hit(Transform enemy)
     {
-        if (!IsHit)
+        if (!_isHit)
         {
+            _isHit = true;
+            _isHitCooldown = true;
+
             var direction = transform.position - enemy.position;
-            Rigidbody.velocity = direction.normalized * HitStrength;
+            _rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
+            _rigidbody.velocity = direction.normalized * _hitStrength;
 
-            IsHit = true;
-            IsHitCooldown = true;
-
-            StartCoroutine(FadeToWhite());
+            if (!_isBlinking)
+            {
+                StartCoroutine(FadeToWhite());
+            }
             StartCoroutine(UnHit());
             StartCoroutine(HitCooldown());
         }
@@ -209,22 +210,23 @@ public class Movement : MonoBehaviour
 
     private IEnumerator UnHit()
     {
-        yield return new WaitForSeconds(UnHitTime);
-        IsHit = false;
+        yield return new WaitForSeconds(_unHitTime);
+        _isHit = false;
     }
 
     private IEnumerator HitCooldown()
     {
-        yield return new WaitForSeconds(HitCooldownTime);
-        IsHitCooldown = false;
+        yield return new WaitForSeconds(_hitCooldownTime);
+        _isHitCooldown = false;
     }
 
     private IEnumerator FadeToWhite()
     {
         float alphaBound = 0f;
-        while (IsHitCooldown)
+        _isBlinking = true;
+        while (_isHitCooldown)
         {
-            yield return null;
+            yield return new WaitForFixedUpdate();
             if (_spriteRenderer.color.a <= 0.1f)
             {
                 alphaBound = 1f;
@@ -233,10 +235,73 @@ public class Movement : MonoBehaviour
             {
                 alphaBound = 0f;
             }
-            float newAlpha = Mathf.Lerp(_spriteRenderer.color.a, alphaBound, Time.fixedDeltaTime * 5f);
+            float newAlpha = Mathf.Lerp(_spriteRenderer.color.a, alphaBound, Time.fixedDeltaTime * _blinkingSpeed);
             _spriteRenderer.color = new Color(_spriteRenderer.color.r, _spriteRenderer.color.g, _spriteRenderer.color.b, newAlpha);
         }
         _spriteRenderer.color = new Color(_spriteRenderer.color.r, _spriteRenderer.color.g, _spriteRenderer.color.b, 1f);
+        _isBlinking = false;
     }
+    #endregion
+
+    #region Checks
+    private bool GroundCheck()
+    {
+        Vector2 center = _capsuleCollider.bounds.center;
+        center += _groundCheckCenterOffset;
+
+        RaycastHit2D raycastHit = Physics2D.BoxCast(center, _groundCheckSize, 0f, Vector2.down, _extraWidth, _groundLayerMask);
+
+        Color rayColor;
+        if (raycastHit.collider != null)
+        {
+            rayColor = _isGroundedColor;
+        }
+        else
+        {
+            rayColor = _isNotGroundedColor;
+        }
+
+        Vector2 halfSize = _groundCheckSize / 2f;
+        Vector2 centerForDebug = new Vector2(center.x, center.y + halfSize.y);
+
+        Debug.DrawRay(centerForDebug + new Vector2(halfSize.x, 0), Vector2.down * (_groundCheckSize.y + _extraWidth), rayColor);
+        Debug.DrawRay(centerForDebug - new Vector2(halfSize.x, 0), Vector2.down * (_groundCheckSize.y + _extraWidth), rayColor);
+        Debug.DrawRay(centerForDebug - new Vector2(halfSize.x, _groundCheckSize.y + _extraWidth), Vector2.right * _groundCheckSize.x, rayColor);
+        Debug.DrawRay(centerForDebug - new Vector2(halfSize.x, 0), Vector2.right * _groundCheckSize.x, rayColor);
+
+        return raycastHit.collider != null;
+    }
+
+    private bool JumpingCheck()
+    {
+        return _rigidbody.velocity.y > 0 && !_isGrounded;
+    }
+
+    private bool FallingCheck()
+    {
+        return _rigidbody.velocity.y < 0 && !_isGrounded;
+    }
+
+    private bool WalkingCheck()
+    {
+        return Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D);
+    }
+
+    public bool CanNewHitCheck()
+    {
+        return _isHitCooldown;
+    }
+    #endregion
+
+    #region Other
+    private void Flip()
+    {
+        _isFacingRight = !_isFacingRight;
+        Vector3 newScale = transform.localScale;
+        newScale.x *= -1;
+        transform.localScale = newScale;
+    }
+    #endregion
+
     #endregion
 }
