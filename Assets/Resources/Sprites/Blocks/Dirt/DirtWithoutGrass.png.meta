@@ -3,7 +3,7 @@ guid: a53991f6619a87a4392e6afa751778ec
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -47,7 +47,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 15
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -63,6 +63,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -512,22 +513,22 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      DirtWithoutGrass_2_0: -387986390
+      DirtWithoutGrass_2_1: -1951821462
+      DirtWithoutGrass_2_10: 1484245923
+      DirtWithoutGrass_2_11: 1714017130
+      DirtWithoutGrass_2_12: 1276312403
+      DirtWithoutGrass_2_13: 2079141295
+      DirtWithoutGrass_2_14: -1329611216
+      DirtWithoutGrass_2_15: 729028757
       DirtWithoutGrass_2_2: -1518737679
       DirtWithoutGrass_2_3: -2145587033
       DirtWithoutGrass_2_4: -1549403615
-      DirtWithoutGrass_2_14: -1329611216
-      DirtWithoutGrass_2_8: 105139210
-      DirtWithoutGrass_2_6: 209436665
-      DirtWithoutGrass_2_0: -387986390
-      DirtWithoutGrass_2_9: 1751353572
-      DirtWithoutGrass_2_12: 1276312403
-      DirtWithoutGrass_2_7: -1385362075
       DirtWithoutGrass_2_5: -1827966361
-      DirtWithoutGrass_2_1: -1951821462
-      DirtWithoutGrass_2_11: 1714017130
-      DirtWithoutGrass_2_13: 2079141295
-      DirtWithoutGrass_2_10: 1484245923
-      DirtWithoutGrass_2_15: 729028757
+      DirtWithoutGrass_2_6: 209436665
+      DirtWithoutGrass_2_7: -1385362075
+      DirtWithoutGrass_2_8: 105139210
+      DirtWithoutGrass_2_9: 1751353572
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

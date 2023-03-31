@@ -3,7 +3,7 @@ guid: 84d7c4955526d7d44bdf02f72e157962
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -47,7 +47,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 15
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -63,6 +63,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -2136,87 +2137,87 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      CopperOre_18: 1928753928
-      CopperOre_57: 1045740446
-      CopperOre_39: -411044449
-      CopperOre_3: 171773842
-      CopperOre_64: 1646476003
-      CopperOre_31: -1405944114
-      CopperOre_14: 1449637326
-      CopperOre_26: 180216250
-      CopperOre_33: 2022053790
-      CopperOre_55: -1480135886
-      CopperOre_24: -15370797
-      CopperOre_37: -107814072
-      CopperOre_70: -376127007
-      CopperOre_4: -1790288038
-      CopperOre_9: 487818054
-      CopperOre_44: 222751246
-      CopperOre_10: -191780009
-      CopperOre_78: -803018310
-      CopperOre_42: -1068041986
-      CopperOre_43: 853245851
-      CopperOre_50: -1598248111
-      CopperOre_47: -1321987951
-      CopperOre_17: 1043047005
-      CopperOre_38: 1496837256
-      CopperOre_62: 1473259681
-      CopperOre_23: -1185224787
-      CopperOre_32: -1094663678
-      CopperOre_71: 675782691
-      CopperOre_27: -407173882
+      CopperOre_0: 259688149
       CopperOre_1: -1516865449
-      CopperOre_53: -698674623
-      CopperOre_20: 1000625961
-      CopperOre_59: 6215641
-      CopperOre_48: -1095114647
-      CopperOre_63: -313519165
-      CopperOre_75: -951438829
-      CopperOre_7: 2146856136
-      CopperOre_67: 1288550841
-      CopperOre_22: -826056030
-      CopperOre_80: 605570188
-      CopperOre_13: -1624491550
-      CopperOre_16: 1389360264
+      CopperOre_10: -191780009
       CopperOre_11: -51800336
-      CopperOre_49: 969535040
-      CopperOre_77: 3627775
-      CopperOre_68: -734865952
+      CopperOre_12: -295648463
+      CopperOre_13: -1624491550
+      CopperOre_14: 1449637326
+      CopperOre_15: 206926932
+      CopperOre_16: 1389360264
+      CopperOre_17: 1043047005
+      CopperOre_18: 1928753928
       CopperOre_19: -458404245
-      CopperOre_74: -319081399
+      CopperOre_2: 1194168796
+      CopperOre_20: 1000625961
       CopperOre_21: -1553861228
-      CopperOre_65: 1406657483
-      CopperOre_6: -291652905
-      CopperOre_76: -198784677
-      CopperOre_79: 98170242
-      CopperOre_72: 306121521
+      CopperOre_22: -826056030
+      CopperOre_23: -1185224787
+      CopperOre_24: -15370797
+      CopperOre_25: -732990599
+      CopperOre_26: 180216250
+      CopperOre_27: -407173882
+      CopperOre_28: 1393212590
+      CopperOre_29: 1394221299
+      CopperOre_3: 171773842
+      CopperOre_30: -285285287
+      CopperOre_31: -1405944114
+      CopperOre_32: -1094663678
+      CopperOre_33: 2022053790
+      CopperOre_34: -223848587
+      CopperOre_35: -1745909872
+      CopperOre_36: 295422039
+      CopperOre_37: -107814072
+      CopperOre_38: 1496837256
+      CopperOre_39: -411044449
+      CopperOre_4: -1790288038
       CopperOre_40: 1765871787
       CopperOre_41: -1072562078
-      CopperOre_56: 256026910
-      CopperOre_34: -223848587
-      CopperOre_0: 259688149
-      CopperOre_61: 1692591302
-      CopperOre_2: 1194168796
-      CopperOre_52: -784264697
+      CopperOre_42: -1068041986
+      CopperOre_43: 853245851
+      CopperOre_44: 222751246
       CopperOre_45: -517415196
       CopperOre_46: 160269097
-      CopperOre_54: 1664565049
-      CopperOre_66: 2037998687
-      CopperOre_58: 1965347942
-      CopperOre_60: 2005593192
-      CopperOre_8: 1954713682
-      CopperOre_73: 869013831
-      CopperOre_35: -1745909872
-      CopperOre_30: -285285287
+      CopperOre_47: -1321987951
+      CopperOre_48: -1095114647
+      CopperOre_49: 969535040
       CopperOre_5: 545653292
+      CopperOre_50: -1598248111
       CopperOre_51: -1594538542
-      CopperOre_12: -295648463
-      CopperOre_15: 206926932
-      CopperOre_29: 1394221299
-      CopperOre_36: 295422039
-      CopperOre_25: -732990599
-      CopperOre_28: 1393212590
+      CopperOre_52: -784264697
+      CopperOre_53: -698674623
+      CopperOre_54: 1664565049
+      CopperOre_55: -1480135886
+      CopperOre_56: 256026910
+      CopperOre_57: 1045740446
+      CopperOre_58: 1965347942
+      CopperOre_59: 6215641
+      CopperOre_6: -291652905
+      CopperOre_60: 2005593192
+      CopperOre_61: 1692591302
+      CopperOre_62: 1473259681
+      CopperOre_63: -313519165
+      CopperOre_64: 1646476003
+      CopperOre_65: 1406657483
+      CopperOre_66: 2037998687
+      CopperOre_67: 1288550841
+      CopperOre_68: -734865952
       CopperOre_69: 2042437227
+      CopperOre_7: 2146856136
+      CopperOre_70: -376127007
+      CopperOre_71: 675782691
+      CopperOre_72: 306121521
+      CopperOre_73: 869013831
+      CopperOre_74: -319081399
+      CopperOre_75: -951438829
+      CopperOre_76: -198784677
+      CopperOre_77: 3627775
+      CopperOre_78: -803018310
+      CopperOre_79: 98170242
+      CopperOre_8: 1954713682
+      CopperOre_80: 605570188
+      CopperOre_9: 487818054
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

@@ -3,7 +3,7 @@ guid: d5a69151f2f94cc489581589fc589fd0
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -47,7 +47,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 15
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -63,6 +63,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -2136,87 +2137,87 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Stone_31: -88433436
-      Stone_38: -411803008
-      Stone_18: 1563518842
-      Stone_70: -550593887
-      Stone_43: 824444025
-      Stone_46: -1879761356
-      Stone_34: -988312915
-      Stone_41: 534839844
-      Stone_44: 1228578271
-      Stone_80: 801390368
-      Stone_68: -568180074
-      Stone_2: -324799097
-      Stone_13: 1425753037
-      Stone_52: -131867577
-      Stone_69: 1662691279
-      Stone_54: 742236560
-      Stone_66: 506432029
-      Stone_17: 1070807303
-      Stone_33: 2109694198
       Stone_0: -1304947881
-      Stone_30: 247184283
-      Stone_62: -673829327
-      Stone_42: 2065565325
-      Stone_20: -896810961
-      Stone_32: -1967471627
-      Stone_28: -1900444999
-      Stone_72: -1748708083
-      Stone_77: -1515862432
-      Stone_73: -253961802
-      Stone_75: 910598394
-      Stone_71: 888751734
-      Stone_49: -2076482847
-      Stone_40: 1827883047
-      Stone_59: -1829355067
-      Stone_36: 195288771
-      Stone_79: 955084805
-      Stone_63: 1715370152
-      Stone_65: 1022387840
-      Stone_7: -1440611794
-      Stone_22: -89421843
-      Stone_11: -331056115
-      Stone_35: -2026779937
-      Stone_37: -1935926362
-      Stone_15: -1043840293
-      Stone_6: -724398749
-      Stone_24: 1851168285
-      Stone_58: 1007455388
-      Stone_8: 1265010126
-      Stone_60: 874570241
-      Stone_78: 1926528946
       Stone_1: -1893427181
-      Stone_16: 931753668
-      Stone_47: 409954230
-      Stone_53: 1466399133
-      Stone_9: 1605565439
-      Stone_4: -551205434
-      Stone_61: -613585535
-      Stone_48: 708315474
-      Stone_25: 1142755789
-      Stone_39: -1773240851
-      Stone_21: -246093984
-      Stone_5: 1059484392
-      Stone_29: 993567666
-      Stone_74: 1595923812
-      Stone_56: 1834272931
       Stone_10: 541565732
-      Stone_26: 949376446
-      Stone_23: 2131447207
-      Stone_27: 948107453
-      Stone_64: -279454407
-      Stone_50: 2023105544
-      Stone_14: 1652740148
-      Stone_3: -1408724207
-      Stone_51: -1998765169
-      Stone_57: 1526321747
-      Stone_55: -438024407
-      Stone_45: 1887968635
+      Stone_11: -331056115
       Stone_12: 778401870
+      Stone_13: 1425753037
+      Stone_14: 1652740148
+      Stone_15: -1043840293
+      Stone_16: 931753668
+      Stone_17: 1070807303
+      Stone_18: 1563518842
       Stone_19: -429052409
+      Stone_2: -324799097
+      Stone_20: -896810961
+      Stone_21: -246093984
+      Stone_22: -89421843
+      Stone_23: 2131447207
+      Stone_24: 1851168285
+      Stone_25: 1142755789
+      Stone_26: 949376446
+      Stone_27: 948107453
+      Stone_28: -1900444999
+      Stone_29: 993567666
+      Stone_3: -1408724207
+      Stone_30: 247184283
+      Stone_31: -88433436
+      Stone_32: -1967471627
+      Stone_33: 2109694198
+      Stone_34: -988312915
+      Stone_35: -2026779937
+      Stone_36: 195288771
+      Stone_37: -1935926362
+      Stone_38: -411803008
+      Stone_39: -1773240851
+      Stone_4: -551205434
+      Stone_40: 1827883047
+      Stone_41: 534839844
+      Stone_42: 2065565325
+      Stone_43: 824444025
+      Stone_44: 1228578271
+      Stone_45: 1887968635
+      Stone_46: -1879761356
+      Stone_47: 409954230
+      Stone_48: 708315474
+      Stone_49: -2076482847
+      Stone_5: 1059484392
+      Stone_50: 2023105544
+      Stone_51: -1998765169
+      Stone_52: -131867577
+      Stone_53: 1466399133
+      Stone_54: 742236560
+      Stone_55: -438024407
+      Stone_56: 1834272931
+      Stone_57: 1526321747
+      Stone_58: 1007455388
+      Stone_59: -1829355067
+      Stone_6: -724398749
+      Stone_60: 874570241
+      Stone_61: -613585535
+      Stone_62: -673829327
+      Stone_63: 1715370152
+      Stone_64: -279454407
+      Stone_65: 1022387840
+      Stone_66: 506432029
       Stone_67: -1432130336
+      Stone_68: -568180074
+      Stone_69: 1662691279
+      Stone_7: -1440611794
+      Stone_70: -550593887
+      Stone_71: 888751734
+      Stone_72: -1748708083
+      Stone_73: -253961802
+      Stone_74: 1595923812
+      Stone_75: 910598394
       Stone_76: -860825696
+      Stone_77: -1515862432
+      Stone_78: 1926528946
+      Stone_79: 955084805
+      Stone_8: 1265010126
+      Stone_80: 801390368
+      Stone_9: 1605565439
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

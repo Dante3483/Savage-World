@@ -7,21 +7,37 @@ public class MouseFollowerOutline : MonoBehaviour
 {
     [SerializeField] private List<Tilemap> _outlinesTilemaps;
 
+    public List<Tilemap> OutlinesTilemaps
+    {
+        get
+        {
+            return _outlinesTilemaps;
+        }
+
+        set
+        {
+            _outlinesTilemaps = value;
+        }
+    }
+
     private void Update()
     {
-        transform.position = Vector2Int.FloorToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition)) + new Vector2(0.5f, 0.5f);
-        Vector3Int position = _outlinesTilemaps[0].WorldToCell(transform.position);
-        foreach (Tilemap tilemap in _outlinesTilemaps)
+        if (OutlinesTilemaps.Count > 0)
         {
-            TileBase tile = tilemap.GetTile(position);
-            if (tile != null)
+            transform.position = Vector2Int.FloorToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition)) + new Vector2(0.5f, 0.5f);
+            Vector3Int position = OutlinesTilemaps[0].WorldToCell(transform.position);
+            foreach (Tilemap tilemap in OutlinesTilemaps)
             {
-                GetComponent<SpriteRenderer>().sprite = (tile as Tile).sprite;
-                break;
-            }
-            else
-            {
-                GetComponent<SpriteRenderer>().sprite = null;
+                TileBase tile = tilemap.GetTile(position);
+                if (tile != null)
+                {
+                    GetComponent<SpriteRenderer>().sprite = (tile as Tile).sprite;
+                    break;
+                }
+                else
+                {
+                    GetComponent<SpriteRenderer>().sprite = null;
+                }
             }
         }
     }

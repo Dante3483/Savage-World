@@ -12,32 +12,6 @@ public class Interactions : MonoBehaviour
     [SerializeField] private float _blockBreakingSpeed;
     [SerializeField] private bool _canPlaceBreakBlock;
 
-    public World World
-    {
-        get
-        {
-            return _world;
-        }
-
-        set
-        {
-            _world = value;
-        }
-    }
-
-    public GameObject DropSection
-    {
-        get
-        {
-            return _dropSection;
-        }
-
-        set
-        {
-            _dropSection = value;
-        }
-    }
-
     public bool CanPlaceBreakBlock
     {
         get
@@ -49,6 +23,12 @@ public class Interactions : MonoBehaviour
         {
             _canPlaceBreakBlock = value;
         }
+    }
+
+    private void Awake()
+    {
+        _dropSection = GameManager.Instance.DropSection;
+        _world = GameManager.Instance.World;
     }
 
     private void Update()
@@ -102,11 +82,11 @@ public class Interactions : MonoBehaviour
     public void PlaceBlock(BlockItemSO block)
     {
         Vector3 position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector3Int intPosition = World.BlockTilemap.WorldToCell(position);
+        Vector3Int intPosition = _world.BlockTilemap.WorldToCell(position);
 
-        if (World.IsValidPlaceToCreateBlock(intPosition))
+        if (_world.IsValidPlaceToCreateBlock(intPosition))
         {
-            World.CreateBlock(World.ObjectAtlas.GetBlockByID(block.BlockToPlace.blockType, block.BlockToPlace.GetID()), intPosition.x, intPosition.y);
+            _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.GetBlockByID(block.BlockToPlace.blockType, block.BlockToPlace.GetID()), intPosition.x, intPosition.y);
             _inventory.RemoveSelectedItem(1);
         }
     }
@@ -114,19 +94,19 @@ public class Interactions : MonoBehaviour
     public void BreakBlock()
     {
         Vector3 position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector3Int intPosition = World.BlockTilemap.WorldToCell(position);
+        Vector3Int intPosition = _world.BlockTilemap.WorldToCell(position);
 
-        if (World.IsValidPlaceToBreakBlock(intPosition))
+        if (_world.IsValidPlaceToBreakBlock(intPosition))
         {
-            if (World.DecreaseDurability(new Vector2Int(intPosition.x, intPosition.y), _blockBreakingSpeed * Time.fixedDeltaTime))
+            if (_world.DecreaseDurability(new Vector2Int(intPosition.x, intPosition.y), _blockBreakingSpeed * Time.fixedDeltaTime))
             {
                 //Create drop
-                ObjectData dropData = World.GetBlockByPosition(intPosition);
-                BlockSO dropBlockSO = World.ObjectAtlas.GetBlockByID(dropData.Type, dropData.Id);
+                ObjectData dropData = _world.GetBlockByPosition(intPosition);
+                BlockSO dropBlockSO = GameManager.Instance.WorldObjectAtlas.GetBlockByID(dropData.Type, dropData.Id);
                 CreateDrop(intPosition, dropBlockSO.Drop, 1, false);
 
                 //Create air block
-                World.CreateBlock(World.ObjectAtlas.Air, intPosition.x, intPosition.y);
+                _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, intPosition.x, intPosition.y);
             }
         }
     }
@@ -153,7 +133,7 @@ public class Interactions : MonoBehaviour
         {
             GameObject dropGameObject = Instantiate(_dropPrefab);
             dropGameObject.name = dropItem.Name;
-            dropGameObject.transform.parent = DropSection.transform;
+            dropGameObject.transform.parent = _dropSection.transform;
             dropGameObject.transform.position = intPosition + new Vector3(Random.Range(0.1f, 0.9f), 0.5f);
             dropGameObject.GetComponent<SpriteRenderer>().sprite = dropItem.ItemImage;
             Drop drop = dropGameObject.GetComponent<Drop>();
@@ -173,6 +153,6 @@ public class Interactions : MonoBehaviour
 
     public bool IsDropCanBeAdded(ItemSO dropItem)
     {
-        return GetComponentInParent<Interactions>()._inventory.IsCanAddItemToInventory(dropItem);
+        return _inventory.IsCanAddItemToInventory(dropItem);
     }
 }

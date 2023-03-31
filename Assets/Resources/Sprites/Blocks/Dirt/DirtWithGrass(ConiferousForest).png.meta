@@ -3,7 +3,7 @@ guid: e30b95e5fe013c24f9f75ed3d2fd8695
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -47,7 +47,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 15
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -63,6 +63,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -313,13 +314,13 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       DirtWithGrass(ConiferousForest)_0: 2043826509
-      DirtWithGrass(ConiferousForest)_4: -255311395
-      DirtWithGrass(ConiferousForest)_2: 1091846187
-      DirtWithGrass(ConiferousForest)_7: -950916898
       DirtWithGrass(ConiferousForest)_1: -540112725
+      DirtWithGrass(ConiferousForest)_2: 1091846187
       DirtWithGrass(ConiferousForest)_3: 1343590417
-      DirtWithGrass(ConiferousForest)_6: 335730697
+      DirtWithGrass(ConiferousForest)_4: -255311395
       DirtWithGrass(ConiferousForest)_5: 894566734
+      DirtWithGrass(ConiferousForest)_6: 335730697
+      DirtWithGrass(ConiferousForest)_7: -950916898
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

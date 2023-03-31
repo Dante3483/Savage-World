@@ -3,7 +3,7 @@ guid: 66278d8b963c2fb4da42170b61343b7b
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -47,7 +47,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 15
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -63,6 +63,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -2136,87 +2137,87 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Clay_55: 1273262738
-      Clay_65: 159687026
-      Clay_17: 1028563419
-      Clay_14: -796957725
-      Clay_53: 2104529014
-      Clay_41: 23062575
-      Clay_48: 490534444
+      Clay_0: -195735744
+      Clay_1: -1220250606
+      Clay_10: 1040189149
+      Clay_11: 1761623704
       Clay_12: -1247142254
       Clay_13: 161669277
-      Clay_62: 857092981
-      Clay_40: 1058475845
-      Clay_63: -1449539147
-      Clay_75: -1059499362
-      Clay_64: 459587665
-      Clay_7: 1288751114
-      Clay_30: 1624345442
-      Clay_76: -732420883
-      Clay_59: 779389834
-      Clay_52: 935202014
-      Clay_70: -690547840
-      Clay_18: 1615297281
-      Clay_67: 1668809152
-      Clay_2: 227524506
-      Clay_19: -1163270025
-      Clay_21: 33348544
-      Clay_42: 1664519726
-      Clay_71: -384126677
-      Clay_54: -1418856196
+      Clay_14: -796957725
       Clay_15: 541267185
-      Clay_34: -1675776986
-      Clay_33: 1630072500
-      Clay_0: -195735744
-      Clay_46: 1258193553
-      Clay_23: 1190942501
-      Clay_6: 858669196
       Clay_16: -1724541767
-      Clay_78: 1600592371
-      Clay_77: -1612722136
-      Clay_4: 173844462
-      Clay_24: -2113837955
-      Clay_8: -1438193723
-      Clay_43: -569428858
-      Clay_31: -1537030985
-      Clay_11: 1761623704
-      Clay_47: -489836379
-      Clay_80: -219194829
-      Clay_79: 1896271562
-      Clay_73: -1376339209
-      Clay_1: -1220250606
-      Clay_32: -293687966
-      Clay_36: -1991670247
-      Clay_45: 1394989620
-      Clay_49: -574488164
-      Clay_37: -1053158000
-      Clay_57: 1305158611
-      Clay_72: 1117069387
-      Clay_22: 1184261247
-      Clay_44: -1755408106
-      Clay_58: -1100330856
+      Clay_17: 1028563419
+      Clay_18: 1615297281
+      Clay_19: -1163270025
+      Clay_2: 227524506
       Clay_20: -429471393
-      Clay_29: 1305196855
-      Clay_39: -1250587566
-      Clay_38: -629533231
-      Clay_50: -1667405457
-      Clay_66: 478221889
-      Clay_5: -2080451445
+      Clay_21: 33348544
+      Clay_22: 1184261247
+      Clay_23: 1190942501
+      Clay_24: -2113837955
       Clay_25: 248113585
-      Clay_68: -1535410284
-      Clay_51: -1382794995
-      Clay_69: -1258042264
       Clay_26: 307697325
-      Clay_35: 1752100893
       Clay_27: 1180374562
-      Clay_10: 1040189149
       Clay_28: -1611553039
-      Clay_74: 829083392
-      Clay_56: 640319760
-      Clay_60: -322796074
-      Clay_9: -1173638625
-      Clay_61: 1551876072
+      Clay_29: 1305196855
       Clay_3: 1697585109
+      Clay_30: 1624345442
+      Clay_31: -1537030985
+      Clay_32: -293687966
+      Clay_33: 1630072500
+      Clay_34: -1675776986
+      Clay_35: 1752100893
+      Clay_36: -1991670247
+      Clay_37: -1053158000
+      Clay_38: -629533231
+      Clay_39: -1250587566
+      Clay_4: 173844462
+      Clay_40: 1058475845
+      Clay_41: 23062575
+      Clay_42: 1664519726
+      Clay_43: -569428858
+      Clay_44: -1755408106
+      Clay_45: 1394989620
+      Clay_46: 1258193553
+      Clay_47: -489836379
+      Clay_48: 490534444
+      Clay_49: -574488164
+      Clay_5: -2080451445
+      Clay_50: -1667405457
+      Clay_51: -1382794995
+      Clay_52: 935202014
+      Clay_53: 2104529014
+      Clay_54: -1418856196
+      Clay_55: 1273262738
+      Clay_56: 640319760
+      Clay_57: 1305158611
+      Clay_58: -1100330856
+      Clay_59: 779389834
+      Clay_6: 858669196
+      Clay_60: -322796074
+      Clay_61: 1551876072
+      Clay_62: 857092981
+      Clay_63: -1449539147
+      Clay_64: 459587665
+      Clay_65: 159687026
+      Clay_66: 478221889
+      Clay_67: 1668809152
+      Clay_68: -1535410284
+      Clay_69: -1258042264
+      Clay_7: 1288751114
+      Clay_70: -690547840
+      Clay_71: -384126677
+      Clay_72: 1117069387
+      Clay_73: -1376339209
+      Clay_74: 829083392
+      Clay_75: -1059499362
+      Clay_76: -732420883
+      Clay_77: -1612722136
+      Clay_78: 1600592371
+      Clay_79: 1896271562
+      Clay_8: -1438193723
+      Clay_80: -219194829
+      Clay_9: -1173638625
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

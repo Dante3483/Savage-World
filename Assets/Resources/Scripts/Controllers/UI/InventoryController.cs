@@ -6,7 +6,6 @@ public class InventoryController : MonoBehaviour
 {
     [SerializeField] private UIInventoryPage _inventoryUI;
     [SerializeField] private InventorySO _inventoryData;
-    [SerializeField] private ItemsAtlas _itemsAtlas;
     [Header("RMB clamp")]
     [SerializeField] private float _maxTimeToTakeOne;
     [SerializeField] private float _minTimeToTakeOne;
@@ -16,44 +15,39 @@ public class InventoryController : MonoBehaviour
 
     public List<InventoryItem> initialItems = new List<InventoryItem>();
 
-    public ItemsAtlas ItemsAtlas
+
+    public UIInventoryPage InventoryUI
     {
         get
         {
-            return _itemsAtlas;
+            return _inventoryUI;
         }
 
         set
         {
-            _itemsAtlas = value;
+            _inventoryUI = value;
         }
-    }
-
-    private void Awake()
-    {
-        _itemsAtlas.LoadData();
     }
 
     private void Start()
     {
         PrepareUI();
-        PrepareInventoryData();
     }
 
     public void Update()
     {
         if (Input.GetKeyDown(KeyCode.I))
         {
-            if (_inventoryUI.isActiveAndEnabled == false)
+            if (InventoryUI.isActiveAndEnabled == false)
             {
-                _inventoryUI.Show();
+                InventoryUI.Show();
                 foreach (var item in _inventoryData.GetCurrentInventoryState())
                 {
                     if (item.Value.IsEmpty)
                     {
                         continue;
                     }
-                    _inventoryUI.UpdateItemData(item.Key, item.Value.Item.ItemImage, item.Value.Quantity, item.Value.Item.ItemType);
+                    InventoryUI.UpdateItemData(item.Key, item.Value.Item.ItemImage, item.Value.Quantity, item.Value.Item.ItemType);
                 }
             }
             else
@@ -67,25 +61,25 @@ public class InventoryController : MonoBehaviour
                         GetComponent<Interactions>().CreateDrop(playerPosition, remainderItem.Item, remainderItem.Quantity, true);
                     }
                 }
-                _inventoryUI.Hide();
+                InventoryUI.Hide();
             }
         }
     }
 
     private void PrepareUI()
     {
-        _inventoryUI.InitializeInventoryUI(_inventoryData.Size);
-        this._inventoryUI.OnDescpriptionRequested += HandleDescriptionRequest;
-        this._inventoryUI.OnItemStartChangingCell += HandleBeginDragging;
-        this._inventoryUI.OnItemEndChangingCell += HandleEndDragging;
-        this._inventoryUI.OnItemAction += HandleItemAction;
-        this._inventoryUI.OnItemStopChangeOne += HandleResetTimer;
-        this._inventoryUI.OnItemDrop += HandleDropItem;
-        this._inventoryUI.OnNeedEquipArmor += HandleEquipArmor;
-        this._inventoryUI.OnNeedRemoveArmor += HandleRemoveArmor;
+        InventoryUI.InitializeInventoryUI(_inventoryData.Size);
+        this.InventoryUI.OnDescpriptionRequested += HandleDescriptionRequest;
+        this.InventoryUI.OnItemStartChangingCell += HandleBeginDragging;
+        this.InventoryUI.OnItemEndChangingCell += HandleEndDragging;
+        this.InventoryUI.OnItemAction += HandleItemAction;
+        this.InventoryUI.OnItemStopChangeOne += HandleResetTimer;
+        this.InventoryUI.OnItemDrop += HandleDropItem;
+        this.InventoryUI.OnNeedEquipArmor += HandleEquipArmor;
+        this.InventoryUI.OnNeedRemoveArmor += HandleRemoveArmor;
     }
 
-    private void PrepareInventoryData()
+    public void PrepareInventoryData()
     {
         _inventoryData.Initialize();
         _inventoryData.OnInventoryChanged += HandleNeedUpdateUI;
@@ -105,11 +99,11 @@ public class InventoryController : MonoBehaviour
         {
             if (item.Value.IsEmpty)
             {
-                _inventoryUI.UpdateItemData(item.Key, null, 0, 0);
+                InventoryUI.UpdateItemData(item.Key, null, 0, 0);
             }
             else
             {
-                _inventoryUI.UpdateItemData(item.Key, item.Value.Item.ItemImage, item.Value.Quantity, item.Value.Item.ItemType);
+                InventoryUI.UpdateItemData(item.Key, item.Value.Item.ItemImage, item.Value.Quantity, item.Value.Item.ItemType);
             }
         }
 
@@ -118,21 +112,21 @@ public class InventoryController : MonoBehaviour
         for (int i = 0; i < armorState.Count; i++)
         {
             playerView.Add(armorState[i].IsEmpty ? null : (armorState[i].Item as ArmorItemSO).PlayerView);
-            _inventoryUI.UpdateArmorData(i, armorState[i]);
+            InventoryUI.UpdateArmorData(i, armorState[i]);
         }
 
         for (int i = 0; i < playerView.Count / 2; i++)
         {
-            _inventoryUI.UpdatePlayerView(playerView[i + armorState.Count / 2] != null ? playerView[i + armorState.Count / 2] : playerView[i], i);
+            InventoryUI.UpdatePlayerView(playerView[i + armorState.Count / 2] != null ? playerView[i + armorState.Count / 2] : playerView[i], i);
         }
 
         if (_inventoryData.ItemInChangeState.IsEmpty)
         {
-            _inventoryUI.ResetDraggedItem();
+            InventoryUI.ResetDraggedItem();
         }
         else
         {
-            _inventoryUI.CreateDraggedItem(_inventoryData.ItemInChangeState.Item.ItemImage, _inventoryData.ItemInChangeState.Quantity);
+            InventoryUI.CreateDraggedItem(_inventoryData.ItemInChangeState.Item.ItemImage, _inventoryData.ItemInChangeState.Quantity);
         }
     }
 
@@ -143,7 +137,7 @@ public class InventoryController : MonoBehaviour
             Vector3 playerPosition = gameObject.transform.position;
             GetComponent<Interactions>().CreateDrop(playerPosition, _inventoryData.ItemInChangeState.Item, _inventoryData.ItemInChangeState.Quantity, true);
             _inventoryData.ItemInChangeState = InventoryItem.GetEmptyItem();
-            _inventoryUI.ResetDraggedItem();
+            InventoryUI.ResetDraggedItem();
         }
     }
 
@@ -159,8 +153,8 @@ public class InventoryController : MonoBehaviour
             case ItemType.Block:
                 {
                     TakeItem(itemIndex, inventoryItem);
-                    _inventoryUI.ResetTooltipDescription();
-                    _inventoryUI.IsItemChangeCell = true;
+                    InventoryUI.ResetTooltipDescription();
+                    InventoryUI.IsItemChangeCell = true;
                 }
                 break;
             case ItemType.Tool:
@@ -172,7 +166,7 @@ public class InventoryController : MonoBehaviour
                     if (_inventoryData.ItemInChangeState.IsEmpty)
                     {
                         EquipArmor(itemIndex);
-                        _inventoryUI.ResetTooltipDescription();
+                        InventoryUI.ResetTooltipDescription();
                         if (!_inventoryData.GetItemAt(itemIndex).IsEmpty)
                         {
                             HandleDescriptionRequest(itemIndex);
@@ -210,7 +204,7 @@ public class InventoryController : MonoBehaviour
 
             int quantity = _inventoryData.RemoveItemAt(itemIndex, 1);
             _inventoryData.AddItemInBuffer(inventoryItem, quantity);
-            _inventoryUI.CreateDraggedItem(_inventoryData.ItemInChangeState.Item.ItemImage, _inventoryData.ItemInChangeState.Quantity);
+            InventoryUI.CreateDraggedItem(_inventoryData.ItemInChangeState.Item.ItemImage, _inventoryData.ItemInChangeState.Quantity);
         }
         else
         {
@@ -226,7 +220,7 @@ public class InventoryController : MonoBehaviour
 
                     int quantity = _inventoryData.RemoveItemAt(itemIndex, 1 + turboQuantity);
                     _inventoryData.AddItemInBuffer(inventoryItem, quantity);
-                    _inventoryUI.CreateDraggedItem(_inventoryData.ItemInChangeState.Item.ItemImage, _inventoryData.ItemInChangeState.Quantity);
+                    InventoryUI.CreateDraggedItem(_inventoryData.ItemInChangeState.Item.ItemImage, _inventoryData.ItemInChangeState.Quantity);
                 }
             }
         }
@@ -248,7 +242,7 @@ public class InventoryController : MonoBehaviour
         }
         _inventoryData.AddItemInBuffer(inventoryItem);
         _inventoryData.RemoveItemAt(itemIndex);
-        _inventoryUI.CreateDraggedItem(inventoryItem.Item.ItemImage, inventoryItem.Quantity);
+        InventoryUI.CreateDraggedItem(inventoryItem.Item.ItemImage, inventoryItem.Quantity);
     }
 
     private void HandleEndDragging(int itemIndex)
@@ -258,11 +252,11 @@ public class InventoryController : MonoBehaviour
 
         if (_inventoryData.ItemInChangeState.IsEmpty)
         {
-            _inventoryUI.ResetDraggedItem();
+            InventoryUI.ResetDraggedItem();
         }
         else
         {
-            _inventoryUI.CreateDraggedItem(_inventoryData.ItemInChangeState.Item.ItemImage, _inventoryData.ItemInChangeState.Quantity);
+            InventoryUI.CreateDraggedItem(_inventoryData.ItemInChangeState.Item.ItemImage, _inventoryData.ItemInChangeState.Quantity);
         }
     }
     #endregion
@@ -276,7 +270,7 @@ public class InventoryController : MonoBehaviour
             return;
         }
         ItemSO item = inventoryItem.Item;
-        _inventoryUI.CreateTooltipDescription(item.GetDescription());
+        InventoryUI.CreateTooltipDescription(item.GetDescription());
     }
     #endregion
 
@@ -291,7 +285,6 @@ public class InventoryController : MonoBehaviour
         _inventoryData.QuickRemoveArmor(type);
     }
     #endregion
-
 
     #region Save/Load
     public InventorySO GetInventory()

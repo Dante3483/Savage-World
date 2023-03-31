@@ -12,14 +12,11 @@ public class World : MonoBehaviour
     #region Private fields
     //For generation
     [SerializeField] private TerrainConfiguration _terrainConfiguration;
-    [SerializeField] private WorldObjectsAtlas _objectAtlas;
     [SerializeField] private int _seed;
-    [SerializeField] private SaveLoadSystem _saveLoadManager;
     private static bool _isGameLoaded;
     private GameObject _terrainGenerationObject;
-    private GameObject _dropSection;
     private System.Random _randomVar;
-    private Chunk[,] _chunks;
+    [SerializeField] private bool _isLevelFullyCreated;
 
     //Threads
     private Thread _updateBlocksDataThread;
@@ -33,9 +30,6 @@ public class World : MonoBehaviour
     private float _minValue = 0.001f;
 
     public float _time = 3f;
-
-    public bool IsLoadind;
-
     #endregion
 
     #region Public fields
@@ -66,19 +60,6 @@ public class World : MonoBehaviour
         }
     }
 
-    public Chunk[,] Chunks
-    {
-        get
-        {
-            return _chunks;
-        }
-
-        set
-        {
-            _chunks = value;
-        }
-    }
-
     public TerrainConfiguration TerrainConfiguration
     {
         get
@@ -93,19 +74,6 @@ public class World : MonoBehaviour
         set
         {
             _terrainConfiguration = value;
-        }
-    }
-
-    public WorldObjectsAtlas ObjectAtlas
-    {
-        get
-        {
-            return _objectAtlas;
-        }
-
-        set
-        {
-            _objectAtlas = value;
         }
     }
 
@@ -143,8 +111,18 @@ public class World : MonoBehaviour
         }
     }
 
-    public static global::System.Boolean IsGameLoaded { get => _isGameLoaded; set => _isGameLoaded = value; }
+    public bool IsLevelFullyCreated
+    {
+        get
+        {
+            return _isLevelFullyCreated;
+        }
 
+        set
+        {
+            _isLevelFullyCreated = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -158,55 +136,10 @@ public class World : MonoBehaviour
         Destroy(WorldMap);
     }
 
-    private void Start()
+    private void Awake()
     {
-        try
-        {
-            Debug.Log("HI");
-            //Create drop section
-            GameObject drop = new GameObject("Drop");
-            drop.transform.parent = transform;
-            GameObject.FindGameObjectWithTag("Player").GetComponent<Interactions>().World = this;
-            GameObject.FindGameObjectWithTag("Player").GetComponent<Interactions>().DropSection = drop;
-            _dropSection = drop;
-
-            //Create new random variable using seed
-            RandomVar = new System.Random(Seed.GetHashCode());
-
-            //Load all resources
-            ObjectAtlas.LoadResources();
-
-            //Set world to terrain generation object
-            _terrainGenerationObject = new GameObject("TerrainGeneration");
-            _terrainGenerationObject.transform.parent = transform;
-            _terrainGenerationObject.AddComponent<TerrainGeneration>();
-            TerrainGeneration.World = this;
-
-            //Create new world
-            if (!IsGameLoaded)
-            {
-                CreateNewWorld();
-            }
-            else
-            {
-                LoadWorld();
-            }
-            StartCoroutine(UpdateScreen());
-            _updateBlocksDataThread = new Thread(UpdateBlocksData);
-            _updateBlocksDataThread.Start();
-
-            _randomUpdateBlocksDataThread = new Thread(RandomUpdateBlocksData);
-            _randomUpdateBlocksDataThread.Start();
-
-            //Create map
-            FillMap();
-        }
-        catch (Exception c)
-        {
-            FillMap();
-            Debug.LogError(c);
-            File.WriteAllText(Application.dataPath + "/Output.txt", c.ToString());
-        }
+        _terrainGenerationObject = gameObject.transform.Find("TerrainGeneration").gameObject;
+        IsLevelFullyCreated = false;
     }
 
     private void Update()
@@ -219,14 +152,42 @@ public class World : MonoBehaviour
 
     public void CreateNewWorld()
     {
-        //Seed = 9470;
-        Seed = new System.Random().Next(-10000, 10000);
-        TerrainGeneration.Generation();
+        try
+        {
+            Seed = new System.Random().Next(-10000, 10000);
+            RandomVar = new System.Random(Seed.GetHashCode());
+            TerrainGeneration.Generation();
+            LoadCoroutinsAndThreads();
+        }
+        catch (Exception c)
+        {
+            Debug.LogError(c);
+            File.WriteAllText(Application.dataPath + "/Output.txt", c.ToString());
+        }
     }
 
     public void LoadWorld()
     {
-        _saveLoadManager.LoadAllData();
+        try
+        {
+            GameManager.Instance.SaveLoadManager.LoadAllData();
+            LoadCoroutinsAndThreads();
+        }
+        catch (Exception c)
+        {
+            Debug.LogError(c);
+            File.WriteAllText(Application.dataPath + "/Output.txt", c.ToString());
+        }
+    }
+
+    private void LoadCoroutinsAndThreads()
+    {
+        StartCoroutine(UpdateScreen());
+        _updateBlocksDataThread = new Thread(UpdateBlocksData);
+        _updateBlocksDataThread.Start();
+
+        _randomUpdateBlocksDataThread = new Thread(RandomUpdateBlocksData);
+        _randomUpdateBlocksDataThread.Start();
     }
 
     public void FillMap()
@@ -236,19 +197,19 @@ public class World : MonoBehaviour
         {
             for (int y = 0; y < TerrainConfiguration.WorldHeight; y++)
             {
-                if (GlobalData.Instance.ObjectsData[x, y].Type == ObjectType.Empty)
+                if (GameManager.Instance.ObjectsData[x, y].Type == ObjectType.Empty)
                 {
-                    if (GlobalData.Instance.ObjectsData[x, y].IsTreeTrunk)
+                    if (GameManager.Instance.ObjectsData[x, y].IsTreeTrunk)
                     {
                         Color trunkColor = new Color(100f / 255f, 60f / 255f, 0);
                         WorldMap.SetPixel(x, y, trunkColor);
                         continue;
                     }
-                    Color backgroundColor = new Color(GlobalData.Instance.ObjectsData[x, y].BackgroundColorOnMap.r - 0.2f, GlobalData.Instance.ObjectsData[x, y].BackgroundColorOnMap.g - 0.2f, GlobalData.Instance.ObjectsData[x, y].BackgroundColorOnMap.b - 0.2f);
+                    Color backgroundColor = new Color(GameManager.Instance.ObjectsData[x, y].BackgroundColorOnMap.r - 0.2f, GameManager.Instance.ObjectsData[x, y].BackgroundColorOnMap.g - 0.2f, GameManager.Instance.ObjectsData[x, y].BackgroundColorOnMap.b - 0.2f);
                     WorldMap.SetPixel(x, y, backgroundColor);
                     continue;
                 }
-                WorldMap.SetPixel(x, y, GlobalData.Instance.ObjectsData[x, y].ColorOnMap);
+                WorldMap.SetPixel(x, y, GameManager.Instance.ObjectsData[x, y].ColorOnMap);
             }
         }
         WorldMap.Apply();
@@ -263,32 +224,32 @@ public class World : MonoBehaviour
     public void CreateBlock(BlockSO block, int x, int y, BlockSO backgroundBlock = null)
     {
         TileBase tile = block.tiles.Count != 0 ? block.tiles[RandomVar.Next(0, block.tiles.Count)] : null;
-        GlobalData.Instance.ObjectsData[x, y].Id = block.GetID();
-        GlobalData.Instance.ObjectsData[x, y].CurrentTile = tile;
-        GlobalData.Instance.ObjectsData[x, y].Type = block.blockType;
-        GlobalData.Instance.ObjectsData[x, y].ColorOnMap = block.colorOnMap;
-        GlobalData.Instance.ObjectsData[x, y].CurrentLiquidBackgroundTile = null;
-        GlobalData.Instance.ObjectsData[x, y].Durability = block.Durability;
+        GameManager.Instance.ObjectsData[x, y].Id = block.GetID();
+        GameManager.Instance.ObjectsData[x, y].CurrentTile = tile;
+        GameManager.Instance.ObjectsData[x, y].Type = block.blockType;
+        GameManager.Instance.ObjectsData[x, y].ColorOnMap = block.colorOnMap;
+        GameManager.Instance.ObjectsData[x, y].CurrentLiquidBackgroundTile = null;
+        GameManager.Instance.ObjectsData[x, y].Durability = block.Durability;
         if (backgroundBlock != null)
         {
             tile = block.tiles.Count != 0 ? backgroundBlock.tiles[RandomVar.Next(0, block.tiles.Count)] : null;
-            GlobalData.Instance.ObjectsData[x, y].IdBackground = backgroundBlock.GetID();
-            GlobalData.Instance.ObjectsData[x, y].CurrentBackgroundTile = backgroundBlock.tiles[RandomVar.Next(0, backgroundBlock.tiles.Count)]; ;
-            GlobalData.Instance.ObjectsData[x, y].TypeBackground = backgroundBlock.blockType;
-            GlobalData.Instance.ObjectsData[x, y].BackgroundColorOnMap = backgroundBlock.colorOnMap;
+            GameManager.Instance.ObjectsData[x, y].IdBackground = backgroundBlock.GetID();
+            GameManager.Instance.ObjectsData[x, y].CurrentBackgroundTile = backgroundBlock.tiles[RandomVar.Next(0, backgroundBlock.tiles.Count)]; ;
+            GameManager.Instance.ObjectsData[x, y].TypeBackground = backgroundBlock.blockType;
+            GameManager.Instance.ObjectsData[x, y].BackgroundColorOnMap = backgroundBlock.colorOnMap;
         }
 
         if (block.blockType == ObjectType.Plant)
         {
-            GlobalData.Instance.ObjectsData[x, y].ChanceToGrow = (block as PlantSO).ChanceToGrow;
+            GameManager.Instance.ObjectsData[x, y].ChanceToGrow = (block as PlantSO).ChanceToGrow;
         }
     }
 
     public bool DecreaseDurability(Vector2Int position, float durrabilityDecrease)
     {
-        GlobalData.Instance.ObjectsData[position.x, position.y].Durability -= durrabilityDecrease;
+        GameManager.Instance.ObjectsData[position.x, position.y].Durability -= durrabilityDecrease;
 
-        if (GlobalData.Instance.ObjectsData[position.x, position.y].Durability <= 0)
+        if (GameManager.Instance.ObjectsData[position.x, position.y].Durability <= 0)
         {
             return true;
         }
@@ -300,7 +261,7 @@ public class World : MonoBehaviour
 
     public ObjectData GetBlockByPosition(Vector3Int intPosition)
     {
-        return GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y];
+        return GameManager.Instance.ObjectsData[intPosition.x, intPosition.y];
     }
 
     private RectInt GetCameraRectInt()
@@ -320,15 +281,15 @@ public class World : MonoBehaviour
     #region Liquid block methods
     private void PaintLiquid(ObjectData block)
     {
-        LiquidBlockSO liquidBlock = ObjectAtlas.GetBlockByID(ObjectType.LiquidBlock, block.Id) as LiquidBlockSO;
-        block.CurrentTile = TakeTextureByFlowValue(block.CurrentFlowValue, liquidBlock.liquidFlowValueTiles);
+        LiquidBlockSO liquidBlock = GameManager.Instance.WorldObjectAtlas.GetBlockByID(ObjectType.LiquidBlock, block.Id) as LiquidBlockSO;
+        block.CurrentTile = GetTextureByFlowValue(block.CurrentFlowValue, liquidBlock.liquidFlowValueTiles);
         if (block.IsPsevdoFull || block.IsAboveNotEmpty)
         {
             block.CurrentTile = liquidBlock.liquidFlowValueTiles[10];
         }
     }
 
-    private TileBase TakeTextureByFlowValue(float flowValue, TileBase[] tiles)
+    private TileBase GetTextureByFlowValue(float flowValue, TileBase[] tiles)
     {
         if (flowValue > 0f && flowValue <= 0.1f)
         {
@@ -379,7 +340,7 @@ public class World : MonoBehaviour
     {
         if (IsInMapRange(x, y))
         {
-            return Chunks[x / TerrainConfiguration.chunkSize, y / TerrainConfiguration.chunkSize];
+            return GameManager.Instance.Chunks[x / TerrainConfiguration.chunkSize, y / TerrainConfiguration.chunkSize];
         }
         return null;
     }
@@ -395,7 +356,7 @@ public class World : MonoBehaviour
                 {
                     if ((x > 0 && y > 0) && (x < TerrainConfiguration.horizontalChunksCount && y < TerrainConfiguration.VerticalChunksCount))
                     {
-                        Chunks[x, y].isActive = true;
+                        GameManager.Instance.Chunks[x, y].isActive = true;
                     }
                 }
             }
@@ -413,7 +374,7 @@ public class World : MonoBehaviour
                 {
                     if ((x > 0 && y > 0) && (x < TerrainConfiguration.horizontalChunksCount && y < TerrainConfiguration.VerticalChunksCount))
                     {
-                        Chunks[x, y].isActive = false;
+                        GameManager.Instance.Chunks[x, y].isActive = false;
                     }
                 }
             }
@@ -426,15 +387,15 @@ public class World : MonoBehaviour
     #region Update methods
     public IEnumerator UpdateScreen()
     {
+        while (!GameManager.Instance.IsPlayerCreated)
+        {
+            yield return null;
+        }
+        yield return null;
         RectInt prevCameraRect = GetCameraRectInt();
         Chunk currentChunk = GetChunk((int)prevCameraRect.center.x, (int)prevCameraRect.center.y);
-        
         while (true)
         {
-            if (IsLoadind)
-            {
-                yield return null;
-            }
             yield return null;
             SetActiveChunks3x3(currentChunk);
 
@@ -476,7 +437,7 @@ public class World : MonoBehaviour
             //Fill Tiles array with drawable blocks
             foreach (Vector2Int position in currentCameraRect.allPositionsWithin)
             {
-                ObjectData block = GlobalData.Instance.ObjectsData[position.x, position.y];
+                ObjectData block = GameManager.Instance.ObjectsData[position.x, position.y];
                 if (IsInMapRange(position.x, position.y))
                 {
                     TileBase blockTile = block.CurrentTile;
@@ -497,9 +458,9 @@ public class World : MonoBehaviour
                     liquidBackgroundTiles.Add(liquidBackgroundTile);
                     blockBackgroundTiles.Add(backgroundTile);
 
-                    if ((GlobalData.Instance.ObjectsData[position.x, position.y].Type != ObjectType.Empty &&
-                        GlobalData.Instance.ObjectsData[position.x, position.y].Type != ObjectType.LiquidBlock &&
-                        GlobalData.Instance.ObjectsData[position.x, position.y].Type != ObjectType.Plant))
+                    if ((GameManager.Instance.ObjectsData[position.x, position.y].Type != ObjectType.Empty &&
+                        GameManager.Instance.ObjectsData[position.x, position.y].Type != ObjectType.LiquidBlock &&
+                        GameManager.Instance.ObjectsData[position.x, position.y].Type != ObjectType.Plant))
                     {
                         solidBlocksTiles.Add(SolidBlocksRuleTile);
                     }
@@ -518,10 +479,9 @@ public class World : MonoBehaviour
             BlockBackgroundTilemap.SetTiles(vectors.ToArray(), blockBackgroundTiles.ToArray());
             PlantTilemap.SetTiles(vectors.ToArray(), plantTiles.ToArray());
             SolidBlocksTilemap.SetTiles(vectors.ToArray(), solidBlocksTiles.ToArray());
-            if (IsGameLoaded)
+            if (!IsLevelFullyCreated)
             {
-                IsGameLoaded = !IsGameLoaded;
-                GameObject.FindGameObjectWithTag("Player").GetComponent<Movement>().Rigidbody.bodyType = RigidbodyType2D.Dynamic;
+                IsLevelFullyCreated = true;
             }
         }
     }
@@ -531,21 +491,17 @@ public class World : MonoBehaviour
         int chunkSize = TerrainConfiguration.chunkSize;
         while (!IsGameClosed)
         {
-            for (int chunkX = 0; chunkX < Chunks.GetLength(0); chunkX++)
+            for (int chunkX = 0; chunkX < GameManager.Instance.Chunks.GetLength(0); chunkX++)
             {
-                for (int chunkY = 0; chunkY < Chunks.GetLength(1); chunkY++)
+                for (int chunkY = 0; chunkY < GameManager.Instance.Chunks.GetLength(1); chunkY++)
                 {
-                    if (Chunks[chunkX, chunkY].isActive)
+                    if (GameManager.Instance.Chunks[chunkX, chunkY].isActive)
                     {
-                        for (int x = Chunks[chunkX, chunkY].x; x < Chunks[chunkX, chunkY].x + chunkSize; x++)
+                        for (int x = GameManager.Instance.Chunks[chunkX, chunkY].x; x < GameManager.Instance.Chunks[chunkX, chunkY].x + chunkSize; x++)
                         {
-                            for (int y = Chunks[chunkX, chunkY].y; y < Chunks[chunkX, chunkY].y + chunkSize; y++)
+                            for (int y = GameManager.Instance.Chunks[chunkX, chunkY].y; y < GameManager.Instance.Chunks[chunkX, chunkY].y + chunkSize; y++)
                             {
-                                if (IsLoadind)
-                                {
-                                    continue;
-                                }
-                                ObjectData block = GlobalData.Instance.ObjectsData[x, y];
+                                ObjectData block = GameManager.Instance.ObjectsData[x, y];
                                 ObjectData downBlockData = null;
                                 ObjectData leftBlockData = null;
                                 ObjectData rightBlockData = null;
@@ -553,19 +509,19 @@ public class World : MonoBehaviour
 
                                 if (y - 1 != -1)
                                 {
-                                    downBlockData = GlobalData.Instance.ObjectsData[x, y - 1];
+                                    downBlockData = GameManager.Instance.ObjectsData[x, y - 1];
                                 }
                                 if (x - 1 != -1)
                                 {
-                                    leftBlockData = GlobalData.Instance.ObjectsData[x - 1, y];
+                                    leftBlockData = GameManager.Instance.ObjectsData[x - 1, y];
                                 }
-                                if (x + 1 != GlobalData.Instance.ObjectsData.GetLength(0))
+                                if (x + 1 != GameManager.Instance.ObjectsData.GetLength(0))
                                 {
-                                    rightBlockData = GlobalData.Instance.ObjectsData[x + 1, y];
+                                    rightBlockData = GameManager.Instance.ObjectsData[x + 1, y];
                                 }
-                                if (y + 1 != GlobalData.Instance.ObjectsData.GetLength(1))
+                                if (y + 1 != GameManager.Instance.ObjectsData.GetLength(1))
                                 {
-                                    topBlockData = GlobalData.Instance.ObjectsData[x, y + 1];
+                                    topBlockData = GameManager.Instance.ObjectsData[x, y + 1];
                                 }
 
                                 if (block.IsPsevdoFull)
@@ -605,7 +561,7 @@ public class World : MonoBehaviour
                                     if (topBlockData != null &&
                                         topBlockData.Type == ObjectType.LiquidBlock)
                                     {
-                                        block.CurrentLiquidBackgroundTile = ObjectAtlas.Water.liquidFlowValueTiles[10];
+                                        block.CurrentLiquidBackgroundTile = GameManager.Instance.WorldObjectAtlas.Water.liquidFlowValueTiles[10];
                                     }
 
                                     //If left, right and top block is not liquid
@@ -639,7 +595,7 @@ public class World : MonoBehaviour
                                     if (topBlockData != null &&
                                         topBlockData.Type == ObjectType.LiquidBlock)
                                     {
-                                        block.CurrentLiquidBackgroundTile = ObjectAtlas.Water.liquidFlowValueTiles[10];
+                                        block.CurrentLiquidBackgroundTile = GameManager.Instance.WorldObjectAtlas.Water.liquidFlowValueTiles[10];
                                     }
 
                                     //If left, right and top block is not liquid
@@ -703,8 +659,8 @@ public class World : MonoBehaviour
 
                                     if (remainingValue < _minValue && !liquidObjectData.IsPsevdoFull)
                                     {
-                                        CreateBlock(ObjectAtlas.GetBlockByID(ObjectType.Empty, 0), x, y);
-                                        GlobalData.Instance.ObjectsData[x, y].CurrentFlowValue = 0f;
+                                        CreateBlock(GameManager.Instance.WorldObjectAtlas.GetBlockByID(ObjectType.Empty, 0), x, y);
+                                        GameManager.Instance.ObjectsData[x, y].CurrentFlowValue = 0f;
                                         continue;
                                     }
                                     #endregion
@@ -742,8 +698,8 @@ public class World : MonoBehaviour
 
                                     if (remainingValue < _minValue && !liquidObjectData.IsPsevdoFull)
                                     {
-                                        CreateBlock(ObjectAtlas.Air, x, y);
-                                        GlobalData.Instance.ObjectsData[x, y].CurrentFlowValue = 0f;
+                                        CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, x, y);
+                                        GameManager.Instance.ObjectsData[x, y].CurrentFlowValue = 0f;
                                         continue;
                                     }
                                     #endregion
@@ -780,8 +736,8 @@ public class World : MonoBehaviour
 
                                     if (remainingValue < _minValue && !liquidObjectData.IsPsevdoFull)
                                     {
-                                        CreateBlock(ObjectAtlas.Air, x, y);
-                                        GlobalData.Instance.ObjectsData[x, y].CurrentFlowValue = 0f;
+                                        CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, x, y);
+                                        GameManager.Instance.ObjectsData[x, y].CurrentFlowValue = 0f;
                                         continue;
                                     }
                                     #endregion
@@ -801,11 +757,11 @@ public class World : MonoBehaviour
                                 {
                                     if (block.Id == (int)PlantsID.Vine && topBlockData.Type == ObjectType.Empty)
                                     {
-                                        CreateBlock(ObjectAtlas.Air, block.Position.x, block.Position.y);
+                                        CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, block.Position.x, block.Position.y);
                                         //ObjectData currentVine = block;
                                         //while (currentVine.Type == ObjectType.Plant)
                                         //{
-                                        //    CreateBlock(ObjectAtlas.Air, currentVine.Position.x, currentVine.Position.y);
+                                        //    CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, currentVine.Position.x, currentVine.Position.y);
                                         //}
                                     }
                                 }
@@ -825,12 +781,12 @@ public class World : MonoBehaviour
             int y = RandomVar.Next(0, TerrainConfiguration.WorldHeight);
 
             //Update vine
-            if (GlobalData.Instance.ObjectsData[x, y].Type == ObjectType.Plant && 
-                GlobalData.Instance.ObjectsData[x, y].Id == (int)PlantsID.Vine &&
-                RandomVar.Next(0, 101) <= GlobalData.Instance.ObjectsData[x, y].ChanceToGrow && 
-                GlobalData.Instance.ObjectsData[x, y - 1].Type == ObjectType.Empty)
+            if (GameManager.Instance.ObjectsData[x, y].Type == ObjectType.Plant && 
+                GameManager.Instance.ObjectsData[x, y].Id == (int)PlantsID.Vine &&
+                RandomVar.Next(0, 101) <= GameManager.Instance.ObjectsData[x, y].ChanceToGrow && 
+                GameManager.Instance.ObjectsData[x, y - 1].Type == ObjectType.Empty)
             {
-                CreateBlock(ObjectAtlas.Vine, x, y - 1);
+                CreateBlock(GameManager.Instance.WorldObjectAtlas.Vine, x, y - 1);
             }
         }
     }
@@ -844,25 +800,24 @@ public class World : MonoBehaviour
 
     public bool IsValidPlaceToCreateBlock(Vector3Int intPosition)
     {
-        return GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y].Type == ObjectType.Empty &&
-            !GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y].IsTreeFoliage &&
-            !GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y].IsTreeTrunk;
+        return GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].Type == ObjectType.Empty &&
+            !GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].IsTreeFoliage &&
+            !GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].IsTreeTrunk;
     }
 
     public bool IsValidPlaceToBreakBlock(Vector3Int intPosition)
     {
-        return GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Empty;
+        return GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Empty;
     }
 
     public bool IsAdjacentBlockSolid(Vector3 position, Vector2Int direction)
     {
         Vector3Int intPosition = BlockTilemap.WorldToCell(position);
         intPosition += new Vector3Int(direction.x, direction.y);
-        return GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Empty &&
-            GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Plant &&
-            GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.LiquidBlock;
+        return GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Empty &&
+            GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Plant &&
+            GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.LiquidBlock;
     }
-
     #endregion
 
     #endregion

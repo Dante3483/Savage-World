@@ -3,7 +3,7 @@ guid: 62e0fa6f2cd23f54c89a3f8271213164
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -47,7 +47,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 15
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -63,6 +63,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -312,14 +313,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      DirtWithGrass(Forest)_6: 609919417
-      DirtWithGrass(Forest)_2: 1510249388
       DirtWithGrass(Forest)_0: -645989001
-      DirtWithGrass(Forest)_7: 1001489376
-      DirtWithGrass(Forest)_3: 1308962641
-      DirtWithGrass(Forest)_5: 1477625413
       DirtWithGrass(Forest)_1: 197025034
+      DirtWithGrass(Forest)_2: 1510249388
+      DirtWithGrass(Forest)_3: 1308962641
       DirtWithGrass(Forest)_4: 1008349798
+      DirtWithGrass(Forest)_5: 1477625413
+      DirtWithGrass(Forest)_6: 609919417
+      DirtWithGrass(Forest)_7: 1001489376
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

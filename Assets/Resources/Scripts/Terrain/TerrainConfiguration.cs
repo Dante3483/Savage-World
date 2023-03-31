@@ -78,13 +78,16 @@ public class TerrainConfiguration : ScriptableObject
     [Header("Tree Properties")]
     public int MinDistanceTree;
 
+    [Header("Player Spawn")]
+    public int SpawnXPosition;
+
     #region Methods
     private void OnValidate()
     {
-        CalculateHorizontalBiomeChunksCount();
+        UpdateData();
     }
 
-    private void CalculateHorizontalBiomeChunksCount()
+    private void UpdateData()
     {
         WorldWitdh = horizontalChunksCount * chunkSize;
         VerticalChunksCount = 0;
@@ -164,6 +167,17 @@ public class TerrainConfiguration : ScriptableObject
         ForestPosition.EndPositionY = OceanPosition.EndPositionY + (int)heightMeadowMountainMultiplier;
         SwampPosition.EndPositionY = OceanPosition.EndPositionY + (int)heightMeadowMountainMultiplier;
         ConiferousForestPosition.EndPositionY = OceanPosition.EndPositionY + (int)heightMeadowMountainMultiplier;
+        #endregion
+
+        #region Player Spawn
+        if (MeadowPosition.StartPositionX != 0)
+        {
+            SpawnXPosition = MeadowPosition.StartPositionX + (MeadowPosition.EndPositionX - MeadowPosition.StartPositionX) / 2;
+        }
+        else
+        {
+            SpawnXPosition = 200;
+        }
         #endregion
     }
 

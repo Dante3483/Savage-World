@@ -3,7 +3,7 @@ guid: 8e1364876618dd3418c176e102bebb17
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -47,7 +47,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 15
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -63,6 +63,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -2136,87 +2137,87 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Sand_22: -438534460
-      Sand_26: 1078812496
-      Sand_25: 1322415076
-      Sand_63: -239117583
-      Sand_14: 1396009807
       Sand_0: -202505473
-      Sand_55: 651517476
-      Sand_64: -698111227
-      Sand_56: 1936354320
-      Sand_45: -2052798272
-      Sand_73: 2075650946
       Sand_1: -1441500817
-      Sand_32: -1470166405
-      Sand_54: 820513374
-      Sand_12: 1010869223
-      Sand_47: 388246729
-      Sand_42: -351811907
-      Sand_52: 1811739721
-      Sand_69: -422154796
-      Sand_68: -872637322
-      Sand_70: -869801629
-      Sand_7: -2145600708
-      Sand_4: 351152435
       Sand_10: 201770468
-      Sand_74: -1538883766
-      Sand_2: 941527628
-      Sand_48: 634229839
-      Sand_62: -212352116
-      Sand_43: -366900257
-      Sand_72: -590602050
-      Sand_6: -1299497372
-      Sand_15: 744676136
-      Sand_71: -114567983
-      Sand_13: 445315885
-      Sand_40: 995891114
-      Sand_17: 225317451
-      Sand_21: -1169147956
-      Sand_33: -1742973550
-      Sand_41: 1009307130
-      Sand_8: 406391463
-      Sand_78: 761988444
-      Sand_36: -1531157766
-      Sand_79: -2132874655
-      Sand_66: 213289103
-      Sand_24: 978303011
-      Sand_44: 1586596798
-      Sand_30: 1062046580
-      Sand_49: -2012543168
-      Sand_60: 1064930623
-      Sand_51: 1929039632
-      Sand_18: 1575514263
-      Sand_28: 453442805
-      Sand_34: -75760268
-      Sand_38: -772953005
-      Sand_9: -1872496642
-      Sand_3: 1401677822
-      Sand_16: -72763453
-      Sand_59: 1388653873
-      Sand_53: 1053165793
-      Sand_65: 1622334449
-      Sand_67: -543846457
       Sand_11: -1913314351
-      Sand_35: 1499506951
-      Sand_39: 1893720610
-      Sand_46: 467192547
-      Sand_20: 639264067
-      Sand_23: 1822463799
-      Sand_27: 1020639669
-      Sand_50: 924384670
-      Sand_58: -580287299
+      Sand_12: 1010869223
+      Sand_13: 445315885
+      Sand_14: 1396009807
+      Sand_15: 744676136
+      Sand_16: -72763453
+      Sand_17: 225317451
+      Sand_18: 1575514263
       Sand_19: -1667394077
+      Sand_2: 941527628
+      Sand_20: 639264067
+      Sand_21: -1169147956
+      Sand_22: -438534460
+      Sand_23: 1822463799
+      Sand_24: 978303011
+      Sand_25: 1322415076
+      Sand_26: 1078812496
+      Sand_27: 1020639669
+      Sand_28: 453442805
       Sand_29: 1156017697
-      Sand_37: -393160494
-      Sand_5: -1305148589
-      Sand_77: 237651166
+      Sand_3: 1401677822
+      Sand_30: 1062046580
       Sand_31: 192401681
-      Sand_76: 1795863430
-      Sand_75: -1014386239
-      Sand_80: 114958378
+      Sand_32: -1470166405
+      Sand_33: -1742973550
+      Sand_34: -75760268
+      Sand_35: 1499506951
+      Sand_36: -1531157766
+      Sand_37: -393160494
+      Sand_38: -772953005
+      Sand_39: 1893720610
+      Sand_4: 351152435
+      Sand_40: 995891114
+      Sand_41: 1009307130
+      Sand_42: -351811907
+      Sand_43: -366900257
+      Sand_44: 1586596798
+      Sand_45: -2052798272
+      Sand_46: 467192547
+      Sand_47: 388246729
+      Sand_48: 634229839
+      Sand_49: -2012543168
+      Sand_5: -1305148589
+      Sand_50: 924384670
+      Sand_51: 1929039632
+      Sand_52: 1811739721
+      Sand_53: 1053165793
+      Sand_54: 820513374
+      Sand_55: 651517476
+      Sand_56: 1936354320
       Sand_57: -527061086
+      Sand_58: -580287299
+      Sand_59: 1388653873
+      Sand_6: -1299497372
+      Sand_60: 1064930623
       Sand_61: 1101988767
+      Sand_62: -212352116
+      Sand_63: -239117583
+      Sand_64: -698111227
+      Sand_65: 1622334449
+      Sand_66: 213289103
+      Sand_67: -543846457
+      Sand_68: -872637322
+      Sand_69: -422154796
+      Sand_7: -2145600708
+      Sand_70: -869801629
+      Sand_71: -114567983
+      Sand_72: -590602050
+      Sand_73: 2075650946
+      Sand_74: -1538883766
+      Sand_75: -1014386239
+      Sand_76: 1795863430
+      Sand_77: 237651166
+      Sand_78: 761988444
+      Sand_79: -2132874655
+      Sand_8: 406391463
+      Sand_80: 114958378
+      Sand_9: -1872496642
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

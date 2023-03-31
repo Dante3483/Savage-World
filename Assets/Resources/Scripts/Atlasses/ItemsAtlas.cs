@@ -22,7 +22,7 @@ public class ItemsAtlas : ScriptableObject
         return items.Find(item => item.Id == id);
     }
 
-    public void LoadData()
+    public void LoadResources()
     {
         items = new List<ItemSO>()
         {

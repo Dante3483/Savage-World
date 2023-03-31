@@ -13,19 +13,36 @@ public class CameraFollow : MonoBehaviour
     #endregion
 
     #region Properties
+    public GameObject Target
+    {
+        get
+        {
+            return _target;
+        }
 
+        set
+        {
+            _target = value;
+        }
+    }
     #endregion
 
     #region Methods
 
     private void Start()
     {
-        transform.position = new Vector3(_target.transform.position.x, _target.transform.position.y, transform.position.z);
+        if (Target != null)
+        {
+            transform.position = new Vector3(Target.transform.position.x, Target.transform.position.y, transform.position.z);
+        }
     }
 
     private void FixedUpdate()
     {
-        transform.position = new Vector3(_target.transform.position.x, _target.transform.position.y, transform.position.z);
+        if (Target != null)
+        {
+            transform.position = new Vector3(Target.transform.position.x, Target.transform.position.y, transform.position.z);
+        }
     }
     #endregion
 }

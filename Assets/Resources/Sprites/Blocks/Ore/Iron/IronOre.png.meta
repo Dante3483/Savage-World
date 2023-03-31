@@ -3,7 +3,7 @@ guid: e3be4be4fd4de624bbfb48be9ff78233
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -47,7 +47,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 15
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -63,6 +63,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -2136,87 +2137,87 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      IronOre_43: 785943763
-      IronOre_72: 403735339
-      IronOre_11: 670103248
-      IronOre_23: 1992931485
-      IronOre_2: -740107293
-      IronOre_32: 1413964759
-      IronOre_38: -2016760027
-      IronOre_47: 980703281
-      IronOre_37: 971930731
-      IronOre_52: 895743069
-      IronOre_54: 1636003769
-      IronOre_73: 1704347668
       IronOre_0: -727828106
-      IronOre_16: -621748463
-      IronOre_76: 1110064627
-      IronOre_26: 442506455
-      IronOre_65: -174987829
-      IronOre_80: 763528392
-      IronOre_5: -1353887828
-      IronOre_42: 696521548
-      IronOre_71: 287624210
-      IronOre_67: 731247738
-      IronOre_34: -88398178
-      IronOre_29: -643209109
-      IronOre_78: 954021328
-      IronOre_60: 1441043506
-      IronOre_49: 1728233692
+      IronOre_1: -1601782808
       IronOre_10: 1649472354
-      IronOre_62: 814185022
-      IronOre_25: -825654381
-      IronOre_64: 1467011642
-      IronOre_36: -1218795575
-      IronOre_18: 1794508132
-      IronOre_39: 691866327
-      IronOre_7: -1616915662
+      IronOre_11: 670103248
+      IronOre_12: 871692150
+      IronOre_13: 1828859223
+      IronOre_14: -1652154902
+      IronOre_15: -2073268277
+      IronOre_16: -621748463
       IronOre_17: 2082869403
-      IronOre_75: -1820437651
-      IronOre_61: -120369513
-      IronOre_70: 127252066
+      IronOre_18: 1794508132
+      IronOre_19: -1930345048
+      IronOre_2: -740107293
+      IronOre_20: -665822929
       IronOre_21: 960536087
+      IronOre_22: -350687643
+      IronOre_23: 1992931485
+      IronOre_24: 251614115
+      IronOre_25: -825654381
+      IronOre_26: 442506455
+      IronOre_27: 344487466
       IronOre_28: -2146903127
-      IronOre_8: 493410855
+      IronOre_29: -643209109
+      IronOre_3: -836966885
+      IronOre_30: 1625755982
+      IronOre_31: -139867395
+      IronOre_32: 1413964759
+      IronOre_33: -1995175404
+      IronOre_34: -88398178
+      IronOre_35: 785605495
+      IronOre_36: -1218795575
+      IronOre_37: 971930731
+      IronOre_38: -2016760027
+      IronOre_39: 691866327
+      IronOre_4: 826585386
       IronOre_40: 2021228552
       IronOre_41: -1613283846
-      IronOre_48: 470362453
-      IronOre_22: -350687643
-      IronOre_50: -1420421521
-      IronOre_66: 1971463783
-      IronOre_9: -190996990
-      IronOre_55: -322962242
-      IronOre_63: -1748817957
-      IronOre_19: -1930345048
-      IronOre_20: -665822929
-      IronOre_69: -329995949
-      IronOre_24: 251614115
-      IronOre_57: 781051450
-      IronOre_3: -836966885
-      IronOre_53: -879941296
-      IronOre_51: 1465812360
-      IronOre_35: 785605495
-      IronOre_68: 888453138
-      IronOre_1: -1601782808
-      IronOre_30: 1625755982
-      IronOre_79: 430627239
-      IronOre_6: -1109729237
-      IronOre_74: 129878896
-      IronOre_33: -1995175404
-      IronOre_56: 1478301047
-      IronOre_12: 871692150
-      IronOre_14: -1652154902
-      IronOre_13: 1828859223
-      IronOre_45: 127013334
+      IronOre_42: 696521548
+      IronOre_43: 785943763
       IronOre_44: -310910633
-      IronOre_59: -1408348087
-      IronOre_27: 344487466
+      IronOre_45: 127013334
       IronOre_46: 165849909
-      IronOre_31: -139867395
-      IronOre_77: -1405108239
-      IronOre_15: -2073268277
+      IronOre_47: 980703281
+      IronOre_48: 470362453
+      IronOre_49: 1728233692
+      IronOre_5: -1353887828
+      IronOre_50: -1420421521
+      IronOre_51: 1465812360
+      IronOre_52: 895743069
+      IronOre_53: -879941296
+      IronOre_54: 1636003769
+      IronOre_55: -322962242
+      IronOre_56: 1478301047
+      IronOre_57: 781051450
       IronOre_58: -1307903573
-      IronOre_4: 826585386
+      IronOre_59: -1408348087
+      IronOre_6: -1109729237
+      IronOre_60: 1441043506
+      IronOre_61: -120369513
+      IronOre_62: 814185022
+      IronOre_63: -1748817957
+      IronOre_64: 1467011642
+      IronOre_65: -174987829
+      IronOre_66: 1971463783
+      IronOre_67: 731247738
+      IronOre_68: 888453138
+      IronOre_69: -329995949
+      IronOre_7: -1616915662
+      IronOre_70: 127252066
+      IronOre_71: 287624210
+      IronOre_72: 403735339
+      IronOre_73: 1704347668
+      IronOre_74: 129878896
+      IronOre_75: -1820437651
+      IronOre_76: 1110064627
+      IronOre_77: -1405108239
+      IronOre_78: 954021328
+      IronOre_79: 430627239
+      IronOre_8: 493410855
+      IronOre_80: 763528392
+      IronOre_9: -190996990
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

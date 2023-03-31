@@ -8,5 +8,6 @@ public enum GameState
     MainMenu,
     NewLevel,
     LoadLevel,
+    InLevel,
     Quit,
 }

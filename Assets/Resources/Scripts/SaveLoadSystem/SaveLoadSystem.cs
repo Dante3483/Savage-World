@@ -6,9 +6,6 @@ using UnityEngine;
 
 public class SaveLoadSystem : MonoBehaviour
 {
-    [SerializeField] private World _world;
-    [SerializeField] private GameObject _player;
-
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.V))
@@ -31,7 +28,7 @@ public class SaveLoadSystem : MonoBehaviour
             Debug.Log("Chunks saved");
             SaveWorldObjectsData(binaryWriter);
             Debug.Log("World saved");
-            //SaveTrees(binaryWriter);
+            SaveTrees(binaryWriter);
             Debug.Log("Trees saved");
             SavePlayer(binaryWriter);
             Debug.Log("Player saved");
@@ -46,8 +43,6 @@ public class SaveLoadSystem : MonoBehaviour
 
         Debug.Log("Load data from: " + path);
 
-        _world.IsLoadind = true;
-
         using (BinaryReader binaryReader = new BinaryReader(File.Open(path, FileMode.Open)))
         {
             LoadConfigurationData(binaryReader);
@@ -56,7 +51,7 @@ public class SaveLoadSystem : MonoBehaviour
             Debug.Log("Chunks loaded");
             LoadWorldObjectsData(binaryReader);
             Debug.Log("World loaded");
-            //LoadTrees(binaryReader);
+            LoadTrees(binaryReader);
             Debug.Log("Trees loaded");
             LoadPlayer(binaryReader);
             Debug.Log("Player loaded");
@@ -67,34 +62,40 @@ public class SaveLoadSystem : MonoBehaviour
 
     public void SaveConfigurationData(BinaryWriter binaryWriter)
     {
-        byte horizontalChunksCount = Convert.ToByte(_world.TerrainConfiguration.horizontalChunksCount);
+        byte horizontalChunksCount = Convert.ToByte(GameManager.Instance.World.TerrainConfiguration.horizontalChunksCount);
 
         binaryWriter.Write(horizontalChunksCount);
+        binaryWriter.Write(GameManager.Instance.World.Seed);
     }
 
     public void LoadConfigurationData(BinaryReader binaryReader)
     {
         byte horizontalChunksCount = binaryReader.ReadByte();
+        int seed = binaryReader.ReadInt32();
 
-        _world.TerrainConfiguration.horizontalChunksCount = (int)horizontalChunksCount;
+        GameManager.Instance.World.TerrainConfiguration.horizontalChunksCount = (int)horizontalChunksCount;
 
-        _world.TerrainConfiguration.WorldWitdh = (int)horizontalChunksCount * _world.TerrainConfiguration.chunkSize;
+        GameManager.Instance.World.TerrainConfiguration.WorldWitdh = (int)horizontalChunksCount * GameManager.Instance.World.TerrainConfiguration.chunkSize;
+
+        GameManager.Instance.World.Seed = seed;
+
+        GameManager.Instance.World.RandomVar = new System.Random(seed.GetHashCode());
     }
 
     private void SaveWorldChunks(BinaryWriter binaryWriter)
     {
-        for (int x = 0; x < _world.TerrainConfiguration.horizontalChunksCount; x++)
+        for (int x = 0; x < GameManager.Instance.World.TerrainConfiguration.horizontalChunksCount; x++)
         {
-            for (int y = 0; y < _world.TerrainConfiguration.VerticalChunksCount; y++)
+            for (int y = 0; y < GameManager.Instance.World.TerrainConfiguration.VerticalChunksCount; y++)
             {
                 byte biomeID = 0;
-                if (_world.Chunks[x, y].BiomeID == BiomesID.NonBiom)
+                if (GameManager.Instance.Chunks[x, y].BiomeID == BiomesID.NonBiom)
                 {
                     biomeID = (byte)(biomeID | 128);
                 }
                 else
                 {
-                    biomeID = Convert.ToByte(_world.Chunks[x, y].BiomeID);
+                    biomeID = Convert.ToByte(GameManager.Instance.Chunks[x, y].BiomeID);
                 }
                 binaryWriter.Write(biomeID);
             }
@@ -103,23 +104,18 @@ public class SaveLoadSystem : MonoBehaviour
 
     private void LoadWorldChunks(BinaryReader binaryReader)
     {
-        _world.Chunks = new Chunk[_world.TerrainConfiguration.horizontalChunksCount, _world.TerrainConfiguration.VerticalChunksCount];
-        for (int x = 0; x < _world.TerrainConfiguration.horizontalChunksCount; x++)
+        for (int x = 0; x < GameManager.Instance.World.TerrainConfiguration.horizontalChunksCount; x++)
         {
-            for (int y = 0; y < _world.TerrainConfiguration.VerticalChunksCount; y++)
+            for (int y = 0; y < GameManager.Instance.World.TerrainConfiguration.VerticalChunksCount; y++)
             {
-                Chunk newChunk = new Chunk();
-                newChunk.x = x;
-                newChunk.y = y;
-                _world.Chunks[x, y] = newChunk;
                 byte biomeID = binaryReader.ReadByte();
                 if (biomeID == 128)
                 {
-                    _world.Chunks[x, y].BiomeID = BiomesID.NonBiom;
+                    GameManager.Instance.Chunks[x, y].BiomeID = BiomesID.NonBiom;
                 }
                 else
                 {
-                    _world.Chunks[x, y].BiomeID = (BiomesID)biomeID;
+                    GameManager.Instance.Chunks[x, y].BiomeID = (BiomesID)biomeID;
                 }
             }
         }
@@ -127,13 +123,13 @@ public class SaveLoadSystem : MonoBehaviour
 
     private void SaveWorldObjectsData(BinaryWriter binaryWriter)
     {
-        for (int x = 0; x < _world.TerrainConfiguration.WorldWitdh; x++)
+        for (int x = 0; x < GameManager.Instance.World.TerrainConfiguration.WorldWitdh; x++)
         {
-            for (int y = 0; y < _world.TerrainConfiguration.WorldHeight; y++)
+            for (int y = 0; y < GameManager.Instance.World.TerrainConfiguration.WorldHeight; y++)
             {
                 List<byte> writeResult = new List<byte>();
 
-                ObjectData data = GlobalData.Instance.ObjectsData[x, y];
+                ObjectData data = GameManager.Instance.ObjectsData[x, y];
 
                 //Bits:
                 //0 - If <Block ID> set
@@ -171,14 +167,14 @@ public class SaveLoadSystem : MonoBehaviour
                 #region RLE Algorithm
                 int iterator = 1;
                 int countOfSameObject = 0;
-                while (_world.IsInMapRange(x, y + iterator) &&
-                    GlobalData.Instance.ObjectsData[x, y + iterator].Id == GlobalData.Instance.ObjectsData[x, y].Id &&
-                    GlobalData.Instance.ObjectsData[x, y + iterator].IdBackground == GlobalData.Instance.ObjectsData[x, y].IdBackground &&
-                    GlobalData.Instance.ObjectsData[x, y + iterator].Type == GlobalData.Instance.ObjectsData[x, y].Type &&
-                    GlobalData.Instance.ObjectsData[x, y + iterator].TypeBackground == GlobalData.Instance.ObjectsData[x, y].TypeBackground &&
-                    GlobalData.Instance.ObjectsData[x, y + iterator].IsTreeTrunk == GlobalData.Instance.ObjectsData[x, y].IsTreeTrunk &&
-                    GlobalData.Instance.ObjectsData[x, y + iterator].IsTreeFoliage == GlobalData.Instance.ObjectsData[x, y].IsTreeFoliage &&
-                    GlobalData.Instance.ObjectsData[x, y + iterator].CurrentFlowValue == GlobalData.Instance.ObjectsData[x, y].CurrentFlowValue)
+                while (GameManager.Instance.World.IsInMapRange(x, y + iterator) &&
+                    GameManager.Instance.ObjectsData[x, y + iterator].Id == GameManager.Instance.ObjectsData[x, y].Id &&
+                    GameManager.Instance.ObjectsData[x, y + iterator].IdBackground == GameManager.Instance.ObjectsData[x, y].IdBackground &&
+                    GameManager.Instance.ObjectsData[x, y + iterator].Type == GameManager.Instance.ObjectsData[x, y].Type &&
+                    GameManager.Instance.ObjectsData[x, y + iterator].TypeBackground == GameManager.Instance.ObjectsData[x, y].TypeBackground &&
+                    GameManager.Instance.ObjectsData[x, y + iterator].IsTreeTrunk == GameManager.Instance.ObjectsData[x, y].IsTreeTrunk &&
+                    GameManager.Instance.ObjectsData[x, y + iterator].IsTreeFoliage == GameManager.Instance.ObjectsData[x, y].IsTreeFoliage &&
+                    GameManager.Instance.ObjectsData[x, y + iterator].CurrentFlowValue == GameManager.Instance.ObjectsData[x, y].CurrentFlowValue)
                 {
                     countOfSameObject++;
                     iterator++;
@@ -240,18 +236,27 @@ public class SaveLoadSystem : MonoBehaviour
 
     private void LoadWorldObjectsData(BinaryReader binaryReader)
     {
-        for (int x = 0; x < _world.TerrainConfiguration.WorldWitdh; x++)
+        int id = 0;
+        int backgroundId = 0;
+        ObjectType type = ObjectType.Empty;
+        ObjectType backgroundType = ObjectType.Empty;
+        bool isTreeTrunk = false;
+        bool isTreeFoliage = false;
+        int countSameVertical = 0;
+        float flowValue = 0f;
+
+        for (int x = 0; x < GameManager.Instance.World.TerrainConfiguration.WorldWitdh; x++)
         {
-            for (int y = 0; y < _world.TerrainConfiguration.WorldHeight; y++)
+            for (int y = 0; y < GameManager.Instance.World.TerrainConfiguration.WorldHeight; y++)
             {
-                int id = 0;
-                int backgroundId = 0;
-                ObjectType type = ObjectType.Empty;
-                ObjectType backgroundType = ObjectType.Empty;
-                bool isTreeTrunk = false;
-                bool isTreeFoliage = false;
-                int countSameVertical = 0;
-                float flowValue = 0f;
+                id = 0;
+                backgroundId = 0;
+                type = ObjectType.Empty;
+                backgroundType = ObjectType.Empty;
+                isTreeTrunk = false;
+                isTreeFoliage = false;
+                countSameVertical = 0;
+                flowValue = 0f;
 
                 byte flags = binaryReader.ReadByte();
                 if ((flags & 1) == 1)
@@ -285,21 +290,21 @@ public class SaveLoadSystem : MonoBehaviour
                     int intFlowValue = (int)binaryReader.ReadByte();
                     flowValue = intFlowValue / 100f;
                 }
-                BlockSO block = _world.ObjectAtlas.GetBlockByID(type, id);
-                _world.CreateBlock(block, x, y);
-                GlobalData.Instance.ObjectsData[x, y].IsTreeTrunk = isTreeTrunk;
-                GlobalData.Instance.ObjectsData[x, y].IsTreeFoliage = isTreeFoliage;
-                GlobalData.Instance.ObjectsData[x, y].CurrentFlowValue = flowValue;
+                BlockSO block = GameManager.Instance.WorldObjectAtlas.GetBlockByID(type, id);
+                GameManager.Instance.World.CreateBlock(block, x, y);
+                GameManager.Instance.ObjectsData[x, y].IsTreeTrunk = isTreeTrunk;
+                GameManager.Instance.ObjectsData[x, y].IsTreeFoliage = isTreeFoliage;
+                GameManager.Instance.ObjectsData[x, y].CurrentFlowValue = flowValue;
                 if (countSameVertical != 0)
                 {
                     int inc = 1;
                     int createdCount = 0;
                     while (countSameVertical > 0)
                     {
-                        _world.CreateBlock(block, x, y + inc);
-                        GlobalData.Instance.ObjectsData[x, y + inc].IsTreeTrunk = isTreeTrunk;
-                        GlobalData.Instance.ObjectsData[x, y + inc].IsTreeFoliage = isTreeFoliage;
-                        GlobalData.Instance.ObjectsData[x, y + inc].CurrentFlowValue = flowValue;
+                        GameManager.Instance.World.CreateBlock(block, x, y + inc);
+                        GameManager.Instance.ObjectsData[x, y + inc].IsTreeTrunk = isTreeTrunk;
+                        GameManager.Instance.ObjectsData[x, y + inc].IsTreeFoliage = isTreeFoliage;
+                        GameManager.Instance.ObjectsData[x, y + inc].CurrentFlowValue = flowValue;
                         inc++;
                         countSameVertical--;
                         createdCount++;
@@ -312,7 +317,7 @@ public class SaveLoadSystem : MonoBehaviour
 
     private void SaveTrees(BinaryWriter binaryWriter)
     {
-        GameObject trees = _world.gameObject.transform.Find("Trees").gameObject;
+        GameObject trees = GameManager.Instance.TreesSection;
         int treeCount = trees.transform.childCount;
 
         byte flags = 0;
@@ -350,8 +355,8 @@ public class SaveLoadSystem : MonoBehaviour
 
     private void LoadTrees(BinaryReader binaryReader) 
     {
-        GameObject trees = new GameObject("Trees");
-        trees.transform.parent = _world.gameObject.transform;
+        GameObject trees = GameManager.Instance.TreesSection;
+        trees.transform.parent = GameManager.Instance.World.gameObject.transform;
 
         foreach (Transform child in trees.transform)
         {
@@ -379,18 +384,18 @@ public class SaveLoadSystem : MonoBehaviour
             float x = binaryReader.ReadSingle();
             float y = binaryReader.ReadSingle();
             createdCount++;
-            GameObject treeGameObject = Instantiate(_world.ObjectAtlas.GetTreeByID(id), new Vector3(x, y), Quaternion.identity, trees.transform);
+            GameObject treeGameObject = Instantiate(GameManager.Instance.WorldObjectAtlas.GetTreeByID(id), new Vector3(x, y), Quaternion.identity, trees.transform);
             Tree tree = treeGameObject.GetComponent<Tree>();
         }
     }
 
     private void SavePlayer(BinaryWriter binaryWriter)
     {
-        InventoryController controller = _player.GetComponent<InventoryController>();
+        InventoryController controller = GameManager.Instance.Player.GetComponent<InventoryController>();
         InventorySO inventoryData = controller.GetInventory();
 
-        float x = _player.transform.position.x;
-        float y = _player.transform.position.y;
+        float x = GameManager.Instance.Player.transform.position.x;
+        float y = GameManager.Instance.Player.transform.position.y;
         byte inventorySize = Convert.ToByte(inventoryData.Size);
 
         binaryWriter.Write(x);
@@ -442,15 +447,15 @@ public class SaveLoadSystem : MonoBehaviour
 
     private void LoadPlayer(BinaryReader binaryReader)
     {
-        InventoryController controller = _player.GetComponent<InventoryController>();
+        InventoryController controller = GameManager.Instance.Player.GetComponent<InventoryController>();
         InventorySO inventoryData = controller.GetInventory();
 
         float x = binaryReader.ReadSingle();
         float y = binaryReader.ReadSingle();
         byte inventorySize = binaryReader.ReadByte();
 
-        _player.transform.position = new Vector3(x, y);
-        _player.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
+        GameManager.Instance.Player.transform.position = new Vector3(x, y);
+        GameManager.Instance.Player.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
         inventoryData.Size = inventorySize;
         inventoryData.Initialize();
 
@@ -465,7 +470,7 @@ public class SaveLoadSystem : MonoBehaviour
             else
             {
                 ItemsID itemID = (ItemsID)binaryReader.ReadUInt16();
-                ItemSO itemSO = controller.ItemsAtlas.GetItemByID(itemID);
+                ItemSO itemSO = GameManager.Instance.ItemsAtlas.GetItemByID(itemID);
                 int itemQuantity = (int)binaryReader.ReadUInt16();
                 InventoryItem item = new InventoryItem()
                 {
@@ -487,7 +492,7 @@ public class SaveLoadSystem : MonoBehaviour
             else
             {
                 ItemsID itemID = (ItemsID)binaryReader.ReadUInt16();
-                ArmorItemSO armorSO = controller.ItemsAtlas.GetItemByID(itemID) as ArmorItemSO;
+                ArmorItemSO armorSO = GameManager.Instance.ItemsAtlas.GetItemByID(itemID) as ArmorItemSO;
                 int itemQuantity = (int)binaryReader.ReadUInt16();
                 InventoryItem item = new InventoryItem()
                 {

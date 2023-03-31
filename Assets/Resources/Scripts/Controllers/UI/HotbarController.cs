@@ -16,6 +16,19 @@ public class HotbarController : MonoBehaviour
         KeyCode.Alpha8, KeyCode.Alpha9,
     };
 
+    public UIHotbar HotbarUI
+    {
+        get
+        {
+            return _hotbarUI;
+        }
+
+        set
+        {
+            _hotbarUI = value;
+        }
+    }
+
     private void Start()
     {
         PrepareUI();
@@ -29,8 +42,8 @@ public class HotbarController : MonoBehaviour
 
     private void PrepareUI()
     {
-        _hotbarUI.InitializeHotbarUI();
-        _hotbarUI.OnNeedSelectCell += HandleSelectCell;
+        HotbarUI.InitializeHotbarUI();
+        HotbarUI.OnNeedSelectCell += HandleSelectCell;
     }
 
     private void PrepareInventoryData()
@@ -67,11 +80,11 @@ public class HotbarController : MonoBehaviour
         {
             if (item.Value.IsEmpty)
             {
-                _hotbarUI.UpdateData(item.Key, null, 0);
+                HotbarUI.UpdateData(item.Key, null, 0);
             }
             else
             {
-                _hotbarUI.UpdateData(item.Key, item.Value.Item.ItemImage, item.Value.Quantity);
+                HotbarUI.UpdateData(item.Key, item.Value.Item.ItemImage, item.Value.Quantity);
             }
         }
     }
@@ -83,6 +96,6 @@ public class HotbarController : MonoBehaviour
 
     private void HandleUpdateSelection(int index)
     {
-        _hotbarUI.UpdateSelection(index);
+        HotbarUI.UpdateSelection(index);
     }
 }
