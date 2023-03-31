@@ -101,7 +101,6 @@ public class Interactions : MonoBehaviour
 
     public void PlaceBlock(BlockItemSO block)
     {
-        ObjectData[,] ObjectsData = World.ObjectsData;
         Vector3 position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3Int intPosition = World.BlockTilemap.WorldToCell(position);
 
@@ -114,7 +113,6 @@ public class Interactions : MonoBehaviour
 
     public void BreakBlock()
     {
-        ObjectData[,] ObjectsData = World.ObjectsData;
         Vector3 position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3Int intPosition = World.BlockTilemap.WorldToCell(position);
 

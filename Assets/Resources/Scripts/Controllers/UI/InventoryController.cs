@@ -1,8 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 public class InventoryController : MonoBehaviour
 {
@@ -31,11 +29,15 @@ public class InventoryController : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        _itemsAtlas.LoadData();
+    }
+
     private void Start()
     {
         PrepareUI();
         PrepareInventoryData();
-        _itemsAtlas.LoadData();
     }
 
     public void Update()

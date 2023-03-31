@@ -620,15 +620,6 @@ public class TerrainGeneration : MonoBehaviour
             height += level.chunkCount * World.TerrainConfiguration.chunkSize;
         }
         World.Chunks = new Chunk[width / chunkSize, height / chunkSize];
-        World.ObjectsData = new ObjectData[width, height];
-        _objectsData = World.ObjectsData;
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                _objectsData[x, y] = new ObjectData(new Vector3Int(x, y));
-            }
-        }
     }
     
     public void GenerateTerrain(Vector2Int startPosition, TerrainLevel level)

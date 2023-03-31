@@ -238,7 +238,7 @@ public class EnemiesMobs : NPC
 
                     //Check if we can jump
                     Vector3Int intPosition = World.BlockTilemap.WorldToCell(transform.position);
-                    if (World.ObjectsData[intPosition.x + MoveDirection, intPosition.y].IsSolidBlock())
+                    if (GlobalData.Instance.ObjectsData[intPosition.x + MoveDirection, intPosition.y].IsSolidBlock())
                     {
                         Rigidbody.velocity = new Vector2(Rigidbody.velocity.x, 20);
                     }

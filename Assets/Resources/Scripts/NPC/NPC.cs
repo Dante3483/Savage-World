@@ -505,7 +505,6 @@ public class NPC : MonoBehaviour
         Debug.DrawRay(centerForDebug - new Vector2(halfSize.x, GroundCheckSize.y + ExtraWidth), Vector2.right * GroundCheckSize.x, rayColor);
         Debug.DrawRay(centerForDebug - new Vector2(halfSize.x, 0), Vector2.right * GroundCheckSize.x, rayColor);
 
-        Debug.Log(raycastHit.collider);
         return raycastHit.collider != null;
     }
 

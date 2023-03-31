@@ -7,18 +7,16 @@ public class MainMenu : MonoBehaviour
 {
     public void NewGame()
     {
-        World.IsGameLoaded = false;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        GameManager.Instance.UpdateGameState(GameState.NewLevel);
     }
 
     public void LoadGame()
     {
-        World.IsGameLoaded = true;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        GameManager.Instance.UpdateGameState(GameState.LoadLevel);
     }
 
     public void Quit()
     {
-        Debug.Log("Quit");
+        GameManager.Instance.UpdateGameState(GameState.Quit);
     }
 }

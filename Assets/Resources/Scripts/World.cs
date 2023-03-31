@@ -19,7 +19,6 @@ public class World : MonoBehaviour
     private GameObject _terrainGenerationObject;
     private GameObject _dropSection;
     private System.Random _randomVar;
-    private ObjectData[,] _objectsData;
     private Chunk[,] _chunks;
 
     //Threads
@@ -64,19 +63,6 @@ public class World : MonoBehaviour
         set
         {
             _seed = value;
-        }
-    }
-
-    public ObjectData[,] ObjectsData
-    {
-        get
-        {
-            return _objectsData;
-        }
-
-        set
-        {
-            _objectsData = value;
         }
     }
 
@@ -176,6 +162,7 @@ public class World : MonoBehaviour
     {
         try
         {
+            Debug.Log("HI");
             //Create drop section
             GameObject drop = new GameObject("Drop");
             drop.transform.parent = transform;
@@ -218,7 +205,7 @@ public class World : MonoBehaviour
         {
             FillMap();
             Debug.LogError(c);
-            File.WriteAllText(Application.dataPath + "/Output.txt", c.Message);
+            File.WriteAllText(Application.dataPath + "/Output.txt", c.ToString());
         }
     }
 
@@ -249,19 +236,19 @@ public class World : MonoBehaviour
         {
             for (int y = 0; y < TerrainConfiguration.WorldHeight; y++)
             {
-                if (ObjectsData[x, y].Type == ObjectType.Empty)
+                if (GlobalData.Instance.ObjectsData[x, y].Type == ObjectType.Empty)
                 {
-                    if (ObjectsData[x, y].IsTreeTrunk)
+                    if (GlobalData.Instance.ObjectsData[x, y].IsTreeTrunk)
                     {
                         Color trunkColor = new Color(100f / 255f, 60f / 255f, 0);
                         WorldMap.SetPixel(x, y, trunkColor);
                         continue;
                     }
-                    Color backgroundColor = new Color(ObjectsData[x, y].BackgroundColorOnMap.r - 0.2f, ObjectsData[x, y].BackgroundColorOnMap.g - 0.2f, ObjectsData[x, y].BackgroundColorOnMap.b - 0.2f);
+                    Color backgroundColor = new Color(GlobalData.Instance.ObjectsData[x, y].BackgroundColorOnMap.r - 0.2f, GlobalData.Instance.ObjectsData[x, y].BackgroundColorOnMap.g - 0.2f, GlobalData.Instance.ObjectsData[x, y].BackgroundColorOnMap.b - 0.2f);
                     WorldMap.SetPixel(x, y, backgroundColor);
                     continue;
                 }
-                WorldMap.SetPixel(x, y, ObjectsData[x, y].ColorOnMap);
+                WorldMap.SetPixel(x, y, GlobalData.Instance.ObjectsData[x, y].ColorOnMap);
             }
         }
         WorldMap.Apply();
@@ -276,32 +263,32 @@ public class World : MonoBehaviour
     public void CreateBlock(BlockSO block, int x, int y, BlockSO backgroundBlock = null)
     {
         TileBase tile = block.tiles.Count != 0 ? block.tiles[RandomVar.Next(0, block.tiles.Count)] : null;
-        ObjectsData[x, y].Id = block.GetID();
-        ObjectsData[x, y].CurrentTile = tile;
-        ObjectsData[x, y].Type = block.blockType;
-        ObjectsData[x, y].ColorOnMap = block.colorOnMap;
-        ObjectsData[x, y].CurrentLiquidBackgroundTile = null;
-        ObjectsData[x, y].Durability = block.Durability;
+        GlobalData.Instance.ObjectsData[x, y].Id = block.GetID();
+        GlobalData.Instance.ObjectsData[x, y].CurrentTile = tile;
+        GlobalData.Instance.ObjectsData[x, y].Type = block.blockType;
+        GlobalData.Instance.ObjectsData[x, y].ColorOnMap = block.colorOnMap;
+        GlobalData.Instance.ObjectsData[x, y].CurrentLiquidBackgroundTile = null;
+        GlobalData.Instance.ObjectsData[x, y].Durability = block.Durability;
         if (backgroundBlock != null)
         {
             tile = block.tiles.Count != 0 ? backgroundBlock.tiles[RandomVar.Next(0, block.tiles.Count)] : null;
-            ObjectsData[x, y].IdBackground = backgroundBlock.GetID();
-            ObjectsData[x, y].CurrentBackgroundTile = backgroundBlock.tiles[RandomVar.Next(0, backgroundBlock.tiles.Count)]; ;
-            ObjectsData[x, y].TypeBackground = backgroundBlock.blockType;
-            ObjectsData[x, y].BackgroundColorOnMap = backgroundBlock.colorOnMap;
+            GlobalData.Instance.ObjectsData[x, y].IdBackground = backgroundBlock.GetID();
+            GlobalData.Instance.ObjectsData[x, y].CurrentBackgroundTile = backgroundBlock.tiles[RandomVar.Next(0, backgroundBlock.tiles.Count)]; ;
+            GlobalData.Instance.ObjectsData[x, y].TypeBackground = backgroundBlock.blockType;
+            GlobalData.Instance.ObjectsData[x, y].BackgroundColorOnMap = backgroundBlock.colorOnMap;
         }
 
         if (block.blockType == ObjectType.Plant)
         {
-            ObjectsData[x, y].ChanceToGrow = (block as PlantSO).ChanceToGrow;
+            GlobalData.Instance.ObjectsData[x, y].ChanceToGrow = (block as PlantSO).ChanceToGrow;
         }
     }
 
     public bool DecreaseDurability(Vector2Int position, float durrabilityDecrease)
     {
-        ObjectsData[position.x, position.y].Durability -= durrabilityDecrease;
+        GlobalData.Instance.ObjectsData[position.x, position.y].Durability -= durrabilityDecrease;
 
-        if (ObjectsData[position.x, position.y].Durability <= 0)
+        if (GlobalData.Instance.ObjectsData[position.x, position.y].Durability <= 0)
         {
             return true;
         }
@@ -313,7 +300,7 @@ public class World : MonoBehaviour
 
     public ObjectData GetBlockByPosition(Vector3Int intPosition)
     {
-        return ObjectsData[intPosition.x, intPosition.y];
+        return GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y];
     }
 
     private RectInt GetCameraRectInt()
@@ -489,7 +476,7 @@ public class World : MonoBehaviour
             //Fill Tiles array with drawable blocks
             foreach (Vector2Int position in currentCameraRect.allPositionsWithin)
             {
-                ObjectData block = ObjectsData[position.x, position.y];
+                ObjectData block = GlobalData.Instance.ObjectsData[position.x, position.y];
                 if (IsInMapRange(position.x, position.y))
                 {
                     TileBase blockTile = block.CurrentTile;
@@ -510,9 +497,9 @@ public class World : MonoBehaviour
                     liquidBackgroundTiles.Add(liquidBackgroundTile);
                     blockBackgroundTiles.Add(backgroundTile);
 
-                    if ((ObjectsData[position.x, position.y].Type != ObjectType.Empty &&
-                        ObjectsData[position.x, position.y].Type != ObjectType.LiquidBlock &&
-                        ObjectsData[position.x, position.y].Type != ObjectType.Plant))
+                    if ((GlobalData.Instance.ObjectsData[position.x, position.y].Type != ObjectType.Empty &&
+                        GlobalData.Instance.ObjectsData[position.x, position.y].Type != ObjectType.LiquidBlock &&
+                        GlobalData.Instance.ObjectsData[position.x, position.y].Type != ObjectType.Plant))
                     {
                         solidBlocksTiles.Add(SolidBlocksRuleTile);
                     }
@@ -534,7 +521,7 @@ public class World : MonoBehaviour
             if (IsGameLoaded)
             {
                 IsGameLoaded = !IsGameLoaded;
-                GameObject.FindGameObjectWithTag("Player").GetComponent<MovementV2>().Rigidbody.bodyType = RigidbodyType2D.Dynamic;
+                GameObject.FindGameObjectWithTag("Player").GetComponent<Movement>().Rigidbody.bodyType = RigidbodyType2D.Dynamic;
             }
         }
     }
@@ -558,7 +545,7 @@ public class World : MonoBehaviour
                                 {
                                     continue;
                                 }
-                                ObjectData block = ObjectsData[x, y];
+                                ObjectData block = GlobalData.Instance.ObjectsData[x, y];
                                 ObjectData downBlockData = null;
                                 ObjectData leftBlockData = null;
                                 ObjectData rightBlockData = null;
@@ -566,19 +553,19 @@ public class World : MonoBehaviour
 
                                 if (y - 1 != -1)
                                 {
-                                    downBlockData = ObjectsData[x, y - 1];
+                                    downBlockData = GlobalData.Instance.ObjectsData[x, y - 1];
                                 }
                                 if (x - 1 != -1)
                                 {
-                                    leftBlockData = ObjectsData[x - 1, y];
+                                    leftBlockData = GlobalData.Instance.ObjectsData[x - 1, y];
                                 }
-                                if (x + 1 != ObjectsData.GetLength(0))
+                                if (x + 1 != GlobalData.Instance.ObjectsData.GetLength(0))
                                 {
-                                    rightBlockData = ObjectsData[x + 1, y];
+                                    rightBlockData = GlobalData.Instance.ObjectsData[x + 1, y];
                                 }
-                                if (y + 1 != ObjectsData.GetLength(1))
+                                if (y + 1 != GlobalData.Instance.ObjectsData.GetLength(1))
                                 {
-                                    topBlockData = ObjectsData[x, y + 1];
+                                    topBlockData = GlobalData.Instance.ObjectsData[x, y + 1];
                                 }
 
                                 if (block.IsPsevdoFull)
@@ -717,7 +704,7 @@ public class World : MonoBehaviour
                                     if (remainingValue < _minValue && !liquidObjectData.IsPsevdoFull)
                                     {
                                         CreateBlock(ObjectAtlas.GetBlockByID(ObjectType.Empty, 0), x, y);
-                                        ObjectsData[x, y].CurrentFlowValue = 0f;
+                                        GlobalData.Instance.ObjectsData[x, y].CurrentFlowValue = 0f;
                                         continue;
                                     }
                                     #endregion
@@ -756,7 +743,7 @@ public class World : MonoBehaviour
                                     if (remainingValue < _minValue && !liquidObjectData.IsPsevdoFull)
                                     {
                                         CreateBlock(ObjectAtlas.Air, x, y);
-                                        ObjectsData[x, y].CurrentFlowValue = 0f;
+                                        GlobalData.Instance.ObjectsData[x, y].CurrentFlowValue = 0f;
                                         continue;
                                     }
                                     #endregion
@@ -794,7 +781,7 @@ public class World : MonoBehaviour
                                     if (remainingValue < _minValue && !liquidObjectData.IsPsevdoFull)
                                     {
                                         CreateBlock(ObjectAtlas.Air, x, y);
-                                        ObjectsData[x, y].CurrentFlowValue = 0f;
+                                        GlobalData.Instance.ObjectsData[x, y].CurrentFlowValue = 0f;
                                         continue;
                                     }
                                     #endregion
@@ -838,10 +825,10 @@ public class World : MonoBehaviour
             int y = RandomVar.Next(0, TerrainConfiguration.WorldHeight);
 
             //Update vine
-            if (_objectsData[x, y].Type == ObjectType.Plant && 
-                _objectsData[x, y].Id == (int)PlantsID.Vine &&
-                RandomVar.Next(0, 101) <= _objectsData[x, y].ChanceToGrow && 
-                _objectsData[x, y - 1].Type == ObjectType.Empty)
+            if (GlobalData.Instance.ObjectsData[x, y].Type == ObjectType.Plant && 
+                GlobalData.Instance.ObjectsData[x, y].Id == (int)PlantsID.Vine &&
+                RandomVar.Next(0, 101) <= GlobalData.Instance.ObjectsData[x, y].ChanceToGrow && 
+                GlobalData.Instance.ObjectsData[x, y - 1].Type == ObjectType.Empty)
             {
                 CreateBlock(ObjectAtlas.Vine, x, y - 1);
             }
@@ -857,23 +844,23 @@ public class World : MonoBehaviour
 
     public bool IsValidPlaceToCreateBlock(Vector3Int intPosition)
     {
-        return ObjectsData[intPosition.x, intPosition.y].Type == ObjectType.Empty &&
-            !ObjectsData[intPosition.x, intPosition.y].IsTreeFoliage &&
-            !ObjectsData[intPosition.x, intPosition.y].IsTreeTrunk;
+        return GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y].Type == ObjectType.Empty &&
+            !GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y].IsTreeFoliage &&
+            !GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y].IsTreeTrunk;
     }
 
     public bool IsValidPlaceToBreakBlock(Vector3Int intPosition)
     {
-        return ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Empty;
+        return GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Empty;
     }
 
     public bool IsAdjacentBlockSolid(Vector3 position, Vector2Int direction)
     {
         Vector3Int intPosition = BlockTilemap.WorldToCell(position);
         intPosition += new Vector3Int(direction.x, direction.y);
-        return ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Empty &&
-            ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Plant &&
-            ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.LiquidBlock;
+        return GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Empty &&
+            GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Plant &&
+            GlobalData.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.LiquidBlock;
     }
 
     #endregion

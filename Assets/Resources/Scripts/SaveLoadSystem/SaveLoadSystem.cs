@@ -19,8 +19,7 @@ public class SaveLoadSystem : MonoBehaviour
 
     public void SaveAllData()
     {
-        string path = Application.dataPath + Path.AltDirectorySeparatorChar + "SaveData.fun";
-        string persistancePath = Application.persistentDataPath + Path.AltDirectorySeparatorChar + "SaveData.fun";
+        string path = Application.dataPath + "/SaveData.fun";
 
         Debug.Log("Saved data to: " + path);
 
@@ -43,8 +42,7 @@ public class SaveLoadSystem : MonoBehaviour
 
     public void LoadAllData()
     {
-        string path = Application.dataPath + Path.AltDirectorySeparatorChar + "SaveData.fun";
-        string persistancePath = Application.persistentDataPath + Path.AltDirectorySeparatorChar + "SaveData.fun";
+        string path = Application.dataPath + "/SaveData.fun";
 
         Debug.Log("Load data from: " + path);
 
@@ -54,7 +52,6 @@ public class SaveLoadSystem : MonoBehaviour
         {
             LoadConfigurationData(binaryReader);
             Debug.Log("Configuration loaded");
-            CreateNewWorldMap();
             LoadWorldChunks(binaryReader);
             Debug.Log("Chunks loaded");
             LoadWorldObjectsData(binaryReader);
@@ -106,6 +103,7 @@ public class SaveLoadSystem : MonoBehaviour
 
     private void LoadWorldChunks(BinaryReader binaryReader)
     {
+        _world.Chunks = new Chunk[_world.TerrainConfiguration.horizontalChunksCount, _world.TerrainConfiguration.VerticalChunksCount];
         for (int x = 0; x < _world.TerrainConfiguration.horizontalChunksCount; x++)
         {
             for (int y = 0; y < _world.TerrainConfiguration.VerticalChunksCount; y++)
@@ -135,7 +133,7 @@ public class SaveLoadSystem : MonoBehaviour
             {
                 List<byte> writeResult = new List<byte>();
 
-                ObjectData data = _world.ObjectsData[x, y];
+                ObjectData data = GlobalData.Instance.ObjectsData[x, y];
 
                 //Bits:
                 //0 - If <Block ID> set
@@ -174,13 +172,13 @@ public class SaveLoadSystem : MonoBehaviour
                 int iterator = 1;
                 int countOfSameObject = 0;
                 while (_world.IsInMapRange(x, y + iterator) &&
-                    _world.ObjectsData[x, y + iterator].Id == _world.ObjectsData[x, y].Id &&
-                    _world.ObjectsData[x, y + iterator].IdBackground == _world.ObjectsData[x, y].IdBackground &&
-                    _world.ObjectsData[x, y + iterator].Type == _world.ObjectsData[x, y].Type &&
-                    _world.ObjectsData[x, y + iterator].TypeBackground == _world.ObjectsData[x, y].TypeBackground &&
-                    _world.ObjectsData[x, y + iterator].IsTreeTrunk == _world.ObjectsData[x, y].IsTreeTrunk &&
-                    _world.ObjectsData[x, y + iterator].IsTreeFoliage == _world.ObjectsData[x, y].IsTreeFoliage &&
-                    _world.ObjectsData[x, y + iterator].CurrentFlowValue == _world.ObjectsData[x, y].CurrentFlowValue)
+                    GlobalData.Instance.ObjectsData[x, y + iterator].Id == GlobalData.Instance.ObjectsData[x, y].Id &&
+                    GlobalData.Instance.ObjectsData[x, y + iterator].IdBackground == GlobalData.Instance.ObjectsData[x, y].IdBackground &&
+                    GlobalData.Instance.ObjectsData[x, y + iterator].Type == GlobalData.Instance.ObjectsData[x, y].Type &&
+                    GlobalData.Instance.ObjectsData[x, y + iterator].TypeBackground == GlobalData.Instance.ObjectsData[x, y].TypeBackground &&
+                    GlobalData.Instance.ObjectsData[x, y + iterator].IsTreeTrunk == GlobalData.Instance.ObjectsData[x, y].IsTreeTrunk &&
+                    GlobalData.Instance.ObjectsData[x, y + iterator].IsTreeFoliage == GlobalData.Instance.ObjectsData[x, y].IsTreeFoliage &&
+                    GlobalData.Instance.ObjectsData[x, y + iterator].CurrentFlowValue == GlobalData.Instance.ObjectsData[x, y].CurrentFlowValue)
                 {
                     countOfSameObject++;
                     iterator++;
@@ -289,9 +287,9 @@ public class SaveLoadSystem : MonoBehaviour
                 }
                 BlockSO block = _world.ObjectAtlas.GetBlockByID(type, id);
                 _world.CreateBlock(block, x, y);
-                _world.ObjectsData[x, y].IsTreeTrunk = isTreeTrunk;
-                _world.ObjectsData[x, y].IsTreeFoliage = isTreeFoliage;
-                _world.ObjectsData[x, y].CurrentFlowValue = flowValue;
+                GlobalData.Instance.ObjectsData[x, y].IsTreeTrunk = isTreeTrunk;
+                GlobalData.Instance.ObjectsData[x, y].IsTreeFoliage = isTreeFoliage;
+                GlobalData.Instance.ObjectsData[x, y].CurrentFlowValue = flowValue;
                 if (countSameVertical != 0)
                 {
                     int inc = 1;
@@ -299,8 +297,9 @@ public class SaveLoadSystem : MonoBehaviour
                     while (countSameVertical > 0)
                     {
                         _world.CreateBlock(block, x, y + inc);
-                        _world.ObjectsData[x, y + inc].IsTreeTrunk = isTreeTrunk;
-                        _world.ObjectsData[x, y + inc].IsTreeFoliage = isTreeFoliage;
+                        GlobalData.Instance.ObjectsData[x, y + inc].IsTreeTrunk = isTreeTrunk;
+                        GlobalData.Instance.ObjectsData[x, y + inc].IsTreeFoliage = isTreeFoliage;
+                        GlobalData.Instance.ObjectsData[x, y + inc].CurrentFlowValue = flowValue;
                         inc++;
                         countSameVertical--;
                         createdCount++;
@@ -451,6 +450,7 @@ public class SaveLoadSystem : MonoBehaviour
         byte inventorySize = binaryReader.ReadByte();
 
         _player.transform.position = new Vector3(x, y);
+        _player.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
         inventoryData.Size = inventorySize;
         inventoryData.Initialize();
 
@@ -499,29 +499,5 @@ public class SaveLoadSystem : MonoBehaviour
         }
 
         inventoryData.InformAboutChange();
-    }
-
-    private void CreateNewWorldMap()
-    {
-        //Initialize blocksData array with specified width and height
-        //Width = count of horizontal chunks * chunk size
-        //Height = count of chunk in specified terrain level * chunk size
-        int width = 0;
-        int height = 0;
-        int chunkSize = _world.TerrainConfiguration.chunkSize;
-        width = _world.TerrainConfiguration.horizontalChunksCount * _world.TerrainConfiguration.chunkSize;
-        foreach (TerrainLevel level in _world.TerrainConfiguration.levels)
-        {
-            height += level.chunkCount * _world.TerrainConfiguration.chunkSize;
-        }
-        _world.Chunks = new Chunk[width / chunkSize, height / chunkSize];
-        _world.ObjectsData = new ObjectData[width, height];
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                _world.ObjectsData[x, y] = new ObjectData(new Vector3Int(x, y));
-            }
-        }
     }
 }
