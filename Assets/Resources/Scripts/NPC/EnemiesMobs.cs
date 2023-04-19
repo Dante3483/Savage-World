@@ -259,7 +259,7 @@ public class EnemiesMobs : NPC
 
                     //Check if we can jump
                     Vector3Int intPosition = World.BlockTilemap.WorldToCell(transform.position);
-                    if (World.ObjectsData[intPosition.x + MoveDirection, intPosition.y].IsSolidBlock() && !IsTargetInAttackArea)
+                    if (GameManager.Instance.ObjectsData[intPosition.x + MoveDirection, intPosition.y].IsSolidBlock() && !IsTargetInAttackArea)
                     {
 
                          IsJumping = true;

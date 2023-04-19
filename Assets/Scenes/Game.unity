@@ -550,6 +550,7 @@ MonoBehaviour:
   Player: {fileID: 0}
   TreesSection: {fileID: 0}
   DropSection: {fileID: 0}
+  PickableItemsSection: {fileID: 0}
   MainCamera: {fileID: 604594818}
   mouseFollowerOutline: {fileID: 994742926}
   WorldObjectAtlas: {fileID: 11400000, guid: b3ded8ce0e2a09244a50f8f34b72e658, type: 2}
@@ -873,7 +874,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acd08919f4d4b4146b68e1a71283474d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _outlinesTilemaps: []
+  _checkMinDistanceItem:
+    _targetLayer:
+      serializedVersion: 2
+      m_Bits: 8192
+    _CheckSize: {x: 5, y: 5}
+    _CheckCenterOffset: {x: 0, y: 0}
+    _extraWidth: 0
+    _isTrueColor: {r: 0.15391564, g: 1, b: 0, a: 1}
+    _isFalseColor: {r: 1, g: 0, b: 0, a: 1}
+  _checkGround:
+    _targetLayer:
+      serializedVersion: 2
+      m_Bits: 1024
+    _isTrueColor: {r: 1, g: 0, b: 0.69761086, a: 1}
+    _isFalseColor: {r: 1, g: 0.89008415, b: 0, a: 1}
+  _maxDistance: 4
+  CurrentOutlinedItem: {fileID: 0}
 --- !u!61 &994742927
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2178,7 +2195,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2058779806}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 596.2643, y: 523.6316, z: 0.06650108}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

@@ -77,6 +77,13 @@ public class Interactions : MonoBehaviour
                 BreakBlock();
             }
         }
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            if (GameManager.Instance.mouseFollowerOutline.CurrentOutlinedItem != null)
+            {
+                GameManager.Instance.mouseFollowerOutline.CurrentOutlinedItem.GetComponent<IInteractiveObject>().HandleInteraction();
+            }
+        }
     }
 
     public void PlaceBlock(BlockItemSO block)
@@ -127,14 +134,14 @@ public class Interactions : MonoBehaviour
         }
     }
 
-    public void CreateDrop(Vector3 intPosition, ItemSO dropItem, int quantity, bool needCooldown)
+    public void CreateDrop(Vector3 position, ItemSO dropItem, int quantity, bool needCooldown)
     {
         if (dropItem != null)
         {
             GameObject dropGameObject = Instantiate(_dropPrefab);
             dropGameObject.name = dropItem.Name;
             dropGameObject.transform.parent = _dropSection.transform;
-            dropGameObject.transform.position = intPosition + new Vector3(Random.Range(0.1f, 0.9f), 0.5f);
+            dropGameObject.transform.position = position + new Vector3(Random.Range(0.1f, 0.9f), 0.5f);
             dropGameObject.GetComponent<SpriteRenderer>().sprite = dropItem.ItemImage;
             Drop drop = dropGameObject.GetComponent<Drop>();
             drop.DropItem = dropItem;

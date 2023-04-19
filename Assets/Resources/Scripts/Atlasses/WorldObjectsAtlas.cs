@@ -14,13 +14,15 @@ public class WorldObjectsAtlas: ScriptableObject
 {
     #region Private fields
     private Sets sets;
-    public Dictionary<ObjectType, BlockSO[]> BlocksDictionary;
-    public Dictionary<TreesID, GameObject[]> TreesDictionary;
-    public Dictionary<BiomesID, GameObject[]> BiomesTreesDictionary;
+    private Dictionary<ObjectType, BlockSO[]> BlocksDictionary;
+    private Dictionary<TreesID, GameObject[]> TreesDictionary;
+    private Dictionary<BiomesID, GameObject[]> BiomesTreesDictionary;
+    private List<PickableItem> PickableItemsList;
 
     #region Empty blocks
     [Header("Empty Blocks")]
-    public BlockSO Air;
+    public SpecialBlockSO Air;
+    public SpecialBlockSO PickableItem;
     #endregion
 
     #region Solid blocks
@@ -69,6 +71,12 @@ public class WorldObjectsAtlas: ScriptableObject
     public GameObject[] ConiferousForestTrees;
     #endregion
 
+    #region Pickable items
+    [Header("Pickable items")]
+    public PickableItem Rock;
+    public PickableItem Log;
+    #endregion
+
     #endregion
 
     #region Public fields
@@ -82,6 +90,16 @@ public class WorldObjectsAtlas: ScriptableObject
         return BlocksDictionary[objectType].ToList().Find(x => x.GetID() == (int)id);
     }
     
+    public List<BlockSO> GetAllBlockByType(ObjectType objectType)
+    {
+        return BlocksDictionary[objectType].ToList();
+    }
+
+    public List<PickableItem> GetAllPickableItems()
+    {
+        return PickableItemsList;
+    }
+
     public List<BlockSO> GetBiomesBlocks(ObjectType objectType, BiomesID biomeID)
     {
         if (objectType == ObjectType.Plant)
@@ -205,6 +223,14 @@ public class WorldObjectsAtlas: ScriptableObject
             { BiomesID.Forest, ForestTrees },
             { BiomesID.Swamp, SwampTrees },
             { BiomesID.ConiferousForest, ConiferousForestTrees }
+        };
+        #endregion
+
+        #region Pickable items
+        PickableItemsList = new List<PickableItem>()
+        {
+            Rock,
+            Log,
         };
         #endregion
     }

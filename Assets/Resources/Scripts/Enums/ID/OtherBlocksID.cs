@@ -4,5 +4,6 @@ using UnityEngine;
 
 public enum OtherBlocksID
 {
-
+    Air = 0,
+    PickableItem = 1,
 }

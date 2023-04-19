@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     #region Private fields
     [Header("Main")]
     [SerializeField] private GameState _gameState;
+
     [Header("Initialization")]
     [SerializeField] private int _maxXWorldSize;
     [SerializeField] private int _maxYWorldSize;
@@ -27,12 +28,14 @@ public class GameManager : MonoBehaviour
     #region Public fields
     public static GameManager Instance;
     public SaveLoadSystem SaveLoadManager;
+    public Interactions PlayerInteractions;
     public World World;
     public GameObject Player;
     public ObjectData[,] ObjectsData;
     public Chunk[,] Chunks;
     public GameObject TreesSection;
     public GameObject DropSection;
+    public GameObject PickableItemsSection;
     public Camera MainCamera;
     public MouseFollowerOutline mouseFollowerOutline;
     public WorldObjectsAtlas WorldObjectAtlas;
@@ -127,12 +130,13 @@ public class GameManager : MonoBehaviour
         GameObject terrain = Instantiate(_terrainPrefab);
         DropSection = terrain.transform.Find("Drop").gameObject;
         TreesSection = terrain.transform.Find("Trees").gameObject;
+        PickableItemsSection = terrain.transform.Find("PickableItems").gameObject;
         World = terrain.GetComponent<World>();
-        mouseFollowerOutline.OutlinesTilemaps.Add(World.PlantTilemap);
 
         Player = Instantiate(_playerPrefab);
         Player.GetComponent<InventoryController>().InventoryUI = _inventoryUI;
         Player.GetComponent<HotbarController>().HotbarUI = _hotbarUI;
+        PlayerInteractions = Player.GetComponent<Interactions>();
         MainCamera.GetComponent<CameraFollow>().Target = Player;
 
         World.LoadWorld();
@@ -148,9 +152,9 @@ public class GameManager : MonoBehaviour
         GameObject terrain = Instantiate(_terrainPrefab);
         DropSection = terrain.transform.Find("Drop").gameObject;
         TreesSection = terrain.transform.Find("Trees").gameObject;
+        PickableItemsSection = terrain.transform.Find("PickableItems").gameObject;
         World = terrain.GetComponent<World>();
         World.CreateNewWorld();
-        mouseFollowerOutline.OutlinesTilemaps.Add(World.PlantTilemap);
 
         int playerSpawnX = World.TerrainConfiguration.SpawnXPosition;
         int playerSpawnY;
@@ -158,7 +162,7 @@ public class GameManager : MonoBehaviour
         {
             if (ObjectsData[playerSpawnX, playerSpawnY].Type == ObjectType.Empty)
             {
-                playerSpawnX += 3;
+                playerSpawnX += 5;
                 break;
             }
         }
@@ -166,6 +170,7 @@ public class GameManager : MonoBehaviour
         Player.GetComponent<InventoryController>().InventoryUI = _inventoryUI;
         Player.GetComponent<InventoryController>().PrepareInventoryData();
         Player.GetComponent<HotbarController>().HotbarUI = _hotbarUI;
+        PlayerInteractions = Player.GetComponent<Interactions>();
         MainCamera.GetComponent<CameraFollow>().Target = Player;
 
         _mainMenuCanvas.gameObject.SetActive(false);

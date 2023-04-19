@@ -25,5 +25,5 @@ MonoBehaviour:
     BlockOnTemplate: {fileID: 11400000, guid: 1af3cf1f3b2e12649babd91a2adc95f4, type: 2}
     CountOfBlocks: 9
   - ColorOnTemplate: {r: 1, g: 1, b: 1, a: 1}
-    BlockOnTemplate: {fileID: 11400000, guid: 7011b0fd664fc49429972de8ff85dfe3, type: 2}
+    BlockOnTemplate: {fileID: 11400000, guid: 0db7046bc3dda8b4e87b8f7fa91db590, type: 2}
     CountOfBlocks: 294

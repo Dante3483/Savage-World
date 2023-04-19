@@ -10,4 +10,5 @@ public enum ObjectType
     DustBlock = 3,
     Plant = 4,
     Tree = 5,
+    PickableItem = 6,
 }

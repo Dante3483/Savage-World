@@ -1,7 +1,5 @@
-UnityEngine.UnassignedReferenceException: The variable Player of GameManager has not been assigned.
-You probably need to assign the Player variable of the GameManager script in the inspector.
-  at (wrapper managed-to-native) UnityEngine.GameObject.GetComponentFastPath(UnityEngine.GameObject,System.Type,intptr)
-  at UnityEngine.GameObject.GetComponent[T] () [0x00021] in <ba783288ca164d3099898a8819fcec1c>:0 
-  at SaveLoadSystem.LoadPlayer (System.IO.BinaryReader binaryReader) [0x00000] in D:\Projects\Savage World\Assets\Resources\Scripts\SaveLoadSystem\SaveLoadSystem.cs:445 
-  at SaveLoadSystem.LoadAllData () [0x0007a] in D:\Projects\Savage World\Assets\Resources\Scripts\SaveLoadSystem\SaveLoadSystem.cs:58 
-  at World.LoadWorld () [0x00000] in D:\Projects\Savage World\Assets\Resources\Scripts\World.cs:176 
+System.NullReferenceException: Object reference not set to an instance of an object
+  at World.CreateBlock (BlockSO block, System.Int32 x, System.Int32 y, BlockSO backgroundBlock) [0x00000] in D:\Projects\Savage World\Assets\Resources\Scripts\World.cs:226 
+  at TerrainGeneration.GenerateStructure (Structure structure) [0x00043] in D:\Projects\Savage World\Assets\Resources\Scripts\Terrain\TerrainGeneration.cs:1239 
+  at TerrainGeneration.Generation () [0x00806] in D:\Projects\Savage World\Assets\Resources\Scripts\Terrain\TerrainGeneration.cs:346 
+  at World.CreateNewWorld () [0x00033] in D:\Projects\Savage World\Assets\Resources\Scripts\World.cs:159 

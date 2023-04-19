@@ -161,9 +161,9 @@ BoxCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
-    border: {x: 0.125, y: 0.125, z: 0.125, w: 0.125}
+    border: {x: 0.26666668, y: 0.26666668, z: 0.26666668, w: 0.26666668}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.53333336, y: 0.53333336}
     newSize: {x: 0.16, y: 0.16}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -187,9 +187,9 @@ BoxCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
-    border: {x: 0.125, y: 0.125, z: 0.125, w: 0.125}
+    border: {x: 0.26666668, y: 0.26666668, z: 0.26666668, w: 0.26666668}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.53333336, y: 0.53333336}
     newSize: {x: 0.16, y: 0.16}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -244,8 +244,8 @@ MonoBehaviour:
     _extraWidth: 0
     _isTrueColor: {r: 0, g: 1, b: 0.6440792, a: 1}
     _isFalseColor: {r: 0.78283024, g: 1, b: 0, a: 1}
-  _magnetVelocity: 10
-  _magnetCooldown: 3
+  _magnetVelocity: 15
+  _magnetCooldown: 2
   _isGrounded: 0
   _isMerge: 0
   _isDropAttracted: 0

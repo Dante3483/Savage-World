@@ -9,12 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2252fc192149ef419db994254b17dc6, type: 3}
+  m_Script: {fileID: 11500000, guid: 38c45ebc652fcf34ca068264b49f2fdb, type: 3}
   m_Name: Air
   m_EditorClassIdentifier: 
   tiles: []
   backgroundBlocks: []
   blockType: 0
-  colorOnMap: {r: 0.3433962, g: 0.86208314, b: 1, a: 0}
+  colorOnMap: {r: 0.50377357, g: 1, b: 0.9676577, a: 1}
   Drop: {fileID: 0}
   Durability: -1
+  ID: 0

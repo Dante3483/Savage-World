@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba27b88f77e53cb49b6e8f5eff20a4c7, type: 3}
   m_Name: WorldObjectsAtlas
   m_EditorClassIdentifier: 
-  Air: {fileID: 11400000, guid: 7011b0fd664fc49429972de8ff85dfe3, type: 2}
+  Air: {fileID: 11400000, guid: 0db7046bc3dda8b4e87b8f7fa91db590, type: 2}
+  PickableItem: {fileID: 11400000, guid: 1427cc14a61cb7146bba54e5a027bd39, type: 2}
   Dirt: {fileID: 11400000, guid: e1504499c9e46cb428925ac3733cf4b9, type: 2}
   Grass:
   - {fileID: 11400000, guid: 0d3c97a7b78ad0e41866bfec1eecb335, type: 2}
@@ -72,3 +73,5 @@ MonoBehaviour:
   - {fileID: 8255332508421466833, guid: f6ef2b9a97b10c045bef45e7153b50d4, type: 3}
   ConiferousForestTrees:
   - {fileID: 8255332508421466833, guid: f6ef2b9a97b10c045bef45e7153b50d4, type: 3}
+  Rock: {fileID: 8476329087553527459, guid: 8b413113bdcf1fb499ca9b3d4f26debb, type: 3}
+  Log: {fileID: 5290306576288096440, guid: df4f760312c62be48a7596650477a1ba, type: 3}

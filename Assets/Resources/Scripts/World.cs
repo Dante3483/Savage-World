@@ -458,9 +458,10 @@ public class World : MonoBehaviour
                     liquidBackgroundTiles.Add(liquidBackgroundTile);
                     blockBackgroundTiles.Add(backgroundTile);
 
-                    if ((GameManager.Instance.ObjectsData[position.x, position.y].Type != ObjectType.Empty &&
+                    if (GameManager.Instance.ObjectsData[position.x, position.y].Type != ObjectType.Empty &&
                         GameManager.Instance.ObjectsData[position.x, position.y].Type != ObjectType.LiquidBlock &&
-                        GameManager.Instance.ObjectsData[position.x, position.y].Type != ObjectType.Plant))
+                        GameManager.Instance.ObjectsData[position.x, position.y].Type != ObjectType.Plant &&
+                        GameManager.Instance.ObjectsData[position.x, position.y].Type != ObjectType.PickableItem)
                     {
                         solidBlocksTiles.Add(SolidBlocksRuleTile);
                     }
@@ -758,11 +759,11 @@ public class World : MonoBehaviour
                                     if (block.Id == (int)PlantsID.Vine && topBlockData.Type == ObjectType.Empty)
                                     {
                                         CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, block.Position.x, block.Position.y);
-                                        //ObjectData currentVine = block;
-                                        //while (currentVine.Type == ObjectType.Plant)
-                                        //{
-                                        //    CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, currentVine.Position.x, currentVine.Position.y);
-                                        //}
+                                        continue;
+                                    }
+                                    if (downBlockData.Type == ObjectType.Empty)
+                                    {
+                                        CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, block.Position.x, block.Position.y);
                                     }
                                 }
                             }
@@ -807,7 +808,19 @@ public class World : MonoBehaviour
 
     public bool IsValidPlaceToBreakBlock(Vector3Int intPosition)
     {
-        return GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Empty;
+        bool result;
+        bool isNotEmpty = GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Empty;
+        bool isNotPickableObject = GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.PickableItem;
+        if (GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Plant)
+        {
+            bool isUnderNotTreeTrunk = !GameManager.Instance.ObjectsData[intPosition.x, intPosition.y + 1].IsTreeTrunk;
+            result = isNotEmpty && isNotPickableObject && isUnderNotTreeTrunk;
+        }
+        else
+        {
+            result = isNotEmpty && isNotPickableObject;
+        }
+        return result;
     }
 
     public bool IsAdjacentBlockSolid(Vector3 position, Vector2Int direction)
@@ -816,7 +829,8 @@ public class World : MonoBehaviour
         intPosition += new Vector3Int(direction.x, direction.y);
         return GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Empty &&
             GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.Plant &&
-            GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.LiquidBlock;
+            GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.LiquidBlock &&
+            GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].Type != ObjectType.PickableItem;
     }
     #endregion
 

@@ -6,4 +6,6 @@ public enum ItemsID
     ClayBlock = 3,
     IronOreBlock = 4,
     CopperOreBlock = 5,
+    Log = 6,
+    Rock = 7
 }

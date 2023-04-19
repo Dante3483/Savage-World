@@ -45,6 +45,7 @@ public class TerrainConfiguration : ScriptableObject
     public bool EnableStructureGeneration = false;
     public bool EnableLakesGeneration = false;
     public bool EnableTreeGeneration = false;
+    public bool EnablePickableItemsGeneration = false;
 
     [Header("Horizontal Biomes Chunks Count")]
     public int CountOfOceanChunks = 0;

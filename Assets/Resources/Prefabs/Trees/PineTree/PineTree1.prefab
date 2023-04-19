@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5905099966894390089}
   - component: {fileID: 6738296291742027624}
   - component: {fileID: 8408031285707283783}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: TreeTrunk
   m_TagString: Tree
   m_Icon: {fileID: 0}
@@ -161,7 +161,7 @@ GameObject:
   - component: {fileID: 654479991953493098}
   - component: {fileID: 7221669844004214123}
   - component: {fileID: 711767229437212556}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: PineTree1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3016,6 +3016,9 @@ MonoBehaviour:
   _id: 0
   _width: 16
   _height: 24
+  _minDropCount: 10
+  _maxDropCount: 20
+  _dropItem: {fileID: 11400000, guid: 40045e33bea8ddf40a4dc8845f2db714, type: 2}
   _chanceToSpawn: 0
   _widthToSpawn: 4
   _trunkBlocks:

@@ -115,6 +115,7 @@ public class TerrainGeneration : MonoBehaviour
 
     #region Generation
 
+    #region General
     public void Generation()
     {
         #region Terrain generation
@@ -307,7 +308,7 @@ public class TerrainGeneration : MonoBehaviour
         GrassSeeding();
         #endregion
 
-        #region Planting
+        #region Planting and Pickable items
         if (_world.TerrainConfiguration.EnablePlanting)
         {
             Debug.Log("Start planting");
@@ -318,6 +319,20 @@ public class TerrainGeneration : MonoBehaviour
             }
             watch.Stop();
             Debug.Log($"Planting complete: {watch.Elapsed.TotalSeconds}");
+        }
+        #endregion
+
+        #region Pickable items
+        if (_world.TerrainConfiguration.EnablePickableItemsGeneration)
+        {
+            Debug.Log("Start pickable items generation");
+            watch.Restart();
+            foreach (TerrainLevel level in _world.TerrainConfiguration.levels)
+            {
+                GeneratePickableItems(level);
+            }
+            watch.Stop();
+            Debug.Log($"Pickable items generation complete: {watch.Elapsed.TotalSeconds}");
         }
         #endregion
 
@@ -336,273 +351,6 @@ public class TerrainGeneration : MonoBehaviour
         #endregion
     }
 
-    private void GenerateTrees()
-    {
-        int startX = 5;
-        int startY = _world.TerrainConfiguration.levels.Find(x => x.Type == TerrainLevelID.Surface).startY;
-        int endX = _world.TerrainConfiguration.WorldWitdh - 5;
-        int endY = _world.TerrainConfiguration.levels.Find(x => x.Type == TerrainLevelID.Surface).endY;
-        int chunkSize = _world.TerrainConfiguration.chunkSize;
-        GameObject treesGameObject = GameManager.Instance.TreesSection;
-
-        for (int x = startX; x < endX; x++)
-        {
-            for (int y = startY; y < endY; y++)
-            {
-                if (_world.IsInMapRange(x, y))
-                {
-                    Chunk currentChunk = GameManager.Instance.Chunks[x / chunkSize, y / chunkSize];
-                    List<GameObject> trees = GameManager.Instance.WorldObjectAtlas.GetBiomeTreesByID(currentChunk.BiomeID);
-                    if (GameManager.Instance.ObjectsData[x, y].Type != ObjectType.Empty &&
-                        GameManager.Instance.ObjectsData[x, y + 1].Type == ObjectType.Empty)
-                    {
-                        if (trees != null && trees.Count != 0)
-                        {
-                            GameObject treeGameObject = trees[_world.RandomVar.Next(0, trees.Count)];
-                            Tree tree = treeGameObject.GetComponent<Tree>();
-                            bool validPlace = true;
-                            for (int dx = x; dx < x + tree.WidthToSpawn; dx++)
-                            {
-                                if (!tree.AllowedToSpawnOn.Exists(b => b.blockType == GameManager.Instance.ObjectsData[dx,y].Type && b.GetID() == GameManager.Instance.ObjectsData[dx, y].Id) ||
-                                    GameManager.Instance.ObjectsData[dx, y + 1].Type != ObjectType.Empty)
-                                {
-                                    validPlace = false;
-                                    break;
-                                }
-                            }
-                            if (validPlace)
-                            {
-                                GameObject createdTree = Instantiate(treeGameObject, new Vector3(x + tree.WidthToSpawn / 2f, y + 1), Quaternion.identity, treesGameObject.transform);
-                                if (GenerateTree(createdTree))
-                                {
-                                    x += _world.TerrainConfiguration.MinDistanceTree;
-                                }
-                            }
-                        }
-                    }
-                }       
-            }
-        }
-    }
-
-    private bool GenerateTree(GameObject treeGameObject)
-    {
-        Tree tree = treeGameObject.GetComponent<Tree>();
-        bool isValid = _world.IsInMapRange((int)tree.transform.position.x + tree.Width, (int)tree.transform.position.y);
-        if (isValid && IsValidTree(treeGameObject))
-        {
-            foreach (var block in tree.TrunkBlocks)
-            {
-                Vector2 point = treeGameObject.transform.TransformPoint(new Vector2(block.x, block.y));
-                Vector3Int intPosition = Vector3Int.RoundToInt(point);
-                GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].IsTreeTrunk = true;
-            }
-            foreach (var block in tree.FoliageBlocks)
-            {
-                Vector2 point = treeGameObject.transform.TransformPoint(new Vector2(block.x, block.y));
-                Vector3Int intPosition = Vector3Int.RoundToInt(point);
-                GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].IsTreeFoliage = true;
-            }
-            return true;
-        }
-        else
-        {
-            Destroy(treeGameObject);
-            return false;
-        }
-    }
-
-    private void GenerateLakes()
-    {
-        #region Lake
-        ObjectData currentObjectData;
-        int startY;
-        int startX = _world.TerrainConfiguration.PlainsPosition.EndPositionX;
-        for (int x = startX; x < _world.TerrainConfiguration.WorldWitdh - 100; x++)
-        {
-            startY = _world.TerrainConfiguration.Equator + 1;
-            currentObjectData = GameManager.Instance.ObjectsData[x, startY];
-            while (GameManager.Instance.ObjectsData[x, currentObjectData.Position.y + 1].Type != ObjectType.Empty)
-            {
-                currentObjectData = GameManager.Instance.ObjectsData[x, currentObjectData.Position.y + 1];
-            }
-            if (GameManager.Instance.ObjectsData[x, currentObjectData.Position.y - 1].Type != ObjectType.Empty)
-            {
-                int id = _world.RandomVar.Next(0, 10);
-                bool isChecked = false;
-                bool isValid = false;
-                int lakeWidth = _world.RandomVar.Next(40,100);
-                int lakeHeight = 0;
-                Queue<ObjectData> queue = new Queue<ObjectData>();
-                for (int dx = x; dx < x + lakeWidth; dx++)
-                {
-                    int randY = _world.RandomVar.Next(0, 2);
-                    if (dx <= x + lakeWidth / 2)
-                    {
-                        lakeHeight += randY;
-                    }
-                    else
-                    {
-                        if (!isChecked)
-                        {
-                            isValid = IsValidLake(currentObjectData.Position.x, currentObjectData.Position.y, lakeWidth, lakeHeight);
-                            isChecked = true;
-                        }
-                        lakeHeight -= randY;
-                    }
-                    if (isChecked && !isValid)
-                    {
-                        queue.Clear();
-                        break;
-                    }
-
-                    for (int dy = currentObjectData.Position.y; dy >= currentObjectData.Position.y - lakeHeight; dy--)
-                    {
-                        queue.Enqueue(GameManager.Instance.ObjectsData[dx, dy]);
-                    }
-                }
-                if (isChecked && isValid)
-                {
-                    x += lakeWidth + 105;
-                    if (_world.RandomVar.Next(0, 101) <= _world.TerrainConfiguration.ChanceToSpawnLake)
-                    {
-                        while (queue.Count != 0)
-                        {
-                            ObjectData objectData = queue.Dequeue();
-                            _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Water, objectData.Position.x, objectData.Position.y);
-                            GameManager.Instance.ObjectsData[objectData.Position.x, objectData.Position.y].CurrentFlowValue = 1f;
-                        }
-                        for (int dx = currentObjectData.Position.x; dx < currentObjectData.Position.x + lakeWidth; dx++)
-                        {
-                            int dy = currentObjectData.Position.y;
-                            while (GameManager.Instance.ObjectsData[dx, dy].Type != ObjectType.Empty) 
-                            {
-                                _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, dx, dy);
-                                dy++;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        #endregion
-
-        #region Oasis
-        double Ellipse(int x, int a, int b)
-        {
-            return Math.Sqrt((1 - Math.Pow(x, 2) / Math.Pow(a, 2)) * Math.Pow(b, 2));
-        }
-        startX = _world.TerrainConfiguration.DesertPosition.StartPositionX;
-        int endX = _world.TerrainConfiguration.DesertPosition.EndPositionX;
-        startY = _world.TerrainConfiguration.Equator + 1;
-        for (int x = startX + 50; x < endX - 50; x++)
-        {
-            currentObjectData = GameManager.Instance.ObjectsData[x, startY];
-            while (GameManager.Instance.ObjectsData[x, currentObjectData.Position.y + 1].Type != ObjectType.Empty)
-            {
-                currentObjectData = GameManager.Instance.ObjectsData[x, currentObjectData.Position.y + 1];
-            }
-            int oasisWidth = _world.RandomVar.Next(20, 41);
-            int oasisHeight = _world.RandomVar.Next(20, 31);
-            if (IsValidLake(currentObjectData.Position.x, currentObjectData.Position.y, oasisWidth, oasisHeight))
-            {
-                if (_world.RandomVar.Next(0, 101) <= _world.TerrainConfiguration.ChanceToSpawnOasis)
-                {
-                    for (int dx = currentObjectData.Position.x; dx < currentObjectData.Position.x + oasisWidth; dx++)
-                    {
-                        for (int dy = currentObjectData.Position.y - oasisHeight; dy <= currentObjectData.Position.y; dy++)
-                        {
-                            if (currentObjectData.Position.y - dy <= Ellipse(dx - (currentObjectData.Position.x + oasisWidth / 2), oasisWidth / 2, oasisHeight / 2))
-                            {
-                                _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Water, dx, dy);
-                                GameManager.Instance.ObjectsData[dx, dy].CurrentFlowValue = 1f;
-                            }
-                        }
-                    }
-                    for (int dx = currentObjectData.Position.x; dx < currentObjectData.Position.x + oasisWidth; dx++)
-                    {
-                        int dy = currentObjectData.Position.y;
-                        while (GameManager.Instance.ObjectsData[dx, dy].Type != ObjectType.Empty)
-                        {
-                            _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, dx, dy);
-                            dy++;
-                        }
-                    }
-                    SmoothMountains(currentObjectData.Position.x + 1, currentObjectData.Position.y - 1, -1);
-                    SmoothMountains(currentObjectData.Position.x + oasisWidth - 1, currentObjectData.Position.y - 1, 1);
-                }
-                x += oasisWidth + 250;
-            }
-        }
-        #endregion
-    }
-
-    private void GenerateStructure(Structure structure)
-    {
-        for (int x = 0; x < structure.StructureTemplate.texture.width; x++)
-        {
-            for (int y = 0; y < structure.StructureTemplate.texture.height; y++)
-            {
-                Color color = structure.StructureTemplate.texture.GetPixel(x, y);
-                BlockSO block = structure.colorsAndBlocks.Find(b => b.ColorOnTemplate == color).BlockOnTemplate;
-                _world.CreateBlock(block, x, y);
-            }
-        }
-    }
-
-    private void PlantWorld(TerrainLevel level)
-    {
-        //Plant vines
-        PlantSO vine = (GameManager.Instance.WorldObjectAtlas.Vine as PlantSO);
-        if (vine.levelID == level.Type)
-        {
-            for (int x = _world.TerrainConfiguration.DesertPosition.EndPositionX + 1; x < _world.TerrainConfiguration.WorldWitdh; x++)
-            {
-                for (int y = level.startY; y < level.endY; y++)
-                {
-                    if (_world.RandomVar.Next(0, 101) <= vine.ChanceToSpawn &&
-                        vine.AllowedToSpawnOn.ToList().Find(b => b.blockType == GameManager.Instance.ObjectsData[x, y + 1].Type && b.GetID() == GameManager.Instance.ObjectsData[x, y + 1].Id) &&
-                        GameManager.Instance.ObjectsData[x, y].Type == ObjectType.Empty)
-                    {
-                        _world.CreateBlock(vine, x, y);
-                    }
-                }
-            }
-        }
-
-        //Biomes specified plants
-        List<List<BlockSO>> biomeSpecifiedPlants = new List<List<BlockSO>>
-        {
-            GameManager.Instance.WorldObjectAtlas.GetBiomesBlocks(ObjectType.Plant, BiomesID.Desert),
-            GameManager.Instance.WorldObjectAtlas.GetBiomesBlocks(ObjectType.Plant, BiomesID.Plains),
-            GameManager.Instance.WorldObjectAtlas.GetBiomesBlocks(ObjectType.Plant, BiomesID.Meadow),
-            GameManager.Instance.WorldObjectAtlas.GetBiomesBlocks(ObjectType.Plant, BiomesID.Forest),
-            GameManager.Instance.WorldObjectAtlas.GetBiomesBlocks(ObjectType.Plant, BiomesID.Swamp),
-            GameManager.Instance.WorldObjectAtlas.GetBiomesBlocks(ObjectType.Plant, BiomesID.ConiferousForest),
-        };
-
-        foreach (var biomePlants in biomeSpecifiedPlants)
-        {
-            foreach (PlantSO plant in biomePlants)
-            {
-                for (int x = 0; x < _world.TerrainConfiguration.WorldWitdh; x++)
-                {
-                    for (int y = level.startY; y < level.endY; y++)
-                    {
-                        if (plant.levelID == level.Type &&
-                            GameManager.Instance.Chunks[x/_world.TerrainConfiguration.chunkSize, y / _world.TerrainConfiguration.chunkSize].BiomeID == plant.BiomeID &&
-                            _world.RandomVar.Next(0, 101) <= plant.ChanceToSpawn &&
-                            plant.AllowedToSpawnOn.ToList().Find(b => b.blockType == GameManager.Instance.ObjectsData[x, y - 1].Type && b.GetID() == GameManager.Instance.ObjectsData[x, y - 1].Id) &&
-                            GameManager.Instance.ObjectsData[x, y].Type == ObjectType.Empty)
-                        {
-                            _world.CreateBlock(plant, x, y);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
     public void GenerateTerrain(Vector2Int startPosition, TerrainLevel level)
     {
         float height;
@@ -625,181 +373,7 @@ public class TerrainGeneration : MonoBehaviour
             }
         }
     }
-    
-    public void GenerateHoles(Vector2Int startPosition, List<Hole> holes)
-    {
-        int chunkSize = _world.TerrainConfiguration.chunkSize;
-        foreach (Hole hole in holes)
-        {
-            for (int x = startPosition.x; x < startPosition.x + chunkSize; x++)
-            {
-                for (int y = startPosition.y; y < startPosition.y + chunkSize; y++)
-                {
-                    if (GenerateNoise(x, y, hole.freq) > hole.size)
-                    {
-                        _world.CreateBlock(hole.fillBlock, x, y);
-                        if (hole.fillBlock.blockType == ObjectType.LiquidBlock)
-                        {
-                            GameManager.Instance.ObjectsData[x, y].CurrentFlowValue = 1f;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    public void GenerateCaves(Vector2Int startPosition, TerrainLevel level, Chunk chunk)
-    {
-        if (chunk.IsAllowedToCave)
-        {
-            for (int x = startPosition.x; x < startPosition.x + _world.TerrainConfiguration.chunkSize; x++)
-            {
-                for (int y = startPosition.y; y < startPosition.y + _world.TerrainConfiguration.chunkSize; y++)
-                {
-                    if (GenerateNoise(x, y, level.caveFreq) > level.caveSize)
-                    {
-                        _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, x, y, GameManager.Instance.WorldObjectAtlas.GetBlockByID(GameManager.Instance.ObjectsData[x,y].Type, GameManager.Instance.ObjectsData[x,y].Id));
-                    }
-                }
-            }
-        }
-    }
-
-    public void GenerateSurvivalistCave(TerrainLevel level)
-    {
-        if (level.Type == TerrainLevelID.Surface)
-        {
-            int startX = _world.TerrainConfiguration.DesertPosition.EndPositionX + 51;
-            while (startX + 150 <= _world.TerrainConfiguration.WorldWitdh)
-            {
-                int xOffset = startX + 100;
-                int x = _world.RandomVar.Next(startX, xOffset);
-                int y = _world.RandomVar.Next(level.startY + 20, _world.TerrainConfiguration.Equator - 10);
-                int randWitdh = _world.RandomVar.Next(20, 40);
-                int randHeight = _world.RandomVar.Next(5, 10);
-
-                if (_world.RandomVar.Next(1,101) <= _world.TerrainConfiguration.chanceToSpawnSurvivalistCave && IsValidSurvivalistCave(x, y, randWitdh, randHeight))
-                {
-                    int direction = _world.RandomVar.Next(0, 2);
-                    for (int dx = x - randWitdh / 2; dx < x + randWitdh / 2; dx++)
-                    {
-                        for (int dy = y - randHeight / 2; dy < y + randHeight / 2; dy++)
-                        {
-                            //Right side
-                            if (direction == 1)
-                            {
-                                CreateWavesTunnel(1, x + randWitdh / 2, y - randHeight / 2);
-                            }
-                            //Left side
-                            else
-                            {
-                                CreateWavesTunnel(-1, x - randWitdh / 2, y - randHeight / 2);
-                            }
-                            //Noise bottom side
-                            if (dy == y - randHeight / 2)
-                            {
-                                if (_world.RandomVar.Next(0, 2) == 1)
-                                {
-                                    _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, dx, dy - 1);
-                                }
-                            }
-                            //Noise left or right side
-                            //If left side
-                            if (direction == 0)
-                            {
-                                if (dx == x - randWitdh / 2 && _world.RandomVar.Next(0, 2) == 1)
-                                {
-                                    _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, dx - 1, dy);
-                                }
-                            }
-                            //If right side
-                            else
-                            {
-                                if (dx == x + randWitdh / 2 && _world.RandomVar.Next(0, 2) == 1)
-                                {
-                                    _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, dx + 1, dy);
-                                }
-                            }
-                            //Noise top side
-                            if (dy == y + randHeight / 2 - 1)
-                            {
-                                if (_world.RandomVar.Next(0, 2) == 1)
-                                {
-                                    for (int i = 1; i <= _world.RandomVar.Next(1, 4); i++)
-                                    {
-                                        _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, dx, dy + i);
-                                    }
-                                }
-                            }
-                            _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, dx, dy);
-                        }
-                    }
-                }
-                startX = xOffset + 50;
-            }
-        }
-    }
-
-    private void CreateWavesTunnel(int startDirection, int startX, int startY)
-    {
-        int x = startX;
-        int y = startY;
-        int countOfRepeat = 0;
-        int moveType = 0;
-        while (true)
-        {
-            int stepUp = 5;
-            DeletePillar(x, y, stepUp);
-            x += startDirection;
-            if (_world.RandomVar.Next(0, 2) == 1)
-            {
-                y++;
-            }
-            if (GameManager.Instance.ObjectsData[x, y].Type == ObjectType.Empty)
-            {
-                break;
-            }
-        }
-
-        void DeletePillar(int x, int y, int height)
-        {
-            for (int i = 0; i <= height; i++)
-            {
-                _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, x, y + i);
-            }
-        }
-    }
-
-    private void DeleteSmallCaves(TerrainLevel level)
-    {
-        List<ObjectData> blocksToDelete = new List<ObjectData>();
-        if (level.caveSize != 0)
-        {
-            for (int x = 0; x < _world.TerrainConfiguration.WorldWitdh; x++)
-            {
-                for (int y = level.startY; y <= level.endY; y++)
-                {
-                    int startX = x;
-                    int startY = y;
-                    if (GameManager.Instance.ObjectsData[x, y].Type == ObjectType.Empty && !GameManager.Instance.ObjectsData[x, y].IsChecked)
-                    {
-                        blocksToDelete.Clear();
-                        blocksToDelete = GetCaveSize(startX, startY);
-                        if (blocksToDelete.Count < level.MinGeneratedCaveSize)
-                        {
-                            for (int i = 0; i < blocksToDelete.Count; i++)
-                            {
-                                int dx = blocksToDelete[i].Position.x;
-                                int dy = blocksToDelete[i].Position.y;
-                                BlockSO block = GameManager.Instance.WorldObjectAtlas.GetBlockByID(GameManager.Instance.ObjectsData[dx, dy].TypeBackground, GameManager.Instance.ObjectsData[dx,dy].IdBackground);
-                                _world.CreateBlock(block, dx, dy);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    #endregion
 
     #region Biomes generation
     //30% of all chunks (if world size = 84 chunks => Round to 26)
@@ -1021,6 +595,31 @@ public class TerrainGeneration : MonoBehaviour
     }
     #endregion
 
+    #region Holes
+    public void GenerateHoles(Vector2Int startPosition, List<Hole> holes)
+    {
+        int chunkSize = _world.TerrainConfiguration.chunkSize;
+        foreach (Hole hole in holes)
+        {
+            for (int x = startPosition.x; x < startPosition.x + chunkSize; x++)
+            {
+                for (int y = startPosition.y; y < startPosition.y + chunkSize; y++)
+                {
+                    if (GenerateNoise(x, y, hole.freq) > hole.size)
+                    {
+                        _world.CreateBlock(hole.fillBlock, x, y);
+                        if (hole.fillBlock.blockType == ObjectType.LiquidBlock)
+                        {
+                            GameManager.Instance.ObjectsData[x, y].CurrentFlowValue = 1f;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region Clusters
     public void GenerateClusters(TerrainLevel level)
     {
         foreach (Cluster cluster in level.Clusters)
@@ -1031,7 +630,7 @@ public class TerrainGeneration : MonoBehaviour
                 for (int y = level.startY; y <= level.endY; y++)
                 {
                     if (GenerateNoise(x, y, cluster.freq, clusterAddSeed) > cluster.size &&
-                        cluster.AllowedToSpawnOn.Find(b => b.GetID() == GameManager.Instance.ObjectsData[x, y].Id && b.blockType == GameManager.Instance.ObjectsData[x, y].Type) != null)  
+                        cluster.AllowedToSpawnOn.Find(b => b.GetID() == GameManager.Instance.ObjectsData[x, y].Id && b.blockType == GameManager.Instance.ObjectsData[x, y].Type) != null)
                     {
                         _world.CreateBlock(cluster.fillBlock, x, y);
                     }
@@ -1039,7 +638,164 @@ public class TerrainGeneration : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #region Caves
+    public void GenerateCaves(Vector2Int startPosition, TerrainLevel level, Chunk chunk)
+    {
+        if (chunk.IsAllowedToCave)
+        {
+            for (int x = startPosition.x; x < startPosition.x + _world.TerrainConfiguration.chunkSize; x++)
+            {
+                for (int y = startPosition.y; y < startPosition.y + _world.TerrainConfiguration.chunkSize; y++)
+                {
+                    if (GenerateNoise(x, y, level.caveFreq) > level.caveSize)
+                    {
+                        _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, x, y, GameManager.Instance.WorldObjectAtlas.GetBlockByID(GameManager.Instance.ObjectsData[x, y].Type, GameManager.Instance.ObjectsData[x, y].Id));
+                    }
+                }
+            }
+        }
+    }
+
+    public void GenerateSurvivalistCave(TerrainLevel level)
+    {
+        if (level.Type == TerrainLevelID.Surface)
+        {
+            int startX = _world.TerrainConfiguration.DesertPosition.EndPositionX + 51;
+            while (startX + 150 <= _world.TerrainConfiguration.WorldWitdh)
+            {
+                int xOffset = startX + 100;
+                int x = _world.RandomVar.Next(startX, xOffset);
+                int y = _world.RandomVar.Next(level.startY + 20, _world.TerrainConfiguration.Equator - 10);
+                int randWitdh = _world.RandomVar.Next(20, 40);
+                int randHeight = _world.RandomVar.Next(5, 10);
+
+                if (_world.RandomVar.Next(1, 101) <= _world.TerrainConfiguration.chanceToSpawnSurvivalistCave && IsValidSurvivalistCave(x, y, randWitdh, randHeight))
+                {
+                    int direction = _world.RandomVar.Next(0, 2);
+                    for (int dx = x - randWitdh / 2; dx < x + randWitdh / 2; dx++)
+                    {
+                        for (int dy = y - randHeight / 2; dy < y + randHeight / 2; dy++)
+                        {
+                            //Right side
+                            if (direction == 1)
+                            {
+                                CreateWavesTunnel(1, x + randWitdh / 2, y - randHeight / 2);
+                            }
+                            //Left side
+                            else
+                            {
+                                CreateWavesTunnel(-1, x - randWitdh / 2, y - randHeight / 2);
+                            }
+                            //Noise bottom side
+                            if (dy == y - randHeight / 2)
+                            {
+                                if (_world.RandomVar.Next(0, 2) == 1)
+                                {
+                                    _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, dx, dy - 1);
+                                }
+                            }
+                            //Noise left or right side
+                            //If left side
+                            if (direction == 0)
+                            {
+                                if (dx == x - randWitdh / 2 && _world.RandomVar.Next(0, 2) == 1)
+                                {
+                                    _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, dx - 1, dy);
+                                }
+                            }
+                            //If right side
+                            else
+                            {
+                                if (dx == x + randWitdh / 2 && _world.RandomVar.Next(0, 2) == 1)
+                                {
+                                    _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, dx + 1, dy);
+                                }
+                            }
+                            //Noise top side
+                            if (dy == y + randHeight / 2 - 1)
+                            {
+                                if (_world.RandomVar.Next(0, 2) == 1)
+                                {
+                                    for (int i = 1; i <= _world.RandomVar.Next(1, 4); i++)
+                                    {
+                                        _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, dx, dy + i);
+                                    }
+                                }
+                            }
+                            _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, dx, dy);
+                        }
+                    }
+                }
+                startX = xOffset + 50;
+            }
+        }
+    }
+
+    private void CreateWavesTunnel(int startDirection, int startX, int startY)
+    {
+        int x = startX;
+        int y = startY;
+        int countOfRepeat = 0;
+        int moveType = 0;
+        while (true)
+        {
+            int stepUp = 5;
+            DeletePillar(x, y, stepUp);
+            x += startDirection;
+            if (_world.RandomVar.Next(0, 2) == 1)
+            {
+                y++;
+            }
+            if (GameManager.Instance.ObjectsData[x, y].Type == ObjectType.Empty)
+            {
+                break;
+            }
+        }
+
+        void DeletePillar(int x, int y, int height)
+        {
+            for (int i = 0; i <= height; i++)
+            {
+                _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, x, y + i);
+            }
+        }
+    }
+
+    private void DeleteSmallCaves(TerrainLevel level)
+    {
+        List<ObjectData> blocksToDelete = new List<ObjectData>();
+        if (level.caveSize != 0)
+        {
+            for (int x = 0; x < _world.TerrainConfiguration.WorldWitdh; x++)
+            {
+                for (int y = level.startY; y <= level.endY; y++)
+                {
+                    int startX = x;
+                    int startY = y;
+                    if (GameManager.Instance.ObjectsData[x, y].Type == ObjectType.Empty && !GameManager.Instance.ObjectsData[x, y].IsChecked)
+                    {
+                        blocksToDelete.Clear();
+                        blocksToDelete = GetCaveSize(startX, startY);
+                        if (blocksToDelete.Count < level.MinGeneratedCaveSize)
+                        {
+                            for (int i = 0; i < blocksToDelete.Count; i++)
+                            {
+                                int dx = blocksToDelete[i].Position.x;
+                                int dy = blocksToDelete[i].Position.y;
+                                BlockSO block = GameManager.Instance.WorldObjectAtlas.GetBlockByID(GameManager.Instance.ObjectsData[dx, dy].TypeBackground, GameManager.Instance.ObjectsData[dx, dy].IdBackground);
+                                _world.CreateBlock(block, dx, dy);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region Ores
     public void GenerateOres()
     {
         foreach (Ore ore in _world.TerrainConfiguration.Ores)
@@ -1049,7 +805,7 @@ public class TerrainGeneration : MonoBehaviour
             {
                 for (int y = ore.MinHeightToSpawn; y < ore.MaxHeightToSpawn; y++)
                 {
-                    if (GenerateNoise(x, y, ore.Rarity, oreAddSeed) > ore.Size && 
+                    if (GenerateNoise(x, y, ore.Rarity, oreAddSeed) > ore.Size &&
                         ore.AllowedToSpawnOn.Find(b => b.GetID() == GameManager.Instance.ObjectsData[x, y].Id && b.blockType == GameManager.Instance.ObjectsData[x, y].Type) != null)
                     {
                         _world.CreateBlock(ore.FillBlock, x, y);
@@ -1058,7 +814,9 @@ public class TerrainGeneration : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #region Smoothing
     public void SmoothWorld()
     {
         Debug.Log("Start smooth world");
@@ -1120,7 +878,214 @@ public class TerrainGeneration : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #region Lakes
+    private void GenerateLakes()
+    {
+        #region Lake
+        ObjectData currentObjectData;
+        int startY;
+        int startX = _world.TerrainConfiguration.PlainsPosition.EndPositionX;
+        for (int x = startX; x < _world.TerrainConfiguration.WorldWitdh - 100; x++)
+        {
+            startY = _world.TerrainConfiguration.Equator + 1;
+            currentObjectData = GameManager.Instance.ObjectsData[x, startY];
+            while (GameManager.Instance.ObjectsData[x, currentObjectData.Position.y + 1].Type != ObjectType.Empty)
+            {
+                currentObjectData = GameManager.Instance.ObjectsData[x, currentObjectData.Position.y + 1];
+            }
+            if (GameManager.Instance.ObjectsData[x, currentObjectData.Position.y - 1].Type != ObjectType.Empty)
+            {
+                int id = _world.RandomVar.Next(0, 10);
+                bool isChecked = false;
+                bool isValid = false;
+                int lakeWidth = _world.RandomVar.Next(40, 100);
+                int lakeHeight = 0;
+                Queue<ObjectData> queue = new Queue<ObjectData>();
+                for (int dx = x; dx < x + lakeWidth; dx++)
+                {
+                    int randY = _world.RandomVar.Next(0, 2);
+                    if (dx <= x + lakeWidth / 2)
+                    {
+                        lakeHeight += randY;
+                    }
+                    else
+                    {
+                        if (!isChecked)
+                        {
+                            isValid = IsValidLake(currentObjectData.Position.x, currentObjectData.Position.y, lakeWidth, lakeHeight);
+                            isChecked = true;
+                        }
+                        lakeHeight -= randY;
+                    }
+                    if (isChecked && !isValid)
+                    {
+                        queue.Clear();
+                        break;
+                    }
+
+                    for (int dy = currentObjectData.Position.y; dy >= currentObjectData.Position.y - lakeHeight; dy--)
+                    {
+                        queue.Enqueue(GameManager.Instance.ObjectsData[dx, dy]);
+                    }
+                }
+                if (isChecked && isValid)
+                {
+                    x += lakeWidth + 105;
+                    if (_world.RandomVar.Next(0, 101) <= _world.TerrainConfiguration.ChanceToSpawnLake)
+                    {
+                        while (queue.Count != 0)
+                        {
+                            ObjectData objectData = queue.Dequeue();
+                            _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Water, objectData.Position.x, objectData.Position.y);
+                            GameManager.Instance.ObjectsData[objectData.Position.x, objectData.Position.y].CurrentFlowValue = 1f;
+                        }
+                        for (int dx = currentObjectData.Position.x; dx < currentObjectData.Position.x + lakeWidth; dx++)
+                        {
+                            int dy = currentObjectData.Position.y;
+                            while (GameManager.Instance.ObjectsData[dx, dy].Type != ObjectType.Empty)
+                            {
+                                _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, dx, dy);
+                                dy++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region Oasis
+        double Ellipse(int x, int a, int b)
+        {
+            return Math.Sqrt((1 - Math.Pow(x, 2) / Math.Pow(a, 2)) * Math.Pow(b, 2));
+        }
+        startX = _world.TerrainConfiguration.DesertPosition.StartPositionX;
+        int endX = _world.TerrainConfiguration.DesertPosition.EndPositionX;
+        startY = _world.TerrainConfiguration.Equator + 1;
+        for (int x = startX + 50; x < endX - 50; x++)
+        {
+            currentObjectData = GameManager.Instance.ObjectsData[x, startY];
+            while (GameManager.Instance.ObjectsData[x, currentObjectData.Position.y + 1].Type != ObjectType.Empty)
+            {
+                currentObjectData = GameManager.Instance.ObjectsData[x, currentObjectData.Position.y + 1];
+            }
+            int oasisWidth = _world.RandomVar.Next(20, 41);
+            int oasisHeight = _world.RandomVar.Next(20, 31);
+            if (IsValidLake(currentObjectData.Position.x, currentObjectData.Position.y, oasisWidth, oasisHeight))
+            {
+                if (_world.RandomVar.Next(0, 101) <= _world.TerrainConfiguration.ChanceToSpawnOasis)
+                {
+                    for (int dx = currentObjectData.Position.x; dx < currentObjectData.Position.x + oasisWidth; dx++)
+                    {
+                        for (int dy = currentObjectData.Position.y - oasisHeight; dy <= currentObjectData.Position.y; dy++)
+                        {
+                            if (currentObjectData.Position.y - dy <= Ellipse(dx - (currentObjectData.Position.x + oasisWidth / 2), oasisWidth / 2, oasisHeight / 2))
+                            {
+                                _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Water, dx, dy);
+                                GameManager.Instance.ObjectsData[dx, dy].CurrentFlowValue = 1f;
+                            }
+                        }
+                    }
+                    for (int dx = currentObjectData.Position.x; dx < currentObjectData.Position.x + oasisWidth; dx++)
+                    {
+                        int dy = currentObjectData.Position.y;
+                        while (GameManager.Instance.ObjectsData[dx, dy].Type != ObjectType.Empty)
+                        {
+                            _world.CreateBlock(GameManager.Instance.WorldObjectAtlas.Air, dx, dy);
+                            dy++;
+                        }
+                    }
+                    SmoothMountains(currentObjectData.Position.x + 1, currentObjectData.Position.y - 1, -1);
+                    SmoothMountains(currentObjectData.Position.x + oasisWidth - 1, currentObjectData.Position.y - 1, 1);
+                }
+                x += oasisWidth + 250;
+            }
+        }
+        #endregion
+    }
+    #endregion
+
+    #region Trees
+    private void GenerateTrees()
+    {
+        int startX = 5;
+        int startY = _world.TerrainConfiguration.levels.Find(x => x.Type == TerrainLevelID.Surface).startY;
+        int endX = _world.TerrainConfiguration.WorldWitdh - 5;
+        int endY = _world.TerrainConfiguration.levels.Find(x => x.Type == TerrainLevelID.Surface).endY;
+        int chunkSize = _world.TerrainConfiguration.chunkSize;
+        GameObject treesGameObject = GameManager.Instance.TreesSection;
+
+        for (int x = startX; x < endX; x++)
+        {
+            for (int y = startY; y < endY; y++)
+            {
+                if (_world.IsInMapRange(x, y))
+                {
+                    Chunk currentChunk = GameManager.Instance.Chunks[x / chunkSize, y / chunkSize];
+                    List<GameObject> trees = GameManager.Instance.WorldObjectAtlas.GetBiomeTreesByID(currentChunk.BiomeID);
+                    if (GameManager.Instance.ObjectsData[x, y].Type != ObjectType.Empty &&
+                        GameManager.Instance.ObjectsData[x, y + 1].Type == ObjectType.Empty)
+                    {
+                        if (trees != null && trees.Count != 0)
+                        {
+                            GameObject treeGameObject = trees[_world.RandomVar.Next(0, trees.Count)];
+                            Tree tree = treeGameObject.GetComponent<Tree>();
+                            bool validPlace = true;
+                            for (int dx = x; dx < x + tree.WidthToSpawn; dx++)
+                            {
+                                if (!tree.AllowedToSpawnOn.Exists(b => b.blockType == GameManager.Instance.ObjectsData[dx,y].Type && b.GetID() == GameManager.Instance.ObjectsData[dx, y].Id) ||
+                                    GameManager.Instance.ObjectsData[dx, y + 1].Type != ObjectType.Empty)
+                                {
+                                    validPlace = false;
+                                    break;
+                                }
+                            }
+                            if (validPlace)
+                            {
+                                GameObject createdTree = Instantiate(treeGameObject, new Vector3(x + tree.WidthToSpawn / 2f, y + 1), Quaternion.identity, treesGameObject.transform);
+                                if (GenerateTree(createdTree))
+                                {
+                                    x += _world.TerrainConfiguration.MinDistanceTree;
+                                }
+                            }
+                        }
+                    }
+                }       
+            }
+        }
+    }
+
+    private bool GenerateTree(GameObject treeGameObject)
+    {
+        Tree tree = treeGameObject.GetComponent<Tree>();
+        bool isValid = _world.IsInMapRange((int)tree.transform.position.x + tree.Width, (int)tree.transform.position.y);
+        if (isValid && IsValidTree(treeGameObject))
+        {
+            foreach (var block in tree.TrunkBlocks)
+            {
+                Vector2 point = treeGameObject.transform.TransformPoint(new Vector2(block.x, block.y));
+                Vector3Int intPosition = Vector3Int.RoundToInt(point);
+                GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].IsTreeTrunk = true;
+            }
+            foreach (var block in tree.FoliageBlocks)
+            {
+                Vector2 point = treeGameObject.transform.TransformPoint(new Vector2(block.x, block.y));
+                Vector3Int intPosition = Vector3Int.RoundToInt(point);
+                GameManager.Instance.ObjectsData[intPosition.x, intPosition.y].IsTreeFoliage = true;
+            }
+            return true;
+        }
+        else
+        {
+            Destroy(treeGameObject);
+            return false;
+        }
+    }
+    #endregion
+
+    #region Plants
     private void GrassSeeding()
     {
         int startX = _world.TerrainConfiguration.PlainsPosition.StartPositionX;
@@ -1168,17 +1133,117 @@ public class TerrainGeneration : MonoBehaviour
                         }
                         break;
                 }
-                if (block != null && 
+                if (block != null &&
                     GameManager.Instance.ObjectsData[x, y + 1].Type == ObjectType.Empty &&
                     GameManager.Instance.ObjectsData[x, y].Type == (block as SolidBlockSO).AllowedForConvertation.blockType &&
                     GameManager.Instance.ObjectsData[x, y].Id == (block as SolidBlockSO).AllowedForConvertation.GetID()
-                    ) 
+                    )
                 {
                     _world.CreateBlock(block, x, y);
                 }
             }
         }
     }
+
+    private void PlantWorld(TerrainLevel level)
+    {
+        //Plant vines
+        PlantSO vine = (GameManager.Instance.WorldObjectAtlas.Vine as PlantSO);
+        if (vine.levelID == level.Type)
+        {
+            for (int x = _world.TerrainConfiguration.DesertPosition.EndPositionX + 1; x < _world.TerrainConfiguration.WorldWitdh; x++)
+            {
+                for (int y = level.startY; y < level.endY; y++)
+                {
+                    if (_world.RandomVar.Next(0, 101) <= vine.ChanceToSpawn &&
+                        vine.AllowedToSpawnOn.ToList().Find(b => b.blockType == GameManager.Instance.ObjectsData[x, y + 1].Type && b.GetID() == GameManager.Instance.ObjectsData[x, y + 1].Id) &&
+                        GameManager.Instance.ObjectsData[x, y].Type == ObjectType.Empty)
+                    {
+                        _world.CreateBlock(vine, x, y);
+                    }
+                }
+            }
+        }
+
+        //Biomes specified plants
+        List<List<BlockSO>> biomeSpecifiedPlants = new List<List<BlockSO>>
+        {
+            GameManager.Instance.WorldObjectAtlas.GetBiomesBlocks(ObjectType.Plant, BiomesID.Desert),
+            GameManager.Instance.WorldObjectAtlas.GetBiomesBlocks(ObjectType.Plant, BiomesID.Plains),
+            GameManager.Instance.WorldObjectAtlas.GetBiomesBlocks(ObjectType.Plant, BiomesID.Meadow),
+            GameManager.Instance.WorldObjectAtlas.GetBiomesBlocks(ObjectType.Plant, BiomesID.Forest),
+            GameManager.Instance.WorldObjectAtlas.GetBiomesBlocks(ObjectType.Plant, BiomesID.Swamp),
+            GameManager.Instance.WorldObjectAtlas.GetBiomesBlocks(ObjectType.Plant, BiomesID.ConiferousForest),
+        };
+
+        foreach (var biomePlants in biomeSpecifiedPlants)
+        {
+            foreach (PlantSO plant in biomePlants)
+            {
+                for (int x = 0; x < _world.TerrainConfiguration.WorldWitdh; x++)
+                {
+                    for (int y = level.startY; y < level.endY; y++)
+                    {
+                        if (plant.levelID == level.Type &&
+                            GameManager.Instance.Chunks[x / _world.TerrainConfiguration.chunkSize, y / _world.TerrainConfiguration.chunkSize].BiomeID == plant.BiomeID &&
+                            _world.RandomVar.Next(0, 101) <= plant.ChanceToSpawn &&
+                            plant.AllowedToSpawnOn.ToList().Find(b => b.blockType == GameManager.Instance.ObjectsData[x, y - 1].Type && b.GetID() == GameManager.Instance.ObjectsData[x, y - 1].Id) &&
+                            GameManager.Instance.ObjectsData[x, y].Type == ObjectType.Empty)
+                        {
+                            _world.CreateBlock(plant, x, y);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region Pickable items
+    private void GeneratePickableItems(TerrainLevel level)
+    {
+        List<PickableItem> pickableItems = GameManager.Instance.WorldObjectAtlas.GetAllPickableItems();
+        int chunkSize = _world.TerrainConfiguration.chunkSize;
+        SpecialBlockSO pickableItemBlock = GameManager.Instance.WorldObjectAtlas.PickableItem;
+        foreach (PickableItem pickableItem in pickableItems)
+        {
+            for (int x = 0; x < _world.TerrainConfiguration.WorldWitdh; x++)
+            {
+                for (int y = level.startY; y < level.endY; y++)
+                {
+                    if (pickableItem.LevelID == level.Type &&
+                        pickableItem.AllowedToSpawnBiomes.Contains(GameManager.Instance.Chunks[x / chunkSize, y / chunkSize].BiomeID) &&
+                        _world.RandomVar.Next(0, 101) <= pickableItem.ChanceToSpawn &&
+                        _world.IsAdjacentBlockSolid(new Vector3(x, y), Vector2Int.down) &&
+                        GameManager.Instance.ObjectsData[x, y].Type == ObjectType.Empty)
+                    {
+                        _world.CreateBlock(pickableItemBlock, x, y);
+                        PickableItem instance = Instantiate(pickableItem, new Vector3(x + 0.5f, y + 0.5f), Quaternion.identity, GameManager.Instance.PickableItemsSection.transform);
+                        instance.SpriteRenderer.sprite = instance.GetRandomSprite();
+                    }
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region Structures
+    private void GenerateStructure(Structure structure)
+    {
+        int startX = 1000;
+        int startY = 2200;
+        for (int x = 0; x < structure.StructureTemplate.texture.width; x++)
+        {
+            for (int y = 0; y < structure.StructureTemplate.texture.height; y++)
+            {
+                Color color = structure.StructureTemplate.texture.GetPixel(x, y);
+                BlockSO block = structure.colorsAndBlocks.Find(b => b.ColorOnTemplate == color).BlockOnTemplate;
+                _world.CreateBlock(block, startX + x, startY + y);
+            }
+        }
+    }
+    #endregion
+
     #endregion
 
     #endregion

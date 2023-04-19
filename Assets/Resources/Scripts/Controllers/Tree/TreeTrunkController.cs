@@ -40,22 +40,9 @@ public class TreeTrunkController : MonoBehaviour
     #region Methods
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.CompareTag("Chop"))
-        {
-            collision.GetComponent<TreeChoppingController>().Tree = Tree;
-            Tree.CanBeChopped = true;
-        }
         if (collision.CompareTag("Ground"))
         {
             _validPlace = false;
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Chop"))
-        {
-            Tree.CanBeChopped = false;
         }
     }
 
@@ -63,19 +50,14 @@ public class TreeTrunkController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0) && Tree.CanBeChopped)
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity);
-            if (hit != null &&
-                hit.collider != null &&
-                hit.collider.gameObject.transform.parent != null &&
-                hit.collider.gameObject.transform.parent == transform.parent)
+            int dropsCount = Random.Range(Tree.MinDropCount, Tree.MaxDropCount);
+            for (int i = 0; i < dropsCount; i++)
             {
-                Tree tree = hit.collider.gameObject.transform.parent.GetComponent<Tree>();
-                if (tree != null)
-                {
-                    Debug.Log(hit.collider.gameObject.transform.parent.name);
-                }
+                Vector3 randomTrunk = Tree.TrunkBlocks[Random.Range(0, Tree.TrunkBlocks.Count)];
+                Vector3 position = Tree.transform.TransformPoint(randomTrunk);
+                GameManager.Instance.PlayerInteractions.CreateDrop(position, Tree.DropItem, 1, false);
             }
+            Tree.NeedToDestroy = true;
         }
     }
     #endregion

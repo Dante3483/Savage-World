@@ -15,7 +15,7 @@ MonoBehaviour:
   Type: 0
   chunkCount: 2
   defaultWallTile: {fileID: 0}
-  defaultBlock: {fileID: 11400000, guid: 7011b0fd664fc49429972de8ff85dfe3, type: 2}
+  defaultBlock: {fileID: 11400000, guid: 0db7046bc3dda8b4e87b8f7fa91db590, type: 2}
   startY: 2400
   endY: 2599
   background: {fileID: 0}

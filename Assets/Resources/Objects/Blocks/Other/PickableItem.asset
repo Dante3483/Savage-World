@@ -9,6 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65ffa83e188a0e448908b9c691323256, type: 3}
-  m_Name: GlobalData
+  m_Script: {fileID: 11500000, guid: 38c45ebc652fcf34ca068264b49f2fdb, type: 3}
+  m_Name: PickableItem
   m_EditorClassIdentifier: 
+  tiles: []
+  backgroundBlocks: []
+  blockType: 6
+  colorOnMap: {r: 1, g: 1, b: 1, a: 1}
+  Drop: {fileID: 0}
+  Durability: -1
+  ID: 1

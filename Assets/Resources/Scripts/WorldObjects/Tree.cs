@@ -16,6 +16,9 @@ public class Tree : MonoBehaviour
     [SerializeField] private TreesID _id; //Saved
     [SerializeField] private int _width;
     [SerializeField] private int _height;
+    [SerializeField] private int _minDropCount;
+    [SerializeField] private int _maxDropCount;
+    [SerializeField] private ItemSO _dropItem;
 
     [Header("Spawn Properties")]
     [SerializeField] private float _chanceToSpawn;
@@ -26,6 +29,7 @@ public class Tree : MonoBehaviour
 
     [Header("Tree Flags")]
     [SerializeField] private bool _canBeChopped;
+    [SerializeField] private bool _needToDestroy;
 
     #region Properties
     public TreesID Id
@@ -142,6 +146,58 @@ public class Tree : MonoBehaviour
         set
         {
             _allowedToSpawnOn = value;
+        }
+    }
+
+    public int MinDropCount
+    {
+        get
+        {
+            return _minDropCount;
+        }
+
+        set
+        {
+            _minDropCount = value;
+        }
+    }
+
+    public int MaxDropCount
+    {
+        get
+        {
+            return _maxDropCount;
+        }
+
+        set
+        {
+            _maxDropCount = value;
+        }
+    }
+
+    public ItemSO DropItem
+    {
+        get
+        {
+            return _dropItem;
+        }
+
+        set
+        {
+            _dropItem = value;
+        }
+    }
+
+    public bool NeedToDestroy
+    {
+        get
+        {
+            return _needToDestroy;
+        }
+
+        set
+        {
+            _needToDestroy = value;
         }
     }
     #endregion
