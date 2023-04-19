@@ -11,8 +11,9 @@ public class EnemiesMobs : NPC
     [SerializeField] private bool _isTargetInAttackArea;
 	[SerializeField] private float _attackCooldown;
 	[SerializeField] private float _selfShootingCooldown;
+    [SerializeField] private float _extraDistance;
 
-	private bool _isNeedToCheckGround;
+    private bool _isNeedToCheckGround;
 	#endregion
 
 	#region Properties
@@ -80,6 +81,21 @@ public class EnemiesMobs : NPC
             _isTargetInAttackArea = value;
         }
     }
+
+    public float ExtraDistance
+    {
+        get
+        {
+            return _extraDistance;
+        }
+
+        set
+        {
+            _extraDistance = value;
+        }
+    }
+
+
     #endregion
 
     #region Methods
@@ -170,7 +186,7 @@ public class EnemiesMobs : NPC
         }
         IsFalling = FallingCheck();
 
-        //Nothing-Walk
+        //Nothing-Idle
         if (CurrentAction == MobAction.Nothing && IsGrounded)
         {
             CurrentAction = MobAction.Idle;
@@ -180,6 +196,7 @@ public class EnemiesMobs : NPC
         if (CurrentAction == MobAction.Idle)
         {
             CurrentAction = MobAction.Walk;
+            Rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
         //Idle-Attack
         if (CurrentAction == MobAction.Idle && IsTargetInAttackArea && ActionCooldown >= AttackCooldown)
@@ -222,6 +239,7 @@ public class EnemiesMobs : NPC
             CurrentAction = MobAction.Idle;
             IsWalking = true;
             ActionCooldown = 0f;
+
         }
         float speed = Random.Range(MinSpeed, MaxSpeed);
 
@@ -230,6 +248,9 @@ public class EnemiesMobs : NPC
             case MobAction.Nothing:
                 break;
             case MobAction.Idle:
+                {
+                    Rigidbody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
+                }
                 break;
             case MobAction.Walk:
                 {
@@ -238,20 +259,30 @@ public class EnemiesMobs : NPC
 
                     //Check if we can jump
                     Vector3Int intPosition = World.BlockTilemap.WorldToCell(transform.position);
-                    if (World.ObjectsData[intPosition.x + MoveDirection, intPosition.y].IsSolidBlock())
+                    if (World.ObjectsData[intPosition.x + MoveDirection, intPosition.y].IsSolidBlock() && !IsTargetInAttackArea)
                     {
-                        Rigidbody.velocity = new Vector2(Rigidbody.velocity.x, 20);
+
+                         IsJumping = true;
+                            Rigidbody.velocity = new Vector2(Rigidbody.velocity.x, JumpForce);
+                        
+                        
                     }
                 }
                 break;
             case MobAction.Run:
                 break;
             case MobAction.Jump:
+                {
+
+                    Rigidbody.velocity = new Vector2(MoveDirection*JumpXForce, Rigidbody.velocity.y);
+                    
+                }
                 break;
             case MobAction.Fall:
                 break;
             case MobAction.Attack:
                 {
+                    Rigidbody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
                     Rigidbody.velocity = Vector2.zero;
                     IsWalking = false;
                 }
@@ -362,6 +393,11 @@ public class EnemiesMobs : NPC
 
 	private void ChooseDirection()
 	{
+        CheakRaycast();
+        if (IsJumping) 
+        {
+            return;
+        }
 		if (transform.position.x - Target.position.x < 0)
 		{
 			MoveDirection = 1;
@@ -390,6 +426,24 @@ public class EnemiesMobs : NPC
         {
             Flip();
         }
+    }
+    private bool CheakRaycast()
+    {
+        
+        Vector3 distance= transform.position - Target.position;
+        distance = distance.normalized* MoveDirection;
+        RaycastHit2D hitRight = Physics2D.Raycast(transform.position, Vector2.right, ExtraDistance, GroundLayerMask);
+        RaycastHit2D hitleft = Physics2D.Raycast(transform.position, Vector2.left, ExtraDistance, GroundLayerMask);
+
+        Debug.DrawRay(transform.position, Vector2.right* ExtraDistance,  Color.red);
+        Debug.DrawRay(transform.position, Vector2.left* ExtraDistance, Color.red);
+
+        if (hitRight.collider != null)
+        {
+            return false;
+        }
+        if (hitleft.collider != null) { return false; }
+        return true;
     }
 	#endregion
 }

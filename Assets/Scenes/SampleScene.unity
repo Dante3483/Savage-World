@@ -295,6 +295,18 @@ PrefabInstance:
       propertyPath: _inventoryUI
       value: 
       objectReference: {fileID: 1784343267}
+    - target: {fileID: 1753163003, guid: 79f189d9ebe33b247a664aa1ca10cdef, type: 3}
+      propertyPath: initialItems.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1753163003, guid: 79f189d9ebe33b247a664aa1ca10cdef, type: 3}
+      propertyPath: initialItems.Array.data[0].Item
+      value: 
+      objectReference: {fileID: 11400000, guid: adf2d28ce72a57d4c968a4fa24ef2489, type: 2}
+    - target: {fileID: 1753163003, guid: 79f189d9ebe33b247a664aa1ca10cdef, type: 3}
+      propertyPath: initialItems.Array.data[0].Quantity
+      value: 999
+      objectReference: {fileID: 0}
     - target: {fileID: 15709530942747699, guid: 79f189d9ebe33b247a664aa1ca10cdef, type: 3}
       propertyPath: _hotbarUI
       value: 
@@ -353,11 +365,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5883331216944407269, guid: 79f189d9ebe33b247a664aa1ca10cdef, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1500
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 5883331216944407269, guid: 79f189d9ebe33b247a664aa1ca10cdef, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2360
+      value: 2360.86
       objectReference: {fileID: 0}
     - target: {fileID: 5883331216944407269, guid: 79f189d9ebe33b247a664aa1ca10cdef, type: 3}
       propertyPath: m_LocalPosition.z
@@ -543,7 +555,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4533465960961181245, guid: 23ba1b24aceebf245983d0bb2327096c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1497.22
+      value: 190
       objectReference: {fileID: 0}
     - target: {fileID: 4533465960961181245, guid: 23ba1b24aceebf245983d0bb2327096c, type: 3}
       propertyPath: m_LocalPosition.y
@@ -581,10 +593,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5781516872200967368, guid: 23ba1b24aceebf245983d0bb2327096c, type: 3}
-      propertyPath: m_Material
-      value: 
-      objectReference: {fileID: 6200000, guid: 588c74f1ee9cd7e428c9954c65ee382b, type: 2}
+    - target: {fileID: 5551925513979049739, guid: 23ba1b24aceebf245983d0bb2327096c, type: 3}
+      propertyPath: _extraDistance
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5927147025834652071, guid: 23ba1b24aceebf245983d0bb2327096c, type: 3}
       propertyPath: m_Name
       value: SkeletonSword

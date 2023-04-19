@@ -218,7 +218,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 3
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 588c74f1ee9cd7e428c9954c65ee382b, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -241,7 +241,7 @@ CapsuleCollider2D:
   m_Direction: 0
 --- !u!95 &6859337384471596344
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -258,7 +258,7 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
 --- !u!114 &5551925513979049739
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -277,6 +277,7 @@ MonoBehaviour:
   _capsuleCollider: {fileID: 2094874820942124979}
   _currentAction: 0
   _actionCooldown: 0
+  _world: {fileID: 0}
   _groundLayerMask:
     serializedVersion: 2
     m_Bits: 1024
@@ -288,7 +289,8 @@ MonoBehaviour:
   _moveDirection: 0
   _minSpeed: 3
   _maxSpeed: 3
-  _jumpForce: 0
+  _jumpForce: 12
+  _jumpXForce: 5
   _animator: {fileID: 6859337384471596344}
   _isGrounded: 0
   _isJumping: 0
