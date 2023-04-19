@@ -43,6 +43,8 @@ public class NPC : MonoBehaviour
 
     [Header("Jumping")]
     [SerializeField] private float _jumpForce;
+    [SerializeField] private float _jumpXForce;
+
 
     [Header("Animation Properties")]
     [SerializeField] private Animator _animator;
@@ -381,6 +383,12 @@ public class NPC : MonoBehaviour
         {
             _world = value;
         }
+    }
+
+    public float JumpXForce
+    { 
+        get => _jumpXForce;
+        set => _jumpXForce = value; 
     }
     #endregion
 

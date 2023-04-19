@@ -259,7 +259,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &5551925513979049739
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -290,7 +289,8 @@ MonoBehaviour:
   _moveDirection: 0
   _minSpeed: 3
   _maxSpeed: 3
-  _jumpForce: 0
+  _jumpForce: 12
+  _jumpXForce: 5
   _animator: {fileID: 6859337384471596344}
   _isGrounded: 0
   _isJumping: 0
