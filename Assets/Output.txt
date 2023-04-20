@@ -1,5 +1,6 @@
-System.NullReferenceException: Object reference not set to an instance of an object
-  at World.CreateBlock (BlockSO block, System.Int32 x, System.Int32 y, BlockSO backgroundBlock) [0x00000] in D:\Projects\Savage World\Assets\Resources\Scripts\World.cs:226 
-  at TerrainGeneration.GenerateStructure (Structure structure) [0x00043] in D:\Projects\Savage World\Assets\Resources\Scripts\Terrain\TerrainGeneration.cs:1239 
-  at TerrainGeneration.Generation () [0x00806] in D:\Projects\Savage World\Assets\Resources\Scripts\Terrain\TerrainGeneration.cs:346 
-  at World.CreateNewWorld () [0x00033] in D:\Projects\Savage World\Assets\Resources\Scripts\World.cs:159 
+System.Collections.Generic.KeyNotFoundException: The given key 'PickableItem' was not present in the dictionary.
+  at System.Collections.Generic.Dictionary`2[TKey,TValue].get_Item (TKey key) [0x0001e] in <4a4789deb75f446a81a24a1a00bdd3f9>:0 
+  at WorldObjectsAtlas.GetBlockByID (ObjectType objectType, System.Object id) [0x0000d] in D:\Projects\Savage World\Assets\Resources\Scripts\Atlasses\WorldObjectsAtlas.cs:90 
+  at SaveLoadSystem.LoadWorldObjectsData (System.IO.BinaryReader binaryReader) [0x000d3] in D:\Projects\Savage World\Assets\Resources\Scripts\SaveLoadSystem\SaveLoadSystem.cs:293 
+  at SaveLoadSystem.LoadAllData () [0x0004f] in D:\Projects\Savage World\Assets\Resources\Scripts\SaveLoadSystem\SaveLoadSystem.cs:52 
+  at World.LoadWorld () [0x00000] in D:\Projects\Savage World\Assets\Resources\Scripts\World.cs:173 

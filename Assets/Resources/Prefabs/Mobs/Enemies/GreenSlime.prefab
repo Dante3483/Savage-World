@@ -202,7 +202,7 @@ CapsuleCollider2D:
   m_Direction: 0
 --- !u!95 &6903476896031403366
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -219,7 +219,8 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &7134189590497122044
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -251,6 +252,7 @@ MonoBehaviour:
   _minSpeed: 3.5
   _maxSpeed: 5.5
   _jumpForce: 10
+  _jumpXForce: 0
   _animator: {fileID: 6903476896031403366}
   _isGrounded: 0
   _isJumping: 0
@@ -264,6 +266,7 @@ MonoBehaviour:
   _isTargetInAttackArea: 0
   _attackCooldown: 2
   _selfShootingCooldown: 4
+  _extraDistance: 0
 --- !u!1 &4711980588141287741
 GameObject:
   m_ObjectHideFlags: 0
