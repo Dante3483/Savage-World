@@ -1,9 +1,9 @@
 fileFormatVersion: 2
-guid: e6982c480fa13c9459a7d9b2682cf7ac
+guid: 944af73d77fb9714eab9c64f6e3afce5
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -63,6 +63,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -104,7 +105,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Fall_0
+      name: Jump_0
       rect:
         serializedVersion: 2
         x: 0
@@ -118,14 +119,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d52d7dd856502b547ae65e4b07418b62
-      internalID: 1274863743
+      spriteID: 923b3e1368fadb4469896af575555334
+      internalID: -197674054
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Fall_1
+      name: Jump_1
       rect:
         serializedVersion: 2
         x: 50
@@ -139,14 +140,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 678129ebc80e23b4fb580f6e2381e540
-      internalID: -1183996861
+      spriteID: 03fcf3a560925534390a957d10efed39
+      internalID: -1763904248
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Fall_2
+      name: Jump_2
       rect:
         serializedVersion: 2
         x: 100
@@ -160,29 +161,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1741d359ef91f2e40bb849cf1f4078af
-      internalID: 1829660826
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Fall_3
-      rect:
-        serializedVersion: 2
-        x: 150
-        y: 0
-        width: 50
-        height: 50
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d045de0c9c955344398d670359882c6d
-      internalID: -1596759998
+      spriteID: 3c0d00f3ae6c570438be72c211718f4e
+      internalID: -209579725
       vertices: []
       indices: 
       edges: []
@@ -198,10 +178,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Fall_1: -1183996861
-      Fall_3: -1596759998
-      Fall_0: 1274863743
-      Fall_2: 1829660826
+      Jump_0: -197674054
+      Jump_1: -1763904248
+      Jump_2: -209579725
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

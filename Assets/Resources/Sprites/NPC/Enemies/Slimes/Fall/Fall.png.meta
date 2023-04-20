@@ -1,9 +1,9 @@
 fileFormatVersion: 2
-guid: eca3c7bb6285b7d41846070eb5a32b1f
+guid: e6982c480fa13c9459a7d9b2682cf7ac
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -63,6 +63,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -104,13 +105,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: SkeletonSwordIdle_0
+      name: Fall_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 34
-        height: 67
+        width: 50
+        height: 50
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -118,20 +119,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: bdac1a44d01c84b4b98ef41b18de41dd
-      internalID: -1992227268
+      spriteID: d52d7dd856502b547ae65e4b07418b62
+      internalID: 1274863743
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkeletonSwordIdle_1
+      name: Fall_1
       rect:
         serializedVersion: 2
-        x: 34
+        x: 50
         y: 0
-        width: 34
-        height: 67
+        width: 50
+        height: 50
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -139,20 +140,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ded6c0c1d2615c746b5d2f6cf7ee2b63
-      internalID: -441137915
+      spriteID: 678129ebc80e23b4fb580f6e2381e540
+      internalID: -1183996861
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkeletonSwordIdle_2
+      name: Fall_2
       rect:
         serializedVersion: 2
-        x: 68
+        x: 100
         y: 0
-        width: 34
-        height: 67
+        width: 50
+        height: 50
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -160,20 +161,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1ca8709581204b64a9f0c1f124b0ee44
-      internalID: -1260633587
+      spriteID: 1741d359ef91f2e40bb849cf1f4078af
+      internalID: 1829660826
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkeletonSwordIdle_3
+      name: Fall_3
       rect:
         serializedVersion: 2
-        x: 102
+        x: 150
         y: 0
-        width: 34
-        height: 67
+        width: 50
+        height: 50
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -181,50 +182,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: bb85c0afc6f25364fa9714d2c604e4f8
-      internalID: -1637531628
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SkeletonSwordIdle_4
-      rect:
-        serializedVersion: 2
-        x: 136
-        y: 0
-        width: 34
-        height: 67
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 13df4bea398cfb54aad6f966a1bc4b65
-      internalID: 591423254
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SkeletonSwordIdle_5
-      rect:
-        serializedVersion: 2
-        x: 170
-        y: 0
-        width: 34
-        height: 67
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 569987c7e38d1e8468e1763740dcbf41
-      internalID: 362212501
+      spriteID: d045de0c9c955344398d670359882c6d
+      internalID: -1596759998
       vertices: []
       indices: 
       edges: []
@@ -240,12 +199,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      SkeletonSwordIdle_0: -1992227268
-      SkeletonSwordIdle_4: 591423254
-      SkeletonSwordIdle_1: -441137915
-      SkeletonSwordIdle_2: -1260633587
-      SkeletonSwordIdle_3: -1637531628
-      SkeletonSwordIdle_5: 362212501
+      Fall_0: 1274863743
+      Fall_1: -1183996861
+      Fall_2: 1829660826
+      Fall_3: -1596759998
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

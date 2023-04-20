@@ -132,16 +132,16 @@ public class MobAttackController : MonoBehaviour
     private void FixedUpdate()
     {
         Vector3 startPosition = transform.parent.transform.position;
-        Vector3 endPosition = (_npc as EnemiesMobs).Target.position;
+        Vector3 endPosition = _npc.Target.position;
         var result = _groundCheck.CheckLinecast(startPosition, endPosition);
         bool result2 = CheckIfCanAttack();
         if (!result.Item1 && result2)
         {
-            (Npc as EnemiesMobs).IsTargetInAttackArea = true;
+            _npc.IsTargetInAttackArea = true;
         }
         else
         {
-            (Npc as EnemiesMobs).IsTargetInAttackArea = false;
+            _npc.IsTargetInAttackArea = false;
         }
     }
 

@@ -7,4 +7,6 @@ public enum NPCID
     Slime = 0, //Enemy
 
     SkeletonSword = 1, //Enemy
+
+    Fox = 2, // Neutral
 }

@@ -1,9 +1,9 @@
 fileFormatVersion: 2
-guid: 69f4d922b478035429e9053704afe849
+guid: d39d406c58178f54a841de95b31f1c2d
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -63,6 +63,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 0
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -104,13 +105,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: SkeletonSwordWalk_0
+      name: Fox_walking-Sheet_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 34
-        height: 67
+        width: 65
+        height: 37
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -118,20 +119,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d7ddc338647f4704da15e37f8a0ffc9b
-      internalID: -245881202
+      spriteID: 154dac882f5473d4eb9151916a7de938
+      internalID: -1505701921
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkeletonSwordWalk_1
+      name: Fox_walking-Sheet_1
       rect:
         serializedVersion: 2
-        x: 34
+        x: 65
         y: 0
-        width: 34
-        height: 67
+        width: 65
+        height: 37
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -139,20 +140,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 31f8878f89b84374c902cf2c72e33f36
-      internalID: 289280148
+      spriteID: 7fbbfa461beb1dd42b1f33bb54c17f1e
+      internalID: 150903429
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkeletonSwordWalk_2
+      name: Fox_walking-Sheet_2
       rect:
         serializedVersion: 2
-        x: 68
+        x: 130
         y: 0
-        width: 34
-        height: 67
+        width: 65
+        height: 37
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -160,20 +161,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f3f39682dc913e14888d5a70d08f9436
-      internalID: -396169957
+      spriteID: 721f30ea30eaa28458779ba2de6f6e44
+      internalID: -1762366572
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkeletonSwordWalk_3
+      name: Fox_walking-Sheet_3
       rect:
         serializedVersion: 2
-        x: 102
+        x: 195
         y: 0
-        width: 34
-        height: 67
+        width: 65
+        height: 37
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -181,20 +182,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ad6ca156f98920c4fb59a2365a2a0ecb
-      internalID: 412745659
+      spriteID: 53685db22ba213e49961acf94963d032
+      internalID: 733836082
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkeletonSwordWalk_4
+      name: Fox_walking-Sheet_4
       rect:
         serializedVersion: 2
-        x: 136
+        x: 260
         y: 0
-        width: 34
-        height: 67
+        width: 65
+        height: 37
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -202,20 +203,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ba4e85a0d115d1a4c8e365ebef6419d4
-      internalID: 426144432
+      spriteID: c0577ef4df9ce4f439e8de64e3322d07
+      internalID: -1033681704
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkeletonSwordWalk_5
+      name: Fox_walking-Sheet_5
       rect:
         serializedVersion: 2
-        x: 170
+        x: 325
         y: 0
-        width: 34
-        height: 67
+        width: 65
+        height: 37
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -223,20 +224,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 65a3b4442eab3134db27b65964972d10
-      internalID: -771241797
+      spriteID: e5e3776169aa6ac479937d311d544b7f
+      internalID: 16246922
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkeletonSwordWalk_6
+      name: Fox_walking-Sheet_6
       rect:
         serializedVersion: 2
-        x: 204
+        x: 390
         y: 0
-        width: 34
-        height: 67
+        width: 65
+        height: 37
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -244,50 +245,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c9397a691e8303a49a818e3e8f670e55
-      internalID: -139647880
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SkeletonSwordWalk_7
-      rect:
-        serializedVersion: 2
-        x: 238
-        y: 0
-        width: 34
-        height: 67
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c7353dc290eff794eaeead4cb3f462cc
-      internalID: 1675725400
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SkeletonSwordWalk_8
-      rect:
-        serializedVersion: 2
-        x: 272
-        y: 0
-        width: 34
-        height: 67
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 90f2eee8fac0b02499fb06921f51b714
-      internalID: 1514458366
+      spriteID: 0087c7c487219cd44ada188db8b5f049
+      internalID: 1279482631
       vertices: []
       indices: 
       edges: []
@@ -303,15 +262,13 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      SkeletonSwordWalk_2: -396169957
-      SkeletonSwordWalk_5: -771241797
-      SkeletonSwordWalk_3: 412745659
-      SkeletonSwordWalk_7: 1675725400
-      SkeletonSwordWalk_1: 289280148
-      SkeletonSwordWalk_6: -139647880
-      SkeletonSwordWalk_4: 426144432
-      SkeletonSwordWalk_0: -245881202
-      SkeletonSwordWalk_8: 1514458366
+      Fox_walking-Sheet_0: -1505701921
+      Fox_walking-Sheet_1: 150903429
+      Fox_walking-Sheet_2: -1762366572
+      Fox_walking-Sheet_3: 733836082
+      Fox_walking-Sheet_4: -1033681704
+      Fox_walking-Sheet_5: 16246922
+      Fox_walking-Sheet_6: 1279482631
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

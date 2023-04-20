@@ -41,6 +41,9 @@ public class NPC : MonoBehaviour
     [SerializeField] private int _moveDirection;
     [SerializeField] private float _minSpeed;
     [SerializeField] private float _maxSpeed;
+    [SerializeField] private float _minRandomDirectionChange;
+    [SerializeField] private float _maxRandomDirectionChange;
+    [SerializeField] private float _currentRandomDirectionChange;
 
     [Header("Jumping")]
     [SerializeField] private float _jumpForce;
@@ -58,6 +61,16 @@ public class NPC : MonoBehaviour
     [SerializeField] private bool _isWalking;
     [SerializeField] private bool _isRunning;
     [SerializeField] private bool _isAttacking;
+
+    [Header("Atack Properties")]
+    [SerializeField] private Transform _target;
+    [SerializeField] private float _attackSpeedMultiplier;
+    [SerializeField] private bool _isTargetInAttackArea;
+    [SerializeField] private float _attackCooldown;
+    [SerializeField] private float _selfShootingCooldown;
+    [SerializeField] private float _extraDistance;
+    [SerializeField] private GameObject _attackCollider;
+    [SerializeField] private GameObject _hitCollider;
     #endregion
 
     #region Properties
@@ -373,15 +386,32 @@ public class NPC : MonoBehaviour
         }
     }
 
-  
-
     public float JumpXForce
     { 
         get => _jumpXForce;
         set => _jumpXForce = value; 
     }
+
     public SpriteRenderer SpriteRenderer { get => _spriteRenderer; set => _spriteRenderer = value; }
-   
+
+    public Transform Target { get => _target; set => _target = value; }
+
+    public float AttackSpeedMultiplier { get => _attackSpeedMultiplier; set => _attackSpeedMultiplier = value; }
+
+    public bool IsTargetInAttackArea { get => _isTargetInAttackArea; set => _isTargetInAttackArea = value; }
+
+    public float AttackCooldown { get => _attackCooldown; set => _attackCooldown = value; }
+
+    public float SelfShootingCooldown { get => _selfShootingCooldown; set => _selfShootingCooldown = value; }
+
+    public float ExtraDistance { get => _extraDistance; set => _extraDistance = value; }
+
+    public GameObject AttackCollider { get => _attackCollider; set => _attackCollider = value; }
+
+    public GameObject HitCollider { get => _hitCollider; set => _hitCollider = value; }
+    public float MinRandomDirectionChange { get => _minRandomDirectionChange; set => _minRandomDirectionChange = value; }
+    public float MaxRandomDirectionChange { get => _maxRandomDirectionChange; set => _maxRandomDirectionChange = value; }
+    public float CurrentRandomDirectionChange { get => _currentRandomDirectionChange; set => _currentRandomDirectionChange = value; }
     #endregion
 
     #region Methods
@@ -392,6 +422,16 @@ public class NPC : MonoBehaviour
         Physics2D.IgnoreLayerCollision(7, 7);
         UpdateData();
         
+    }
+
+    public void Update()
+    {
+        Animate();
+    }
+
+    public void FixedUpdate()
+    {
+        ActionCooldown += Time.fixedDeltaTime;
     }
 
     public void OnValidate()
@@ -410,6 +450,30 @@ public class NPC : MonoBehaviour
         Animator = GetComponent<Animator>();
         SpriteRenderer = GetComponent<SpriteRenderer>();
         IsFacingRight = true;
+
+        //GameObject target = GameObject.FindGameObjectWithTag("Player");
+        //if (target != null)
+        //{
+        //    Target = target.transform;
+        //}
+
+        if (!transform.Find("AttackCollider"))
+        {
+            AttackCollider = new GameObject("AttackCollider");
+            AttackCollider.AddComponent<MobAttackController>();
+            AttackCollider.transform.parent = transform;
+            AttackCollider.transform.position = transform.position;
+        }
+
+        if (!transform.Find("HitCollider"))
+        {
+            HitCollider = new GameObject("HitCollider");
+            HitCollider.AddComponent<PolygonCollider2D>();
+            HitCollider.GetComponent<PolygonCollider2D>().isTrigger = true;
+            HitCollider.AddComponent<MobHitController>();
+            HitCollider.transform.parent = transform;
+            HitCollider.transform.position = transform.position;
+        }
     }
 
     public void Animate()
@@ -470,16 +534,6 @@ public class NPC : MonoBehaviour
         Animator.SetBool("IsFall", isFall);
         Animator.SetBool("IsAttack", isAttack);
         Animator.SetBool("IsDeath", isDeath);
-
-        //if (IsGrounded)
-        //{
-        //    Animator.SetBool("Jump", false);
-        //}
-        //if (IsJumping)
-        //{
-        //    Animator.SetBool("Jump", true);
-        //    Animator.SetFloat("yVelocity", Rigidbody.velocity.y);
-        //}
     }
 
     public bool GroundCheck()
@@ -528,6 +582,59 @@ public class NPC : MonoBehaviour
         transform.localScale = theScale;
     }
 
-    public virtual void UpdatePhysicsShape() { }
+    public void EndAttack()
+    {
+        IsAttacking = false;
+    }
+
+    public void ChooseDirectionByTarget()
+    {
+        if (IsJumping)
+        {
+            return;
+        }
+        if (transform.position.x - Target.position.x < 0)
+        {
+            MoveDirection = 1;
+        }
+        else
+        {
+            MoveDirection = -1;
+        }
+    }
+
+    public void ChooseRandomDirection()
+    {
+        ActionCooldown = 0f;
+        MoveDirection = Random.Range(-1, 2);
+        CurrentRandomDirectionChange = Random.Range(MinRandomDirectionChange, MaxRandomDirectionChange);
+    }
+
+    public void ChangeScaleByMoveDirection()
+    {
+        if (IsFacingRight && MoveDirection < 0)
+        {
+            Flip();
+        }
+        if (!IsFacingRight && MoveDirection > 0)
+        {
+            Flip();
+        }
+    }
+
+    public void ChangeScaleToNormal()
+    {
+        if (!IsFacingRight)
+        {
+            Flip();
+        }
+    }
+
+    public void UpdatePhysicsShape()
+    {
+        List<Vector2> physicsShape = new List<Vector2>();
+        SpriteRenderer.sprite.GetPhysicsShape(0, physicsShape);
+        HitCollider.GetComponent<PolygonCollider2D>().SetPath(0, physicsShape);
+    }
     #endregion
 }
