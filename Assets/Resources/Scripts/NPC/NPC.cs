@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
@@ -24,9 +25,9 @@ public class NPC : MonoBehaviour
     [SerializeField] private NPCID _id;
     [SerializeField] private Rigidbody2D _rigidbody;
     [SerializeField] private CapsuleCollider2D _capsuleCollider;
+    [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private MobAction _currentAction;
     [SerializeField] private float _actionCooldown;
-    [SerializeField] private World _world;
 
     [Header("Ground Checking")]
     [SerializeField] private LayerMask _groundLayerMask;
@@ -372,33 +373,25 @@ public class NPC : MonoBehaviour
         }
     }
 
-    public World World
-    {
-        get
-        {
-            return _world;
-        }
-
-        set
-        {
-            _world = value;
-        }
-    }
+  
 
     public float JumpXForce
     { 
         get => _jumpXForce;
         set => _jumpXForce = value; 
     }
+    public SpriteRenderer SpriteRenderer { get => _spriteRenderer; set => _spriteRenderer = value; }
+   
     #endregion
 
     #region Methods
     public void Start()
     {
+
         Physics2D.IgnoreLayerCollision(6, 7);
         Physics2D.IgnoreLayerCollision(7, 7);
         UpdateData();
-        World = GameObject.FindGameObjectWithTag("World").GetComponent<World>();
+        
     }
 
     public void OnValidate()
@@ -415,6 +408,7 @@ public class NPC : MonoBehaviour
         Rigidbody = GetComponent<Rigidbody2D>();
         CapsuleCollider = GetComponent<CapsuleCollider2D>();
         Animator = GetComponent<Animator>();
+        SpriteRenderer = GetComponent<SpriteRenderer>();
         IsFacingRight = true;
     }
 
@@ -534,5 +528,6 @@ public class NPC : MonoBehaviour
         transform.localScale = theScale;
     }
 
+    public virtual void UpdatePhysicsShape() { }
     #endregion
 }

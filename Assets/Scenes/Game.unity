@@ -546,6 +546,7 @@ MonoBehaviour:
   _inventoryUI: {fileID: 1784343267}
   _hotbarUI: {fileID: 1014096118}
   SaveLoadManager: {fileID: 1121125786}
+  PlayerInteractions: {fileID: 0}
   World: {fileID: 0}
   Player: {fileID: 0}
   TreesSection: {fileID: 0}
