@@ -240,17 +240,21 @@ MonoBehaviour:
   _spriteRenderer: {fileID: 8454532610028036505}
   _currentAction: 0
   _actionCooldown: 0
-  _groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 1024
-  _groundCheckSize: {x: 1, y: 0.5}
-  _groundCheckCenterOffset: {x: -0.5, y: -1.7}
-  _extraWidth: 0
-  _isGroundedColor: {r: 0.09825277, g: 1, b: 0, a: 1}
-  _isNotGroundedColor: {r: 1, g: 0, b: 0, a: 1}
+  _groundCheck:
+    _targetLayer:
+      serializedVersion: 2
+      m_Bits: 1024
+    _checkSize: {x: 1, y: 0.5}
+    _checkCenterOffset: {x: 0, y: -1.7}
+    _extraWidth: 0
+    _isTrueColor: {r: 0, g: 1, b: 0, a: 1}
+    _isFalseColor: {r: 1, g: 0, b: 0, a: 1}
   _moveDirection: 0
   _minSpeed: 3
   _maxSpeed: 3
+  _minRandomDirectionChange: 0
+  _maxRandomDirectionChange: 0
+  _currentRandomDirectionChange: 0
   _jumpForce: 12
   _jumpXForce: 5
   _animator: {fileID: 6859337384471596344}
@@ -315,17 +319,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _updateData: 0
   _npc: {fileID: 0}
-  _targetLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  _attackCheckSize: {x: 8, y: 3.3}
-  _attackCheckCenterOffset: {x: 0, y: 0}
-  _extraWidth: 0
-  _isAttackingColor: {r: 1, g: 0, b: 0.91239405, a: 1}
-  _isNotAttackingColor: {r: 0.94275093, g: 1, b: 0, a: 1}
+  _checkTarget:
+    _targetLayer:
+      serializedVersion: 2
+      m_Bits: 64
+    _checkSize: {x: 8, y: 4}
+    _checkCenterOffset: {x: 0, y: 0}
+    _extraWidth: 0
+    _isTrueColor: {r: 0.93333334, g: 0, b: 1, a: 1}
+    _isFalseColor: {r: 0.8666667, g: 1, b: 0, a: 1}
   _groundCheck:
     _targetLayer:
       serializedVersion: 2
       m_Bits: 1024
-    _isTrueColor: {r: 0, g: 1, b: 0.08463907, a: 1}
-    _isFalseColor: {r: 0, g: 0.5216656, b: 1, a: 1}
+    _isTrueColor: {r: 0, g: 1, b: 0, a: 1}
+    _isFalseColor: {r: 0, g: 0, b: 1, a: 1}

@@ -6,11 +6,11 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 [Serializable]
-public class CheckingAreaUtil
+public struct CheckingAreaUtil
 {
     [SerializeField] private LayerMask _targetLayer;
-    [SerializeField] private Vector2 _CheckSize;
-    [SerializeField] private Vector2 _CheckCenterOffset;
+    [SerializeField] private Vector2 _checkSize;
+    [SerializeField] private Vector2 _checkCenterOffset;
     [SerializeField] private float _extraWidth;
     [SerializeField] private Color _isTrueColor;
     [SerializeField] private Color _isFalseColor;
@@ -32,12 +32,12 @@ public class CheckingAreaUtil
     {
         get
         {
-            return _CheckSize;
+            return _checkSize;
         }
 
         set
         {
-            _CheckSize = value;
+            _checkSize = value;
         }
     }
 
@@ -45,12 +45,12 @@ public class CheckingAreaUtil
     {
         get
         {
-            return _CheckCenterOffset;
+            return _checkCenterOffset;
         }
 
         set
         {
-            _CheckCenterOffset = value;
+            _checkCenterOffset = value;
         }
     }
 
@@ -95,7 +95,16 @@ public class CheckingAreaUtil
 
     public Tuple<bool, Collider2D> CheckArea(Vector2 center, GameObject self)
     {
-        center += CheckCenterOffset;
+        Vector2 fixedCenterOffset;
+        if (self.transform.localScale.x < 0)
+        {
+            fixedCenterOffset = new Vector2(CheckCenterOffset.x * (-1), CheckCenterOffset.y);
+        }
+        else
+        {
+            fixedCenterOffset = CheckCenterOffset;
+        }
+        center += fixedCenterOffset;
         RaycastHit2D raycastHit = Physics2D.BoxCast(center, CheckSize, 0f, Vector2.down, ExtraWidth, TargetLayer);
 
         Color rayColor;
@@ -122,7 +131,16 @@ public class CheckingAreaUtil
 
     public Tuple<bool, Collider2D> CheckWithMinDistance(Vector2 center, GameObject self, Vector3 startPosition, float distance)
     {
-        center += CheckCenterOffset;
+        Vector2 fixedCenterOffset;
+        if (self.transform.localScale.x < 0)
+        {
+            fixedCenterOffset = new Vector2(CheckCenterOffset.x * (-1), CheckCenterOffset.y);
+        }
+        else
+        {
+            fixedCenterOffset = CheckCenterOffset;
+        }
+        center += fixedCenterOffset;
         RaycastHit2D[] raycastHit = Physics2D.BoxCastAll(center, CheckSize, 0f, Vector2.down, ExtraWidth, TargetLayer);
 
         Color rayColor;

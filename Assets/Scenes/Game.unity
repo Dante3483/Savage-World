@@ -879,8 +879,8 @@ MonoBehaviour:
     _targetLayer:
       serializedVersion: 2
       m_Bits: 8192
-    _CheckSize: {x: 5, y: 5}
-    _CheckCenterOffset: {x: 0, y: 0}
+    _checkSize: {x: 5, y: 5}
+    _checkCenterOffset: {x: 0, y: 0}
     _extraWidth: 0
     _isTrueColor: {r: 0.15391564, g: 1, b: 0, a: 1}
     _isFalseColor: {r: 1, g: 0, b: 0, a: 1}

@@ -222,6 +222,7 @@ public class EnemiesMobs : NPC
         {
             CurrentAction = MobAction.Idle;
             ActionCooldown = 0f;
+            IsWalking = true;
         }
         float speed = Random.Range(MinSpeed, MaxSpeed);
 

@@ -52,8 +52,8 @@ MonoBehaviour:
     _targetLayer:
       serializedVersion: 2
       m_Bits: 2048
-    _CheckSize: {x: 0.7, y: 0.7}
-    _CheckCenterOffset: {x: 0, y: 0}
+    _checkSize: {x: 0.7, y: 0.7}
+    _checkCenterOffset: {x: 0, y: 0}
     _extraWidth: 0
     _isTrueColor: {r: 0.11119795, g: 1, b: 0, a: 1}
     _isFalseColor: {r: 1, g: 0, b: 0, a: 1}
@@ -239,8 +239,8 @@ MonoBehaviour:
     _targetLayer:
       serializedVersion: 2
       m_Bits: 64
-    _CheckSize: {x: 3, y: 3}
-    _CheckCenterOffset: {x: 0, y: 0}
+    _checkSize: {x: 3, y: 3}
+    _checkCenterOffset: {x: 0, y: 0}
     _extraWidth: 0
     _isTrueColor: {r: 0, g: 1, b: 0.6440792, a: 1}
     _isFalseColor: {r: 0.78283024, g: 1, b: 0, a: 1}

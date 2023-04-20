@@ -12,12 +12,7 @@ public class Movement : MonoBehaviour
     [SerializeField] private Player _player;
 
     [Header("Ground Checking")]
-    [SerializeField] private LayerMask _groundLayerMask;
-    [SerializeField] private Vector2 _groundCheckSize;
-    [SerializeField] private Vector2 _groundCheckCenterOffset;
-    [SerializeField] private float _extraWidth;
-    [SerializeField] private Color _isGroundedColor;
-    [SerializeField] private Color _isNotGroundedColor;
+    [SerializeField] private CheckingAreaUtil _checkingGround;
 
     [Header("Moving")]
     [SerializeField] private float _walkSpeed;
@@ -250,30 +245,8 @@ public class Movement : MonoBehaviour
     #region Checks
     private bool GroundCheck()
     {
-        Vector2 center = _capsuleCollider.bounds.center;
-        center += _groundCheckCenterOffset;
-
-        RaycastHit2D raycastHit = Physics2D.BoxCast(center, _groundCheckSize, 0f, Vector2.down, _extraWidth, _groundLayerMask);
-
-        Color rayColor;
-        if (raycastHit.collider != null)
-        {
-            rayColor = _isGroundedColor;
-        }
-        else
-        {
-            rayColor = _isNotGroundedColor;
-        }
-
-        Vector2 halfSize = _groundCheckSize / 2f;
-        Vector2 centerForDebug = new Vector2(center.x, center.y + halfSize.y);
-
-        Debug.DrawRay(centerForDebug + new Vector2(halfSize.x, 0), Vector2.down * (_groundCheckSize.y + _extraWidth), rayColor);
-        Debug.DrawRay(centerForDebug - new Vector2(halfSize.x, 0), Vector2.down * (_groundCheckSize.y + _extraWidth), rayColor);
-        Debug.DrawRay(centerForDebug - new Vector2(halfSize.x, _groundCheckSize.y + _extraWidth), Vector2.right * _groundCheckSize.x, rayColor);
-        Debug.DrawRay(centerForDebug - new Vector2(halfSize.x, 0), Vector2.right * _groundCheckSize.x, rayColor);
-
-        return raycastHit.collider != null;
+        var result = _checkingGround.CheckArea(transform.position, gameObject);
+        return result.Item1;
     }
 
     private bool JumpingCheck()

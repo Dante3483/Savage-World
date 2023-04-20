@@ -30,12 +30,7 @@ public class NPC : MonoBehaviour
     [SerializeField] private float _actionCooldown;
 
     [Header("Ground Checking")]
-    [SerializeField] private LayerMask _groundLayerMask;
-    [SerializeField] private Vector2 _groundCheckSize;
-    [SerializeField] private Vector2 _groundCheckCenterOffset;
-    [SerializeField] private float _extraWidth;
-    [SerializeField] private Color _isGroundedColor;
-    [SerializeField] private Color _isNotGroundedColor;
+    [SerializeField] private CheckingAreaUtil _groundCheck;
 
     [Header("Walking")]
     [SerializeField] private int _moveDirection;
@@ -123,84 +118,6 @@ public class NPC : MonoBehaviour
         set
         {
             _capsuleCollider = value;
-        }
-    }
-
-    public LayerMask GroundLayerMask
-    {
-        get
-        {
-            return _groundLayerMask;
-        }
-
-        set
-        {
-            _groundLayerMask = value;
-        }
-    }
-
-    public Vector2 GroundCheckSize
-    {
-        get
-        {
-            return _groundCheckSize;
-        }
-
-        set
-        {
-            _groundCheckSize = value;
-        }
-    }
-
-    public Vector2 GroundCheckCenterOffset
-    {
-        get
-        {
-            return _groundCheckCenterOffset;
-        }
-
-        set
-        {
-            _groundCheckCenterOffset = value;
-        }
-    }
-
-    public float ExtraWidth
-    {
-        get
-        {
-            return _extraWidth;
-        }
-
-        set
-        {
-            _extraWidth = value;
-        }
-    }
-
-    public Color IsGroundedColor
-    {
-        get
-        {
-            return _isGroundedColor;
-        }
-
-        set
-        {
-            _isGroundedColor = value;
-        }
-    }
-
-    public Color IsNotGroundedColor
-    {
-        get
-        {
-            return _isNotGroundedColor;
-        }
-
-        set
-        {
-            _isNotGroundedColor = value;
         }
     }
 
@@ -451,12 +368,6 @@ public class NPC : MonoBehaviour
         SpriteRenderer = GetComponent<SpriteRenderer>();
         IsFacingRight = true;
 
-        //GameObject target = GameObject.FindGameObjectWithTag("Player");
-        //if (target != null)
-        //{
-        //    Target = target.transform;
-        //}
-
         if (!transform.Find("AttackCollider"))
         {
             AttackCollider = new GameObject("AttackCollider");
@@ -474,6 +385,9 @@ public class NPC : MonoBehaviour
             HitCollider.transform.parent = transform;
             HitCollider.transform.position = transform.position;
         }
+
+        _groundCheck.IsTrueColor = Color.green;
+        _groundCheck.IsFalseColor = Color.red;
     }
 
     public void Animate()
@@ -538,30 +452,8 @@ public class NPC : MonoBehaviour
 
     public bool GroundCheck()
     {
-        Vector2 center = CapsuleCollider.bounds.center;
-        center += GroundCheckCenterOffset;
-
-        RaycastHit2D raycastHit = Physics2D.BoxCast(center, GroundCheckSize, 0f, Vector2.down, ExtraWidth, GroundLayerMask);
-
-        Color rayColor;
-        if (raycastHit.collider != null)
-        {
-            rayColor = IsGroundedColor;
-        }
-        else
-        {
-            rayColor = IsNotGroundedColor;
-        }
-
-        Vector2 halfSize = GroundCheckSize / 2f;
-        Vector2 centerForDebug = center + halfSize;
-
-        Debug.DrawRay(centerForDebug + new Vector2(halfSize.x, 0), Vector2.down * (GroundCheckSize.y + ExtraWidth), rayColor);
-        Debug.DrawRay(centerForDebug - new Vector2(halfSize.x, 0), Vector2.down * (GroundCheckSize.y + ExtraWidth), rayColor);
-        Debug.DrawRay(centerForDebug - new Vector2(halfSize.x, GroundCheckSize.y + ExtraWidth), Vector2.right * GroundCheckSize.x, rayColor);
-        Debug.DrawRay(centerForDebug - new Vector2(halfSize.x, 0), Vector2.right * GroundCheckSize.x, rayColor);
-
-        return raycastHit.collider != null;
+        var result = _groundCheck.CheckArea(transform.position, gameObject);
+        return result.Item1;
     }
 
     public bool JumpingCheck()
