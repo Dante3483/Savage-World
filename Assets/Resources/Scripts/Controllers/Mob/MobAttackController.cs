@@ -16,6 +16,8 @@ public class MobAttackController : MonoBehaviour
     [SerializeField] private float _extraWidth;
     [SerializeField] private Color _isAttackingColor;
     [SerializeField] private Color _isNotAttackingColor;
+    [SerializeField] private CheckingLineCast _groundCheck;
+
     #endregion
 
     #region Properties
@@ -129,7 +131,18 @@ public class MobAttackController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        (Npc as EnemiesMobs).IsTargetInAttackArea = CheckIfCanAttack();
+        Vector3 startPosition = transform.parent.transform.position;
+        Vector3 endPosition = (_npc as EnemiesMobs).Target.position;
+        var result = _groundCheck.CheckLinecast(startPosition, endPosition);
+        bool result2 = CheckIfCanAttack();
+        if (!result.Item1 && result2)
+        {
+            (Npc as EnemiesMobs).IsTargetInAttackArea = true;
+        }
+        else
+        {
+            (Npc as EnemiesMobs).IsTargetInAttackArea = false;
+        }
     }
 
     private bool CheckIfCanAttack()

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -12,7 +13,8 @@ public class EnemiesMobs : NPC
 	[SerializeField] private float _attackCooldown;
 	[SerializeField] private float _selfShootingCooldown;
     [SerializeField] private float _extraDistance;
-
+    [SerializeField] private GameObject _attackCollider;
+    [SerializeField] private GameObject _hitCollider;
     private bool _isNeedToCheckGround;
 	#endregion
 
@@ -110,20 +112,20 @@ public class EnemiesMobs : NPC
 
 		if (!transform.Find("AttackCollider"))
 		{
-			GameObject attackCollider = new GameObject("AttackCollider");
-			attackCollider.AddComponent<MobAttackController>();
-			attackCollider.transform.parent = transform;
-			attackCollider.transform.position = transform.position;
+            _attackCollider = new GameObject("AttackCollider");
+            _attackCollider.AddComponent<MobAttackController>();
+            _attackCollider.transform.parent = transform;
+            _attackCollider.transform.position = transform.position;
 		}
 
 		if (!transform.Find("HitCollider"))
 		{
-			GameObject hitCollider = new GameObject("HitCollider");
-			hitCollider.AddComponent<BoxCollider2D>();
-			hitCollider.GetComponent<BoxCollider2D>().isTrigger = true;
-			hitCollider.AddComponent<MobHitController>();
-			hitCollider.transform.parent = transform;
-			hitCollider.transform.position = transform.position;
+            _hitCollider = new GameObject("HitCollider");
+            _hitCollider.AddComponent<PolygonCollider2D>();
+            _hitCollider.GetComponent<PolygonCollider2D>().isTrigger = true;
+            _hitCollider.AddComponent<MobHitController>();
+            _hitCollider.transform.parent = transform;
+            _hitCollider.transform.position = transform.position;
 		}
 	}
 
@@ -258,15 +260,15 @@ public class EnemiesMobs : NPC
                     Rigidbody.velocity = new Vector2(speed * MoveDirection, Rigidbody.velocity.y);
 
                     //Check if we can jump
-                    Vector3Int intPosition = World.BlockTilemap.WorldToCell(transform.position);
-                    if (GameManager.Instance.ObjectsData[intPosition.x + MoveDirection, intPosition.y].IsSolidBlock() && !IsTargetInAttackArea)
-                    {
+                    //Vector3Int intPosition = GameManager.Instance.World.BlockTilemap.WorldToCell(transform.position);
+                    //if (GameManager.Instance.ObjectsData[intPosition.x + MoveDirection, intPosition.y].IsSolidBlock() && !IsTargetInAttackArea)
+                    //{
 
-                         IsJumping = true;
-                            Rigidbody.velocity = new Vector2(Rigidbody.velocity.x, JumpForce);
+                    //     IsJumping = true;
+                    //        Rigidbody.velocity = new Vector2(Rigidbody.velocity.x, JumpForce);
                         
                         
-                    }
+                    //}
                 }
                 break;
             case MobAction.Run:
@@ -393,7 +395,6 @@ public class EnemiesMobs : NPC
 
 	private void ChooseDirection()
 	{
-        CheakRaycast();
         if (IsJumping) 
         {
             return;
@@ -427,23 +428,12 @@ public class EnemiesMobs : NPC
             Flip();
         }
     }
-    private bool CheakRaycast()
+
+    public void UpdatePhysicsShape()
     {
-        
-        Vector3 distance= transform.position - Target.position;
-        distance = distance.normalized* MoveDirection;
-        RaycastHit2D hitRight = Physics2D.Raycast(transform.position, Vector2.right, ExtraDistance, GroundLayerMask);
-        RaycastHit2D hitleft = Physics2D.Raycast(transform.position, Vector2.left, ExtraDistance, GroundLayerMask);
-
-        Debug.DrawRay(transform.position, Vector2.right* ExtraDistance,  Color.red);
-        Debug.DrawRay(transform.position, Vector2.left* ExtraDistance, Color.red);
-
-        if (hitRight.collider != null)
-        {
-            return false;
-        }
-        if (hitleft.collider != null) { return false; }
-        return true;
+        List<Vector2> physicsShape = new List<Vector2>();
+        SpriteRenderer.sprite.GetPhysicsShape(0, physicsShape);
+        _hitCollider.GetComponent<PolygonCollider2D>().SetPath(0, physicsShape);
     }
-	#endregion
+    #endregion
 }

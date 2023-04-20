@@ -8,6 +8,7 @@ public class MobHitController : MonoBehaviour
     [SerializeField] private NPC _npc;
     [SerializeField] private float _damage;
 
+
     private void Start()
     {
         _npc = transform.parent.GetComponent<NPC>();
