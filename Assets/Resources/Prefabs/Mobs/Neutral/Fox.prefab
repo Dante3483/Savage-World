@@ -320,8 +320,8 @@ MonoBehaviour:
   _minRandomDirectionChange: 3
   _maxRandomDirectionChange: 5
   _currentRandomDirectionChange: 0
-  _jumpForce: 0
-  _jumpXForce: 0
+  _jumpForce: 5
+  _jumpXForce: 3
   _animator: {fileID: 536251167078366318}
   _isGrounded: 0
   _isJumping: 0

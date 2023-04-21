@@ -82,11 +82,11 @@ public class NeutralMobs: NPC
         //    CurrentAction = MobAction.Attack;
         //    IsAttacking = true;
         //}
-        //Walk-Jump
-        //if (CurrentAction == MobAction.Walk && IsJumping)
-        //{
-        //    CurrentAction = MobAction.Jump;
-        //}
+        //Walk - Jump
+        if (CurrentAction == MobAction.Walk && IsJumping)
+        {
+            CurrentAction = MobAction.Jump;
+        }
         //Any-Fall
         if (IsFalling)
         {
@@ -130,14 +130,14 @@ public class NeutralMobs: NPC
                     Rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
                     Rigidbody.velocity = new Vector2(speed * MoveDirection, Rigidbody.velocity.y);
 
-                    //Check if we can jump
+                   // Check if we can jump
 
-                    //Vector3Int intPosition = GameManager.Instance.World.BlockTilemap.WorldToCell(transform.position);
-                    //if (GameManager.Instance.ObjectsData[intPosition.x + MoveDirection, intPosition.y].IsSolidBlock() && !IsTargetInAttackArea)
-                    //{
-                    //    IsJumping = true;
-                    //    Rigidbody.velocity = new Vector2(Rigidbody.velocity.x, JumpForce);
-                    //}
+                    Vector3Int intPosition = GameManager.Instance.World.BlockTilemap.WorldToCell(transform.position);
+                    if (GameManager.Instance.ObjectsData[intPosition.x + MoveDirection, intPosition.y].IsSolidBlock() && !IsTargetInAttackArea)
+                    {
+                        IsJumping = true;
+                        Rigidbody.velocity = new Vector2(Rigidbody.velocity.x, JumpForce);
+                    }
                 }
                 break;
             case MobAction.Run:
