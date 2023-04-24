@@ -162,10 +162,10 @@ public class GameManager : MonoBehaviour
         {
             if (ObjectsData[playerSpawnX, playerSpawnY].Type == ObjectType.Empty)
             {
-                playerSpawnX += 5;
                 break;
             }
         }
+        playerSpawnY += 3;
         Player = Instantiate(_playerPrefab, new Vector3(playerSpawnX, playerSpawnY), Quaternion.identity);
         Player.GetComponent<InventoryController>().InventoryUI = _inventoryUI;
         Player.GetComponent<InventoryController>().PrepareInventoryData();
