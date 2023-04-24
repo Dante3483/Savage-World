@@ -15,6 +15,8 @@ public class ItemsAtlas : ScriptableObject
     public BlockItemSO ClayBlock;
     public BlockItemSO IronOreBlock;
     public BlockItemSO CopperOreBlock;
+    public BlockItemSO Log;
+    public BlockItemSO Rock;
     #endregion
 
     public ItemSO GetItemByID(ItemsID id)
@@ -32,6 +34,8 @@ public class ItemsAtlas : ScriptableObject
             ClayBlock,
             IronOreBlock,
             CopperOreBlock,
+            Log,
+            Rock,
         };
     }
 }

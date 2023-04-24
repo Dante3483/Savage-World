@@ -168,16 +168,18 @@ public class World : MonoBehaviour
 
     public void LoadWorld()
     {
-        try
-        {
-            GameManager.Instance.SaveLoadManager.LoadAllData();
-            LoadCoroutinsAndThreads();
-        }
-        catch (Exception c)
-        {
-            Debug.LogError(c);
-            File.WriteAllText(Application.dataPath + "/Output.txt", c.ToString());
-        }
+        GameManager.Instance.SaveLoadManager.LoadAllData();
+        LoadCoroutinsAndThreads();
+        //try
+        //{
+        //    GameManager.Instance.SaveLoadManager.LoadAllData();
+        //    LoadCoroutinsAndThreads();
+        //}
+        //catch (Exception c)
+        //{
+        //    Debug.LogError(c);
+        //    File.WriteAllText(Application.dataPath + "/Output.txt", c.ToString());
+        //}
     }
 
     private void LoadCoroutinsAndThreads()

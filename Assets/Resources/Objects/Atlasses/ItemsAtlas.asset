@@ -18,3 +18,5 @@ MonoBehaviour:
   ClayBlock: {fileID: 11400000, guid: c71d4d3e4ec9e1f46912fb195570439a, type: 2}
   IronOreBlock: {fileID: 11400000, guid: 6e3c6781eb7784641bceb0245b0425f1, type: 2}
   CopperOreBlock: {fileID: 11400000, guid: 870ad0fc20d640341b4d34bcedc334c8, type: 2}
+  Log: {fileID: 11400000, guid: 40045e33bea8ddf40a4dc8845f2db714, type: 2}
+  Rock: {fileID: 11400000, guid: 076cbfc4eed23104eb7ccb52de17fccd, type: 2}

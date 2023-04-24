@@ -5,8 +5,6 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 [RequireComponent(typeof(SpriteRenderer))]
-[RequireComponent(typeof(PolygonCollider2D))]
-[RequireComponent(typeof(CompositeCollider2D))]
 [RequireComponent(typeof(BoxCollider2D))]
 public class Tree : MonoBehaviour
 {
@@ -205,34 +203,13 @@ public class Tree : MonoBehaviour
     #endregion
 
     #region Methods
-    private void Start()
-    {
-        UpdateInfo();
-    }
-
     private void UpdateInfo()
     {
-        PolygonCollider2D polygonCollider = GetComponent<PolygonCollider2D>();
-        CompositeCollider2D compositeCollider = GetComponent<CompositeCollider2D>();
-        Rigidbody2D rigidbody = GetComponent<Rigidbody2D>();
+        BoxCollider2D boxCollider = new BoxCollider2D();
         Width = 0;
         Height = 0;
         TrunkBlocks.Clear();
         FoliageBlocks.Clear();
-
-
-        if (polygonCollider != null)
-        {
-            polygonCollider.usedByComposite = true;
-        }
-        if (compositeCollider != null)
-        {
-            compositeCollider.isTrigger = true;
-        }
-        if (rigidbody != null)
-        {
-            rigidbody.bodyType = RigidbodyType2D.Static;
-        }
 
         if (!transform.Find("TreeTrunk"))
         {
@@ -282,8 +259,8 @@ public class Tree : MonoBehaviour
             {
                 Vector2 point = new Vector2(x, y);
                 Vector2 pointEnd = new Vector2(x + 1, y + 1);
-                Vector2 newPoint = polygonCollider.transform.TransformPoint(point);
-                Vector2 newPointEnd = polygonCollider.transform.TransformPoint(pointEnd);
+                Vector2 newPoint = transform.TransformPoint(point);
+                Vector2 newPointEnd = transform.TransformPoint(pointEnd);
                 Collider2D[] hits = Physics2D.OverlapAreaAll(newPoint, newPointEnd);
                 Collider2D treeTrunk = hits.ToList().Find(c => c.gameObject.GetComponent<TreeTrunkController>());
                 Collider2D treeFoliage = hits.ToList().Find(c => c.gameObject.GetComponent<TreeFoliageController>());
