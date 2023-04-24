@@ -10,7 +10,7 @@ public class DropMergeController : MonoBehaviour
     [SerializeField] private float _distanceToMerge;
     [SerializeField] private GameObject _target;
     [SerializeField] private Rigidbody2D _rigidbody;
-    [SerializeField] private CheckingAreaUtil _checkSameDropNear = new CheckingAreaUtil();
+    [SerializeField] private CheckingAreaUtil _checkSameDropNear;
 
     public CheckingAreaUtil CheckSameDropNear
     {

@@ -30,17 +30,15 @@ public class NPC : MonoBehaviour
     [SerializeField] private float _actionCooldown;
 
     [Header("Ground Checking")]
-    [SerializeField] private LayerMask _groundLayerMask;
-    [SerializeField] private Vector2 _groundCheckSize;
-    [SerializeField] private Vector2 _groundCheckCenterOffset;
-    [SerializeField] private float _extraWidth;
-    [SerializeField] private Color _isGroundedColor;
-    [SerializeField] private Color _isNotGroundedColor;
+    [SerializeField] private CheckingAreaUtil _groundCheck;
 
     [Header("Walking")]
     [SerializeField] private int _moveDirection;
     [SerializeField] private float _minSpeed;
     [SerializeField] private float _maxSpeed;
+    [SerializeField] private float _minRandomDirectionChange;
+    [SerializeField] private float _maxRandomDirectionChange;
+    [SerializeField] private float _currentRandomDirectionChange;
 
     [Header("Jumping")]
     [SerializeField] private float _jumpForce;
@@ -58,6 +56,16 @@ public class NPC : MonoBehaviour
     [SerializeField] private bool _isWalking;
     [SerializeField] private bool _isRunning;
     [SerializeField] private bool _isAttacking;
+
+    [Header("Atack Properties")]
+    [SerializeField] private Transform _target;
+    [SerializeField] private float _attackSpeedMultiplier;
+    [SerializeField] private bool _isTargetInAttackArea;
+    [SerializeField] private float _attackCooldown;
+    [SerializeField] private float _selfShootingCooldown;
+    [SerializeField] private float _extraDistance;
+    [SerializeField] private GameObject _attackCollider;
+    [SerializeField] private GameObject _hitCollider;
     #endregion
 
     #region Properties
@@ -110,84 +118,6 @@ public class NPC : MonoBehaviour
         set
         {
             _capsuleCollider = value;
-        }
-    }
-
-    public LayerMask GroundLayerMask
-    {
-        get
-        {
-            return _groundLayerMask;
-        }
-
-        set
-        {
-            _groundLayerMask = value;
-        }
-    }
-
-    public Vector2 GroundCheckSize
-    {
-        get
-        {
-            return _groundCheckSize;
-        }
-
-        set
-        {
-            _groundCheckSize = value;
-        }
-    }
-
-    public Vector2 GroundCheckCenterOffset
-    {
-        get
-        {
-            return _groundCheckCenterOffset;
-        }
-
-        set
-        {
-            _groundCheckCenterOffset = value;
-        }
-    }
-
-    public float ExtraWidth
-    {
-        get
-        {
-            return _extraWidth;
-        }
-
-        set
-        {
-            _extraWidth = value;
-        }
-    }
-
-    public Color IsGroundedColor
-    {
-        get
-        {
-            return _isGroundedColor;
-        }
-
-        set
-        {
-            _isGroundedColor = value;
-        }
-    }
-
-    public Color IsNotGroundedColor
-    {
-        get
-        {
-            return _isNotGroundedColor;
-        }
-
-        set
-        {
-            _isNotGroundedColor = value;
         }
     }
 
@@ -373,15 +303,32 @@ public class NPC : MonoBehaviour
         }
     }
 
-  
-
     public float JumpXForce
     { 
         get => _jumpXForce;
         set => _jumpXForce = value; 
     }
+
     public SpriteRenderer SpriteRenderer { get => _spriteRenderer; set => _spriteRenderer = value; }
-   
+
+    public Transform Target { get => _target; set => _target = value; }
+
+    public float AttackSpeedMultiplier { get => _attackSpeedMultiplier; set => _attackSpeedMultiplier = value; }
+
+    public bool IsTargetInAttackArea { get => _isTargetInAttackArea; set => _isTargetInAttackArea = value; }
+
+    public float AttackCooldown { get => _attackCooldown; set => _attackCooldown = value; }
+
+    public float SelfShootingCooldown { get => _selfShootingCooldown; set => _selfShootingCooldown = value; }
+
+    public float ExtraDistance { get => _extraDistance; set => _extraDistance = value; }
+
+    public GameObject AttackCollider { get => _attackCollider; set => _attackCollider = value; }
+
+    public GameObject HitCollider { get => _hitCollider; set => _hitCollider = value; }
+    public float MinRandomDirectionChange { get => _minRandomDirectionChange; set => _minRandomDirectionChange = value; }
+    public float MaxRandomDirectionChange { get => _maxRandomDirectionChange; set => _maxRandomDirectionChange = value; }
+    public float CurrentRandomDirectionChange { get => _currentRandomDirectionChange; set => _currentRandomDirectionChange = value; }
     #endregion
 
     #region Methods
@@ -392,6 +339,16 @@ public class NPC : MonoBehaviour
         Physics2D.IgnoreLayerCollision(7, 7);
         UpdateData();
         
+    }
+
+    public void Update()
+    {
+        Animate();
+    }
+
+    public void FixedUpdate()
+    {
+        ActionCooldown += Time.fixedDeltaTime;
     }
 
     public void OnValidate()
@@ -410,6 +367,27 @@ public class NPC : MonoBehaviour
         Animator = GetComponent<Animator>();
         SpriteRenderer = GetComponent<SpriteRenderer>();
         IsFacingRight = true;
+
+        if (!transform.Find("AttackCollider"))
+        {
+            AttackCollider = new GameObject("AttackCollider");
+            AttackCollider.AddComponent<MobAttackController>();
+            AttackCollider.transform.parent = transform;
+            AttackCollider.transform.position = transform.position;
+        }
+
+        if (!transform.Find("HitCollider"))
+        {
+            HitCollider = new GameObject("HitCollider");
+            HitCollider.AddComponent<PolygonCollider2D>();
+            HitCollider.GetComponent<PolygonCollider2D>().isTrigger = true;
+            HitCollider.AddComponent<MobHitController>();
+            HitCollider.transform.parent = transform;
+            HitCollider.transform.position = transform.position;
+        }
+
+        _groundCheck.IsTrueColor = Color.green;
+        _groundCheck.IsFalseColor = Color.red;
     }
 
     public void Animate()
@@ -470,44 +448,12 @@ public class NPC : MonoBehaviour
         Animator.SetBool("IsFall", isFall);
         Animator.SetBool("IsAttack", isAttack);
         Animator.SetBool("IsDeath", isDeath);
-
-        //if (IsGrounded)
-        //{
-        //    Animator.SetBool("Jump", false);
-        //}
-        //if (IsJumping)
-        //{
-        //    Animator.SetBool("Jump", true);
-        //    Animator.SetFloat("yVelocity", Rigidbody.velocity.y);
-        //}
     }
 
     public bool GroundCheck()
     {
-        Vector2 center = CapsuleCollider.bounds.center;
-        center += GroundCheckCenterOffset;
-
-        RaycastHit2D raycastHit = Physics2D.BoxCast(center, GroundCheckSize, 0f, Vector2.down, ExtraWidth, GroundLayerMask);
-
-        Color rayColor;
-        if (raycastHit.collider != null)
-        {
-            rayColor = IsGroundedColor;
-        }
-        else
-        {
-            rayColor = IsNotGroundedColor;
-        }
-
-        Vector2 halfSize = GroundCheckSize / 2f;
-        Vector2 centerForDebug = center + halfSize;
-
-        Debug.DrawRay(centerForDebug + new Vector2(halfSize.x, 0), Vector2.down * (GroundCheckSize.y + ExtraWidth), rayColor);
-        Debug.DrawRay(centerForDebug - new Vector2(halfSize.x, 0), Vector2.down * (GroundCheckSize.y + ExtraWidth), rayColor);
-        Debug.DrawRay(centerForDebug - new Vector2(halfSize.x, GroundCheckSize.y + ExtraWidth), Vector2.right * GroundCheckSize.x, rayColor);
-        Debug.DrawRay(centerForDebug - new Vector2(halfSize.x, 0), Vector2.right * GroundCheckSize.x, rayColor);
-
-        return raycastHit.collider != null;
+        var result = _groundCheck.CheckArea(transform.position, gameObject);
+        return result.Item1;
     }
 
     public bool JumpingCheck()
@@ -528,6 +474,59 @@ public class NPC : MonoBehaviour
         transform.localScale = theScale;
     }
 
-    public virtual void UpdatePhysicsShape() { }
+    public void EndAttack()
+    {
+        IsAttacking = false;
+    }
+
+    public void ChooseDirectionByTarget()
+    {
+        if (IsJumping)
+        {
+            return;
+        }
+        if (transform.position.x - Target.position.x < 0)
+        {
+            MoveDirection = 1;
+        }
+        else
+        {
+            MoveDirection = -1;
+        }
+    }
+
+    public void ChooseRandomDirection()
+    {
+        ActionCooldown = 0f;
+        MoveDirection = Random.Range(-1, 2);
+        CurrentRandomDirectionChange = Random.Range(MinRandomDirectionChange, MaxRandomDirectionChange);
+    }
+
+    public void ChangeScaleByMoveDirection()
+    {
+        if (IsFacingRight && MoveDirection < 0)
+        {
+            Flip();
+        }
+        if (!IsFacingRight && MoveDirection > 0)
+        {
+            Flip();
+        }
+    }
+
+    public void ChangeScaleToNormal()
+    {
+        if (!IsFacingRight)
+        {
+            Flip();
+        }
+    }
+
+    public void UpdatePhysicsShape()
+    {
+        List<Vector2> physicsShape = new List<Vector2>();
+        SpriteRenderer.sprite.GetPhysicsShape(0, physicsShape);
+        HitCollider.GetComponent<PolygonCollider2D>().SetPath(0, physicsShape);
+    }
     #endregion
 }

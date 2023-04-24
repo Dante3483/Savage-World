@@ -48,8 +48,8 @@ MonoBehaviour:
     _targetLayer:
       serializedVersion: 2
       m_Bits: 2048
-    _CheckSize: {x: 1, y: 3}
-    _CheckCenterOffset: {x: 0, y: 0}
+    _checkSize: {x: 1, y: 3}
+    _checkCenterOffset: {x: 0, y: 0}
     _extraWidth: 0
     _isTrueColor: {r: 1, g: 0, b: 0.60252666, a: 1}
     _isFalseColor: {r: 0, g: 0.074855804, b: 1, a: 1}
@@ -172,13 +172,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80ba3388008d28243b72b598b4da2fa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tree: {fileID: 0}
+  _currentTree: {fileID: 0}
   _findNearTree:
     _targetLayer:
       serializedVersion: 2
       m_Bits: 512
-    _CheckSize: {x: 2, y: 4}
-    _CheckCenterOffset: {x: 0, y: 0}
+    _checkSize: {x: 2, y: 4}
+    _checkCenterOffset: {x: 0, y: 0}
     _extraWidth: 0
     _isTrueColor: {r: 0.8051141, g: 1, b: 0.032075405, a: 1}
     _isFalseColor: {r: 0.57390785, g: 0, b: 1, a: 1}
@@ -348,14 +348,15 @@ MonoBehaviour:
   _capsuleCollider: {fileID: 5883331216944407275}
   _spriteRenderer: {fileID: 0}
   _player: {fileID: 0}
-  _groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 1024
-  _groundCheckSize: {x: 0.1, y: 0.25}
-  _groundCheckCenterOffset: {x: -0.05, y: -1.25}
-  _extraWidth: 0.5
-  _isGroundedColor: {r: 0.26666665, g: 1, b: 0, a: 1}
-  _isNotGroundedColor: {r: 1, g: 0, b: 0, a: 1}
+  _checkingGround:
+    _targetLayer:
+      serializedVersion: 2
+      m_Bits: 1024
+    _checkSize: {x: 0.1, y: 0.25}
+    _checkCenterOffset: {x: -0.05, y: -1.25}
+    _extraWidth: 0.5
+    _isTrueColor: {r: 0.05802095, g: 1, b: 0, a: 1}
+    _isFalseColor: {r: 1, g: 0.036852706, b: 0, a: 1}
   _walkSpeed: 4
   _runSpeed: 7
   _staminaDecreaseRun: 0.1
