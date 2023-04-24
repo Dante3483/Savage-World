@@ -3,7 +3,7 @@ guid: 69f4d922b478035429e9053704afe849
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -63,6 +63,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -303,14 +304,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      SkeletonSwordWalk_2: -396169957
-      SkeletonSwordWalk_5: -771241797
-      SkeletonSwordWalk_3: 412745659
-      SkeletonSwordWalk_7: 1675725400
-      SkeletonSwordWalk_1: 289280148
-      SkeletonSwordWalk_6: -139647880
-      SkeletonSwordWalk_4: 426144432
       SkeletonSwordWalk_0: -245881202
+      SkeletonSwordWalk_1: 289280148
+      SkeletonSwordWalk_2: -396169957
+      SkeletonSwordWalk_3: 412745659
+      SkeletonSwordWalk_4: 426144432
+      SkeletonSwordWalk_5: -771241797
+      SkeletonSwordWalk_6: -139647880
+      SkeletonSwordWalk_7: 1675725400
       SkeletonSwordWalk_8: 1514458366
   spritePackingTag: 
   pSDRemoveMatte: 0

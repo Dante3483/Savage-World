@@ -95,6 +95,11 @@ public class WorldObjectsAtlas: ScriptableObject
         return BlocksDictionary[objectType].ToList();
     }
 
+    public PickableItem GetPickableItemById(object id)
+    {
+        return PickableItemsList.Find(x => (int)x.ID == (int)id);
+    }
+
     public List<PickableItem> GetAllPickableItems()
     {
         return PickableItemsList;
@@ -131,10 +136,14 @@ public class WorldObjectsAtlas: ScriptableObject
         BlocksDictionary = new Dictionary<ObjectType, BlockSO[]>();
         sets = new Sets();
 
-        #region Empty blocks
+        #region Other blocks
         BlocksDictionary.Add(ObjectType.Empty, new BlockSO[]
         {
-            Air
+            Air,
+        });
+        BlocksDictionary.Add(ObjectType.PickableItem, new BlockSO[]
+        {
+            PickableItem,
         });
         #endregion
 

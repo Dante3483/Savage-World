@@ -40,7 +40,7 @@ MonoBehaviour:
   EnableStructureGeneration: 1
   EnableLakesGeneration: 1
   EnableTreeGeneration: 1
-  EnablePickableItemsGeneration: 0
+  EnablePickableItemsGeneration: 1
   CountOfOceanChunks: 2
   CountOfDesertChunks: 6
   CountOfPlainsChunks: 1
@@ -51,37 +51,37 @@ MonoBehaviour:
   OceanPosition:
     StartPositionX: 0
     EndPositionX: 199
-    StartPositionY: 2291
+    StartPositionY: 2292
     EndPositionY: 2349
   DesertPosition:
     StartPositionX: 200
     EndPositionX: 799
-    StartPositionY: 2291
+    StartPositionY: 2292
     EndPositionY: 2369
   PlainsPosition:
     StartPositionX: 800
     EndPositionX: 899
-    StartPositionY: 2291
+    StartPositionY: 2292
     EndPositionY: 2359
   MeadowPosition:
     StartPositionX: 900
     EndPositionX: 1699
-    StartPositionY: 2291
+    StartPositionY: 2292
     EndPositionY: 2359
   ForestPosition:
     StartPositionX: 1700
     EndPositionX: 1999
-    StartPositionY: 2291
+    StartPositionY: 2292
     EndPositionY: 2359
   SwampPosition:
     StartPositionX: 2000
     EndPositionX: 2199
-    StartPositionY: 2291
+    StartPositionY: 2292
     EndPositionY: 2359
   ConiferousForestPosition:
     StartPositionX: 2200
     EndPositionX: 2399
-    StartPositionY: 2291
+    StartPositionY: 2292
     EndPositionY: 2359
   chanceToSpawnSurvivalistCave: 50
   ChanceToSpawnLake: 30

@@ -1,6 +1,9 @@
-System.Collections.Generic.KeyNotFoundException: The given key 'PickableItem' was not present in the dictionary.
-  at System.Collections.Generic.Dictionary`2[TKey,TValue].get_Item (TKey key) [0x0001e] in <4a4789deb75f446a81a24a1a00bdd3f9>:0 
-  at WorldObjectsAtlas.GetBlockByID (ObjectType objectType, System.Object id) [0x0000d] in D:\Projects\Savage World\Assets\Resources\Scripts\Atlasses\WorldObjectsAtlas.cs:90 
-  at SaveLoadSystem.LoadWorldObjectsData (System.IO.BinaryReader binaryReader) [0x000d3] in D:\Projects\Savage World\Assets\Resources\Scripts\SaveLoadSystem\SaveLoadSystem.cs:293 
-  at SaveLoadSystem.LoadAllData () [0x0004f] in D:\Projects\Savage World\Assets\Resources\Scripts\SaveLoadSystem\SaveLoadSystem.cs:52 
+System.NullReferenceException: Object reference not set to an instance of an object
+  at MouseFollower.SetData (UnityEngine.Sprite sprite, System.Int32 quantity) [0x00000] in D:\Projects\Savage World\Assets\Resources\Scripts\UI\Helpful\MouseFollower.cs:32 
+  at UIInventoryPage.CreateDraggedItem (UnityEngine.Sprite sprite, System.Int32 quantity) [0x0001d] in D:\Projects\Savage World\Assets\Resources\Scripts\UI\Inventory\UIInventoryPage.cs:226 
+  at InventoryController.HandleNeedUpdateUI (System.Collections.Generic.Dictionary`2[TKey,TValue] inventoryState, System.Collections.Generic.List`1[T] armorState) [0x0016d] in D:\Projects\Savage World\Assets\Resources\Scripts\Controllers\UI\InventoryController.cs:129 
+  at InventorySO.InformAboutChange () [0x00000] in D:\Projects\Savage World\Assets\Resources\Scripts\Player\Inventory\InventorySO.cs:360 
+  at InventorySO.AddItemAt (InventoryItem item, System.Int32 index) [0x0013d] in D:\Projects\Savage World\Assets\Resources\Scripts\Player\Inventory\InventorySO.cs:232 
+  at SaveLoadSystem.LoadPlayer (System.IO.BinaryReader binaryReader) [0x000b5] in D:\Projects\Savage World\Assets\Resources\Scripts\SaveLoadSystem\SaveLoadSystem.cs:556 
+  at SaveLoadSystem.LoadAllData () [0x00082] in D:\Projects\Savage World\Assets\Resources\Scripts\SaveLoadSystem\SaveLoadSystem.cs:60 
   at World.LoadWorld () [0x00000] in D:\Projects\Savage World\Assets\Resources\Scripts\World.cs:173 

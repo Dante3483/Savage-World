@@ -83,14 +83,14 @@ public class InventoryController : MonoBehaviour
     {
         _inventoryData.Initialize();
         _inventoryData.OnInventoryChanged += HandleNeedUpdateUI;
-        foreach (InventoryItem item in initialItems)
-        {
-            if (item.IsEmpty)
-            {
-                continue;
-            }
-            _inventoryData.AddItem(item);
-        }
+        //foreach (InventoryItem item in initialItems)
+        //{
+        //    if (item.IsEmpty)
+        //    {
+        //        continue;
+        //    }
+        //    _inventoryData.AddItem(item);
+        //}
     }
 
     private void HandleNeedUpdateUI(Dictionary<int, InventoryItem> inventoryState, List<InventoryItem> armorState)

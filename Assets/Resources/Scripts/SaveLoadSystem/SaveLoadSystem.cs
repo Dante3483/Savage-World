@@ -30,6 +30,8 @@ public class SaveLoadSystem : MonoBehaviour
             Debug.Log("World saved");
             SaveTrees(binaryWriter);
             Debug.Log("Trees saved");
+            SavePickableItems(binaryWriter);
+            Debug.Log("Pickable items saved");
             SavePlayer(binaryWriter);
             Debug.Log("Player saved");
         }
@@ -53,6 +55,8 @@ public class SaveLoadSystem : MonoBehaviour
             Debug.Log("World loaded");
             LoadTrees(binaryReader);
             Debug.Log("Trees loaded");
+            LoadPickableItems(binaryReader);
+            Debug.Log("Pickable items loaded");
             LoadPlayer(binaryReader);
             Debug.Log("Player loaded");
         }
@@ -356,13 +360,8 @@ public class SaveLoadSystem : MonoBehaviour
     private void LoadTrees(BinaryReader binaryReader) 
     {
         GameObject trees = GameManager.Instance.TreesSection;
-        trees.transform.parent = GameManager.Instance.World.gameObject.transform;
 
-        foreach (Transform child in trees.transform)
-        {
-            Destroy(child.gameObject);
-        }
-        int treeCount = trees.transform.childCount;
+        int treeCount = 0;
 
         byte flags = binaryReader.ReadByte();
 
@@ -384,8 +383,85 @@ public class SaveLoadSystem : MonoBehaviour
             float x = binaryReader.ReadSingle();
             float y = binaryReader.ReadSingle();
             createdCount++;
-            GameObject treeGameObject = Instantiate(GameManager.Instance.WorldObjectAtlas.GetTreeByID(id), new Vector3(x, y), Quaternion.identity, trees.transform);
-            Tree tree = treeGameObject.GetComponent<Tree>();
+            Instantiate(
+                GameManager.Instance.WorldObjectAtlas.GetTreeByID(id), 
+                new Vector3(x, y), 
+                Quaternion.identity, 
+                trees.transform
+                );
+        }
+    }
+
+    private void SavePickableItems(BinaryWriter binaryWriter)
+    {
+        GameObject pickableItems = GameManager.Instance.PickableItemsSection;
+        int itemsCount = pickableItems.transform.childCount;
+
+        byte flags = 0;
+        byte[] count = new byte[2];
+
+        count[0] = (byte)(itemsCount & 255);
+        flags = (byte)(flags | 1);
+
+        if (itemsCount > 255)
+        {
+            count[1] = (byte)((itemsCount >> 8) & 255);
+            flags = (byte)(flags | 2);
+        }
+
+        binaryWriter.Write(flags);
+        if ((flags & 1) == 1)
+        {
+            binaryWriter.Write(count[0]);
+        }
+        if ((flags & 2) == 2)
+        {
+            binaryWriter.Write(count[1]);
+        }
+
+        foreach (Transform child in pickableItems.transform)
+        {
+            byte id = Convert.ToByte(child.GetComponent<PickableItem>().ID);
+            float x = child.transform.position.x;
+            float y = child.transform.position.y;
+            binaryWriter.Write(id);
+            binaryWriter.Write(x);
+            binaryWriter.Write(y);
+        }
+    }
+
+    private void LoadPickableItems(BinaryReader binaryReader)
+    {
+        GameObject pickableItems = GameManager.Instance.PickableItemsSection;
+
+        int itemsCount = 0;
+
+        byte flags = binaryReader.ReadByte();
+
+        if ((flags & 1) == 1 && (flags & 2) != 2)
+        {
+            itemsCount = (int)binaryReader.ReadByte();
+        }
+        if ((flags & 2) == 2)
+        {
+            int firstPart = binaryReader.ReadByte();
+            int secondPart = binaryReader.ReadByte();
+            itemsCount = firstPart | (secondPart << 8);
+        }
+
+        int createdCount = 0;
+        while (createdCount != itemsCount)
+        {
+            PickableItemsID id = (PickableItemsID)binaryReader.ReadByte();
+            float x = binaryReader.ReadSingle();
+            float y = binaryReader.ReadSingle();
+            createdCount++;
+            Instantiate(
+                GameManager.Instance.WorldObjectAtlas.GetPickableItemById(id).gameObject, 
+                new Vector3(x, y), 
+                Quaternion.identity, 
+                pickableItems.transform
+                );
         }
     }
 
@@ -457,7 +533,7 @@ public class SaveLoadSystem : MonoBehaviour
         GameManager.Instance.Player.transform.position = new Vector3(x, y);
         GameManager.Instance.Player.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
         inventoryData.Size = inventorySize;
-        inventoryData.Initialize();
+        controller.PrepareInventoryData();
 
         for (int i = 0; i < inventorySize; i++)
         {

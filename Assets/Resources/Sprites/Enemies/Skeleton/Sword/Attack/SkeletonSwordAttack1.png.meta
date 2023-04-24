@@ -3,7 +3,7 @@ guid: e0dbca105f9c98e45aefd374189de6c1
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -63,6 +63,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -241,11 +242,11 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       SkeletonSwordAttack1_0: -1684310050
+      SkeletonSwordAttack1_1: 1290642462
       SkeletonSwordAttack1_2: 888103046
       SkeletonSwordAttack1_3: -1385050797
       SkeletonSwordAttack1_4: 1817536576
       SkeletonSwordAttack1_5: -637960501
-      SkeletonSwordAttack1_1: 1290642462
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

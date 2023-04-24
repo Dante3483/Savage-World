@@ -29,6 +29,7 @@ public class TreeChoppingController : MonoBehaviour
             CurrentTree = result.Item2.GetComponentInParent<Tree>();
             if (CurrentTree.NeedToDestroy)
             {
+                ClearTileFlags();
                 Destroy(CurrentTree.gameObject);
                 return;
             }
@@ -54,6 +55,22 @@ public class TreeChoppingController : MonoBehaviour
         {
             CurrentTree.CanBeChopped = false;
             CurrentTree = null;
+        }
+    }
+
+    private void ClearTileFlags()
+    {
+        foreach (var tile in CurrentTree.TrunkBlocks)
+        {
+            Vector2Int position;
+            position = Vector2Int.FloorToInt(CurrentTree.transform.TransformPoint(tile));
+            GameManager.Instance.ObjectsData[position.x, position.y].IsTreeTrunk = false;
+        }
+        foreach (var tile in CurrentTree.FoliageBlocks)
+        {
+            Vector2Int position;
+            position = Vector2Int.FloorToInt(CurrentTree.transform.TransformPoint(tile));
+            GameManager.Instance.ObjectsData[position.x, position.y].IsTreeFoliage = false;
         }
     }
 }
