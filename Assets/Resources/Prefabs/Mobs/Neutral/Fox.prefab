@@ -243,8 +243,8 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_GravityScale: 3
+  m_Material: {fileID: 6200000, guid: 588c74f1ee9cd7e428c9954c65ee382b, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -320,8 +320,8 @@ MonoBehaviour:
   _minRandomDirectionChange: 3
   _maxRandomDirectionChange: 5
   _currentRandomDirectionChange: 0
-  _jumpForce: 5
-  _jumpXForce: 3
+  _jumpForce: 10
+  _jumpXForce: 5
   _animator: {fileID: 536251167078366318}
   _isGrounded: 0
   _isJumping: 0

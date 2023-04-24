@@ -93,11 +93,17 @@ public class NeutralMobs: NPC
             CurrentAction = MobAction.Fall;
             IsJumping = false;
         }
-        //Fall-Idle
+        //Fall-Idle / Fall-Walk
         if (CurrentAction == MobAction.Fall && IsGrounded)
         {
-            CurrentAction = MobAction.Idle;
-            ActionCooldown = 0f;
+            if (MoveDirection == 0)
+            {
+                CurrentAction = MobAction.Idle;
+            }
+            else
+            {
+                CurrentAction = MobAction.Walk;
+            }
         }
         //Run-Attack
         //if (CurrentAction == MobAction.Run && IsTargetInAttackArea && ActionCooldown >= AttackCooldown)
@@ -129,14 +135,27 @@ public class NeutralMobs: NPC
                     ChangeScaleByMoveDirection();
                     Rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
                     Rigidbody.velocity = new Vector2(speed * MoveDirection, Rigidbody.velocity.y);
-
-                   // Check if we can jump
+                    
+                        // Check if we can jump
 
                     Vector3Int intPosition = GameManager.Instance.World.BlockTilemap.WorldToCell(transform.position);
-                    if (GameManager.Instance.ObjectsData[intPosition.x + MoveDirection, intPosition.y].IsSolidBlock() && !IsTargetInAttackArea)
+                  
+                    if (!GameManager.Instance.ObjectsData[intPosition.x + MoveDirection, intPosition.y].IsSolidBlock())
                     {
-                        IsJumping = true;
-                        Rigidbody.velocity = new Vector2(Rigidbody.velocity.x, JumpForce);
+                        break;
+                    }
+                    if (GameManager.Instance.ObjectsData[intPosition.x + MoveDirection, intPosition.y+2].IsSolidBlock())
+                    {
+                        MoveDirection *= -1;
+                        break;
+                    }
+                    if (GameManager.Instance.ObjectsData[intPosition.x + MoveDirection, intPosition.y + 1].IsSolidBlock())
+                    {
+                        if (!GameManager.Instance.ObjectsData[intPosition.x, intPosition.y + 1].IsSolidBlock())
+                        {
+                            IsJumping = true;
+                            Rigidbody.velocity = new Vector2(Rigidbody.velocity.x, JumpForce);
+                        }
                     }
                 }
                 break;
