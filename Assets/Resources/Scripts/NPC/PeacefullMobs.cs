@@ -24,7 +24,7 @@ public class PeacefullMobs : NPC
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         base.FixedUpdate();
         switch (Id)
