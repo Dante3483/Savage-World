@@ -11,4 +11,6 @@ public enum NPCID
     Fox = 2, // Neutral
 
     Bunny = 3, // Peacaful
+
+    Crow = 4, // Peacaful
 }
