@@ -9,4 +9,8 @@ public enum NPCID
     SkeletonSword = 1, //Enemy
 
     Fox = 2, // Neutral
+
+    Bunny = 3, // Peacaful
+
+    Crow = 4, // Peacaful
 }
