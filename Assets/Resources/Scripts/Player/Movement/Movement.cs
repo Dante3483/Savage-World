@@ -92,12 +92,15 @@ public class Movement : MonoBehaviour
         if (_isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
             Rigidbody.velocity = Vector2.up * _jumpForce;
+            _player.Animator.SetBool("IsJumping", true);
         }
 
         if (Input.GetKeyUp(KeyCode.Space) && Rigidbody.velocity.y > 0)
         {
             Rigidbody.velocity = new Vector2(Rigidbody.velocity.x, Rigidbody.velocity.y * 0.5f);
+            _player.Animator.SetBool("IsJumping", true);
         }
+        AnimateMovement();
     }
 
     private void FixedUpdate()
@@ -277,6 +280,38 @@ public class Movement : MonoBehaviour
         Vector3 newScale = transform.localScale;
         newScale.x *= -1;
         transform.localScale = newScale;
+    }
+
+    private void AnimateMovement()
+    {
+        //Reset flags
+        _player.Animator.SetBool("IsIdle", false);
+        _player.Animator.SetBool("IsWalking", false);
+        _player.Animator.SetBool("IsRunning", false);
+        _player.Animator.SetBool("IsJumping", false);
+        _player.Animator.SetBool("IsFalling", false);
+
+        //Set flag
+        if (!_isWalking && !_isRunning && !_isJumping && !_isFalling)
+        {
+            _player.Animator.SetBool("IsIdle", true);
+        }
+        if (_isWalking)
+        {
+            _player.Animator.SetBool("IsWalking", true);
+        }
+        if (_isRunning)
+        {
+            _player.Animator.SetBool("IsRunning", true);
+        }
+        if (_isJumping)
+        {
+            _player.Animator.SetBool("IsJumping", true);
+        }
+        if (_isFalling)
+        {
+            _player.Animator.SetBool("IsFalling", true);
+        }
     }
     #endregion
 

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Interactions : MonoBehaviour
 {
+    [SerializeField] private Player _player;
     [SerializeField] private World _world;
     [SerializeField] private InventorySO _inventory;
     [SerializeField] private InventorySO _hotbar;
@@ -25,10 +26,13 @@ public class Interactions : MonoBehaviour
         }
     }
 
+    public Player Player { get => _player; set => _player = value; }
+
     private void Awake()
     {
         _dropSection = GameManager.Instance.DropSection;
         _world = GameManager.Instance.World;
+        _player = GetComponent<Player>();
     }
 
     private void Update()

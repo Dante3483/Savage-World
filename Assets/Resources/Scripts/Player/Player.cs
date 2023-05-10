@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    [Header("Main")]
+    [SerializeField] private Animator _animator;
     [Header("Health")]
     [SerializeField] private float _currentHealth;
     [SerializeField] private float _maxHealth;
@@ -12,11 +14,18 @@ public class Player : MonoBehaviour
     [SerializeField] private float _currentStamina;
     [SerializeField] private float _maxStamina;
 
+    public Animator Animator { get => _animator; set => _animator = value; }
+
     private void Awake()
     {
         _currentHealth = _maxHealth;
         _currentMana = _maxMana;
         _currentStamina = _maxStamina;
+    }
+
+    private void Start()
+    {
+        _animator = GetComponent<Animator>();
     }
 
     public void AddHealh(float healh)
