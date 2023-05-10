@@ -17,6 +17,7 @@ public class NPC : MonoBehaviour
         Fall = 5,
         Attack = 6,
         Death = 7,
+        Fly = 8,
     }
 
     #region Private fields
@@ -527,6 +528,11 @@ public class NPC : MonoBehaviour
         List<Vector2> physicsShape = new List<Vector2>();
         SpriteRenderer.sprite.GetPhysicsShape(0, physicsShape);
         HitCollider.GetComponent<PolygonCollider2D>().SetPath(0, physicsShape);
+    }
+
+    public virtual void AI()
+    {
+
     }
     #endregion
 }
