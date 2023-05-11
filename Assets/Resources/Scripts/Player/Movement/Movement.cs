@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -15,10 +16,21 @@ public class Movement : MonoBehaviour
     [SerializeField] private CheckingAreaUtil _checkingGround;
 
     [Header("Moving")]
+    [SerializeField] private int _moveDirection;
     [SerializeField] private float _walkSpeed;
     [SerializeField] private float _runSpeed;
     [SerializeField] private float _staminaDecreaseRun;
     [SerializeField] private float _staminaIncrease;
+
+    [Header("Slope")]
+    [SerializeField] private Vector2 _capsuleColliderSize;
+    [SerializeField] private Vector2 _slopeNormalPerpendicular;
+    [SerializeField] private float _slopeCheckDistance;
+    [SerializeField] private float _slopeDownAngle;
+    [SerializeField] private float _slopeDownAnglePrev;
+    [SerializeField] private float _slopeSideAngle;
+    [SerializeField] private PhysicsMaterial2D _noFriction;
+    [SerializeField] private PhysicsMaterial2D _fullFriction;
 
     [Header("Jumping")]
     [SerializeField] private float _jumpForce;
@@ -31,6 +43,7 @@ public class Movement : MonoBehaviour
 
     [Header("Flags")]
     [SerializeField] private bool _isGrounded;
+    [SerializeField] private bool _isIdle;
     [SerializeField] private bool _isJumping;
     [SerializeField] private bool _isFalling;
     [SerializeField] private bool _isWalking;
@@ -39,6 +52,8 @@ public class Movement : MonoBehaviour
     [SerializeField] private bool _isHit;
     [SerializeField] private bool _isHitCooldown;
     [SerializeField] private bool _isBlinking;
+    [SerializeField] private bool _isOnSlope;
+    [SerializeField] private bool _isLShiftDown;
     #endregion
 
     #region Public Fields
@@ -67,7 +82,6 @@ public class Movement : MonoBehaviour
         _player = GetComponent<Player>();
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         UpdateData();
@@ -82,103 +96,188 @@ public class Movement : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     private void Update()
     {
-        _isGrounded = GroundCheck();
-        _isJumping = JumpingCheck();
-        _isFalling = FallingCheck();
+        SetMoving();
+        GroundCheck();
+        JumpingCheck();
+        FallingCheck();
 
         if (_isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
+            _isJumping = true;
             Rigidbody.velocity = Vector2.up * _jumpForce;
-            _player.Animator.SetBool("IsJumping", true);
         }
 
         if (Input.GetKeyUp(KeyCode.Space) && Rigidbody.velocity.y > 0)
         {
             Rigidbody.velocity = new Vector2(Rigidbody.velocity.x, Rigidbody.velocity.y * 0.5f);
-            _player.Animator.SetBool("IsJumping", true);
         }
-        AnimateMovement();
     }
 
     private void FixedUpdate()
     {
-        Rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
+        SlopeCheck();
+        Move();
+        AnimateMovement();
+    }
 
-        if (Input.GetKey(KeyCode.LeftShift))
+    private void SlopeCheck()
+    {
+        Vector2 checkPosistion = transform.position - (Vector3)(new Vector2(_capsuleColliderSize.x / 2f * -_moveDirection, _capsuleColliderSize.y / 2));
+
+        SlopeCheckHorizontal(checkPosistion);
+        SlopeCheckVertical(checkPosistion);
+    }
+
+    private void SlopeCheckVertical(Vector2 checkPosistion)
+    {
+        RaycastHit2D hit = Physics2D.Raycast(checkPosistion, Vector2.down, _slopeCheckDistance, _checkingGround.TargetLayer);
+        if (hit)
         {
-            if (WalkingCheck())
+            _slopeNormalPerpendicular = Vector2.Perpendicular(hit.normal).normalized;
+
+            _slopeDownAngle = Vector2.Angle(hit.normal, Vector2.up);
+
+            if (_slopeDownAngle > 0)
             {
-                _isWalking = false;
-                _isRunning = true;
+                _isOnSlope = true;
             }
-            else
+
+            _slopeDownAnglePrev = _slopeDownAngle;
+
+            Debug.DrawRay(hit.point, _slopeNormalPerpendicular, Color.red);
+            Debug.DrawRay(hit.point, hit.normal, Color.green);
+        }
+        else
+        {
+            _slopeDownAngle = 0;
+        }
+
+        if (_slopeSideAngle == 90)
+        {
+            _isOnSlope = false;
+        }
+
+        if (_isOnSlope)
+        {
+            Rigidbody.gravityScale = 0f;
+        }
+        else
+        {
+            Rigidbody.gravityScale = 9f;
+        }
+    }
+
+    private void SlopeCheckHorizontal(Vector2 checkPosistion)
+    {
+        RaycastHit2D slopeHitFront = Physics2D.Raycast(checkPosistion, transform.right, _slopeCheckDistance, _checkingGround.TargetLayer);
+        RaycastHit2D slopeHitBack = Physics2D.Raycast(checkPosistion, -transform.right, _slopeCheckDistance, _checkingGround.TargetLayer);
+        if (slopeHitFront)
+        {
+            _isOnSlope = true;
+            _slopeSideAngle = Vector2.Angle(slopeHitFront.normal, Vector2.up);
+        }
+        else if (slopeHitBack)
+        {
+            _isOnSlope = true;
+            _slopeSideAngle = Vector2.Angle(slopeHitBack.normal, Vector2.up);
+        }
+        else
+        {
+            _isOnSlope = false;
+            _slopeSideAngle = 0.0f;
+        }
+    }
+
+    private void SetMoving()
+    {
+        _isIdle = false;
+        _isWalking = false;
+
+        if (_isHit)
+        {
+            _moveDirection = 0;
+            return;
+        }
+
+        if (Input.GetKey(KeyCode.A))
+        {
+            Rigidbody.sharedMaterial = _noFriction;
+            _isWalking = true;
+            _moveDirection = -1;
+            if (_isFacingRight)
             {
-                _isWalking = true;
-                _isRunning = false;
+                Flip();
+            }
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            Rigidbody.sharedMaterial = _noFriction;
+            _isWalking = true;
+            _moveDirection = 1;
+            if (!_isFacingRight)
+            {
+                Flip();
             }
         }
         else
         {
-            _isWalking = true;
+            Rigidbody.sharedMaterial = _fullFriction;
+            _isIdle = true;
+            _moveDirection = 0;
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            _isLShiftDown = true;
+        }
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            _isLShiftDown = false;
+        }
+
+        if (!_isIdle && _isLShiftDown)
+        {
+            _isWalking = false;
+            _isRunning = true;
+        }
+        else if (!_isLShiftDown)
+        {
             _isRunning = false;
         }
-        float speed = 0f;
 
-        if (_isWalking)
+        if (!_player.CanUseStamina())
         {
-            _player.AddStamina(_staminaIncrease);
-            speed = _walkSpeed;
+            _isLShiftDown = false;
+            _isRunning = false;
         }
+    }
+
+    private void Move()
+    {
+        float speed = _isRunning ? _runSpeed : _walkSpeed;
+
         if (_isRunning)
         {
             _player.RemoveStamina(_staminaDecreaseRun);
-            if (_player.CanUseStamina())
-            {
-                speed = _runSpeed;
-            }
-            else
-            {
-                speed = _walkSpeed;
-            }
+        }
+        else
+        {
+            _player.AddStamina(_staminaIncrease);
         }
 
-        if (!_isHit)
+        if (_isGrounded && !_isOnSlope && !_isJumping && _rigidbody.velocity.y >= -0.05f)
         {
-            if (Input.GetKey(KeyCode.A))
-            {
-                if (_isFacingRight)
-                {
-                    Flip();
-                }
-                Rigidbody.velocity = new Vector2(-speed, Rigidbody.velocity.y);
-            }
-            else
-            {
-                if (Input.GetKey(KeyCode.D))
-                {
-                    if (!_isFacingRight)
-                    {
-                        Flip();
-                    }
-                    Rigidbody.velocity = new Vector2(speed, Rigidbody.velocity.y);
-                }
-                else
-                {
-                    // No keys pressed
-                    // If is not jumping or is not falling freeze X posiotion and set X velocity to 0
-                    if (!_isJumping || !_isFalling)
-                    {
-                        Rigidbody.velocity = new Vector2(0, Rigidbody.velocity.y);
-                        if (_isGrounded)
-                        {
-                            Rigidbody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
-                        }
-                    }
-                }
-            }
+            _rigidbody.velocity = new Vector2(speed * _moveDirection, 0.0f);
+        }
+        else if (_isGrounded && _isOnSlope && !_isJumping)
+        {
+            _rigidbody.velocity = new Vector2(speed * _slopeNormalPerpendicular.x * -_moveDirection * 1.5f, speed * _slopeNormalPerpendicular.y * -_moveDirection);
+        }
+        else if (!_isGrounded)
+        {
+            _rigidbody.velocity = new Vector2(speed * _moveDirection, _rigidbody.velocity.y);
         }
     }
 
@@ -186,6 +285,7 @@ public class Movement : MonoBehaviour
     {
         Rigidbody = GetComponent<Rigidbody2D>();
         _capsuleCollider = GetComponent<CapsuleCollider2D>();
+        _capsuleColliderSize = _capsuleCollider.size;
         _isFacingRight = true;
     }
 
@@ -246,25 +346,26 @@ public class Movement : MonoBehaviour
     #endregion
 
     #region Checks
-    private bool GroundCheck()
+    private void GroundCheck()
     {
-        var result = _checkingGround.CheckArea(transform.position, gameObject);
-        return result.Item1;
+        _isGrounded = _checkingGround.CheckArea(transform.position, gameObject).Item1;
     }
 
-    private bool JumpingCheck()
+    private void JumpingCheck()
     {
-        return Rigidbody.velocity.y > 0 && !_isGrounded;
+        if (Rigidbody.velocity.y <= 0)
+        {
+            _isJumping = false;
+        }
     }
 
-    private bool FallingCheck()
+    private void FallingCheck()
     {
-        return Rigidbody.velocity.y < 0 && !_isGrounded;
-    }
-
-    private bool WalkingCheck()
-    {
-        return Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D);
+        _isFalling = Rigidbody.velocity.y < 0 && !_isGrounded && !_isOnSlope;
+        if (_isFalling)
+        {
+            _isJumping = false;
+        }
     }
 
     public bool CanNewHitCheck()
@@ -277,9 +378,7 @@ public class Movement : MonoBehaviour
     private void Flip()
     {
         _isFacingRight = !_isFacingRight;
-        Vector3 newScale = transform.localScale;
-        newScale.x *= -1;
-        transform.localScale = newScale;
+        transform.Rotate(0.0f, 180.0f, 0.0f);
     }
 
     private void AnimateMovement()
@@ -292,7 +391,7 @@ public class Movement : MonoBehaviour
         _player.Animator.SetBool("IsFalling", false);
 
         //Set flag
-        if (!_isWalking && !_isRunning && !_isJumping && !_isFalling)
+        if (_isIdle)
         {
             _player.Animator.SetBool("IsIdle", true);
         }
