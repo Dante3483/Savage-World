@@ -700,6 +700,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _gameState: 0
+  _terrainConfiguration: {fileID: 11400000, guid: cfb098fe8f879f14ab9cd73b8e35a61c, type: 2}
+  _maxTerrainWidth: 0
+  _maxTerrainHeight: 0
+  _objectsAtlass: {fileID: 11400000, guid: 69f44a460fd501948b3914d8b720fd71, type: 2}
 --- !u!1 &869520364
 GameObject:
   m_ObjectHideFlags: 0
