@@ -17,3 +17,9 @@ MonoBehaviour:
   CurrentHorizontalChunksCount: 26
   CurrentVerticalChunksCount: 24
   ChunkSize: 100
+  Equator: 2350
+  Levels:
+  - {fileID: 11400000, guid: abfc12d2ebd9c244a95107aae1c41b37, type: 2}
+  - {fileID: 11400000, guid: 318a27e219dd34042a9bc397b17bb678, type: 2}
+  - {fileID: 11400000, guid: 630aa759ed86328409a86c5fa46ef795, type: 2}
+  - {fileID: 11400000, guid: 9846cc9e5b1d2be428660e3d881e8d90, type: 2}

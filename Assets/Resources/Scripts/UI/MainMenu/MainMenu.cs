@@ -5,6 +5,19 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
+    #region Private fields
+
+    #endregion
+
+    #region Public fields
+
+    #endregion
+
+    #region Properties
+
+    #endregion
+
+    #region Methods
     public void NewGame()
     {
         GameManager.Instance.UpdateGameState(GameState.NewGameState);
@@ -19,4 +32,5 @@ public class MainMenu : MonoBehaviour
     {
         //GameManager.Instance.UpdateGameState(GameState.Quit);
     }
+    #endregion
 }

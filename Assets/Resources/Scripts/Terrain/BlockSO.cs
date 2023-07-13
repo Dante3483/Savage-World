@@ -26,6 +26,19 @@ public abstract class BlockSO : ScriptableObject
             _type = value;
         }
     }
+
+    public List<TileBase> Tiles
+    {
+        get
+        {
+            return _tiles;
+        }
+
+        set
+        {
+            _tiles = value;
+        }
+    }
     #endregion
 
     #region Methods

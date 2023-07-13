@@ -37,7 +37,6 @@ public class WorldCellData
 
         set
         {
-            _blockData = GameManager.Instance.ObjectsAtlass.FindBlockById(value, _id);
             _blockType = value;
         }
     }
@@ -47,7 +46,7 @@ public class WorldCellData
     public WorldCellData()
     {
         //Set Ait block by default
-        _blockData = GameManager.Instance.ObjectsAtlass.Air;
+        _blockData = GameManager.Instance.ObjectsAtlass.Dirt;
     }
 
     public WorldCellData(ushort xPosition, ushort yPosition)
@@ -62,17 +61,28 @@ public class WorldCellData
     {
         Id = block.GetId();
         BlockType = block.Type;
+        _blockData = block;
     }
 
     public void SetData(ushort id, BlockTypes blockType)
     {
         Id = id;
         BlockType = blockType;
+        _blockData = GameManager.Instance.ObjectsAtlass.GetBlockById(blockType, id);
     }
 
     public override string ToString()
     {
         return $"X: {_coords.x}\nY: {_coords.y}";
+    }
+
+    public TileBase GetTile()
+    {
+        if (_blockData.Tiles.Count == 0)
+        {
+            return null;
+        }
+        return _blockData.Tiles[Random.Range(0, _blockData.Tiles.Count)];
     }
     #endregion
 }

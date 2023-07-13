@@ -11,9 +11,21 @@ public class GameManager : MonoBehaviour
     [Header("World data")]
     [SerializeField] private int _maxTerrainWidth;
     [SerializeField] private int _maxTerrainHeight;
+    [SerializeField] private int _currentTerrainWidth;
+    [SerializeField] private int _currentTerrainHeight;
+
+    [Header("Session data")]
+    [SerializeField] private int _seed;
 
     [Header("Atlasses")]
     [SerializeField] private ObjectsAtlass _objectsAtlass;
+
+    [Header("Terrain")]
+    [SerializeField] private GameObject _terrainGameObject;
+    private Terrain _terrain;
+
+    [Header("UI")]
+    [SerializeField] private Canvas _mainMenu;
     #endregion
 
     #region Public fields
@@ -46,12 +58,82 @@ public class GameManager : MonoBehaviour
             _objectsAtlass = value;
         }
     }
+
+    public int Seed
+    {
+        get
+        {
+            return _seed;
+        }
+
+        set
+        {
+            _seed = value;
+        }
+    }
+
+    public Terrain Terrain
+    {
+        get
+        {
+            if (_terrain == null)
+            {
+                _terrain = _terrainGameObject.GetComponent<Terrain>();
+            }
+            return _terrain;
+        }
+
+        set
+        {
+            _terrain = value;
+        }
+    }
+
+    public int CurrentTerrainWidth
+    {
+        get
+        {
+            return _currentTerrainWidth;
+        }
+
+        set
+        {
+            _currentTerrainWidth = value;
+        }
+    }
+
+    public int CurrentTerrainHeight
+    {
+        get
+        {
+            return _currentTerrainHeight;
+        }
+
+        set
+        {
+            _currentTerrainHeight = value;
+        }
+    }
+
+    public WorldCellData[,] WorldData
+    {
+        get
+        {
+            return _worldData;
+        }
+
+        set
+        {
+            _worldData = value;
+        }
+    }
     #endregion
 
     #region Methods
     private void Awake()
     {
         Instance = this;
+        _terrainGameObject.SetActive(false);
     }
 
     private void Start()
@@ -93,21 +175,24 @@ public class GameManager : MonoBehaviour
         _maxTerrainWidth = TerrainConfiguration.DefaultHorizontalChunksCount * TerrainConfiguration.ChunkSize;
         _maxTerrainHeight = TerrainConfiguration.DefaultVerticalChunksCount * TerrainConfiguration.ChunkSize;
 
+        CurrentTerrainWidth = TerrainConfiguration.CurrentHorizontalChunksCount * TerrainConfiguration.ChunkSize;
+        CurrentTerrainHeight= TerrainConfiguration.CurrentVerticalChunksCount * TerrainConfiguration.ChunkSize;
+
         //Initialize 2d world data array
         var watch = System.Diagnostics.Stopwatch.StartNew();
 
-        _worldData = new WorldCellData[_maxTerrainWidth, _maxTerrainHeight];
+        WorldData = new WorldCellData[_maxTerrainWidth, _maxTerrainHeight];
         for (ushort x = 0; x < _maxTerrainWidth; x++)
         {
             for (ushort y = 0; y < _maxTerrainHeight; y++)
             {
                 WorldCellData emptyWorldCellData = new WorldCellData(x,y);
-                _worldData[x, y] = emptyWorldCellData;
+                WorldData[x, y] = emptyWorldCellData;
             }
         }
 
         watch.Stop();
-        Debug.Log($"Terrain generation complete: {watch.Elapsed.TotalSeconds}");
+        Debug.Log($"Game initialication: {watch.Elapsed.TotalSeconds}");
 
         //Initialize atlasses
         ObjectsAtlass.Initialize();
@@ -123,6 +208,12 @@ public class GameManager : MonoBehaviour
     private void HandleNewGameState()
     {
         Debug.Log("New game state");
+
+        _mainMenu.gameObject.SetActive(false);
+        _terrainGameObject.SetActive(true);
+        //Create new world
+        Terrain.CreateNewWorld();
+
     }
     #endregion
 }
