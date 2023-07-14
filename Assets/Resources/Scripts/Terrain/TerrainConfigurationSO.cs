@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -21,6 +20,7 @@ public class TerrainConfigurationSO : ScriptableObject
 
     [Header("World data")]
     public ushort Equator;
+    public ushort DeepOceanY;
     public List<TerrainLevelSO> Levels;
     public List<BiomeSO> Biomes;
     #endregion
@@ -59,6 +59,11 @@ public class TerrainConfigurationSO : ScriptableObject
         ushort x = 0;
         foreach (BiomeSO biome in Biomes)
         {
+            if (biome.Id == BiomesID.NonBiom)
+            {
+                continue;
+            }
+
             //Calculate couont
             biome.RoundCount(CurrentHorizontalChunksCount * biome.Percentage / 100f);
 

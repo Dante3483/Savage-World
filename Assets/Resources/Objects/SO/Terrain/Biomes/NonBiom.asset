@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 220fe6937979db64d9271989b859a0ac, type: 3}
-  m_Name: Meadow
+  m_Name: NonBiom
   m_EditorClassIdentifier: 
-  _id: 4
-  _percentage: 30
-  _mountainCompression: 35
-  _mountainHeight: 15
-  _chunksCount: 26
-  _startX: 3300
-  _endX: 5899
-  _colorOnMap: {r: 0.29551017, g: 1, b: 0, a: 1}
+  _id: 0
+  _percentage: 0
+  _mountainCompression: 0
+  _mountainHeight: 0
+  _chunksCount: 0
+  _startX: 0
+  _endX: 0
+  _colorOnMap: {r: 0.6415094, g: 0.6415094, b: 0.6415094, a: 1}
   _floor: 0
   _round: 0
-  _ceil: 1
+  _ceil: 0

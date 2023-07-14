@@ -18,12 +18,14 @@ MonoBehaviour:
   CurrentVerticalChunksCount: 24
   ChunkSize: 100
   Equator: 2150
+  DeepOceanY: 1875
   Levels:
   - {fileID: 11400000, guid: abfc12d2ebd9c244a95107aae1c41b37, type: 2}
   - {fileID: 11400000, guid: 318a27e219dd34042a9bc397b17bb678, type: 2}
   - {fileID: 11400000, guid: 630aa759ed86328409a86c5fa46ef795, type: 2}
   - {fileID: 11400000, guid: 9846cc9e5b1d2be428660e3d881e8d90, type: 2}
   Biomes:
+  - {fileID: 11400000, guid: 6b283d4b4f1de6e4997b8bc29a8a2643, type: 2}
   - {fileID: 11400000, guid: 43e08cdcaaf358e4a9e8a3563ccb3924, type: 2}
   - {fileID: 11400000, guid: f56a44bec5cf4634b977a662ba16432a, type: 2}
   - {fileID: 11400000, guid: 8633f2e87d1b8624684ce0eb39c9e9f3, type: 2}

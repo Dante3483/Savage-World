@@ -97,5 +97,10 @@ public class WorldCellData
         }
         return BlockData.Tiles[Random.Range(0, BlockData.Tiles.Count)];
     }
+
+    public bool CompareBlock(BlockSO block)
+    {
+        return _blockData.GetId() == block.GetId() && _blockData.Type == block.Type;
+    }
     #endregion
 }

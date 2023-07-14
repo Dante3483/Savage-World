@@ -1,10 +1,10 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "newSolidBlock", menuName = "Blocks/Solid")]
-public class SolidBlockSO : BlockSO
+[CreateAssetMenu(fileName = "newLiquidBlock", menuName = "Blocks/Liquid")]
+public class LiquidBlockSO : BlockSO
 {
     #region Private fields
-    [SerializeField] private SolidBlocksID _id;
+    [SerializeField] private LiquidBlocksID _id;
     #endregion
 
     #region Public fields
@@ -16,9 +16,9 @@ public class SolidBlockSO : BlockSO
     #endregion
 
     #region Methods
-    public SolidBlockSO()
+    public LiquidBlockSO()
     {
-        Type = BlockTypes.Solid;
+        Type = BlockTypes.Liquid;
     }
 
     public override ushort GetId()

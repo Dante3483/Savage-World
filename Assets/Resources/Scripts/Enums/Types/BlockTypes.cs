@@ -4,6 +4,8 @@ using UnityEngine;
 
 public enum BlockTypes: byte
 {
-    Abstract,
-    Solid,
+    Abstract = 0,
+    Solid = 1,
+    Dust = 2,
+    Liquid = 3,
 }

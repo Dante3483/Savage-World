@@ -1,10 +1,10 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "newSolidBlock", menuName = "Blocks/Solid")]
-public class SolidBlockSO : BlockSO
+[CreateAssetMenu(fileName = "newDustBlock", menuName = "Blocks/Dust")]
+public class DustBlockSO : BlockSO
 {
     #region Private fields
-    [SerializeField] private SolidBlocksID _id;
+    [SerializeField] private DustBlocksID _id;
     #endregion
 
     #region Public fields
@@ -16,9 +16,9 @@ public class SolidBlockSO : BlockSO
     #endregion
 
     #region Methods
-    public SolidBlockSO()
+    public DustBlockSO()
     {
-        Type = BlockTypes.Solid;
+        Type = BlockTypes.Dust;
     }
 
     public override ushort GetId()

@@ -1,7 +1,7 @@
 public class Chunk
 {
     #region Private fields
-    private BiomesID _biomeId;
+    private BiomeSO _biome;
     private Vector2Byte _coords;
     #endregion
 
@@ -10,29 +10,29 @@ public class Chunk
     #endregion
 
     #region Properties
-    public BiomesID BiomeId
-    {
-        get
-        {
-            return _biomeId;
-        }
-
-        set
-        {
-            _biomeId = value;
-        }
-    }
-
     public Vector2Byte Coords
     {
         get
         {
-            return _coords;
+            return Coords;
         }
 
         set
         {
-            _coords = value;
+            Coords = value;
+        }
+    }
+
+    public BiomeSO Biome
+    {
+        get
+        {
+            return _biome;
+        }
+
+        set
+        {
+            _biome = value;
         }
     }
     #endregion
@@ -40,12 +40,12 @@ public class Chunk
     #region Methods
     public Chunk()
     {
-        _biomeId = BiomesID.NonBiom;
+        Biome = GameManager.Instance.TerrainConfiguration.Biomes[0];
     }
 
     public Chunk(byte x, byte y)
     {
-        _biomeId = BiomesID.NonBiom;
+        Biome = GameManager.Instance.TerrainConfiguration.Biomes[0];
         _coords.x = x;
         _coords.y = y;
     }

@@ -1,6 +1,5 @@
 using System.IO;
 using UnityEngine;
-using static TMPro.Examples.TMP_ExampleScript_01;
 
 public class GameManager : MonoBehaviour
 {
@@ -19,6 +18,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Session data")]
     [SerializeField] private int _seed;
+    [SerializeField] private System.Random _randomVar;
 
     [Header("Atlasses")]
     [SerializeField] private ObjectsAtlass _objectsAtlass;
@@ -159,6 +159,19 @@ public class GameManager : MonoBehaviour
             _isStaticSeed = value;
         }
     }
+
+    public System.Random RandomVar
+    {
+        get
+        {
+            return _randomVar;
+        }
+
+        set
+        {
+            _randomVar = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -261,14 +274,15 @@ public class GameManager : MonoBehaviour
 
         _mainMenu.gameObject.SetActive(false);
         _terrainGameObject.SetActive(true);
+
         //Create new world
         Terrain.CreateNewWorld();
-
     }
 
     private void SaveMapToPNG()
     {
         Texture2D worldMap = new Texture2D(CurrentTerrainWidth, CurrentTerrainHeight);
+        Texture2D biomesMap = new Texture2D(CurrentTerrainWidth, CurrentTerrainHeight);
         for (int x = 0; x < CurrentTerrainWidth; x++)
         {
             for (int y = 0; y < CurrentTerrainHeight; y++)
@@ -277,11 +291,26 @@ public class GameManager : MonoBehaviour
                 Color gridColor = new Color(blockColor.r - 0.2f, blockColor.g - 0.2f, blockColor.b - 0.2f, blockColor.a);
                 Color mapColor = x % 100 == 0 || y % 100 == 0 ? gridColor : blockColor;
                 worldMap.SetPixel(x, y, mapColor);
+
+                Color biomeColor = GetChunk(x, y).Biome.ColorOnMap;
+                Color gridBiomeColor = new Color(biomeColor.r - 0.2f, biomeColor.g - 0.2f, biomeColor.b - 0.2f, biomeColor.a);
+                Color biomeMapColor = x % 100 == 0 || y % 100 == 0 ? gridBiomeColor : biomeColor;
+                biomesMap.SetPixel(x, y, biomeMapColor);
             }
         }
         worldMap.Apply();
-        byte[] bytes = worldMap.EncodeToPNG();
-        File.WriteAllBytes(Application.dataPath + "/WorldMap.png", bytes);
+        biomesMap.Apply();
+
+        byte[] bytesMap = worldMap.EncodeToPNG();
+        File.WriteAllBytes(Application.dataPath + "/WorldMap.png", bytesMap);
+
+        byte[] bytesBiome = biomesMap.EncodeToPNG();
+        File.WriteAllBytes(Application.dataPath + "/BiomesMap.png", bytesBiome);
+    }
+
+    public Chunk GetChunk(int x, int y)
+    {
+        return Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize];
     }
     #endregion
 }

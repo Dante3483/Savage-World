@@ -9,17 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 220fe6937979db64d9271989b859a0ac, type: 3}
-  m_Name: Ocean
+  m_Script: {fileID: 11500000, guid: 14b719d074d086f4da2d8cde30ea358e, type: 3}
+  m_Name: Sand
   m_EditorClassIdentifier: 
-  _id: 1
-  _percentage: 10
-  _mountainCompression: 25
-  _mountainHeight: 8
-  _chunksCount: 8
-  _startX: 0
-  _endX: 799
-  _colorOnMap: {r: 0, g: 0.6972952, b: 1, a: 1}
-  _floor: 1
-  _round: 0
-  _ceil: 0
+  _tiles:
+  - {fileID: 11400000, guid: 1957a515606f4064d8e2f0c0da9e1432, type: 2}
+  _type: 2
+  _colorOnMap: {r: 0.9490196, g: 0.9254902, b: 0.70980394, a: 1}
+  _id: 0

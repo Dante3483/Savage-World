@@ -13,6 +13,7 @@ public class BiomeSO : ScriptableObject
     [SerializeField] private byte _chunksCount;
     [SerializeField] private ushort _startX;
     [SerializeField] private ushort _endX;
+    [SerializeField] private Color _colorOnMap = Color.white;
 
     [Header("Flags")]
     [SerializeField] private bool _floor;
@@ -113,6 +114,19 @@ public class BiomeSO : ScriptableObject
         set
         {
             _endX = value;
+        }
+    }
+
+    public Color ColorOnMap
+    {
+        get
+        {
+            return _colorOnMap;
+        }
+
+        set
+        {
+            _colorOnMap = value;
         }
     }
     #endregion

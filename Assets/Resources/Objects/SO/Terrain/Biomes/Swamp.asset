@@ -17,6 +17,9 @@ MonoBehaviour:
   _mountainCompression: 35
   _mountainHeight: 15
   _chunksCount: 8
+  _startX: 6800
+  _endX: 7599
+  _colorOnMap: {r: 0.3679245, g: 0.20118834, b: 0.12287288, a: 1}
   _floor: 1
   _round: 0
   _ceil: 0

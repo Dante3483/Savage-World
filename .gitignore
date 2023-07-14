@@ -56,6 +56,8 @@ ExportedObj/
 sysinfo.txt
 WorldMap.png
 WorldMap.png.meta
+BiomesMap.png
+BiomesMap.png.meta
 
 # Builds
 *.apk

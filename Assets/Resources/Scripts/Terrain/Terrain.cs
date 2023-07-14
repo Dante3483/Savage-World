@@ -41,6 +41,8 @@ public class Terrain : MonoBehaviour
             GameManager.Instance.Seed = UnityEngine.Random.Range(-1000000, 1000000);
         }
 
+        GameManager.Instance.RandomVar = new System.Random(GameManager.Instance.Seed.GetHashCode());
+
         //Start generation
         TerrainGeneration terrainGeneration = new TerrainGeneration(GameManager.Instance.Seed);
         terrainGeneration.StartTerrainGeneration();

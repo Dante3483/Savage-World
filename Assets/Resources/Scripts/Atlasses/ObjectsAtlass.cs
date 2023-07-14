@@ -27,6 +27,16 @@ public class ObjectsAtlass : ScriptableObject
     public BlockSO Stone;
     #endregion
 
+    #region Dust blocks
+    [Header("Dust")]
+    public BlockSO Sand;
+    #endregion
+
+    #region Liquid blocks
+    [Header("Liquid")]
+    public BlockSO Water;
+    #endregion
+
     #endregion
 
     #region Properties
@@ -39,13 +49,26 @@ public class ObjectsAtlass : ScriptableObject
         //Initialize lists
         Blocks = new Dictionary<BlockTypes, BlockSO[]>();
 
-
         //Fill lists
         #region Solid
         Blocks.Add(BlockTypes.Solid, new BlockSO[]
         {
             Dirt,
             Stone,
+        }.ToList().OrderBy(x => x.GetId()).ToArray());
+        #endregion
+
+        #region Dust
+        Blocks.Add(BlockTypes.Dust, new BlockSO[]
+        {
+            Sand,
+        }.ToList().OrderBy(x => x.GetId()).ToArray());
+        #endregion
+
+        #region Liquid
+        Blocks.Add(BlockTypes.Liquid, new BlockSO[]
+        {
+            Water,
         }.ToList().OrderBy(x => x.GetId()).ToArray());
         #endregion
     }
