@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Air: {fileID: 11400000, guid: 19d9968675a8f204f9d2c9db05716948, type: 2}
   Dirt: {fileID: 11400000, guid: 5c652c777cfdd1b4ba8ceee62bf0c0b9, type: 2}
+  Stone: {fileID: 11400000, guid: 69d4dec1e01b8fa40849fc78b54e4490, type: 2}

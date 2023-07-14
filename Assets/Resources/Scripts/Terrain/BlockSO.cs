@@ -7,6 +7,7 @@ public abstract class BlockSO : ScriptableObject
     #region Private fields
     [SerializeField] private List<TileBase> _tiles;
     [SerializeField] private BlockTypes _type;
+    [SerializeField] private Color _colorOnMap = Color.white;
     #endregion
 
     #region Public fields
@@ -37,6 +38,19 @@ public abstract class BlockSO : ScriptableObject
         set
         {
             _tiles = value;
+        }
+    }
+
+    public Color ColorOnMap
+    {
+        get
+        {
+            return _colorOnMap;
+        }
+
+        set
+        {
+            _colorOnMap = value;
         }
     }
     #endregion

@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _tiles: []
   _type: 1
-  _id: 0
+  _colorOnMap: {r: 0.45490196, g: 0.45490196, b: 0.45490196, a: 1}
+  _id: 7

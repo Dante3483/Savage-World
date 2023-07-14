@@ -40,20 +40,33 @@ public class WorldCellData
             _blockType = value;
         }
     }
+
+    public BlockSO BlockData
+    {
+        get
+        {
+            return _blockData;
+        }
+
+        set
+        {
+            _blockData = value;
+        }
+    }
     #endregion
 
     #region Methods
     public WorldCellData()
     {
         //Set Ait block by default
-        _blockData = GameManager.Instance.ObjectsAtlass.Dirt;
+        BlockData = GameManager.Instance.ObjectsAtlass.Dirt;
     }
 
     public WorldCellData(ushort xPosition, ushort yPosition)
     {
         //Set Ait block by default
         _id = 0;
-        _blockData = GameManager.Instance.ObjectsAtlass.Air;
+        BlockData = GameManager.Instance.ObjectsAtlass.Air;
         _coords = new Vector2Ushort { x = xPosition, y = yPosition };
     }
 
@@ -61,14 +74,14 @@ public class WorldCellData
     {
         Id = block.GetId();
         BlockType = block.Type;
-        _blockData = block;
+        BlockData = block;
     }
 
     public void SetData(ushort id, BlockTypes blockType)
     {
         Id = id;
         BlockType = blockType;
-        _blockData = GameManager.Instance.ObjectsAtlass.GetBlockById(blockType, id);
+        BlockData = GameManager.Instance.ObjectsAtlass.GetBlockById(blockType, id);
     }
 
     public override string ToString()
@@ -78,11 +91,11 @@ public class WorldCellData
 
     public TileBase GetTile()
     {
-        if (_blockData.Tiles.Count == 0)
+        if (BlockData.Tiles.Count == 0)
         {
             return null;
         }
-        return _blockData.Tiles[Random.Range(0, _blockData.Tiles.Count)];
+        return BlockData.Tiles[Random.Range(0, BlockData.Tiles.Count)];
     }
     #endregion
 }

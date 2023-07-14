@@ -1,4 +1,6 @@
+using System.IO;
 using UnityEngine;
+using static TMPro.Examples.TMP_ExampleScript_01;
 
 public class GameManager : MonoBehaviour
 {
@@ -7,6 +9,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameState _gameState;
     [SerializeField] private TerrainConfigurationSO _terrainConfiguration;
     private WorldCellData[,] _worldData;
+    private Chunk[,] _chunks;
 
     [Header("World data")]
     [SerializeField] private int _maxTerrainWidth;
@@ -26,6 +29,9 @@ public class GameManager : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private Canvas _mainMenu;
+
+    [Header("Conditions")]
+    [SerializeField] private bool _isStaticSeed;
     #endregion
 
     #region Public fields
@@ -127,6 +133,32 @@ public class GameManager : MonoBehaviour
             _worldData = value;
         }
     }
+
+    public Chunk[,] Chunks
+    {
+        get
+        {
+            return _chunks;
+        }
+
+        set
+        {
+            _chunks = value;
+        }
+    }
+
+    public bool IsStaticSeed
+    {
+        get
+        {
+            return _isStaticSeed;
+        }
+
+        set
+        {
+            _isStaticSeed = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -139,6 +171,14 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         UpdateGameState(global::GameState.GameInitializationState);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            SaveMapToPNG();
+        }
     }
 
     public void UpdateGameState(GameState newState)
@@ -178,7 +218,7 @@ public class GameManager : MonoBehaviour
         CurrentTerrainWidth = TerrainConfiguration.CurrentHorizontalChunksCount * TerrainConfiguration.ChunkSize;
         CurrentTerrainHeight= TerrainConfiguration.CurrentVerticalChunksCount * TerrainConfiguration.ChunkSize;
 
-        //Initialize 2d world data array
+        //Initialize 2d world data and chunk array
         var watch = System.Diagnostics.Stopwatch.StartNew();
 
         WorldData = new WorldCellData[_maxTerrainWidth, _maxTerrainHeight];
@@ -191,8 +231,18 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        Chunks = new Chunk[TerrainConfiguration.CurrentHorizontalChunksCount, TerrainConfiguration.CurrentVerticalChunksCount];
+        for (byte x = 0; x < TerrainConfiguration.CurrentHorizontalChunksCount; x++)
+        {
+            for (byte y = 0; y < TerrainConfiguration.CurrentVerticalChunksCount; y++)
+            {
+                Chunk emptyChunk = new Chunk(x, y);
+                Chunks[x,y] = emptyChunk;
+            }
+        }
+
         watch.Stop();
-        Debug.Log($"Game initialication: {watch.Elapsed.TotalSeconds}");
+        Debug.Log($"Game initialization: {watch.Elapsed.TotalSeconds}");
 
         //Initialize atlasses
         ObjectsAtlass.Initialize();
@@ -214,6 +264,24 @@ public class GameManager : MonoBehaviour
         //Create new world
         Terrain.CreateNewWorld();
 
+    }
+
+    private void SaveMapToPNG()
+    {
+        Texture2D worldMap = new Texture2D(CurrentTerrainWidth, CurrentTerrainHeight);
+        for (int x = 0; x < CurrentTerrainWidth; x++)
+        {
+            for (int y = 0; y < CurrentTerrainHeight; y++)
+            {
+                Color blockColor = WorldData[x, y].BlockData.ColorOnMap;
+                Color gridColor = new Color(blockColor.r - 0.2f, blockColor.g - 0.2f, blockColor.b - 0.2f, blockColor.a);
+                Color mapColor = x % 100 == 0 || y % 100 == 0 ? gridColor : blockColor;
+                worldMap.SetPixel(x, y, mapColor);
+            }
+        }
+        worldMap.Apply();
+        byte[] bytes = worldMap.EncodeToPNG();
+        File.WriteAllBytes(Application.dataPath + "/WorldMap.png", bytes);
     }
     #endregion
 }

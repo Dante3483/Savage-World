@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,7 @@ public class TerrainConfigurationSO : ScriptableObject
     [Header("World data")]
     public ushort Equator;
     public List<TerrainLevelSO> Levels;
+    public List<BiomeSO> Biomes;
     #endregion
 
     #region Properties
@@ -53,7 +55,20 @@ public class TerrainConfigurationSO : ScriptableObject
         Equator -= (ushort)(ChunkSize / 2);
         #endregion
 
+        #region Calculate biomes
+        ushort x = 0;
+        foreach (BiomeSO biome in Biomes)
+        {
+            //Calculate couont
+            biome.RoundCount(CurrentHorizontalChunksCount * biome.Percentage / 100f);
 
+            //Calculate start and end X coords
+            ushort biomeLength = (ushort)(biome.ChunksCount * ChunkSize);
+            biome.StartX = x;
+            biome.EndX = (ushort)(x + biomeLength - 1);
+            x += biomeLength;
+        }
+        #endregion
     }
     #endregion
 }
