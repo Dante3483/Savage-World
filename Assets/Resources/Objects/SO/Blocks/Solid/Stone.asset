@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22cfa30691df0b545b8eb5dc58571591, type: 3}
   m_Name: Stone
   m_EditorClassIdentifier: 
-  _tiles: []
+  _tiles:
+  - {fileID: 11400000, guid: 9236a465cb7ab2e498348bcf1750f2e5, type: 2}
   _type: 1
   _colorOnMap: {r: 0.45490196, g: 0.45490196, b: 0.45490196, a: 1}
   _id: 7

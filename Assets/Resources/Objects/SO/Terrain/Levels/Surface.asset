@@ -14,5 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Surface
   _countOfVerticalChunks: 2
-  _startY: 2200
-  _endY: 2400
+  _startY: 2000
+  _endY: 2199
+  _stoneAmplitude: 1
+  _stoneScale: 10
+  _stoneIntensity: 0.2

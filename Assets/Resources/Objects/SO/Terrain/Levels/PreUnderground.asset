@@ -14,5 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: PreUnderground
   _countOfVerticalChunks: 3
-  _startY: 0
-  _endY: 0
+  _startY: 1700
+  _endY: 1999
+  _stoneAmplitude: 1
+  _stoneScale: 10
+  _stoneIntensity: 0.4

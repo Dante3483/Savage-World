@@ -15,4 +15,7 @@ MonoBehaviour:
   _name: Underground
   _countOfVerticalChunks: 17
   _startY: 0
-  _endY: 1900
+  _endY: 1699
+  _stoneAmplitude: 1
+  _stoneScale: 10
+  _stoneIntensity: 0.6

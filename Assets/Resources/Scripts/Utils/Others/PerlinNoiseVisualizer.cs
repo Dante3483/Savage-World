@@ -250,8 +250,12 @@ public class PerlinNoiseVisualizer : MonoBehaviour
                     {
                         FillTextureNoise();
                         if (Copy && TerrainLevel != null)
-                        {
+                        { 
+                            TerrainLevel.StoneAmplitude = Amplitude;
+                            TerrainLevel.StoneScale = Scale;
+                            TerrainLevel.StoneIntensity = Intensity;
                             Copy = !Copy;
+                            TerrainLevel = null;
                         }
                     }
                     break;
@@ -263,6 +267,7 @@ public class PerlinNoiseVisualizer : MonoBehaviour
                             Biome.MountainCompression = Compression;
                             Biome.MountainHeight = LandscapeHeight;
                             Copy = !Copy;
+                            Biome = null;
                         }
                     }
                     break;

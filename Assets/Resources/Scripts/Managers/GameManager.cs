@@ -1,5 +1,14 @@
+using System;
+using System.Collections;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using Unity.Jobs;
+using Unity.Collections;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,6 +18,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TerrainConfigurationSO _terrainConfiguration;
     private WorldCellData[,] _worldData;
     private Chunk[,] _chunks;
+    private SynchronizationContext _syncContext;
 
     [Header("World data")]
     [SerializeField] private int _maxTerrainWidth;
@@ -19,6 +29,8 @@ public class GameManager : MonoBehaviour
     [Header("Session data")]
     [SerializeField] private int _seed;
     [SerializeField] private System.Random _randomVar;
+    private string _generalInfo;
+    private float _loadingValue;
 
     [Header("Atlasses")]
     [SerializeField] private ObjectsAtlass _objectsAtlass;
@@ -29,9 +41,14 @@ public class GameManager : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private Canvas _mainMenu;
+    [SerializeField] private Canvas _loadingProgress;
+    [SerializeField] private Slider _loadingSlider;
+    [SerializeField] private TextMeshProUGUI _infoText;
 
     [Header("Conditions")]
     [SerializeField] private bool _isStaticSeed;
+    [SerializeField] private bool _isMenuActive;
+    [SerializeField] private bool _isLoadingProgressActive;
     #endregion
 
     #region Public fields
@@ -172,9 +189,24 @@ public class GameManager : MonoBehaviour
             _randomVar = value;
         }
     }
+
+    public string GeneralInfo
+    {
+        get
+        {
+            return _generalInfo;
+        }
+
+        set
+        {
+            _generalInfo = value;
+        }
+    }
     #endregion
 
     #region Methods
+
+    #region General
     private void Awake()
     {
         Instance = this;
@@ -183,7 +215,10 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        UpdateGameState(global::GameState.GameInitializationState);
+        StartCoroutine(PrintDebugInfo());
+        StartCoroutine(UpdateObjects());
+
+        UpdateGameState(GameState.GameInitializationState);
     }
 
     private void Update()
@@ -194,15 +229,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void UpdateGameState(GameState newState)
+    public void UpdateGameState(object obj)
     {
-        _gameState = newState;
+        _gameState = (GameState) obj;
 
         switch (_gameState)
         {
             case GameState.GameInitializationState:
                 {
-                    HandleGameInitialization();
+                    Task.Run(() => HandleGameInitialization());
                 }
                 break;
             case GameState.MainMenuState:
@@ -223,6 +258,8 @@ public class GameManager : MonoBehaviour
     private void HandleGameInitialization()
     {
         Debug.Log("Initialization state");
+        _isMenuActive = false;
+        _isLoadingProgressActive = true;
 
         //Define Terrain width and height
         _maxTerrainWidth = TerrainConfiguration.DefaultHorizontalChunksCount * TerrainConfiguration.ChunkSize;
@@ -235,16 +272,19 @@ public class GameManager : MonoBehaviour
         var watch = System.Diagnostics.Stopwatch.StartNew();
 
         WorldData = new WorldCellData[_maxTerrainWidth, _maxTerrainHeight];
+        float step = 50f / _maxTerrainWidth;
         for (ushort x = 0; x < _maxTerrainWidth; x++)
         {
             for (ushort y = 0; y < _maxTerrainHeight; y++)
             {
-                WorldCellData emptyWorldCellData = new WorldCellData(x,y);
+                WorldCellData emptyWorldCellData = new WorldCellData(x, y);
                 WorldData[x, y] = emptyWorldCellData;
             }
+            _loadingValue += step;
         }
 
         Chunks = new Chunk[TerrainConfiguration.CurrentHorizontalChunksCount, TerrainConfiguration.CurrentVerticalChunksCount];
+        step = 50f / TerrainConfiguration.CurrentHorizontalChunksCount;
         for (byte x = 0; x < TerrainConfiguration.CurrentHorizontalChunksCount; x++)
         {
             for (byte y = 0; y < TerrainConfiguration.CurrentVerticalChunksCount; y++)
@@ -252,10 +292,12 @@ public class GameManager : MonoBehaviour
                 Chunk emptyChunk = new Chunk(x, y);
                 Chunks[x,y] = emptyChunk;
             }
+            _loadingValue += step;
         }
 
         watch.Stop();
         Debug.Log($"Game initialization: {watch.Elapsed.TotalSeconds}");
+        GeneralInfo += $"Game initialization: {watch.Elapsed.TotalSeconds}\n";
 
         //Initialize atlasses
         ObjectsAtlass.Initialize();
@@ -266,19 +308,23 @@ public class GameManager : MonoBehaviour
     private void HandleMainMenu()
     {
         Debug.Log("Menu state");
+        _isMenuActive = true;
+        _isLoadingProgressActive = false;
     }
 
     private void HandleNewGameState()
     {
         Debug.Log("New game state");
 
-        _mainMenu.gameObject.SetActive(false);
+        _isMenuActive = false;
         _terrainGameObject.SetActive(true);
 
         //Create new world
         Terrain.CreateNewWorld();
     }
+    #endregion
 
+    #region Helpful
     private void SaveMapToPNG()
     {
         Texture2D worldMap = new Texture2D(CurrentTerrainWidth, CurrentTerrainHeight);
@@ -312,5 +358,27 @@ public class GameManager : MonoBehaviour
     {
         return Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize];
     }
+
+    public IEnumerator PrintDebugInfo()
+    {
+        while (true)
+        {
+            _infoText.text = GeneralInfo;
+            yield return null;
+        }
+    }
+
+    public IEnumerator UpdateObjects()
+    {
+        while (true)
+        {
+            _mainMenu.gameObject.SetActive(_isMenuActive);
+            _loadingProgress.gameObject.SetActive(_isLoadingProgressActive);
+            _loadingSlider.value = _loadingValue;
+            yield return null;
+        }
+    }
+    #endregion
+
     #endregion
 }

@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
 
 public class TerrainGeneration
@@ -65,6 +70,7 @@ public class TerrainGeneration
 
     public void StartTerrainGeneration()
     {
+        double totalTime = 0f;
         #region Phase 1 - Flat world generation
         var watch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -72,6 +78,8 @@ public class TerrainGeneration
 
         watch.Stop();
         Debug.Log($"Phase 1: {watch.Elapsed.TotalSeconds}");
+        GameManager.Instance.GeneralInfo += $"Phase 1: {watch.Elapsed.TotalSeconds}\n";
+        totalTime += watch.Elapsed.TotalSeconds;
         #endregion
 
         #region Phase 2 - Landscape generation
@@ -81,6 +89,8 @@ public class TerrainGeneration
 
         watch.Stop();
         Debug.Log($"Phase 2: {watch.Elapsed.TotalSeconds}");
+        GameManager.Instance.GeneralInfo += $"Phase 2: {watch.Elapsed.TotalSeconds}\n";
+        totalTime += watch.Elapsed.TotalSeconds;
         #endregion
 
         #region Phase 3 - Biomes generation
@@ -90,12 +100,29 @@ public class TerrainGeneration
 
         watch.Stop();
         Debug.Log($"Phase 3: {watch.Elapsed.TotalSeconds}");
+        GameManager.Instance.GeneralInfo += $"Phase 3: {watch.Elapsed.TotalSeconds}\n";
+        totalTime += watch.Elapsed.TotalSeconds;
         #endregion
+
+        #region Phase 4 - Stone generation
+        watch.Restart();
+
+        CreateStone();
+
+        watch.Stop();
+        Debug.Log($"Phase 4: {watch.Elapsed.TotalSeconds}");
+        GameManager.Instance.GeneralInfo += $"Phase 4: {watch.Elapsed.TotalSeconds}\n";
+        totalTime += watch.Elapsed.TotalSeconds;
+        #endregion
+
+        Debug.Log($"Total time: {totalTime}");
+        GameManager.Instance.GeneralInfo += $"Total time: {totalTime}\n";
     }
     #endregion
 
     #region Phases
-    //Phase 1
+
+    #region Phase 1
     private void CreateFlatWorld()
     {
         BlockSO block = GameManager.Instance.ObjectsAtlass.Dirt;
@@ -107,8 +134,9 @@ public class TerrainGeneration
             }
         }
     }
+    #endregion
 
-    //Phase 2
+    #region Phase 2
     private void CreateLandscape()
     {
         BlockSO block = GameManager.Instance.ObjectsAtlass.Dirt;
@@ -147,8 +175,9 @@ public class TerrainGeneration
             prevHeight = height;
         }
     }
+    #endregion
 
-    //Phase 3
+    #region Phase 3
     private void CreateBiomes()
     {
         CreateOcean(TerrainConfiguration.Biomes[1]);
@@ -345,6 +374,30 @@ public class TerrainGeneration
     {
         SetBiomeIntoChunk(biome);
     }
+    #endregion
+
+    #region Phase 4
+    private void CreateStone()
+    {
+        List<Thread> threads = new List<Thread>();
+        byte i = 0;
+
+        foreach (TerrainLevelSO level in TerrainConfiguration.Levels)
+        {
+            for (ushort y = level.StartY; y < level.EndY; y += TerrainConfiguration.ChunkSize)
+            {
+                threads.Add(new Thread(GenerateStone));
+                threads[i].Start(new Tuple<TerrainLevelSO, ushort>(level, y));
+                i++;
+            }
+        }
+
+        foreach (Thread thread in threads)
+        {
+            thread.Join();
+        }
+    }
+    #endregion
 
     #endregion
 
@@ -353,9 +406,9 @@ public class TerrainGeneration
     #endregion
 
     #region Helpful
-    public float GenerateNoise(int x, int y, float noiseFreq, int additionalSeed = 0)
+    public float GenerateNoise(int x, int y, float scale, float amplitude, int additionalSeed = 0)
     {
-        return Mathf.PerlinNoise((x + Seed + additionalSeed) / noiseFreq, (y + Seed + additionalSeed) / noiseFreq);
+        return Mathf.PerlinNoise((x + Seed + additionalSeed) / scale, (y + Seed + additionalSeed) / scale) * amplitude;
     }
 
     public float GenerateNoiseLandscape(int x, float compression, float height)
@@ -373,6 +426,28 @@ public class TerrainGeneration
                 chunk.Biome = biome;
             }
         }
+    }
+
+    private void GenerateStone(object obj)
+    {
+        Tuple<TerrainLevelSO, ushort> data = (Tuple<TerrainLevelSO, ushort>)obj;
+        BlockSO dirtBlock = GameManager.Instance.ObjectsAtlass.Dirt;
+        BlockSO stoneBlock = GameManager.Instance.ObjectsAtlass.Stone;
+
+        for (ushort x = 0; x < GameManager.Instance.CurrentTerrainWidth; x++)
+        {
+            for (ushort y = data.Item2; y < data.Item2 + TerrainConfiguration.ChunkSize; y++)
+            {
+                if (GameManager.Instance.WorldData[x, y].CompareBlock(dirtBlock))
+                {
+                    if (GenerateNoise(x, y, data.Item1.StoneScale, data.Item1.StoneAmplitude) <= data.Item1.StoneIntensity)
+                    {
+                        Terrain.CreateBlock(x, y, stoneBlock);
+                    }
+                }
+            }
+        }
+        Debug.Log(data.Item1.Name);
     }
     #endregion
 

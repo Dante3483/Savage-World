@@ -6,10 +6,16 @@ using UnityEngine;
 public class TerrainLevelSO : ScriptableObject
 {
     #region Private fields
+    [Header("Main")]
     [SerializeField] private string _name;
     [SerializeField] private byte _countOfVerticalChunks;
     [SerializeField] private ushort _startY;
     [SerializeField] private ushort _endY;
+
+    [Header("Stone")]
+    [SerializeField] private float _stoneAmplitude;
+    [SerializeField] private float _stoneScale;
+    [SerializeField] private float _stoneIntensity;
     #endregion
 
     #region Public fields
@@ -66,6 +72,45 @@ public class TerrainLevelSO : ScriptableObject
         set
         {
             _endY = value;
+        }
+    }
+
+    public float StoneIntensity
+    {
+        get
+        {
+            return _stoneIntensity;
+        }
+
+        set
+        {
+            _stoneIntensity = value;
+        }
+    }
+
+    public float StoneAmplitude
+    {
+        get
+        {
+            return _stoneAmplitude;
+        }
+
+        set
+        {
+            _stoneAmplitude = value;
+        }
+    }
+
+    public float StoneScale
+    {
+        get
+        {
+            return _stoneScale;
+        }
+
+        set
+        {
+            _stoneScale = value;
         }
     }
     #endregion

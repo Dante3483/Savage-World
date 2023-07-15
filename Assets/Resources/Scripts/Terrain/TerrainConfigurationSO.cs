@@ -40,7 +40,7 @@ public class TerrainConfigurationSO : ScriptableObject
             //Calculate start and end Y coords
             ushort levelHeight = (ushort)(level.CountOfVerticalChunks * ChunkSize);
             level.StartY = y;
-            level.EndY = (ushort)(y + levelHeight);
+            level.EndY = (ushort)(y + levelHeight - 1);
             y += levelHeight;
 
             //Skip if level is Air
