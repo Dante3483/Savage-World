@@ -23,6 +23,7 @@ public class TerrainConfigurationSO : ScriptableObject
     public ushort DeepOceanY;
     public List<TerrainLevelSO> Levels;
     public List<BiomeSO> Biomes;
+    public List<ClusterSO> Clusters;
     #endregion
 
     #region Properties

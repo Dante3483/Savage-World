@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,6 +17,7 @@ public class TerrainLevelSO : ScriptableObject
     [SerializeField] private float _stoneAmplitude;
     [SerializeField] private float _stoneScale;
     [SerializeField] private float _stoneIntensity;
+    [SerializeField] private List<BiomesID> _biomes;
     #endregion
 
     #region Public fields

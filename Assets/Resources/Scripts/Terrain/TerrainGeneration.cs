@@ -104,10 +104,10 @@ public class TerrainGeneration
         totalTime += watch.Elapsed.TotalSeconds;
         #endregion
 
-        #region Phase 4 - Stone generation
+        #region Phase 4 - Clusters generation
         watch.Restart();
 
-        CreateStone();
+        CreateClusters();
 
         watch.Stop();
         Debug.Log($"Phase 4: {watch.Elapsed.TotalSeconds}");
@@ -377,7 +377,15 @@ public class TerrainGeneration
     #endregion
 
     #region Phase 4
-    private void CreateStone()
+    private void CreateClusters()
+    {
+        foreach (ClusterSO cluster in TerrainConfiguration.Clusters)
+        {
+            CreateCluster(cluster);
+        }
+    }
+
+    private void CreateCluster(ClusterSO cluster)
     {
         List<Thread> threads = new List<Thread>();
         byte i = 0;
@@ -386,8 +394,8 @@ public class TerrainGeneration
         {
             for (ushort y = level.StartY; y < level.EndY; y += TerrainConfiguration.ChunkSize)
             {
-                threads.Add(new Thread(GenerateStone));
-                threads[i].Start(new Tuple<TerrainLevelSO, ushort>(level, y));
+                threads.Add(new Thread(GenerateLine));
+                threads[i].Start(new Tuple<TerrainLevelSO, ClusterSO, ushort>(level, cluster, y));
                 i++;
             }
         }
@@ -428,26 +436,26 @@ public class TerrainGeneration
         }
     }
 
-    private void GenerateStone(object obj)
+    private void GenerateLine(object obj)
     {
-        Tuple<TerrainLevelSO, ushort> data = (Tuple<TerrainLevelSO, ushort>)obj;
-        BlockSO dirtBlock = GameManager.Instance.ObjectsAtlass.Dirt;
-        BlockSO stoneBlock = GameManager.Instance.ObjectsAtlass.Stone;
+        Tuple<TerrainLevelSO, ClusterSO, ushort> data = (Tuple<TerrainLevelSO, ClusterSO, ushort>)obj;
+        ClusterSO cluster = data.Item2;
+        ClusterSO.ClusterData clusterData = data.Item2.GetClusterData(data.Item1);
+        ushort startY = data.Item3;
 
         for (ushort x = 0; x < GameManager.Instance.CurrentTerrainWidth; x++)
         {
-            for (ushort y = data.Item2; y < data.Item2 + TerrainConfiguration.ChunkSize; y++)
+            for (ushort y = startY; y < startY + TerrainConfiguration.ChunkSize; y++)
             {
-                if (GameManager.Instance.WorldData[x, y].CompareBlock(dirtBlock))
+                if (!cluster.CompareBlock(GameManager.Instance.WorldData[x, y].BlockData))
                 {
-                    if (GenerateNoise(x, y, data.Item1.StoneScale, data.Item1.StoneAmplitude) <= data.Item1.StoneIntensity)
+                    if (GenerateNoise(x, y, clusterData.Scale, clusterData.Amplitude) <= clusterData.Intensity)
                     {
-                        Terrain.CreateBlock(x, y, stoneBlock);
+                        Terrain.CreateBlock(x, y, data.Item2.Block);
                     }
                 }
             }
         }
-        Debug.Log(data.Item1.Name);
     }
     #endregion
 
