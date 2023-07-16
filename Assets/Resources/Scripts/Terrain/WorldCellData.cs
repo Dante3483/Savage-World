@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class WorldCellData
+public struct WorldCellData
 {
     #region Private fields
     private ushort _id;
@@ -56,17 +56,12 @@ public class WorldCellData
     #endregion
 
     #region Methods
-    public WorldCellData()
-    {
-        //Set Ait block by default
-        BlockData = GameManager.Instance.ObjectsAtlass.Dirt;
-    }
-
     public WorldCellData(ushort xPosition, ushort yPosition)
     {
         //Set Ait block by default
         _id = 0;
-        BlockData = GameManager.Instance.ObjectsAtlass.Air;
+        _blockType = BlockTypes.Abstract;
+        _blockData = GameManager.Instance.ObjectsAtlass.Air;
         _coords = new Vector2Ushort { x = xPosition, y = yPosition };
     }
 
@@ -86,7 +81,7 @@ public class WorldCellData
 
     public override string ToString()
     {
-        return $"X: {_coords.x}\nY: {_coords.y}";
+        return $"{_coords.x}, {_coords.y}, {_id}, {_blockType}, {_blockData.name}";
     }
 
     public TileBase GetTile()

@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Unity.Collections;
-using Unity.Jobs;
 using UnityEngine;
 
 public class TerrainGeneration
@@ -11,6 +9,10 @@ public class TerrainGeneration
     private TerrainConfigurationSO _terrainConfiguration;
     private int _seed;
     private System.Random _randomVar;
+    private float[,] _caveMap;
+    private float _maxNoiseHeight = float.MinValue;
+    private float _minNoiseHeight = float.MaxValue;
+    private object _lockObject = new object();
     #endregion
 
     #region Public fields
@@ -71,6 +73,8 @@ public class TerrainGeneration
     public void StartTerrainGeneration()
     {
         double totalTime = 0f;
+        float step = 100f / 5;
+
         #region Phase 1 - Flat world generation
         var watch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -80,6 +84,7 @@ public class TerrainGeneration
         Debug.Log($"Phase 1: {watch.Elapsed.TotalSeconds}");
         GameManager.Instance.GeneralInfo += $"Phase 1: {watch.Elapsed.TotalSeconds}\n";
         totalTime += watch.Elapsed.TotalSeconds;
+        GameManager.Instance.LoadingValue += step;
         #endregion
 
         #region Phase 2 - Landscape generation
@@ -91,6 +96,7 @@ public class TerrainGeneration
         Debug.Log($"Phase 2: {watch.Elapsed.TotalSeconds}");
         GameManager.Instance.GeneralInfo += $"Phase 2: {watch.Elapsed.TotalSeconds}\n";
         totalTime += watch.Elapsed.TotalSeconds;
+        GameManager.Instance.LoadingValue += step;
         #endregion
 
         #region Phase 3 - Biomes generation
@@ -102,6 +108,7 @@ public class TerrainGeneration
         Debug.Log($"Phase 3: {watch.Elapsed.TotalSeconds}");
         GameManager.Instance.GeneralInfo += $"Phase 3: {watch.Elapsed.TotalSeconds}\n";
         totalTime += watch.Elapsed.TotalSeconds;
+        GameManager.Instance.LoadingValue += step;
         #endregion
 
         #region Phase 4 - Clusters generation
@@ -113,6 +120,19 @@ public class TerrainGeneration
         Debug.Log($"Phase 4: {watch.Elapsed.TotalSeconds}");
         GameManager.Instance.GeneralInfo += $"Phase 4: {watch.Elapsed.TotalSeconds}\n";
         totalTime += watch.Elapsed.TotalSeconds;
+        GameManager.Instance.LoadingValue += step;
+        #endregion
+
+        #region Phase 5 - Caves generation
+        watch.Restart();
+
+        CreateCaves();
+
+        watch.Stop();
+        Debug.Log($"Phase 5: {watch.Elapsed.TotalSeconds}");
+        GameManager.Instance.GeneralInfo += $"Phase 5: {watch.Elapsed.TotalSeconds}\n";
+        totalTime += watch.Elapsed.TotalSeconds;
+        GameManager.Instance.LoadingValue += step;
         #endregion
 
         Debug.Log($"Total time: {totalTime}");
@@ -214,11 +234,7 @@ public class TerrainGeneration
             for (ushort y = startY; y >= startY - downHeight; y--)
             {
                 Terrain.CreateBlock(x, y, waterBlock);
-                Chunk chunk = GameManager.Instance.GetChunk(x, y);
-                if (chunk.Biome.Id == BiomesID.NonBiom)
-                {
-                    chunk.Biome = biome;
-                }
+                GameManager.Instance.SetChunk(x, y, biome);
             }
 
             byte chanceToMoveDown = (byte)RandomVar.Next(0, 6);
@@ -278,11 +294,7 @@ public class TerrainGeneration
                 if (GameManager.Instance.WorldData[x, y].CompareBlock(dirtBlock))
                 {
                     Terrain.CreateBlock(x, y, sandBlock);
-                    Chunk chunk = GameManager.Instance.GetChunk(x, y);
-                    if (chunk.Biome.Id == BiomesID.NonBiom)
-                    {
-                        chunk.Biome = biome;
-                    }
+                    GameManager.Instance.SetChunk(x, y, biome);
                 }
             }
         }
@@ -381,11 +393,11 @@ public class TerrainGeneration
     {
         foreach (ClusterSO cluster in TerrainConfiguration.Clusters)
         {
-            CreateCluster(cluster);
+            CreateCluster(cluster, RandomVar.Next(0, 1000000));
         }
     }
 
-    private void CreateCluster(ClusterSO cluster)
+    private void CreateCluster(ClusterSO cluster, int additionalSeed)
     {
         List<Thread> threads = new List<Thread>();
         byte i = 0;
@@ -394,8 +406,8 @@ public class TerrainGeneration
         {
             for (ushort y = level.StartY; y < level.EndY; y += TerrainConfiguration.ChunkSize)
             {
-                threads.Add(new Thread(GenerateLine));
-                threads[i].Start(new Tuple<TerrainLevelSO, ClusterSO, ushort>(level, cluster, y));
+                threads.Add(new Thread(GenerateClusterLine));
+                threads[i].Start(new Tuple<TerrainLevelSO, ClusterSO, ushort, int>(level, cluster, y, additionalSeed));
                 i++;
             }
         }
@@ -403,6 +415,144 @@ public class TerrainGeneration
         foreach (Thread thread in threads)
         {
             thread.Join();
+        }
+    }
+
+    private void GenerateClusterLine(object obj)
+    {
+        Tuple<TerrainLevelSO, ClusterSO, ushort, int> data = (Tuple<TerrainLevelSO, ClusterSO, ushort, int>)obj;
+        ClusterSO cluster = data.Item2;
+        ClusterSO.ClusterData clusterData = data.Item2.GetClusterData(data.Item1);
+        ushort startY = data.Item3;
+        int additionalSeed = data.Item4;
+
+        for (ushort x = 0; x < GameManager.Instance.CurrentTerrainWidth; x++)
+        {
+            for (ushort y = startY; y < startY + TerrainConfiguration.ChunkSize; y++)
+            {
+                if (!cluster.CompareBlock(GameManager.Instance.WorldData[x, y].BlockData))
+                {
+                    if (GenerateNoise(x, y, clusterData.Scale, clusterData.Amplitude, additionalSeed) >= clusterData.Intensity)
+                    {
+                        Terrain.CreateBlock(x, y, data.Item2.Block);
+                    }
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region Phase 5
+    private void CreateCaves()
+    {
+        _caveMap = new float[GameManager.Instance.CurrentTerrainWidth, GameManager.Instance.CurrentTerrainHeight];
+        int[,] visited = new int[GameManager.Instance.CurrentTerrainWidth, GameManager.Instance.CurrentTerrainHeight];
+        List<Thread> threads = new List<Thread>();
+        List<Vector2Int> caveCoords = new List<Vector2Int>();
+        BlockSO airBlock = GameManager.Instance.ObjectsAtlass.Air;
+        short i = 0;
+
+        //Create noise map
+        foreach (Chunk chunk in GameManager.Instance.Chunks)
+        {
+            threads.Add(new Thread(CreateCave));
+            threads[i].Start(new Tuple<ushort, ushort>(chunk.Coords.x, chunk.Coords.y));
+            i++;
+        }
+
+        //Wait until all thread done
+        foreach (Thread thread in threads)
+        {
+            thread.Join();
+        }
+
+        //Lerp noise
+        for (ushort x = 0; x < GameManager.Instance.CurrentTerrainWidth; x++)
+        {
+            for (ushort y = 0; y < GameManager.Instance.CurrentTerrainHeight; y++)
+            {
+                _caveMap[x, y] = Mathf.InverseLerp(_minNoiseHeight, _maxNoiseHeight, _caveMap[x, y]);
+            }
+        }
+
+        //Create cave in conditions
+        for (ushort x = 0; x < GameManager.Instance.CurrentTerrainWidth; x++)
+        {
+            for (ushort y = 0; y < GameManager.Instance.CurrentTerrainHeight; y++)
+            {
+                if (_caveMap[x, y] <= TerrainConfiguration.Intensity && visited[x, y] == 0)
+                {
+                    (int count, bool isNonChunk) = FloodFill(x, y, _caveMap, visited, ref caveCoords);
+                    if (!isNonChunk)
+                    {
+                        caveCoords.Clear();
+                        continue;
+                    }
+                    if ((count > TerrainConfiguration.MinSmallCaveSize && count < TerrainConfiguration.MaxSmallCaveSize) ||
+                        (count > TerrainConfiguration.MinLargeCaveSize && count < TerrainConfiguration.MaxLargeCaveSize))
+                    {
+                        foreach (Vector2Int v in caveCoords)
+                        {
+                            Terrain.CreateBlock((ushort)v.x, (ushort)v.y, airBlock);
+                        }
+                    }
+                    caveCoords.Clear();
+                }
+            }
+        }
+    }
+
+    private void CreateCave(object obj)
+    {
+        Tuple<ushort, ushort> data = (Tuple<ushort, ushort>)obj;
+        ushort startX = (ushort)(data.Item1 * TerrainConfiguration.ChunkSize);
+        ushort startY = (ushort)(data.Item2 * TerrainConfiguration.ChunkSize);
+        float scale = TerrainConfiguration.Scale;
+        int octaves = TerrainConfiguration.Octaves;
+        float persistance = TerrainConfiguration.Persistance;
+        float lacunarity = TerrainConfiguration.Lacunarity;
+        System.Random randomVar = new System.Random(Seed);
+        Vector2[] octaveOffset = new Vector2[octaves];
+
+        for (int i = 0; i < octaves; i++)
+        {
+            float offsetX = randomVar.Next(-100000, 100000);
+            float offsetY = randomVar.Next(-100000, 100000);
+            octaveOffset[i] = new Vector2(offsetX, offsetY);
+        }
+
+        for (ushort x = startX; x < startX + TerrainConfiguration.ChunkSize; x++)
+        {
+            for (ushort y = startY; y < startY + TerrainConfiguration.ChunkSize; y++)
+            {
+                float amplitude = 1;
+                float frequency = 1;
+                float noiseHeight = 0;
+
+                for (int i = 0; i < octaves; i++)
+                {
+                    float sampleX = x / scale * frequency + octaveOffset[i].x;
+                    float sampleY = y / scale * frequency + octaveOffset[i].y;
+
+                    float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
+                    noiseHeight += perlinValue * amplitude;
+                    amplitude *= persistance;
+                    frequency *= lacunarity;
+                }
+
+                lock (_lockObject)
+                {
+                    if (noiseHeight > _maxNoiseHeight)
+                    {
+                        _maxNoiseHeight = noiseHeight;
+                    }
+                    else if (noiseHeight < _minNoiseHeight)
+                    {
+                        _minNoiseHeight = noiseHeight;
+                    }
+                }
+                _caveMap[x, y] = noiseHeight;
+            }
         }
     }
     #endregion
@@ -428,33 +578,49 @@ public class TerrainGeneration
     {
         for (ushort x = biome.StartX; x < biome.EndX; x += TerrainConfiguration.ChunkSize)
         {
-            Chunk chunk = GameManager.Instance.GetChunk(x, TerrainConfiguration.Equator);
-            if (chunk.Biome.Id == BiomesID.NonBiom)
-            {
-                chunk.Biome = biome;
-            }
+            GameManager.Instance.SetChunk(x, TerrainConfiguration.Equator, biome);
         }
     }
 
-    private void GenerateLine(object obj)
+    private (int, bool) FloodFill(int startX, int startY, float[,] map, int[,] visited, ref List<Vector2Int> connected)
     {
-        Tuple<TerrainLevelSO, ClusterSO, ushort> data = (Tuple<TerrainLevelSO, ClusterSO, ushort>)obj;
-        ClusterSO cluster = data.Item2;
-        ClusterSO.ClusterData clusterData = data.Item2.GetClusterData(data.Item1);
-        ushort startY = data.Item3;
-
-        for (ushort x = 0; x < GameManager.Instance.CurrentTerrainWidth; x++)
+        try
         {
-            for (ushort y = startY; y < startY + TerrainConfiguration.ChunkSize; y++)
+            int width = map.GetLength(0);
+            int height = map.GetLength(1);
+            int regionSize = 0;
+            bool isNonChunk = true;
+            Queue<(int, int)> queue = new Queue<(int, int)>();
+            queue.Enqueue((startX, startY));
+
+            while (queue.Count > 0)
             {
-                if (!cluster.CompareBlock(GameManager.Instance.WorldData[x, y].BlockData))
+                (int x, int y) = queue.Dequeue();
+
+                if (x < 0 || x >= width || y < 0 || y >= height || map[x, y] >= TerrainConfiguration.Intensity || visited[x, y] == 1)
                 {
-                    if (GenerateNoise(x, y, clusterData.Scale, clusterData.Amplitude) <= clusterData.Intensity)
-                    {
-                        Terrain.CreateBlock(x, y, data.Item2.Block);
-                    }
+                    continue;
                 }
+
+                visited[x, y] = 1;
+                connected.Add(new Vector2Int(x, y));
+                if (GameManager.Instance.GetChunk(x, y).Biome.Id != BiomesID.NonBiom)
+                {
+                    isNonChunk = false;
+                }
+                regionSize++;
+
+                queue.Enqueue((x + 1, y));
+                queue.Enqueue((x - 1, y));
+                queue.Enqueue((x, y + 1));
+                queue.Enqueue((x, y - 1));
             }
+
+            return (regionSize , isNonChunk);
+        }
+        catch (Exception e)
+        {
+            throw e;
         }
     }
     #endregion

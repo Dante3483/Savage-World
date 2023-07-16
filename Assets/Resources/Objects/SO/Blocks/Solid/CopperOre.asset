@@ -9,8 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c0c6d194b68206b44a20fd01eb8789d1, type: 3}
-  m_Name: Sand
+  m_Script: {fileID: 11500000, guid: 22cfa30691df0b545b8eb5dc58571591, type: 3}
+  m_Name: CopperOre
   m_EditorClassIdentifier: 
-  _block: {fileID: 0}
-  _variety: []
+  _tiles:
+  - {fileID: 11400000, guid: 5501ed1865eb5164d8df984bbb18bd99, type: 2}
+  _type: 1
+  _colorOnMap: {r: 1, g: 0.58085513, b: 0, a: 1}
+  _id: 10

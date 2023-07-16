@@ -18,7 +18,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TerrainConfigurationSO _terrainConfiguration;
     private WorldCellData[,] _worldData;
     private Chunk[,] _chunks;
-    private SynchronizationContext _syncContext;
 
     [Header("World data")]
     [SerializeField] private int _maxTerrainWidth;
@@ -99,10 +98,6 @@ public class GameManager : MonoBehaviour
     {
         get
         {
-            if (_terrain == null)
-            {
-                _terrain = _terrainGameObject.GetComponent<Terrain>();
-            }
             return _terrain;
         }
 
@@ -202,6 +197,45 @@ public class GameManager : MonoBehaviour
             _generalInfo = value;
         }
     }
+
+    public bool IsMenuActive
+    {
+        get
+        {
+            return _isMenuActive;
+        }
+
+        set
+        {
+            _isMenuActive = value;
+        }
+    }
+
+    public bool IsLoadingProgressActive
+    {
+        get
+        {
+            return _isLoadingProgressActive;
+        }
+
+        set
+        {
+            _isLoadingProgressActive = value;
+        }
+    }
+
+    public float LoadingValue
+    {
+        get
+        {
+            return _loadingValue;
+        }
+
+        set
+        {
+            _loadingValue = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -210,6 +244,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        _terrain = _terrainGameObject.GetComponent<Terrain>();
         _terrainGameObject.SetActive(false);
     }
 
@@ -227,6 +262,11 @@ public class GameManager : MonoBehaviour
         {
             SaveMapToPNG();
         }
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            Task.Run(() => DisplayChunks());
+        }
+        Move();
     }
 
     public void UpdateGameState(object obj)
@@ -247,7 +287,10 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.NewGameState:
                 {
-                    HandleNewGameState();
+                    _terrainGameObject.SetActive(true);
+                    Task.Run(() => HandleNewGameState());
+                    //HandleNewGameState();
+                    _terrain.StartCoroutinesAndThreads();
                 }
                 break;
             default:
@@ -258,8 +301,8 @@ public class GameManager : MonoBehaviour
     private void HandleGameInitialization()
     {
         Debug.Log("Initialization state");
-        _isMenuActive = false;
-        _isLoadingProgressActive = true;
+        IsMenuActive = false;
+        IsLoadingProgressActive = true;
 
         //Define Terrain width and height
         _maxTerrainWidth = TerrainConfiguration.DefaultHorizontalChunksCount * TerrainConfiguration.ChunkSize;
@@ -277,10 +320,9 @@ public class GameManager : MonoBehaviour
         {
             for (ushort y = 0; y < _maxTerrainHeight; y++)
             {
-                WorldCellData emptyWorldCellData = new WorldCellData(x, y);
-                WorldData[x, y] = emptyWorldCellData;
+                WorldData[x, y] = new WorldCellData(x, y);
             }
-            _loadingValue += step;
+            LoadingValue += step;
         }
 
         Chunks = new Chunk[TerrainConfiguration.CurrentHorizontalChunksCount, TerrainConfiguration.CurrentVerticalChunksCount];
@@ -289,10 +331,9 @@ public class GameManager : MonoBehaviour
         {
             for (byte y = 0; y < TerrainConfiguration.CurrentVerticalChunksCount; y++)
             {
-                Chunk emptyChunk = new Chunk(x, y);
-                Chunks[x,y] = emptyChunk;
+                Chunks[x,y] = new Chunk(x, y);
             }
-            _loadingValue += step;
+            LoadingValue += step;
         }
 
         watch.Stop();
@@ -308,19 +349,21 @@ public class GameManager : MonoBehaviour
     private void HandleMainMenu()
     {
         Debug.Log("Menu state");
-        _isMenuActive = true;
-        _isLoadingProgressActive = false;
+        IsMenuActive = true;
+        IsLoadingProgressActive = false;
     }
 
     private void HandleNewGameState()
     {
         Debug.Log("New game state");
 
-        _isMenuActive = false;
-        _terrainGameObject.SetActive(true);
+        IsMenuActive = false;
+        IsLoadingProgressActive = true;
+        LoadingValue = 0;
 
         //Create new world
         Terrain.CreateNewWorld();
+        IsLoadingProgressActive = false;
     }
     #endregion
 
@@ -354,9 +397,26 @@ public class GameManager : MonoBehaviour
         File.WriteAllBytes(Application.dataPath + "/BiomesMap.png", bytesBiome);
     }
 
+    private void DisplayChunks()
+    {
+        foreach (Chunk chunk in Chunks)
+        {
+            Debug.Log(chunk.ToString());
+        }
+    }
+
     public Chunk GetChunk(int x, int y)
     {
         return Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize];
+    }
+
+    public void SetChunk(int x, int y, BiomeSO biome)
+    {
+        Chunk chunk = GetChunk(x, y);
+        if (chunk.Biome.Id == BiomesID.NonBiom)
+        {
+            Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize].Biome = biome;
+        }
     }
 
     public IEnumerator PrintDebugInfo()
@@ -372,11 +432,16 @@ public class GameManager : MonoBehaviour
     {
         while (true)
         {
-            _mainMenu.gameObject.SetActive(_isMenuActive);
-            _loadingProgress.gameObject.SetActive(_isLoadingProgressActive);
-            _loadingSlider.value = _loadingValue;
+            _mainMenu.gameObject.SetActive(IsMenuActive);
+            _loadingProgress.gameObject.SetActive(IsLoadingProgressActive);
+            _loadingSlider.value = LoadingValue;
             yield return null;
         }
+    }
+
+    public void Move()
+    {
+        Camera.main.transform.position = new Vector3(Camera.main.transform.position.x + Input.GetAxis("Horizontal"), Camera.main.transform.position.y + Input.GetAxis("Vertical"), -10);
     }
     #endregion
 

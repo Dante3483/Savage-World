@@ -33,3 +33,18 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a821a3f5d872d1242b84c3040dd2dc87, type: 2}
   - {fileID: 11400000, guid: 46597d3879444a34d91e75e371753597, type: 2}
   - {fileID: 11400000, guid: b7b9e251eac8dc549a09ebf3f31b6ef8, type: 2}
+  Clusters:
+  - {fileID: 11400000, guid: a8ba2ac30db5fb74ea3c9e2a973e3dfa, type: 2}
+  - {fileID: 11400000, guid: 204034f2de6044b43b23136483e12de8, type: 2}
+  - {fileID: 11400000, guid: e61ffe56d925e2f4db7943457da742be, type: 2}
+  - {fileID: 11400000, guid: d8ffb371b22355244b52342b0c177e5f, type: 2}
+  - {fileID: 11400000, guid: 818d41102877db84b86853e62ffa5b3f, type: 2}
+  Scale: 35
+  Intensity: 0.4
+  Octaves: 4
+  Persistance: 0.4
+  Lacunarity: 2
+  MinSmallCaveSize: 0
+  MaxSmallCaveSize: 1500
+  MinLargeCaveSize: 3500
+  MaxLargeCaveSize: 10000

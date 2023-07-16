@@ -24,6 +24,17 @@ public class TerrainConfigurationSO : ScriptableObject
     public List<TerrainLevelSO> Levels;
     public List<BiomeSO> Biomes;
     public List<ClusterSO> Clusters;
+
+    [Header("Caves")]
+    public float Scale;
+    public float Intensity;
+    public int Octaves;
+    public float Persistance;
+    public float Lacunarity;
+    public int MinSmallCaveSize;
+    public int MaxSmallCaveSize;
+    public int MinLargeCaveSize;
+    public int MaxLargeCaveSize;
     #endregion
 
     #region Properties

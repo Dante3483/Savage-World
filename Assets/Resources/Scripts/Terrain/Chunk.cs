@@ -1,4 +1,4 @@
-public class Chunk
+public struct Chunk
 {
     #region Private fields
     private BiomeSO _biome;
@@ -14,12 +14,12 @@ public class Chunk
     {
         get
         {
-            return Coords;
+            return _coords;
         }
 
         set
         {
-            Coords = value;
+            _coords = value;
         }
     }
 
@@ -38,16 +38,16 @@ public class Chunk
     #endregion
 
     #region Methods
-    public Chunk()
-    {
-        Biome = GameManager.Instance.TerrainConfiguration.Biomes[0];
-    }
-
     public Chunk(byte x, byte y)
     {
-        Biome = GameManager.Instance.TerrainConfiguration.Biomes[0];
+        _biome = GameManager.Instance.TerrainConfiguration.Biomes[0];
         _coords.x = x;
         _coords.y = y;
+    }
+
+    public override string ToString()
+    {
+        return $"{_biome.Id}";
     }
     #endregion
 }

@@ -9,8 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c0c6d194b68206b44a20fd01eb8789d1, type: 3}
-  m_Name: Stone
+  m_Script: {fileID: 11500000, guid: 22cfa30691df0b545b8eb5dc58571591, type: 3}
+  m_Name: Clay
   m_EditorClassIdentifier: 
-  _block: {fileID: 0}
-  _variety: []
+  _tiles:
+  - {fileID: 11400000, guid: 3b487d829b96fad468ee547f04fb806f, type: 2}
+  _type: 1
+  _colorOnMap: {r: 0.70980394, g: 0.7294118, b: 0.81960785, a: 1}
+  _id: 8

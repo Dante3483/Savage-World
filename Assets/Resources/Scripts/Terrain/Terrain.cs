@@ -41,12 +41,15 @@ public class Terrain : MonoBehaviour
             GameManager.Instance.Seed = UnityEngine.Random.Range(-1000000, 1000000);
         }
 
-        GameManager.Instance.RandomVar = new System.Random(GameManager.Instance.Seed.GetHashCode());
+        GameManager.Instance.RandomVar = new System.Random(GameManager.Instance.Seed);
 
         //Start generation
         TerrainGeneration terrainGeneration = new TerrainGeneration(GameManager.Instance.Seed);
         terrainGeneration.StartTerrainGeneration();
+    }
 
+    public void StartCoroutinesAndThreads()
+    {
         //Start update tilemaps
         StartCoroutine(UpdateTilemaps());
     }
@@ -55,16 +58,34 @@ public class Terrain : MonoBehaviour
     #region Update
     public IEnumerator UpdateTilemaps()
     {
-        yield return null;
+        WorldCellData block;
+        RectInt currentCameraRect;
         RectInt prevCameraRect = GetCameraRectInt();
+
+        int arraySizeX;
+        int arraySizeY;
+        TileBase[] blockTiles;
+        Vector3Int[] vectors;
+        int i;
+
+        ArrayObjectPool<TileBase> blockTilesPool = new ArrayObjectPool<TileBase>();
+        ArrayObjectPool<Vector3Int> vectorsPool = new ArrayObjectPool<Vector3Int>();
+
+        yield return null;
+
         while (true)
         {
             yield return null;
 
-            RectInt currentCameraRect = GetCameraRectInt();
-            List<TileBase> blockTiles = new List<TileBase>();
+            i = 0;
+            currentCameraRect = GetCameraRectInt();
 
-            List<Vector3Int> vectors = new List<Vector3Int>();
+            //Calculate array size
+            arraySizeX = prevCameraRect.width + Mathf.Abs(prevCameraRect.x - currentCameraRect.x);
+            arraySizeY = prevCameraRect.height + Mathf.Abs(prevCameraRect.y - currentCameraRect.y);
+
+            blockTiles = blockTilesPool.GetArray(arraySizeX * arraySizeY);
+            vectors = vectorsPool.GetArray(arraySizeX * arraySizeY);
 
             //Fill Tiles array with blocks to destroy
             if (Mathf.Abs(prevCameraRect.x - currentCameraRect.x) >= 1
@@ -74,9 +95,9 @@ public class Terrain : MonoBehaviour
                 {
                     if (!currentCameraRect.Contains(position))
                     {
-                        blockTiles.Add(null);
-
-                        vectors.Add(new Vector3Int(position.x, position.y));
+                        blockTiles[i] = null;
+                        vectors[i] = new Vector3Int(position.x, position.y);
+                        i++;
                     }
                 }
                 prevCameraRect = currentCameraRect;
@@ -87,16 +108,15 @@ public class Terrain : MonoBehaviour
             {
                 if (IsInMapRange(position.x, position.y))
                 {
-                    WorldCellData block = GameManager.Instance.WorldData[position.x, position.y];
-                    TileBase blockTile = block.GetTile();
-                    blockTiles.Add(blockTile);
-
-                    vectors.Add(new Vector3Int(position.x, position.y));
+                    block = GameManager.Instance.WorldData[position.x, position.y];
+                    blockTiles[i] = block.GetTile();
+                    vectors[i] = new Vector3Int(position.x, position.y);
+                    i++;
                 }
             }
 
             //Change Tilemap using Vector's array and Tile's array
-            _blocksTilemap.SetTiles(vectors.ToArray(), blockTiles.ToArray());
+            _blocksTilemap.SetTiles(vectors, blockTiles);
         }
     }
     #endregion

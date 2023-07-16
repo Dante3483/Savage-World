@@ -9,14 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1397bfbe14d7dd3499ec4f091e2773c8, type: 3}
-  m_Name: Underground
+  m_Script: {fileID: 11500000, guid: 22cfa30691df0b545b8eb5dc58571591, type: 3}
+  m_Name: IronOre
   m_EditorClassIdentifier: 
-  _name: Underground
-  _countOfVerticalChunks: 17
-  _startY: 0
-  _endY: 1699
-  _stoneAmplitude: 1
-  _stoneScale: 10
-  _stoneIntensity: 0.6
-  _biomes: 
+  _tiles:
+  - {fileID: 11400000, guid: 017f3d8edfe7db348941544c98f0cf1a, type: 2}
+  _type: 1
+  _colorOnMap: {r: 1, g: 0.5886792, b: 0.74406093, a: 1}
+  _id: 9
