@@ -35,6 +35,13 @@ public class TerrainConfigurationSO : ScriptableObject
     public int MaxSmallCaveSize;
     public int MinLargeCaveSize;
     public int MaxLargeCaveSize;
+
+    [Header("Special cave")]
+    public int StarterCaveChance;
+    public int MinStarterCaveLength;
+    public int MaxStarterCaveLength;
+    public int MinStarterCaveHeight;
+    public int MaxStarterCaveHeight;
     #endregion
 
     #region Properties

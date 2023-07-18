@@ -19,3 +19,4 @@ MonoBehaviour:
   _stoneAmplitude: 1
   _stoneScale: 10
   _stoneIntensity: 0.4
+  _biomes: 

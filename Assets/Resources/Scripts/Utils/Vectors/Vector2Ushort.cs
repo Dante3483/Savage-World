@@ -20,6 +20,10 @@ public struct Vector2Ushort
     #endregion
 
     #region Methods
-
+    public Vector2Ushort(ushort x, ushort y)
+    {
+        this.x = x;
+        this.y = y;
+    }
     #endregion
 }

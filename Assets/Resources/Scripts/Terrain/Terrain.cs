@@ -35,17 +35,19 @@ public class Terrain : MonoBehaviour
 
     public void CreateNewWorld()
     {
-        //Set random seed
-        if (!GameManager.Instance.IsStaticSeed)
+        try
         {
-            GameManager.Instance.Seed = UnityEngine.Random.Range(-1000000, 1000000);
+            GameManager.Instance.RandomVar = new System.Random(GameManager.Instance.Seed);
+
+            //Start generation
+            TerrainGeneration terrainGeneration = new TerrainGeneration(GameManager.Instance.Seed);
+            terrainGeneration.StartTerrainGeneration();
         }
-
-        GameManager.Instance.RandomVar = new System.Random(GameManager.Instance.Seed);
-
-        //Start generation
-        TerrainGeneration terrainGeneration = new TerrainGeneration(GameManager.Instance.Seed);
-        terrainGeneration.StartTerrainGeneration();
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            throw e;
+        }
     }
 
     public void StartCoroutinesAndThreads()

@@ -39,7 +39,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e61ffe56d925e2f4db7943457da742be, type: 2}
   - {fileID: 11400000, guid: d8ffb371b22355244b52342b0c177e5f, type: 2}
   - {fileID: 11400000, guid: 818d41102877db84b86853e62ffa5b3f, type: 2}
-  Scale: 35
+  Scale: 45
   Intensity: 0.4
   Octaves: 4
   Persistance: 0.4
@@ -48,3 +48,8 @@ MonoBehaviour:
   MaxSmallCaveSize: 1500
   MinLargeCaveSize: 3500
   MaxLargeCaveSize: 10000
+  StarterCaveChance: 25
+  MinStarterCaveLength: 20
+  MaxStarterCaveLength: 25
+  MinStarterCaveHeight: 5
+  MaxStarterCaveHeight: 6

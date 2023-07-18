@@ -287,6 +287,11 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.NewGameState:
                 {
+                    //Set random seed
+                    if (!IsStaticSeed)
+                    {
+                        Seed = UnityEngine.Random.Range(-1000000, 1000000);
+                    }
                     _terrainGameObject.SetActive(true);
                     Task.Run(() => HandleNewGameState());
                     //HandleNewGameState();

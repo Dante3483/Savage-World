@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using static TMPro.Examples.TMP_ExampleScript_01;
 
 public class TerrainGeneration
 {
@@ -73,7 +74,7 @@ public class TerrainGeneration
     public void StartTerrainGeneration()
     {
         double totalTime = 0f;
-        float step = 100f / 5;
+        float step = 100f / 6;
 
         #region Phase 1 - Flat world generation
         var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -131,6 +132,18 @@ public class TerrainGeneration
         watch.Stop();
         Debug.Log($"Phase 5: {watch.Elapsed.TotalSeconds}");
         GameManager.Instance.GeneralInfo += $"Phase 5: {watch.Elapsed.TotalSeconds}\n";
+        totalTime += watch.Elapsed.TotalSeconds;
+        GameManager.Instance.LoadingValue += step;
+        #endregion
+
+        #region Phase 6 - Special caves generation
+        watch.Restart();
+
+        CreateSpecialCaves();
+
+        watch.Stop();
+        Debug.Log($"Phase 6: {watch.Elapsed.TotalSeconds}");
+        GameManager.Instance.GeneralInfo += $"Phase 6: {watch.Elapsed.TotalSeconds}\n";
         totalTime += watch.Elapsed.TotalSeconds;
         GameManager.Instance.LoadingValue += step;
         #endregion
@@ -200,13 +213,13 @@ public class TerrainGeneration
     #region Phase 3
     private void CreateBiomes()
     {
-        CreateOcean(TerrainConfiguration.Biomes[1]);
-        CreateDesert(TerrainConfiguration.Biomes[2]);
-        CreateSavannah(TerrainConfiguration.Biomes[3]);
-        CreateMeadow(TerrainConfiguration.Biomes[4]);
-        CreateForest(TerrainConfiguration.Biomes[5]);
-        CreateSwamp(TerrainConfiguration.Biomes[6]);
-        CreateConiferousForest(TerrainConfiguration.Biomes[7]);
+        CreateOcean(TerrainConfiguration.Biomes.Find(b => b.Id == BiomesID.Ocean));
+        CreateDesert(TerrainConfiguration.Biomes.Find(b => b.Id == BiomesID.Desert));
+        CreateSavannah(TerrainConfiguration.Biomes.Find(b => b.Id == BiomesID.Savannah));
+        CreateMeadow(TerrainConfiguration.Biomes.Find(b => b.Id == BiomesID.Meadow));
+        CreateForest(TerrainConfiguration.Biomes.Find(b => b.Id == BiomesID.Forest));
+        CreateSwamp(TerrainConfiguration.Biomes.Find(b => b.Id == BiomesID.Swamp));
+        CreateConiferousForest(TerrainConfiguration.Biomes.Find(b => b.Id == BiomesID.ConiferousForest));
     }
 
     //Phase 3.1
@@ -552,6 +565,180 @@ public class TerrainGeneration
                     }
                 }
                 _caveMap[x, y] = noiseHeight;
+            }
+        }
+    }
+    #endregion
+
+    #region Phase 6
+    private void CreateSpecialCaves()
+    {
+        BiomeSO savannah = TerrainConfiguration.Biomes.Find(b => b.Id == BiomesID.Savannah);
+        TerrainLevelSO surfaceLevel = TerrainConfiguration.Levels.Find(l => l.Name == "Surface");
+        short tunnelDirection = 0;
+        short prevTunnelDirection = 0;
+        int countOfRepeats = 0;
+
+        for (ushort x = (ushort)(savannah.StartX + TerrainConfiguration.ChunkSize); x < GameManager.Instance.CurrentTerrainWidth; x += TerrainConfiguration.ChunkSize)
+        {
+            int chance = RandomVar.Next(0, 101);
+            if (chance <= TerrainConfiguration.StarterCaveChance)
+            {
+                ushort startX = (ushort)RandomVar.Next(x + 5, x + TerrainConfiguration.ChunkSize - TerrainConfiguration.MaxStarterCaveLength - 5);
+                ushort startY = (ushort)RandomVar.Next(surfaceLevel.StartY + TerrainConfiguration.ChunkSize + 5, TerrainConfiguration.Equator - TerrainConfiguration.MaxStarterCaveHeight - 10);
+                tunnelDirection = (short)(RandomVar.Next(0, 2) == 0 ? -1 : 1);
+                tunnelDirection = (short)(countOfRepeats == 2 ? tunnelDirection - (tunnelDirection * 2) : tunnelDirection);
+
+                if (CreateStarterCave(startX, startY, tunnelDirection))
+                {
+                    x += TerrainConfiguration.ChunkSize;
+                }
+                if (tunnelDirection == prevTunnelDirection)
+                {
+                    countOfRepeats++;
+                }
+                else
+                {
+                    prevTunnelDirection = tunnelDirection;
+                    countOfRepeats = 0;
+                }
+            }
+        }
+    }
+
+    private bool CreateStarterCave(ushort startX, ushort startY, short tunnelDirection)
+    {
+        //Define length and height
+        int length = RandomVar.Next(TerrainConfiguration.MinStarterCaveLength, TerrainConfiguration.MaxStarterCaveLength);
+        int height = RandomVar.Next(TerrainConfiguration.MinStarterCaveHeight, TerrainConfiguration.MaxStarterCaveHeight);
+
+        //Define list of coords and air block
+        List<Vector2Ushort> coords = new List<Vector2Ushort>();
+        BlockSO airBlock = GameManager.Instance.ObjectsAtlass.Air;
+
+        //Create rectangle
+        ushort y;
+        ushort x;
+        for (x = startX; x <= startX + length; x++)
+        {
+            for (y = startY; y <= startY + height; y++)
+            {
+                if (!GameManager.Instance.WorldData[x, y].CompareBlock(airBlock))
+                {
+                    coords.Add(new Vector2Ushort(x, y));
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        int countOfRepeats = 0;
+        //Add noise to the top
+        y = (ushort)(startY + height + 1);
+        for (x = startX; x <= startX + length; x++)
+        {
+            if (RandomVar.Next(0, 2) == 1 || countOfRepeats == 2)
+            {
+                coords.Add(new Vector2Ushort(x, y));
+                countOfRepeats = 0;
+            }
+            else
+            {
+                countOfRepeats++;
+            }
+        }
+
+        //Add noise to the bottom
+        y = (ushort)(startY - 1);
+        countOfRepeats = 0;
+        for (x = startX; x <= startX + length; x++)
+        {
+            if (RandomVar.Next(0, 2) == 1 || countOfRepeats == 2)
+            {
+                coords.Add(new Vector2Ushort(x, y));
+                countOfRepeats = 0;
+            }
+            else
+            {
+                countOfRepeats++;
+            }
+        }
+
+        //Add noise to the left
+        countOfRepeats = 0;
+        x = (ushort)(startX + length + 1);
+        for (y = startY; y <= startY + height; y++)
+        {
+            if (RandomVar.Next(0, 2) == 1 || countOfRepeats == 2)
+            {
+                coords.Add(new Vector2Ushort(x, y));
+                countOfRepeats = 0;
+            }
+            else
+            {
+                countOfRepeats++;
+            }
+        }
+
+        //Add noise to the right
+        x = (ushort)(startX - 1);
+        for (y = startY; y <= startY + height; y++)
+        {
+            if (RandomVar.Next(0, 2) == 1 || countOfRepeats == 2)
+            {
+                coords.Add(new Vector2Ushort(x, y));
+                countOfRepeats = 0;
+            }
+            else
+            {
+                countOfRepeats++;
+            }
+        }
+
+        //Create tunnel
+        if (tunnelDirection == -1)
+        {
+            CreateTunnel(tunnelDirection, startX, startY, ref coords);
+        }
+        else
+        {
+            CreateTunnel(tunnelDirection, (ushort)(startX + length), startY, ref coords);
+        }
+
+
+        //Fill terrain with air blocks
+        foreach (Vector2Ushort coord in coords)
+        {
+            Terrain.CreateBlock(coord.x, coord.y, airBlock);
+        }
+
+        return true;
+    }
+
+    private void CreateTunnel(short direction, ushort startX, ushort startY, ref List<Vector2Ushort> coords)
+    {
+        short x = (short)startX;
+        short y = (short)startY;
+        int stepUp = 5;
+        BlockSO airBlock = GameManager.Instance.ObjectsAtlass.Air;
+
+        while (true)
+        {
+            for (int i = 0; i <= stepUp; i++)
+            {
+                coords.Add(new Vector2Ushort((ushort)x, (ushort)(y + i)));
+            }
+
+            x += direction;
+            if (RandomVar.Next(0, 2) == 1)
+            {
+                y++;
+            }
+            if (GameManager.Instance.WorldData[x, y].CompareBlock(airBlock))
+            {
+                break;
             }
         }
     }
