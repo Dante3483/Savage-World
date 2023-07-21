@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b0572a9e2a280b4396150628efcef6e, type: 3}
+  m_Name: ForestGrass
+  m_EditorClassIdentifier: 
+  _tiles:
+  - {fileID: 11400000, guid: e16a3cb58812480478d0ea1b1f086f19, type: 2}
+  - {fileID: 11400000, guid: a22e40ef8fd5dcf418af627b78f3d314, type: 2}
+  - {fileID: 11400000, guid: 03b10b17e2a5a3f4fbe8ea3fda043ce7, type: 2}
+  - {fileID: 11400000, guid: 8548746d76678774db7b8d6a8bf2e1c7, type: 2}
+  _type: 4
+  _colorOnMap: {r: 0.47843137, g: 0.6784314, b: 0.36078432, a: 1}
+  _id: 16
+  _biomeId: 5
+  _allowedToSpawnOn:
+  - {fileID: 11400000, guid: 95ae94fc45d66d641b8a222c3813a32d, type: 2}
+  _canGrow: 0
+  _isBottomSpawn: 1
+  _isTopSpawn: 0
+  _chanceToSpawn: 25
+  _chanceToGrow: 0
+  _isBiomeSpecified: 1

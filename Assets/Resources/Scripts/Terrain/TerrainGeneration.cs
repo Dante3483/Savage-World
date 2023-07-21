@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Threading;
 using UnityEngine;
 
@@ -74,7 +75,7 @@ public class TerrainGeneration
     public void StartTerrainGeneration()
     {
         double totalTime = 0f;
-        float step = 100f / 8;
+        float step = 100f / 9;
 
         #region Phase 1 - Flat world generation
         var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -168,6 +169,30 @@ public class TerrainGeneration
         watch.Stop();
         Debug.Log($"Phase 8: {watch.Elapsed.TotalSeconds}");
         GameManager.Instance.GeneralInfo += $"Phase 8: {watch.Elapsed.TotalSeconds}\n";
+        totalTime += watch.Elapsed.TotalSeconds;
+        GameManager.Instance.LoadingValue += step;
+        #endregion
+
+        #region Phase 9 - Grass seeding
+        watch.Restart();
+
+        GrassSeeding();
+
+        watch.Stop();
+        Debug.Log($"Phase 9: {watch.Elapsed.TotalSeconds}");
+        GameManager.Instance.GeneralInfo += $"Phase 9: {watch.Elapsed.TotalSeconds}\n";
+        totalTime += watch.Elapsed.TotalSeconds;
+        GameManager.Instance.LoadingValue += step;
+        #endregion
+
+        #region Phase 10 - Plants generation
+        watch.Restart();
+
+        CreatePlants();
+
+        watch.Stop();
+        Debug.Log($"Phase 10: {watch.Elapsed.TotalSeconds}");
+        GameManager.Instance.GeneralInfo += $"Phase 10: {watch.Elapsed.TotalSeconds}\n";
         totalTime += watch.Elapsed.TotalSeconds;
         GameManager.Instance.LoadingValue += step;
         #endregion
@@ -642,7 +667,9 @@ public class TerrainGeneration
 
         //Define list of coords and air block
         List<Vector2Ushort> coords = new List<Vector2Ushort>();
+        List<Vector2Ushort> stoneCoords = new List<Vector2Ushort>();
         BlockSO airBlock = GameManager.Instance.ObjectsAtlass.Air;
+        BlockSO stoneBlock = GameManager.Instance.ObjectsAtlass.Stone;
 
         //Create rectangle
         ushort y;
@@ -685,11 +712,13 @@ public class TerrainGeneration
         {
             if (RandomVar.Next(0, 2) == 1 || countOfRepeats == 2)
             {
+                stoneCoords.Add(new Vector2Ushort(x, (ushort)(y - 1)));
                 coords.Add(new Vector2Ushort(x, y));
                 countOfRepeats = 0;
             }
             else
             {
+                stoneCoords.Add(new Vector2Ushort(x, (ushort)(y)));
                 countOfRepeats++;
             }
         }
@@ -728,11 +757,11 @@ public class TerrainGeneration
         //Create tunnel
         if (tunnelDirection == -1)
         {
-            CreateTunnel(tunnelDirection, startX, startY, ref coords);
+            CreateTunnel(tunnelDirection, startX, startY, ref coords, ref stoneCoords);
         }
         else
         {
-            CreateTunnel(tunnelDirection, (ushort)(startX + length), startY, ref coords);
+            CreateTunnel(tunnelDirection, (ushort)(startX + length), startY, ref coords, ref stoneCoords);
         }
 
 
@@ -742,10 +771,16 @@ public class TerrainGeneration
             Terrain.CreateBlock(coord.x, coord.y, airBlock);
         }
 
+        //Fill terrain with stone blocks
+        foreach (Vector2Ushort coord in stoneCoords)
+        {
+            Terrain.CreateBlock(coord.x, coord.y, stoneBlock);
+        }
+
         return true;
     }
 
-    private void CreateTunnel(short direction, ushort startX, ushort startY, ref List<Vector2Ushort> coords)
+    private void CreateTunnel(short direction, ushort startX, ushort startY, ref List<Vector2Ushort> coords, ref List<Vector2Ushort> stoneCoords)
     {
         short x = (short)startX;
         short y = (short)startY;
@@ -757,6 +792,11 @@ public class TerrainGeneration
             for (int i = 0; i <= stepUp; i++)
             {
                 coords.Add(new Vector2Ushort((ushort)x, (ushort)(y + i)));
+            }
+
+            if (RandomVar.Next(0, 2) == 1)
+            {
+                stoneCoords.Add(new Vector2Ushort((ushort)x, (ushort)(y - 1)));
             }
 
             x += direction;
@@ -1019,6 +1059,94 @@ public class TerrainGeneration
     }
     #endregion
 
+    #region Phase 9
+    private void GrassSeeding()
+    {
+        TerrainLevelSO surface = TerrainConfiguration.Levels.Find(l => l.Name == "Surface");
+        BlockSO dirtBlock = GameManager.Instance.ObjectsAtlass.Dirt;
+        BlockSO airBlock = GameManager.Instance.ObjectsAtlass.Air;
+        BiomesID currentBiomeId;
+        _surfaceCoords.Clear();
+
+        for (int x = 0; x < GameManager.Instance.CurrentTerrainWidth; x++)
+        {
+            for (int y = TerrainConfiguration.Equator; y < surface.EndY; y++)
+            {
+                currentBiomeId = GameManager.Instance.GetChunk(x, y).Biome.Id;
+                if (GameManager.Instance.WorldData[x, y + 1].CompareBlock(airBlock))
+                {
+                    _surfaceCoords.Add(new Vector2Ushort((ushort)x, (ushort)y));
+                    if (GameManager.Instance.WorldData[x, y].CompareBlock(dirtBlock))
+                    {
+                        Terrain.CreateBlock((ushort)x, (ushort)y, GameManager.Instance.ObjectsAtlass.GetGrassByBiome(currentBiomeId));
+                    }
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region Phase 10
+    private void CreatePlants()
+    {
+        //Create surface plants
+        TerrainLevelSO surface = TerrainConfiguration.Levels.Find(l => l.Name == "Surface");
+        BlockSO airBlock = GameManager.Instance.ObjectsAtlass.Air;
+        List<List<PlantSO>> allPlants = new List<List<PlantSO>>()
+        {
+            GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.NonBiom),
+            //GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.Ocean),
+            GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.Desert),
+            GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.Savannah),
+            GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.Meadow),
+            GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.Forest),
+            //GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.Swamp),
+            GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.ConiferousForest),
+        };
+        BiomeSO currentBiome;
+        int chance;
+        ushort startX;
+        ushort endX;
+
+        foreach (List<PlantSO> plants in allPlants)
+        {
+            foreach (PlantSO plant in plants)
+            {
+                if (plant.BiomeId == BiomesID.NonBiom)
+                {
+                    startX = 0;
+                    endX = (ushort)(GameManager.Instance.CurrentTerrainWidth - 1);
+                }
+                else
+                {
+                    currentBiome = TerrainConfiguration.Biomes.Find(b => b.Id == plant.BiomeId);
+                    startX = currentBiome.StartX;
+                    endX = currentBiome.EndX;
+                }
+
+                for (ushort x = startX; x <= endX; x++)
+                {
+                    for (ushort y = surface.StartY; y < surface.EndY; y++)
+                    {
+                        chance = RandomVar.Next(0, 101);
+                        if (plant.AllowedToSpawnOn.Contains(GameManager.Instance.WorldData[x, y].BlockData) && chance <= plant.ChanceToSpawn)
+                        {
+                            if (plant.IsBottomSpawn && GameManager.Instance.WorldData[x, y + 1].CompareBlock(airBlock))
+                            {
+                                Terrain.CreateBlock(x, (ushort)(y + 1), plant);
+                            }
+                            else if (plant.IsTopSpawn && GameManager.Instance.WorldData[x, y - 1].CompareBlock(airBlock))
+                            {
+                                Terrain.CreateBlock(x, (ushort)(y - 1), plant);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    #endregion
+
     #endregion
 
     #region Validation
@@ -1083,23 +1211,6 @@ public class TerrainGeneration
         catch (Exception e)
         {
             throw e;
-        }
-    }
-
-    private void ChangeSurfaceList()
-    {
-        BlockSO airBlock = GameManager.Instance.ObjectsAtlass.Air;
-        List<int> indexes = new List<int>();
-        for (int i = 0; i < _surfaceCoords.Count; i++)
-        {
-            if (GameManager.Instance.WorldData[_surfaceCoords[i].x, _surfaceCoords[i].y].CompareBlock(airBlock))
-            {
-                indexes.Add(i);
-            }
-        }
-        foreach (int index in indexes)
-        {
-            _surfaceCoords.RemoveAt(index);
         }
     }
     #endregion

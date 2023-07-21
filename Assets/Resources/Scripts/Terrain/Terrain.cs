@@ -60,7 +60,6 @@ public class Terrain : MonoBehaviour
     #region Update
     public IEnumerator UpdateTilemaps()
     {
-        WorldCellData block;
         RectInt currentCameraRect;
         RectInt prevCameraRect = GetCameraRectInt();
 
@@ -73,10 +72,9 @@ public class Terrain : MonoBehaviour
         ArrayObjectPool<TileBase> blockTilesPool = new ArrayObjectPool<TileBase>();
         ArrayObjectPool<Vector3Int> vectorsPool = new ArrayObjectPool<Vector3Int>();
 
-        yield return null;
-
         while (true)
         {
+
             yield return null;
 
             i = 0;
@@ -110,8 +108,7 @@ public class Terrain : MonoBehaviour
             {
                 if (IsInMapRange(position.x, position.y))
                 {
-                    block = GameManager.Instance.WorldData[position.x, position.y];
-                    blockTiles[i] = block.GetTile();
+                    blockTiles[i] = GameManager.Instance.WorldData[position.x, position.y].GetTile();
                     vectors[i] = new Vector3Int(position.x, position.y);
                     i++;
                 }

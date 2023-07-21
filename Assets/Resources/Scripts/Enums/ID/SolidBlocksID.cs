@@ -2,23 +2,25 @@ public enum SolidBlocksID: ushort
 {
     Dirt = 0,
 
-    DesertGrass = 1,
+    OceanGrass = 1,
 
-    PlainsGrass = 2,
+    DesertGrass = 2,
 
-    MeadowGrass = 3,
+    SavannahGrass = 3,
 
-    ForestGrass = 4,
+    MeadowGrass = 4,
 
-    SwampGrass = 5,
+    ForestGrass = 5,
 
-    ConiferousForestGrass = 6,
+    SwampGrass = 6,
 
-    Stone = 7,
+    ConiferousForestGrass = 7,
 
-    Clay = 8,
+    Stone = 8,
 
-    IronOre = 9,
+    Clay = 9,
 
-    CopperOre = 10,
+    IronOre = 10,
+
+    CopperOre = 11,
 }

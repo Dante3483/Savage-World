@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b0572a9e2a280b4396150628efcef6e, type: 3}
+  m_Name: Dandelion
+  m_EditorClassIdentifier: 
+  _tiles:
+  - {fileID: 11400000, guid: 872657123d1e74c43bce9f047371538b, type: 2}
+  - {fileID: 11400000, guid: dc6a8a71169d3a144a973e14a33aa4ee, type: 2}
+  _type: 4
+  _colorOnMap: {r: 0.98039216, g: 0.8666667, b: 0.29803923, a: 1}
+  _id: 5
+  _biomeId: 4
+  _allowedToSpawnOn:
+  - {fileID: 11400000, guid: 9b5ee4b9e005d044a8737850c9abde8f, type: 2}
+  _canGrow: 0
+  _isBottomSpawn: 1
+  _isTopSpawn: 0
+  _chanceToSpawn: 25
+  _chanceToGrow: 0
+  _isBiomeSpecified: 1

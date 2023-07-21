@@ -5,6 +5,7 @@ public struct WorldCellData
 {
     #region Private fields
     private ushort _id;
+    private byte _tileId;
     private BlockTypes _blockType;
     private BlockSO _blockData;
     private Vector2Ushort _coords;
@@ -53,6 +54,19 @@ public struct WorldCellData
             _blockData = value;
         }
     }
+
+    public byte TileId
+    {
+        get
+        {
+            return _tileId;
+        }
+
+        set
+        {
+            _tileId = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -60,6 +74,7 @@ public struct WorldCellData
     {
         //Set Ait block by default
         _id = 0;
+        _tileId = 255;
         _blockType = BlockTypes.Abstract;
         _blockData = GameManager.Instance.ObjectsAtlass.Air;
         _coords = new Vector2Ushort { x = xPosition, y = yPosition };
@@ -68,6 +83,7 @@ public struct WorldCellData
     public void SetData(BlockSO block)
     {
         Id = block.GetId();
+        TileId = 255;
         BlockType = block.Type;
         BlockData = block;
     }
@@ -86,11 +102,16 @@ public struct WorldCellData
 
     public TileBase GetTile()
     {
+        if (TileId != 255)
+        {
+            return BlockData.Tiles[_tileId];
+        }
         if (BlockData.Tiles.Count == 0)
         {
             return null;
         }
-        return BlockData.Tiles[Random.Range(0, BlockData.Tiles.Count)];
+        TileId = (byte)Random.Range(0, BlockData.Tiles.Count);
+        return BlockData.Tiles[TileId];
     }
 
     public bool CompareBlock(BlockSO block)

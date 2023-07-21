@@ -294,7 +294,6 @@ public class GameManager : MonoBehaviour
                     }
                     _terrainGameObject.SetActive(true);
                     Task.Run(() => HandleNewGameState());
-                    //HandleNewGameState();
                     _terrain.StartCoroutinesAndThreads();
                 }
                 break;
@@ -305,50 +304,58 @@ public class GameManager : MonoBehaviour
 
     private void HandleGameInitialization()
     {
-        Debug.Log("Initialization state");
-        IsMenuActive = false;
-        IsLoadingProgressActive = true;
-
-        //Define Terrain width and height
-        _maxTerrainWidth = TerrainConfiguration.DefaultHorizontalChunksCount * TerrainConfiguration.ChunkSize;
-        _maxTerrainHeight = TerrainConfiguration.DefaultVerticalChunksCount * TerrainConfiguration.ChunkSize;
-
-        CurrentTerrainWidth = TerrainConfiguration.CurrentHorizontalChunksCount * TerrainConfiguration.ChunkSize;
-        CurrentTerrainHeight= TerrainConfiguration.CurrentVerticalChunksCount * TerrainConfiguration.ChunkSize;
-
-        //Initialize 2d world data and chunk array
-        var watch = System.Diagnostics.Stopwatch.StartNew();
-
-        WorldData = new WorldCellData[_maxTerrainWidth, _maxTerrainHeight];
-        float step = 50f / _maxTerrainWidth;
-        for (ushort x = 0; x < _maxTerrainWidth; x++)
+        try
         {
-            for (ushort y = 0; y < _maxTerrainHeight; y++)
-            {
-                WorldData[x, y] = new WorldCellData(x, y);
-            }
-            LoadingValue += step;
-        }
+            Debug.Log("Initialization state");
+            IsMenuActive = false;
+            IsLoadingProgressActive = true;
 
-        Chunks = new Chunk[TerrainConfiguration.CurrentHorizontalChunksCount, TerrainConfiguration.CurrentVerticalChunksCount];
-        step = 50f / TerrainConfiguration.CurrentHorizontalChunksCount;
-        for (byte x = 0; x < TerrainConfiguration.CurrentHorizontalChunksCount; x++)
+            //Define Terrain width and height
+            _maxTerrainWidth = TerrainConfiguration.DefaultHorizontalChunksCount * TerrainConfiguration.ChunkSize;
+            _maxTerrainHeight = TerrainConfiguration.DefaultVerticalChunksCount * TerrainConfiguration.ChunkSize;
+
+            CurrentTerrainWidth = TerrainConfiguration.CurrentHorizontalChunksCount * TerrainConfiguration.ChunkSize;
+            CurrentTerrainHeight = TerrainConfiguration.CurrentVerticalChunksCount * TerrainConfiguration.ChunkSize;
+
+            //Initialize 2d world data and chunk array
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+
+            WorldData = new WorldCellData[_maxTerrainWidth, _maxTerrainHeight];
+            float step = 50f / _maxTerrainWidth;
+            for (ushort x = 0; x < _maxTerrainWidth; x++)
+            {
+                for (ushort y = 0; y < _maxTerrainHeight; y++)
+                {
+                    WorldData[x, y] = new WorldCellData(x, y);
+                }
+                LoadingValue += step;
+            }
+
+            Chunks = new Chunk[TerrainConfiguration.CurrentHorizontalChunksCount, TerrainConfiguration.CurrentVerticalChunksCount];
+            step = 50f / TerrainConfiguration.CurrentHorizontalChunksCount;
+            for (byte x = 0; x < TerrainConfiguration.CurrentHorizontalChunksCount; x++)
+            {
+                for (byte y = 0; y < TerrainConfiguration.CurrentVerticalChunksCount; y++)
+                {
+                    Chunks[x, y] = new Chunk(x, y);
+                }
+                LoadingValue += step;
+            }
+
+            watch.Stop();
+            Debug.Log($"Game initialization: {watch.Elapsed.TotalSeconds}");
+            GeneralInfo += $"Game initialization: {watch.Elapsed.TotalSeconds}\n";
+
+            //Initialize atlasses
+            ObjectsAtlass.Initialize();
+
+            UpdateGameState(GameState.MainMenuState);
+        }
+        catch (Exception e)
         {
-            for (byte y = 0; y < TerrainConfiguration.CurrentVerticalChunksCount; y++)
-            {
-                Chunks[x,y] = new Chunk(x, y);
-            }
-            LoadingValue += step;
+            Debug.LogException(e);
+            throw e;
         }
-
-        watch.Stop();
-        Debug.Log($"Game initialization: {watch.Elapsed.TotalSeconds}");
-        GeneralInfo += $"Game initialization: {watch.Elapsed.TotalSeconds}\n";
-
-        //Initialize atlasses
-        ObjectsAtlass.Initialize();
-
-        UpdateGameState(GameState.MainMenuState);
     }
 
     private void HandleMainMenu()
@@ -413,6 +420,16 @@ public class GameManager : MonoBehaviour
     public Chunk GetChunk(int x, int y)
     {
         return Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize];
+    }
+
+    public BiomeSO GetBiome(int x, int y)
+    {
+        return GetChunk(x, y).Biome;
+    }
+
+    public bool IsChunkBiomed(int x, int y, BiomesID id)
+    {
+        return GetChunk(x, y).Biome.Id == id;
     }
 
     public void SetChunk(int x, int y, BiomeSO biome)

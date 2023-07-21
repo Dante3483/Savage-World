@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b0572a9e2a280b4396150628efcef6e, type: 3}
+  m_Name: DryGrass
+  m_EditorClassIdentifier: 
+  _tiles:
+  - {fileID: 11400000, guid: 86f0708d83312004d835c326524bdc78, type: 2}
+  - {fileID: 11400000, guid: f550fa020726ce44b8591d225ce95b48, type: 2}
+  - {fileID: 11400000, guid: 2f9b97c6bee03bb439384b4d196388c9, type: 2}
+  - {fileID: 11400000, guid: 3108574c98dd6304599268485aeef60a, type: 2}
+  - {fileID: 11400000, guid: 696f557df3962ee4587aa9c5df25fee5, type: 2}
+  - {fileID: 11400000, guid: f090f4f3370e5304a897068ae8b2a960, type: 2}
+  _type: 4
+  _colorOnMap: {r: 0.59607846, g: 0.5764706, b: 0.20392157, a: 1}
+  _id: 2
+  _biomeId: 3
+  _allowedToSpawnOn:
+  - {fileID: 11400000, guid: b70ce9478c7d4a143a11de9f32b42a81, type: 2}
+  _canGrow: 0
+  _isBottomSpawn: 1
+  _isTopSpawn: 0
+  _chanceToSpawn: 25
+  _chanceToGrow: 0
+  _isBiomeSpecified: 1

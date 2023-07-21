@@ -4,7 +4,9 @@ using UnityEngine;
 
 public enum GameState
 {
-    GameInitializationState,
-    MainMenuState,
-    NewGameState,
+    GameInitializationState = 0,
+
+    MainMenuState = 1,
+
+    NewGameState = 2,
 }
