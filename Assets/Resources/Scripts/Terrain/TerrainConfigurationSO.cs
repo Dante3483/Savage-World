@@ -42,6 +42,22 @@ public class TerrainConfigurationSO : ScriptableObject
     public int MaxStarterCaveLength;
     public int MinStarterCaveHeight;
     public int MaxStarterCaveHeight;
+
+    [Header("Lake")]
+    public int LakeChance;
+    public int LakeDistanceInChunks;
+    public int MinLakeLength;
+    public int MaxLakeLength;
+    public int MinLakeHeight;
+    public int MaxLakeHeight;
+
+    [Header("Oasis")]
+    public int OasisChance;
+    public int OasisDistanceInChunks;
+    public int MinOasisLength;
+    public int MaxOasisLength;
+    public int MinOasisHeight;
+    public int MaxOasisHeight;
     #endregion
 
     #region Properties

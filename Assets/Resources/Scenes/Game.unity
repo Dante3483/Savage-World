@@ -665,7 +665,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 8
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1170,7 +1170,7 @@ MonoBehaviour:
   _loadingProgress: {fileID: 749423061}
   _loadingSlider: {fileID: 1532897560}
   _infoText: {fileID: 1396519211}
-  _isStaticSeed: 1
+  _isStaticSeed: 0
   _isMenuActive: 0
   _isLoadingProgressActive: 0
 --- !u!28 &758104367

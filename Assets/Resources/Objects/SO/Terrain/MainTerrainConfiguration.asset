@@ -18,7 +18,7 @@ MonoBehaviour:
   CurrentVerticalChunksCount: 24
   ChunkSize: 100
   Equator: 2150
-  DeepOceanY: 1875
+  DeepOceanY: 1897
   Levels:
   - {fileID: 11400000, guid: abfc12d2ebd9c244a95107aae1c41b37, type: 2}
   - {fileID: 11400000, guid: 318a27e219dd34042a9bc397b17bb678, type: 2}
@@ -53,3 +53,15 @@ MonoBehaviour:
   MaxStarterCaveLength: 25
   MinStarterCaveHeight: 5
   MaxStarterCaveHeight: 6
+  LakeChance: 30
+  LakeDistanceInChunks: 2
+  MinLakeLength: 10
+  MaxLakeLength: 60
+  MinLakeHeight: 5
+  MaxLakeHeight: 30
+  OasisChance: 30
+  OasisDistanceInChunks: 5
+  MinOasisLength: 20
+  MaxOasisLength: 50
+  MinOasisHeight: 10
+  MaxOasisHeight: 30

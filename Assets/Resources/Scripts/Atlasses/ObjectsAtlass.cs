@@ -25,6 +25,9 @@ public class ObjectsAtlass : ScriptableObject
     [Header("Solid")]
     public BlockSO Dirt;
     public BlockSO Stone;
+    public BlockSO Clay;
+    public BlockSO IronOre;
+    public BlockSO CopperOre;
     #endregion
 
     #region Dust blocks
@@ -55,6 +58,9 @@ public class ObjectsAtlass : ScriptableObject
         {
             Dirt,
             Stone,
+            Clay,
+            IronOre,
+            CopperOre,
         }.ToList().OrderBy(x => x.GetId()).ToArray());
         #endregion
 
