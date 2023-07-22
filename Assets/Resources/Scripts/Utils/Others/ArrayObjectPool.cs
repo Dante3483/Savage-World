@@ -1,29 +1,22 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class ArrayObjectPool<T>
 {
-    private List<T[]> pool = new List<T[]>();
+    private Dictionary<int, T[]> _pool
+        = new Dictionary<int, T[]>();
+    private T[] _array;
 
     public T[] GetArray(int size)
     {
-        T[] array;
-        if (pool.Count > 0)
+        if (_pool.ContainsKey(size))
         {
-            array = pool.Find(a => a.Length == size);
-            if (array == null)
-            {
-                array = new T[size];
-                pool.Add(array);
-            }
-            return array;
+            _array = _pool[size];
         }
         else
         {
-            array = new T[size];
-            pool.Add(array);
-            return array;
+            _array = new T[size];
+            _pool.Add(size, _array);
         }
+        return _array;
     }
 }

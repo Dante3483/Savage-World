@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Unity.Jobs;
 using Unity.Collections;
+using UnityEngine.XR;
 
 public class GameManager : MonoBehaviour
 {
@@ -30,6 +31,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private System.Random _randomVar;
     private string _generalInfo;
     private float _loadingValue;
+    private bool _isGameSession;
 
     [Header("Atlasses")]
     [SerializeField] private ObjectsAtlass _objectsAtlass;
@@ -236,11 +238,29 @@ public class GameManager : MonoBehaviour
             _loadingValue = value;
         }
     }
+
+    public bool IsGameSession
+    {
+        get
+        {
+            return _isGameSession;
+        }
+
+        set
+        {
+            _isGameSession = value;
+        }
+    }
     #endregion
 
     #region Methods
 
     #region General
+    private void OnApplicationQuit()
+    {
+        IsGameSession = false;
+    }
+
     private void Awake()
     {
         Instance = this;
@@ -288,6 +308,7 @@ public class GameManager : MonoBehaviour
             case GameState.NewGameState:
                 {
                     //Set random seed
+                    IsGameSession = false;
                     if (!IsStaticSeed)
                     {
                         Seed = UnityEngine.Random.Range(-1000000, 1000000);
@@ -374,7 +395,7 @@ public class GameManager : MonoBehaviour
         LoadingValue = 0;
 
         //Create new world
-        Terrain.CreateNewWorld();
+        Terrain.CreateNewWorld(ref _worldData);
         IsLoadingProgressActive = false;
     }
     #endregion
@@ -432,13 +453,33 @@ public class GameManager : MonoBehaviour
         return GetChunk(x, y).Biome.Id == id;
     }
 
-    public void SetChunk(int x, int y, BiomeSO biome)
+    public void SetChunkBiome(int x, int y, BiomeSO biome)
     {
         Chunk chunk = GetChunk(x, y);
         if (chunk.Biome.Id == BiomesID.NonBiom)
         {
             Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize].Biome = biome;
         }
+    }
+
+    public void SetChunkActivityByWorldCoords(int x, int y, bool activity)
+    {
+        Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize].Activity = activity;
+    }
+
+    public void SetChunkActivityByChunkCoords(int x, int y, bool activity)
+    {
+        Chunks[x, y].Activity = activity;
+    }
+
+    public bool CompareTwoChunks(int x, int y, int dx, int dy)
+    {
+        int firstX = x / TerrainConfiguration.ChunkSize;
+        int firstY = y / TerrainConfiguration.ChunkSize;
+        int secondX = dx / TerrainConfiguration.ChunkSize;
+        int secontY = dy / TerrainConfiguration.ChunkSize;
+
+        return firstX == secondX && firstY == secontY;
     }
 
     public IEnumerator PrintDebugInfo()

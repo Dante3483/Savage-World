@@ -12,6 +12,13 @@ public class Terrain : MonoBehaviour
     [SerializeField] private Tilemap _blocksTilemap;
     [SerializeField] private GameObject _trees;
     [SerializeField] private GameObject _pickableItems;
+
+    #region Threads
+    private Thread _blockProcessingThread;
+    private Thread _randomBlockProcessingThread;
+    private object _lockObject = new object();
+    #endregion
+
     #endregion
 
     #region Public fields
@@ -82,14 +89,14 @@ public class Terrain : MonoBehaviour
         }
     }
 
-    public void CreateNewWorld()
+    public void CreateNewWorld(ref WorldCellData[,] worldData)
     {
         try
         {
             GameManager.Instance.RandomVar = new System.Random(GameManager.Instance.Seed);
 
             //Start generation
-            TerrainGeneration terrainGeneration = new TerrainGeneration(GameManager.Instance.Seed);
+            TerrainGeneration terrainGeneration = new TerrainGeneration(GameManager.Instance.Seed, ref worldData);
             terrainGeneration.StartTerrainGeneration();
         }
         catch (Exception e)
@@ -103,14 +110,26 @@ public class Terrain : MonoBehaviour
     {
         //Start update tilemaps
         StartCoroutine(UpdateTilemaps());
+
+        //Start update chunk activity
+        //StartCoroutine(UpdateChunkActivity());
+
+        //Start block processing
+        //_blockProcessingThread = new Thread(BlockProcessing);
+        //_blockProcessingThread.Start();
+
+        //Start random block processing
+        //_randomBlockProcessingThread = new Thread(RandomBlockProcessing);
+        //_randomBlockProcessingThread.Start();
     }
     #endregion
 
     #region Update
     public IEnumerator UpdateTilemaps()
     {
-        RectInt currentCameraRect;
-        RectInt prevCameraRect = GetCameraRectInt();
+        RectInt currentCameraRect = new RectInt();
+        RectInt prevCameraRect = new RectInt();
+        Vector3Int vector = new Vector3Int();
 
         int arraySizeX;
         int arraySizeY;
@@ -121,9 +140,10 @@ public class Terrain : MonoBehaviour
         ArrayObjectPool<TileBase> blockTilesPool = new ArrayObjectPool<TileBase>();
         ArrayObjectPool<Vector3Int> vectorsPool = new ArrayObjectPool<Vector3Int>();
 
+        prevCameraRect = GetCameraRectInt();
+
         while (true)
         {
-
             yield return null;
 
             i = 0;
@@ -145,7 +165,9 @@ public class Terrain : MonoBehaviour
                     if (!currentCameraRect.Contains(position))
                     {
                         blockTiles[i] = null;
-                        vectors[i] = new Vector3Int(position.x, position.y);
+                        vector.x = position.x;
+                        vector.y = position.y;
+                        vectors[i] = vector;
                         i++;
                     }
                 }
@@ -158,13 +180,165 @@ public class Terrain : MonoBehaviour
                 if (IsInMapRange(position.x, position.y))
                 {
                     blockTiles[i] = GameManager.Instance.WorldData[position.x, position.y].GetTile();
-                    vectors[i] = new Vector3Int(position.x, position.y);
+                    vector.x = position.x;
+                    vector.y = position.y;
+                    vectors[i] = vector;
                     i++;
                 }
             }
 
             //Change Tilemap using Vector's array and Tile's array
             BlocksTilemap.SetTiles(vectors, blockTiles);
+        }
+    }
+
+    public IEnumerator UpdateChunkActivity()
+    {
+        RectInt currentCameraRect;
+        RectInt prevCameraRect = GetCameraRectInt();
+        Chunk currentChunk = GameManager.Instance.GetChunk((int)prevCameraRect.center.x, (int)prevCameraRect.center.y);
+        Chunk prevChunk;
+        int chunkSize = GameManager.Instance.TerrainConfiguration.ChunkSize;
+        int x;
+        int y;
+        
+        while (true)
+        {
+            yield return null;
+
+            currentCameraRect = GetCameraRectInt();
+
+            for (x = currentChunk.Coords.x - 1; x <= currentChunk.Coords.x + 1; x++)
+            {
+                for (y = currentChunk.Coords.y - 1; y <= currentChunk.Coords.y + 1; y++)
+                {
+                    if (x < 0 || y < 0 || x > GameManager.Instance.Chunks.GetLength(0) || y > GameManager.Instance.Chunks.GetLength(1))
+                    {
+                        continue;
+                    }
+                    GameManager.Instance.SetChunkActivityByChunkCoords(x, y, true);
+                }
+            }
+
+            if (Mathf.Abs(prevCameraRect.x - currentCameraRect.x) >= 1 ||
+                Mathf.Abs(prevCameraRect.y - currentCameraRect.y) >= 1)
+            {
+                prevChunk = currentChunk;
+                currentChunk = GameManager.Instance.GetChunk((int)currentCameraRect.center.x, (int)currentCameraRect.center.y);
+
+                if (prevChunk.Coords.x != currentChunk.Coords.x ||
+                    prevChunk.Coords.y != currentChunk.Coords.y)
+                {
+                    for (x = prevChunk.Coords.x - 1; x <= prevChunk.Coords.x + 1; x++)
+                    {
+                        for (y = prevChunk.Coords.y - 1; y <= prevChunk.Coords.y + 1; y++)
+                        {
+                            if (x < 0 || y < 0 || x > GameManager.Instance.Chunks.GetLength(0) || y > GameManager.Instance.Chunks.GetLength(1))
+                            {
+                                continue;
+                            }
+                            GameManager.Instance.SetChunkActivityByChunkCoords(x, y, false);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void BlockProcessing()
+    {
+        Chunk currentChunk;
+        int chunkSize = GameManager.Instance.TerrainConfiguration.ChunkSize;
+
+        int minX = 0;
+        int minY = 0;
+        int maxX = GameManager.Instance.CurrentTerrainWidth - 1;
+        int maxY = GameManager.Instance.CurrentTerrainHeight - 1;
+
+        WorldCellData block;
+        WorldCellData bottomBlock;
+        WorldCellData topBlock;
+        WorldCellData leftBlock;
+        WorldCellData rightBlock;
+
+        while (!GameManager.Instance.IsGameSession)
+        {
+
+        }
+        while (GameManager.Instance.IsGameSession)
+        {
+            for (int chunkX = 0; chunkX < GameManager.Instance.Chunks.GetLength(0); chunkX++)
+            {
+                for (int chunkY = 0; chunkY < GameManager.Instance.Chunks.GetLength(1); chunkY++)
+                {
+                    currentChunk = GameManager.Instance.Chunks[chunkX, chunkY];
+                    if (currentChunk.Activity)
+                    {
+                        for (ushort x = (ushort)(currentChunk.Coords.x * chunkSize); x < currentChunk.Coords.x * chunkSize + chunkSize; x++)
+                        {
+                            for (ushort y = (ushort)(currentChunk.Coords.y * chunkSize); x < currentChunk.Coords.y * chunkSize + chunkSize; y++)
+                            {
+                                #region Set blocks
+                                block = GameManager.Instance.WorldData[x, y];
+                                if (y - 1 >= minY)
+                                {
+                                    bottomBlock = GameManager.Instance.WorldData[x, y - 1];
+                                }
+                                if (y + 1 <= maxY)
+                                {
+                                    topBlock = GameManager.Instance.WorldData[x, y + 1];
+                                }
+                                if (x - 1 >= minX)
+                                {
+                                    leftBlock = GameManager.Instance.WorldData[x - 1, y];
+                                }
+                                if (x + 1 <= maxX)
+                                {
+                                    rightBlock = GameManager.Instance.WorldData[x + 1, y];
+                                }
+                                #endregion
+
+                                if (block.BlockType == BlockTypes.Abstract)
+                                {
+
+                                }
+
+                                if (block.BlockType == BlockTypes.Solid)
+                                {
+
+                                }
+
+                                if (block.BlockType == BlockTypes.Dust)
+                                {
+
+                                }
+
+                                if (block.BlockType == BlockTypes.Liquid)
+                                {
+
+                                }
+
+                                if (block.BlockType == BlockTypes.Plant)
+                                {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void RandomBlockProcessing()
+    {
+        while (!GameManager.Instance.IsGameSession)
+        {
+
+        }
+        while (GameManager.Instance.IsGameSession)
+        {
+
         }
     }
     #endregion
