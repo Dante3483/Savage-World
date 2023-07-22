@@ -10,6 +10,7 @@ public class Terrain : MonoBehaviour
     #region Private fields
     [Header("Tilemaps")]
     [SerializeField] private Tilemap _blocksTilemap;
+    [SerializeField] private GameObject _trees;
     #endregion
 
     #region Public fields
@@ -17,7 +18,31 @@ public class Terrain : MonoBehaviour
     #endregion
 
     #region Properties
+    public GameObject Trees
+    {
+        get
+        {
+            return _trees;
+        }
 
+        set
+        {
+            _trees = value;
+        }
+    }
+
+    public Tilemap BlocksTilemap
+    {
+        get
+        {
+            return _blocksTilemap;
+        }
+
+        set
+        {
+            _blocksTilemap = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -26,10 +51,15 @@ public class Terrain : MonoBehaviour
     private void Awake()
     {
         //Setup tilemaps
-        _blocksTilemap = transform.Find("BlocksTilemap").GetComponent<Tilemap>();
-        if (_blocksTilemap == null)
+        BlocksTilemap = transform.Find("BlocksTilemap").GetComponent<Tilemap>();
+        if (BlocksTilemap == null)
         {
             throw new NullReferenceException("BlockTilemap is null");
+        }
+        Trees = transform.Find("Trees").gameObject;
+        if (Trees == null)
+        {
+            throw new NullReferenceException("Trees is null");
         }
     }
 
@@ -115,7 +145,7 @@ public class Terrain : MonoBehaviour
             }
 
             //Change Tilemap using Vector's array and Tile's array
-            _blocksTilemap.SetTiles(vectors, blockTiles);
+            BlocksTilemap.SetTiles(vectors, blockTiles);
         }
     }
     #endregion

@@ -118,5 +118,15 @@ public struct WorldCellData
     {
         return _blockData.GetId() == block.GetId() && _blockData.Type == block.Type;
     }
+
+    public bool IsEmpty()
+    {
+        return _blockType == BlockTypes.Abstract || _blockType == BlockTypes.Plant;
+    }
+
+    public bool IsSolid()
+    {
+        return _blockType == BlockTypes.Solid || _blockType == BlockTypes.Dust;
+    }
     #endregion
 }

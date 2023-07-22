@@ -24,6 +24,6 @@ MonoBehaviour:
   _canGrow: 0
   _isBottomSpawn: 1
   _isTopSpawn: 0
-  _chanceToSpawn: 25
+  _chanceToSpawn: 5
   _chanceToGrow: 0
   _isBiomeSpecified: 1

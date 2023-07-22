@@ -75,7 +75,7 @@ public class TerrainGeneration
     public void StartTerrainGeneration()
     {
         double totalTime = 0f;
-        float step = 100f / 9;
+        float step = 100f / 11;
 
         #region Phase 1 - Flat world generation
         var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -193,6 +193,18 @@ public class TerrainGeneration
         watch.Stop();
         Debug.Log($"Phase 10: {watch.Elapsed.TotalSeconds}");
         GameManager.Instance.GeneralInfo += $"Phase 10: {watch.Elapsed.TotalSeconds}\n";
+        totalTime += watch.Elapsed.TotalSeconds;
+        GameManager.Instance.LoadingValue += step;
+        #endregion
+
+        #region Phase 11 - Tree generation
+        watch.Restart();
+
+        CreateTrees();
+
+        watch.Stop();
+        Debug.Log($"Phase 11: {watch.Elapsed.TotalSeconds}");
+        GameManager.Instance.GeneralInfo += $"Phase 11: {watch.Elapsed.TotalSeconds}\n";
         totalTime += watch.Elapsed.TotalSeconds;
         GameManager.Instance.LoadingValue += step;
         #endregion
@@ -1144,6 +1156,115 @@ public class TerrainGeneration
                 }
             }
         }
+    }
+    #endregion
+
+    #region Phase 11
+    private void CreateTrees()
+    {
+        //Create surface plants
+        TerrainLevelSO surface = TerrainConfiguration.Levels.Find(l => l.Name == "Surface");
+        BlockSO airBlock = GameManager.Instance.ObjectsAtlass.Air;
+        Dictionary<BiomesID, List<Tree>> allTrees = null;
+        List<Vector3> coords = new List<Vector3>();
+        ThreadsManager.Instance.AddAction(() =>
+        {
+            allTrees = new Dictionary<BiomesID, List<Tree>>()
+            {
+                //{ BiomesID.NonBiom, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.NonBiom) },
+                //{ BiomesID.Ocean, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Ocean) },
+                { BiomesID.Desert, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Desert) },
+                { BiomesID.Savannah, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Savannah) },
+                { BiomesID.Meadow, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Meadow) },
+                { BiomesID.Forest, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Forest) },
+                { BiomesID.Swamp, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Swamp) },
+                { BiomesID.ConiferousForest, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.ConiferousForest) },
+            };
+        });
+        BiomeSO currentBiome;
+        int chance;
+        ushort startX;
+        ushort endX;
+        GameObject treesSection = GameManager.Instance.Terrain.Trees;
+
+        foreach (var trees in allTrees)
+        {
+            foreach (Tree tree in trees.Value)
+            {
+                if (trees.Key == BiomesID.NonBiom)
+                {
+                    startX = 0;
+                    endX = (ushort)(GameManager.Instance.CurrentTerrainWidth - 1);
+                }
+                else
+                {
+                    currentBiome = TerrainConfiguration.Biomes.Find(b => b.Id == trees.Key);
+                    startX = currentBiome.StartX;
+                    endX = currentBiome.EndX;
+                }
+
+                for (ushort x = startX; x <= endX - tree.Width; x++)
+                {
+                    for (ushort y = surface.StartY; y < surface.EndY; y++)
+                    {
+                        bool isValidPlace = true;
+                        for (int i = 0; i < tree.WidthToSpawn; i++)
+                        {
+                            if (!tree.AllowedToSpawnOn.Contains(GameManager.Instance.WorldData[x + i, y].BlockData))
+                            {
+                                isValidPlace = false;
+                                break;
+                            }
+                            if (!GameManager.Instance.WorldData[x, y + 1].IsEmpty())
+                            {
+                                isValidPlace = false;
+                                break;
+                            }
+                        }
+                        if (isValidPlace)
+                        {
+                            chance = RandomVar.Next(0, 101);
+                            if (chance <= tree.ChanceToSpawn)
+                            {
+                                if (CreateTree(x, (ushort)(y + 1), tree, ref coords))
+                                {
+                                    x += (ushort)(tree.Width + tree.DistanceEachOthers);
+                                }
+                            }
+                        }
+                    }
+                }
+                ThreadsManager.Instance.AddAction(() =>
+                {
+                    foreach (Vector3 coord in coords)
+                    {
+                        GameObject treeGameObject = GameObject.Instantiate(tree.gameObject, coord, Quaternion.identity, treesSection.transform);
+                        treeGameObject.name = tree.gameObject.name;
+                    }
+                });
+                coords.Clear();
+            }
+        }
+    }
+
+    private bool CreateTree(ushort x, ushort y, Tree tree, ref List<Vector3> coords)
+    {
+        foreach (Vector3 vector in tree.TrunkBlocks)
+        {
+            if (!GameManager.Instance.WorldData[x + (int)(vector.x - tree.Start.x), y].IsEmpty())
+            {
+                return false;
+            }
+        }
+        foreach (Vector3 vector in tree.TreeBlocks)
+        {
+            if (!GameManager.Instance.WorldData[x + (int)(vector.x - tree.Start.x), y].IsEmpty())
+            {
+                return false;
+            }
+        }
+        coords.Add(new Vector3(x - tree.Start.x + tree.Offset.x, y));
+        return true;
     }
     #endregion
 

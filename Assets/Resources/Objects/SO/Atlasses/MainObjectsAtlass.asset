@@ -50,3 +50,5 @@ MonoBehaviour:
   ConiferousForestGrass: {fileID: 11400000, guid: b8bbc5805e05f21418d9ebd4d0dc13bd, type: 2}
   ConiferousForestFern: {fileID: 11400000, guid: 4e085f59599331a4fa52d52fd3c6ef73, type: 2}
   Vine: {fileID: 11400000, guid: 5ac07c1679a32cc478efba84a26cfd66, type: 2}
+  Pine1: {fileID: 6575782605102750959, guid: bcc829edaefc1f444bfeec893ca33e6b, type: 3}
+  Cactus1: {fileID: 4904016515695010468, guid: 40f63a090e2903c40984a91305c99f80, type: 3}

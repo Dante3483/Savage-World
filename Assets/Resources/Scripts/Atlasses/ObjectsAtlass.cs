@@ -15,6 +15,7 @@ public class ObjectsAtlass : ScriptableObject
     #region Dictionaries
     public Dictionary<BlockTypes, BlockSO[]> Blocks;
     public Dictionary<BiomesID, BlockSO[]> Plants;
+    public Dictionary<BiomesID, GameObject[]> Trees;
     #endregion
 
     #region Abstract blocks
@@ -90,6 +91,12 @@ public class ObjectsAtlass : ScriptableObject
     public BlockSO Vine;
     #endregion
 
+    #region Trees
+    [Header("Trees")]
+    public GameObject Pine1;
+    public GameObject Cactus1;
+    #endregion
+
     #endregion
 
     #region Properties
@@ -102,6 +109,7 @@ public class ObjectsAtlass : ScriptableObject
         //Initialize dictionaries
         Blocks = new Dictionary<BlockTypes, BlockSO[]>();
         Plants = new Dictionary<BiomesID, BlockSO[]>();
+        Trees = new Dictionary<BiomesID, GameObject[]>();
 
         //Fill lists
         #region Solid
@@ -145,6 +153,13 @@ public class ObjectsAtlass : ScriptableObject
         });
         #endregion
 
+        #region Ocean
+        Plants.Add(BiomesID.Ocean, new BlockSO[]
+        {
+
+        });
+        #endregion
+
         #region Desert
         Plants.Add(BiomesID.Desert, new BlockSO[]
         {
@@ -185,12 +200,10 @@ public class ObjectsAtlass : ScriptableObject
         #endregion
 
         #region Swamp
-        //Plants.Add(BiomesID.Swamp, new BlockSO[]
-        //{
-        //    CamelThorn,
-        //    Aloe,
-        //    BarrelCactus,
-        //});
+        Plants.Add(BiomesID.Swamp, new BlockSO[]
+        {
+
+        });
         #endregion
 
         #region Coniferous forest
@@ -204,6 +217,60 @@ public class ObjectsAtlass : ScriptableObject
         #endregion
 
         #endregion
+
+        #region Trees
+
+        #region Ocean
+        Trees.Add(BiomesID.Ocean, new GameObject[]
+        {
+
+        });
+        #endregion
+
+        #region Desert
+        Trees.Add(BiomesID.Desert, new GameObject[]
+        {
+            Cactus1,
+        });
+        #endregion
+
+        #region Savannah
+        Trees.Add(BiomesID.Savannah, new GameObject[]
+        {
+            Pine1,
+        });
+        #endregion
+
+        #region Meadow
+        Trees.Add(BiomesID.Meadow, new GameObject[]
+        {
+            Pine1,
+        });
+        #endregion
+
+        #region Forest
+        Trees.Add(BiomesID.Forest, new GameObject[]
+        {
+            Pine1,
+        });
+        #endregion
+
+        #region Swamp
+        Trees.Add(BiomesID.Swamp, new GameObject[]
+        {
+            Pine1,
+        });
+        #endregion
+
+        #region Coniferous forest
+        Trees.Add(BiomesID.ConiferousForest, new GameObject[]
+        {
+            Pine1,
+        });
+        #endregion
+
+        #endregion
+
     }
 
     public BlockSO GetBlockById(BlockTypes type, object id)
@@ -263,6 +330,22 @@ public class ObjectsAtlass : ScriptableObject
                 if (block is PlantSO plant)
                 {
                     result.Add(plant);
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<Tree> GetAllBiomeTrees(BiomesID id)
+    {
+        List<Tree> result = new List<Tree>();
+        if (Trees.ContainsKey(id))
+        {
+            foreach (GameObject treeObject in Trees[id])
+            {
+                if (treeObject.GetComponent<Tree>() is Tree tree)
+                {
+                    result.Add(tree);
                 }
             }
         }
