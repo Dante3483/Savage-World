@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -112,15 +113,15 @@ public class Terrain : MonoBehaviour
         StartCoroutine(UpdateTilemaps());
 
         //Start update chunk activity
-        //StartCoroutine(UpdateChunkActivity());
+        StartCoroutine(UpdateChunkActivity());
 
         //Start block processing
-        //_blockProcessingThread = new Thread(BlockProcessing);
-        //_blockProcessingThread.Start();
+        _blockProcessingThread = new Thread(BlockProcessing);
+        _blockProcessingThread.Start();
 
         //Start random block processing
-        //_randomBlockProcessingThread = new Thread(RandomBlockProcessing);
-        //_randomBlockProcessingThread.Start();
+        _randomBlockProcessingThread = new Thread(RandomBlockProcessing);
+        _randomBlockProcessingThread.Start();
     }
     #endregion
 
@@ -194,14 +195,16 @@ public class Terrain : MonoBehaviour
 
     public IEnumerator UpdateChunkActivity()
     {
-        RectInt currentCameraRect;
-        RectInt prevCameraRect = GetCameraRectInt();
+        RectInt currentCameraRect = new RectInt();
+        RectInt prevCameraRect = new RectInt();
+
+        prevCameraRect = GetCameraRectInt();
         Chunk currentChunk = GameManager.Instance.GetChunk((int)prevCameraRect.center.x, (int)prevCameraRect.center.y);
         Chunk prevChunk;
         int chunkSize = GameManager.Instance.TerrainConfiguration.ChunkSize;
         int x;
         int y;
-        
+
         while (true)
         {
             yield return null;
@@ -254,6 +257,10 @@ public class Terrain : MonoBehaviour
         int minY = 0;
         int maxX = GameManager.Instance.CurrentTerrainWidth - 1;
         int maxY = GameManager.Instance.CurrentTerrainHeight - 1;
+        int chunkX;
+        int chunkY;
+        int x;
+        int y;
 
         WorldCellData block;
         WorldCellData bottomBlock;
@@ -267,34 +274,34 @@ public class Terrain : MonoBehaviour
         }
         while (GameManager.Instance.IsGameSession)
         {
-            for (int chunkX = 0; chunkX < GameManager.Instance.Chunks.GetLength(0); chunkX++)
+            for (chunkX = 0; chunkX < GameManager.Instance.Chunks.GetLength(0); chunkX++)
             {
-                for (int chunkY = 0; chunkY < GameManager.Instance.Chunks.GetLength(1); chunkY++)
+                for (chunkY = 0; chunkY < GameManager.Instance.Chunks.GetLength(1); chunkY++)
                 {
                     currentChunk = GameManager.Instance.Chunks[chunkX, chunkY];
                     if (currentChunk.Activity)
                     {
-                        for (ushort x = (ushort)(currentChunk.Coords.x * chunkSize); x < currentChunk.Coords.x * chunkSize + chunkSize; x++)
+                        for (x = (ushort)(currentChunk.Coords.x * chunkSize); x < currentChunk.Coords.x * chunkSize + chunkSize; x++)
                         {
-                            for (ushort y = (ushort)(currentChunk.Coords.y * chunkSize); x < currentChunk.Coords.y * chunkSize + chunkSize; y++)
+                            for (y = (ushort)(currentChunk.Coords.y * chunkSize); x < currentChunk.Coords.y * chunkSize + chunkSize; y++)
                             {
                                 #region Set blocks
-                                block = GameManager.Instance.WorldData[x, y];
+                                block = GameManager.Instance.GetWorldCellDataRef(x, y);
                                 if (y - 1 >= minY)
                                 {
-                                    bottomBlock = GameManager.Instance.WorldData[x, y - 1];
+                                    bottomBlock = GameManager.Instance.GetWorldCellDataRef(x, y - 1);
                                 }
                                 if (y + 1 <= maxY)
                                 {
-                                    topBlock = GameManager.Instance.WorldData[x, y + 1];
+                                    topBlock = GameManager.Instance.GetWorldCellDataRef(x, y + 1);
                                 }
                                 if (x - 1 >= minX)
                                 {
-                                    leftBlock = GameManager.Instance.WorldData[x - 1, y];
+                                    leftBlock = GameManager.Instance.GetWorldCellDataRef(x - 1, y);
                                 }
                                 if (x + 1 <= maxX)
                                 {
-                                    rightBlock = GameManager.Instance.WorldData[x + 1, y];
+                                    rightBlock = GameManager.Instance.GetWorldCellDataRef(x + 1, y);
                                 }
                                 #endregion
 
@@ -332,13 +339,99 @@ public class Terrain : MonoBehaviour
 
     public void RandomBlockProcessing()
     {
+        ushort minX = 0;
+        ushort minY = 0;
+        ushort maxX = (ushort)(GameManager.Instance.CurrentTerrainWidth - 1);
+        ushort maxY = (ushort)(GameManager.Instance.CurrentTerrainHeight - 1);
+        int x;
+        int y;
+        byte chanceToAction;
+
+        WorldCellData block = new WorldCellData();
+        WorldCellData bottomBlock = new WorldCellData();
+        WorldCellData topBlock = new WorldCellData();
+        WorldCellData leftBlock = new WorldCellData();
+        WorldCellData rightBlock = new WorldCellData();
+
+        PlantSO plant;
+
+        System.Random randomVar = new System.Random(GameManager.Instance.Seed);
+
         while (!GameManager.Instance.IsGameSession)
         {
 
         }
         while (GameManager.Instance.IsGameSession)
         {
+            x = (ushort)randomVar.Next(minX, maxX + 1);
+            y = (ushort)randomVar.Next(minY, maxY + 1);
 
+            #region Set blocks
+            block = GameManager.Instance.GetWorldCellDataRef(x, y);
+            if (y - 1 >= minY)
+            {
+                bottomBlock = GameManager.Instance.GetWorldCellDataRef(x, y - 1);
+            }
+            if (y + 1 <= maxY)
+            {
+                topBlock = GameManager.Instance.GetWorldCellDataRef(x, y + 1);
+            }
+            if (x - 1 >= minX)
+            {
+                leftBlock = GameManager.Instance.GetWorldCellDataRef(x - 1, y);
+            }
+            if (x + 1 <= maxX)
+            {
+                rightBlock = GameManager.Instance.GetWorldCellDataRef(x + 1, y);
+            }
+            #endregion
+
+            if (block.BlockType == BlockTypes.Abstract)
+            {
+
+            }
+
+            if (block.BlockType == BlockTypes.Solid)
+            {
+
+            }
+
+            if (block.BlockType == BlockTypes.Dust)
+            {
+
+            }
+
+            if (block.BlockType == BlockTypes.Liquid)
+            {
+
+            }
+
+            if (block.BlockType == BlockTypes.Plant)
+            {
+                plant = block.BlockData as PlantSO;
+                if (plant.CanGrow)
+                {
+                    chanceToAction = (byte)randomVar.Next(0, 101);
+                    if (chanceToAction > plant.ChanceToSpawn)
+                    {
+                        continue;
+                    }
+                    if (plant.IsBottomSpawn)
+                    {
+                        if (y + 1 <= maxY && topBlock.IsEmpty())
+                        {
+                            CreateBlock((ushort)x, (ushort)(y + 1), plant);
+                        }
+                    }
+                    if (plant.IsTopSpawn)
+                    {
+                        if (y - 1 >= minY && bottomBlock.IsEmpty())
+                        {
+                            CreateBlock((ushort)x, (ushort)(y - 1), plant);
+                        }
+                    }
+                }
+            }
         }
     }
     #endregion

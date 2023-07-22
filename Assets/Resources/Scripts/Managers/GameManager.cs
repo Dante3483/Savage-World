@@ -401,6 +401,59 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Helpful
+
+    #region World data
+    public ref WorldCellData GetWorldCellDataRef(int x, int y)
+    {
+        return ref WorldData[x, y];
+    }
+    #endregion
+
+    #region Chunk
+    private void DisplayChunks()
+    {
+        foreach (Chunk chunk in Chunks)
+        {
+            Debug.Log(chunk.ToString());
+        }
+    }
+
+    public Chunk GetChunk(int x, int y)
+    {
+        return Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize];
+    }
+
+    public BiomeSO GetChunkBiome(int x, int y)
+    {
+        return GetChunk(x, y).Biome;
+    }
+
+    public void SetChunkBiome(int x, int y, BiomeSO biome)
+    {
+        Chunk chunk = GetChunk(x, y);
+        if (chunk.Biome.Id == BiomesID.NonBiom)
+        {
+            Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize].Biome = biome;
+        }
+    }
+
+    public void SetChunkActivityByWorldCoords(int x, int y, bool activity)
+    {
+        Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize].Activity = activity;
+    }
+
+    public void SetChunkActivityByChunkCoords(int x, int y, bool activity)
+    {
+        Chunks[x, y].Activity = activity;
+    }
+
+    public bool IsChunkBiomed(int x, int y, BiomesID id)
+    {
+        return GetChunk(x, y).Biome.Id == id;
+    }
+    #endregion
+
+    #region Other
     private void SaveMapToPNG()
     {
         Texture2D worldMap = new Texture2D(CurrentTerrainWidth, CurrentTerrainHeight);
@@ -430,58 +483,6 @@ public class GameManager : MonoBehaviour
         File.WriteAllBytes(Application.dataPath + "/BiomesMap.png", bytesBiome);
     }
 
-    private void DisplayChunks()
-    {
-        foreach (Chunk chunk in Chunks)
-        {
-            Debug.Log(chunk.ToString());
-        }
-    }
-
-    public Chunk GetChunk(int x, int y)
-    {
-        return Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize];
-    }
-
-    public BiomeSO GetBiome(int x, int y)
-    {
-        return GetChunk(x, y).Biome;
-    }
-
-    public bool IsChunkBiomed(int x, int y, BiomesID id)
-    {
-        return GetChunk(x, y).Biome.Id == id;
-    }
-
-    public void SetChunkBiome(int x, int y, BiomeSO biome)
-    {
-        Chunk chunk = GetChunk(x, y);
-        if (chunk.Biome.Id == BiomesID.NonBiom)
-        {
-            Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize].Biome = biome;
-        }
-    }
-
-    public void SetChunkActivityByWorldCoords(int x, int y, bool activity)
-    {
-        Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize].Activity = activity;
-    }
-
-    public void SetChunkActivityByChunkCoords(int x, int y, bool activity)
-    {
-        Chunks[x, y].Activity = activity;
-    }
-
-    public bool CompareTwoChunks(int x, int y, int dx, int dy)
-    {
-        int firstX = x / TerrainConfiguration.ChunkSize;
-        int firstY = y / TerrainConfiguration.ChunkSize;
-        int secondX = dx / TerrainConfiguration.ChunkSize;
-        int secontY = dy / TerrainConfiguration.ChunkSize;
-
-        return firstX == secondX && firstY == secontY;
-    }
-
     public IEnumerator PrintDebugInfo()
     {
         while (true)
@@ -506,6 +507,8 @@ public class GameManager : MonoBehaviour
     {
         Camera.main.transform.position = new Vector3(Camera.main.transform.position.x + Input.GetAxis("Horizontal"), Camera.main.transform.position.y + Input.GetAxis("Vertical"), -10);
     }
+    #endregion
+
     #endregion
 
     #endregion
