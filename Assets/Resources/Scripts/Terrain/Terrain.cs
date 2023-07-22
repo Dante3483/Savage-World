@@ -11,6 +11,7 @@ public class Terrain : MonoBehaviour
     [Header("Tilemaps")]
     [SerializeField] private Tilemap _blocksTilemap;
     [SerializeField] private GameObject _trees;
+    [SerializeField] private GameObject _pickableItems;
     #endregion
 
     #region Public fields
@@ -43,6 +44,19 @@ public class Terrain : MonoBehaviour
             _blocksTilemap = value;
         }
     }
+
+    public GameObject PickableItems
+    {
+        get
+        {
+            return _pickableItems;
+        }
+
+        set
+        {
+            _pickableItems = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -60,6 +74,11 @@ public class Terrain : MonoBehaviour
         if (Trees == null)
         {
             throw new NullReferenceException("Trees is null");
+        }
+        PickableItems = transform.Find("PickableItems").gameObject;
+        if (PickableItems == null)
+        {
+            throw new NullReferenceException("PickableItems is null");
         }
     }
 

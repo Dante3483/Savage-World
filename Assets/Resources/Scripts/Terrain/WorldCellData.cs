@@ -121,8 +121,14 @@ public struct WorldCellData
 
     public bool IsEmpty()
     {
+        return _blockType == BlockTypes.Abstract;
+    }
+
+    public bool IsEmptyWithPlant()
+    {
         return _blockType == BlockTypes.Abstract || _blockType == BlockTypes.Plant;
     }
+
 
     public bool IsSolid()
     {

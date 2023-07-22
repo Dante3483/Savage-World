@@ -16,6 +16,7 @@ public class ObjectsAtlass : ScriptableObject
     public Dictionary<BlockTypes, BlockSO[]> Blocks;
     public Dictionary<BiomesID, BlockSO[]> Plants;
     public Dictionary<BiomesID, GameObject[]> Trees;
+    public Dictionary<BiomesID, GameObject[]> PickableItems;
     #endregion
 
     #region Abstract blocks
@@ -97,6 +98,12 @@ public class ObjectsAtlass : ScriptableObject
     public GameObject Cactus1;
     #endregion
 
+    #region Pickable items
+    [Header("Pickable items")]
+    public GameObject Rock1;
+    public GameObject Log1;
+    #endregion
+
     #endregion
 
     #region Properties
@@ -110,6 +117,7 @@ public class ObjectsAtlass : ScriptableObject
         Blocks = new Dictionary<BlockTypes, BlockSO[]>();
         Plants = new Dictionary<BiomesID, BlockSO[]>();
         Trees = new Dictionary<BiomesID, GameObject[]>();
+        PickableItems = new Dictionary<BiomesID, GameObject[]>();
 
         //Fill lists
         #region Solid
@@ -271,6 +279,64 @@ public class ObjectsAtlass : ScriptableObject
 
         #endregion
 
+        #region Pickable items
+
+        #region Ocean
+        PickableItems.Add(BiomesID.Ocean, new GameObject[]
+        {
+
+        });
+        #endregion
+
+        #region Desert
+        PickableItems.Add(BiomesID.Desert, new GameObject[]
+        {
+
+        });
+        #endregion
+
+        #region Savannah
+        PickableItems.Add(BiomesID.Savannah, new GameObject[]
+        {
+            Rock1,
+            Log1,
+        });
+        #endregion
+
+        #region Meadow
+        PickableItems.Add(BiomesID.Meadow, new GameObject[]
+        {
+            Rock1,
+            Log1,
+        });
+        #endregion
+
+        #region Forest
+        PickableItems.Add(BiomesID.Forest, new GameObject[]
+        {
+            Rock1,
+            Log1,
+        });
+        #endregion
+
+        #region Swamp
+        PickableItems.Add(BiomesID.Swamp, new GameObject[]
+        {
+            Rock1,
+            Log1,
+        });
+        #endregion
+
+        #region Coniferous forest
+        PickableItems.Add(BiomesID.ConiferousForest, new GameObject[]
+        {
+            Rock1,
+            Log1,
+        });
+        #endregion
+
+        #endregion
+
     }
 
     public BlockSO GetBlockById(BlockTypes type, object id)
@@ -346,6 +412,22 @@ public class ObjectsAtlass : ScriptableObject
                 if (treeObject.GetComponent<Tree>() is Tree tree)
                 {
                     result.Add(tree);
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<PickableItem> GetAllBiomePickableItems(BiomesID id)
+    {
+        List<PickableItem> result = new List<PickableItem>();
+        if (PickableItems.ContainsKey(id))
+        {
+            foreach (GameObject pickableItemObject in PickableItems[id])
+            {
+                if (pickableItemObject.GetComponent<PickableItem>() is PickableItem pickableItem)
+                {
+                    result.Add(pickableItem);
                 }
             }
         }

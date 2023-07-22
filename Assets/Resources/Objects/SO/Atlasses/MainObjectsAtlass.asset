@@ -52,3 +52,5 @@ MonoBehaviour:
   Vine: {fileID: 11400000, guid: 5ac07c1679a32cc478efba84a26cfd66, type: 2}
   Pine1: {fileID: 6575782605102750959, guid: bcc829edaefc1f444bfeec893ca33e6b, type: 3}
   Cactus1: {fileID: 4904016515695010468, guid: 40f63a090e2903c40984a91305c99f80, type: 3}
+  Rock1: {fileID: 4254250584498150045, guid: 8a4a5db4239c32b4c92025dbd54eb8da, type: 3}
+  Log1: {fileID: 4931390332437461884, guid: 0f5908a1d0556814ca887042132de5a9, type: 3}

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 
 public class TerrainGeneration
@@ -75,7 +76,7 @@ public class TerrainGeneration
     public void StartTerrainGeneration()
     {
         double totalTime = 0f;
-        float step = 100f / 11;
+        float step = 100f / 12;
 
         #region Phase 1 - Flat world generation
         var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -205,6 +206,18 @@ public class TerrainGeneration
         watch.Stop();
         Debug.Log($"Phase 11: {watch.Elapsed.TotalSeconds}");
         GameManager.Instance.GeneralInfo += $"Phase 11: {watch.Elapsed.TotalSeconds}\n";
+        totalTime += watch.Elapsed.TotalSeconds;
+        GameManager.Instance.LoadingValue += step;
+        #endregion
+
+        #region Phase 12 - Pickable items generation
+        watch.Restart();
+
+        CreatePickableItems();
+
+        watch.Stop();
+        Debug.Log($"Phase 12: {watch.Elapsed.TotalSeconds}");
+        GameManager.Instance.GeneralInfo += $"Phase 12: {watch.Elapsed.TotalSeconds}\n";
         totalTime += watch.Elapsed.TotalSeconds;
         GameManager.Instance.LoadingValue += step;
         #endregion
@@ -1162,7 +1175,7 @@ public class TerrainGeneration
     #region Phase 11
     private void CreateTrees()
     {
-        //Create surface plants
+        //Create surface trees
         TerrainLevelSO surface = TerrainConfiguration.Levels.Find(l => l.Name == "Surface");
         BlockSO airBlock = GameManager.Instance.ObjectsAtlass.Air;
         Dictionary<BiomesID, List<Tree>> allTrees = null;
@@ -1215,7 +1228,7 @@ public class TerrainGeneration
                                 isValidPlace = false;
                                 break;
                             }
-                            if (!GameManager.Instance.WorldData[x, y + 1].IsEmpty())
+                            if (!GameManager.Instance.WorldData[x, y + 1].IsEmptyWithPlant())
                             {
                                 isValidPlace = false;
                                 break;
@@ -1251,20 +1264,93 @@ public class TerrainGeneration
     {
         foreach (Vector3 vector in tree.TrunkBlocks)
         {
-            if (!GameManager.Instance.WorldData[x + (int)(vector.x - tree.Start.x), y].IsEmpty())
+            if (!GameManager.Instance.WorldData[x + (int)(vector.x - tree.Start.x), y].IsEmptyWithPlant())
             {
                 return false;
             }
         }
         foreach (Vector3 vector in tree.TreeBlocks)
         {
-            if (!GameManager.Instance.WorldData[x + (int)(vector.x - tree.Start.x), y].IsEmpty())
+            if (!GameManager.Instance.WorldData[x + (int)(vector.x - tree.Start.x), y].IsEmptyWithPlant())
             {
                 return false;
             }
         }
         coords.Add(new Vector3(x - tree.Start.x + tree.Offset.x, y));
         return true;
+    }
+    #endregion
+
+    #region Phase 12
+    private void CreatePickableItems()
+    {
+        //Create surface pickable items
+        TerrainLevelSO surface = TerrainConfiguration.Levels.Find(l => l.Name == "Surface");
+        BlockSO airBlock = GameManager.Instance.ObjectsAtlass.Air;
+        Dictionary<BiomesID, List<PickableItem>> allPickableItems = null;
+        List<Vector3> coords = new List<Vector3>();
+        ThreadsManager.Instance.AddAction(() =>
+        {
+            allPickableItems = new Dictionary<BiomesID, List<PickableItem>>()
+            {
+                //{ BiomesID.NonBiom, GameManager.Instance.ObjectsAtlass.GetAllBiomePickableItems(BiomesID.NonBiom) },
+                //{ BiomesID.Ocean, GameManager.Instance.ObjectsAtlass.GetAllBiomePickableItems(BiomesID.Ocean) },
+                { BiomesID.Desert, GameManager.Instance.ObjectsAtlass.GetAllBiomePickableItems(BiomesID.Desert) },
+                { BiomesID.Savannah, GameManager.Instance.ObjectsAtlass.GetAllBiomePickableItems(BiomesID.Savannah) },
+                { BiomesID.Meadow, GameManager.Instance.ObjectsAtlass.GetAllBiomePickableItems(BiomesID.Meadow) },
+                { BiomesID.Forest, GameManager.Instance.ObjectsAtlass.GetAllBiomePickableItems(BiomesID.Forest) },
+                { BiomesID.Swamp, GameManager.Instance.ObjectsAtlass.GetAllBiomePickableItems(BiomesID.Swamp) },
+                { BiomesID.ConiferousForest, GameManager.Instance.ObjectsAtlass.GetAllBiomePickableItems(BiomesID.ConiferousForest) },
+            };
+        });
+        BiomeSO currentBiome;
+        int chance;
+        ushort startX;
+        ushort endX;
+        GameObject pickableItemsSection = GameManager.Instance.Terrain.PickableItems;
+
+        foreach (var pickableItems in allPickableItems)
+        {
+            foreach (PickableItem pickableItem in pickableItems.Value)
+            {
+                if (pickableItems.Key == BiomesID.NonBiom)
+                {
+                    startX = 0;
+                    endX = (ushort)(GameManager.Instance.CurrentTerrainWidth - 1);
+                }
+                else
+                {
+                    currentBiome = TerrainConfiguration.Biomes.Find(b => b.Id == pickableItems.Key);
+                    startX = currentBiome.StartX;
+                    endX = currentBiome.EndX;
+                }
+
+                for (ushort x = startX; x <= endX; x++)
+                {
+                    for (ushort y = surface.StartY; y < surface.EndY; y++)
+                    {
+                        if (GameManager.Instance.WorldData[x, y].IsSolid() &&
+                            GameManager.Instance.WorldData[x, y + 1].IsEmpty())
+                        {
+                            chance = RandomVar.Next(0, 101);
+                            if (chance <= pickableItem.ChanceToSpawn)
+                            {
+                                coords.Add(new Vector3(x, y + 1));
+                            }
+                        }
+                    }
+                }
+                ThreadsManager.Instance.AddAction(() =>
+                {
+                    foreach (Vector3 coord in coords)
+                    {
+                        GameObject pickableItemGameObject = GameObject.Instantiate(pickableItem.gameObject, coord, Quaternion.identity, pickableItemsSection.transform);
+                        pickableItemGameObject.name = pickableItem.gameObject.name;
+                    }
+                });
+                coords.Clear();
+            }
+        }
     }
     #endregion
 
