@@ -1,15 +1,10 @@
 using System;
 using System.Collections;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Unity.Jobs;
-using Unity.Collections;
-using UnityEngine.XR;
 
 public class GameManager : MonoBehaviour
 {
@@ -30,6 +25,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int _seed;
     [SerializeField] private System.Random _randomVar;
     private string _generalInfo;
+    private string _blockInfo;
+    private string _processingSpeedInfo;
     private float _loadingValue;
     private bool _isGameSession;
 
@@ -45,6 +42,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Canvas _loadingProgress;
     [SerializeField] private Slider _loadingSlider;
     [SerializeField] private TextMeshProUGUI _infoText;
+    [SerializeField] private TextMeshProUGUI _blockInfoText;
+    [SerializeField] private TextMeshProUGUI _ProcessingSpeedInfoText;
 
     [Header("Conditions")]
     [SerializeField] private bool _isStaticSeed;
@@ -251,6 +250,32 @@ public class GameManager : MonoBehaviour
             _isGameSession = value;
         }
     }
+
+    public string BlockInfo
+    {
+        get
+        {
+            return _blockInfo;
+        }
+
+        set
+        {
+            _blockInfo = value;
+        }
+    }
+
+    public string ProcessingSpeedInfo
+    {
+        get
+        {
+            return _processingSpeedInfo;
+        }
+
+        set
+        {
+            _processingSpeedInfo = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -273,6 +298,8 @@ public class GameManager : MonoBehaviour
         StartCoroutine(PrintDebugInfo());
         StartCoroutine(UpdateObjects());
 
+        WorldCellData size = new WorldCellData(0, 0);
+        GeneralInfo += $"World cell size: {size.GetSize()}\n";
         UpdateGameState(GameState.GameInitializationState);
     }
 
@@ -287,6 +314,9 @@ public class GameManager : MonoBehaviour
             Task.Run(() => DisplayChunks());
         }
         Move();
+        BreakBlock();
+        PrintBlockDetail();
+        CreateWater();
     }
 
     public void UpdateGameState(object obj)
@@ -488,6 +518,8 @@ public class GameManager : MonoBehaviour
         while (true)
         {
             _infoText.text = GeneralInfo;
+            _blockInfoText.text = BlockInfo;
+            _ProcessingSpeedInfoText.text = ProcessingSpeedInfo;
             yield return null;
         }
     }
@@ -506,6 +538,42 @@ public class GameManager : MonoBehaviour
     public void Move()
     {
         Camera.main.transform.position = new Vector3(Camera.main.transform.position.x + Input.GetAxis("Horizontal"), Camera.main.transform.position.y + Input.GetAxis("Vertical"), -10);
+    }
+
+    public void BreakBlock()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            Vector3 clickPosition = Input.mousePosition;
+
+            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
+
+            Terrain.CreateBlock((ushort)worldPosition.x, (ushort)worldPosition.y, ObjectsAtlass.Air);
+        }
+    }
+
+    public void PrintBlockDetail()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            Vector3 clickPosition = Input.mousePosition;
+
+            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
+
+            BlockInfo = WorldData[(int)worldPosition.x, (int)worldPosition.y].ToString();
+        }
+    }
+
+    public void CreateWater()
+    {
+        if (Input.GetMouseButton(2))
+        {
+            Vector3 clickPosition = Input.mousePosition;
+
+            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
+
+            Terrain.CreateLiquidBlock((ushort)worldPosition.x, (ushort)worldPosition.y, (byte)ObjectsAtlass.Water.GetId());
+        }
     }
     #endregion
 

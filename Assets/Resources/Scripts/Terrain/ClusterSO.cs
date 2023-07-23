@@ -67,7 +67,7 @@ public class ClusterSO : ScriptableObject
     #endregion
 
     #region Methods
-    public bool CompareBlock(BlockSO block)
+    public bool CompareForbiddenBlock(BlockSO block)
     {
         return ForbiddenBlocks.Contains(block);
     }

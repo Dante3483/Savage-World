@@ -4,11 +4,20 @@ using UnityEngine.Tilemaps;
 public struct WorldCellData
 {
     #region Private fields
+
+    #region Main
     private ushort _id;
     private byte _tileId;
     private BlockTypes _blockType;
     private BlockSO _blockData;
     private Vector2Ushort _coords;
+    #endregion
+
+    #region Liquid
+    private byte _liquidId;
+    private bool _isFlowsDown;
+    private float _flowValue;
+    #endregion
     #endregion
 
     #region Public fields
@@ -67,6 +76,58 @@ public struct WorldCellData
             _tileId = value;
         }
     }
+
+    public Vector2Ushort Coords
+    {
+        get
+        {
+            return _coords;
+        }
+
+        set
+        {
+            _coords = value;
+        }
+    }
+
+    public float FlowValue
+    {
+        get
+        {
+            return _flowValue;
+        }
+
+        set
+        {
+            _flowValue = value;
+        }
+    }
+
+    public byte LiquidId
+    {
+        get
+        {
+            return _liquidId;
+        }
+
+        set
+        {
+            _liquidId = value;
+        }
+    }
+
+    public bool IsFlowsDown
+    {
+        get
+        {
+            return _isFlowsDown;
+        }
+
+        set
+        {
+            _isFlowsDown = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -78,6 +139,38 @@ public struct WorldCellData
         _blockType = BlockTypes.Abstract;
         _blockData = GameManager.Instance.ObjectsAtlass.Air;
         _coords = new Vector2Ushort { x = xPosition, y = yPosition };
+
+        _liquidId = 255;
+        _isFlowsDown = false;
+        _flowValue = 0;
+    }
+
+    public override string ToString()
+    {
+        return $"X: {_coords.x}\n" +
+            $"Y: {_coords.y}\n" +
+            $"ID: {_id}\n" +
+            $"Tile ID: {_tileId}\n" +
+            $"Block type: {_blockType}\n" +
+            $"Name: {_blockData.name}\n" +
+            $"Is liquid: {_liquidId != 255}\n" +
+            $"Is flow down: {_isFlowsDown}\n" +
+            $"Liquid ID: {_liquidId}\n" +
+            $"Flow value: {_flowValue}";
+    }
+
+    public int GetSize()
+    {
+        int size = 0;
+        size += System.Runtime.InteropServices.Marshal.SizeOf(_id);
+        size += System.Runtime.InteropServices.Marshal.SizeOf(_tileId);
+        size += System.Runtime.InteropServices.Marshal.SizeOf(System.Enum.GetUnderlyingType(typeof(BlockTypes)));
+        size += System.IntPtr.Size;
+        size += System.Runtime.InteropServices.Marshal.SizeOf(_coords);
+        size += System.Runtime.InteropServices.Marshal.SizeOf(_liquidId);
+        size += System.Runtime.InteropServices.Marshal.SizeOf(_isFlowsDown);
+        size += System.Runtime.InteropServices.Marshal.SizeOf(_flowValue);
+        return size;
     }
 
     public void SetData(BlockSO block)
@@ -88,16 +181,10 @@ public struct WorldCellData
         BlockData = block;
     }
 
-    public void SetData(ushort id, BlockTypes blockType)
+    public void SetData(byte id)
     {
-        Id = id;
-        BlockType = blockType;
-        BlockData = GameManager.Instance.ObjectsAtlass.GetBlockById(blockType, id);
-    }
-
-    public override string ToString()
-    {
-        return $"{_coords.x}, {_coords.y}, {_id}, {_blockType}, {_blockData.name}";
+        LiquidId = id;
+        FlowValue = 100f;
     }
 
     public TileBase GetTile()
@@ -121,18 +208,22 @@ public struct WorldCellData
 
     public bool IsEmpty()
     {
-        return _blockType == BlockTypes.Abstract;
+        return _blockType == BlockTypes.Abstract && !IsLiquid();
     }
 
     public bool IsEmptyWithPlant()
     {
-        return _blockType == BlockTypes.Abstract || _blockType == BlockTypes.Plant;
+        return IsEmpty() || _blockType == BlockTypes.Plant;
     }
-
 
     public bool IsSolid()
     {
         return _blockType == BlockTypes.Solid || _blockType == BlockTypes.Dust;
+    }
+
+    public bool IsLiquid()
+    {
+        return LiquidId != 255;
     }
     #endregion
 }

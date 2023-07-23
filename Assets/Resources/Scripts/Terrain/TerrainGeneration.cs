@@ -265,13 +265,14 @@ public class TerrainGeneration
         short sign;
         short heightAdder;
         short height = 0;
+        short dif;
         Vector2Ushort vector = new Vector2Ushort();
 
         foreach (BiomeSO biome in _terrainConfiguration.Biomes)
         {
             //Calculate difference of height between two biomes
             firstHeight = (short)(startY + Mathf.PerlinNoise((biome.StartX + _seed) / biome.MountainCompression, _seed / biome.MountainCompression) * biome.MountainHeight);
-            short dif = (short)(prevHeight != -1 ? (short)(prevHeight - firstHeight) : 0);
+            dif = (short)(prevHeight != -1 ? (short)(prevHeight - firstHeight) : 0);
             sign = (short)(dif < 0 ? 1 : -1);
             heightAdder = dif;
 
@@ -322,6 +323,7 @@ public class TerrainGeneration
         byte currentLength = 0;
         byte chanceToMoveDown;
         byte chanceToMoveUp;
+        byte waterId = (byte)_waterBlock.GetId();
         ushort x;
         ushort y;
         //Hole generation
@@ -336,7 +338,8 @@ public class TerrainGeneration
             //Create hole
             for (y = startY; y >= startY - downHeight; y--)
             {
-                Terrain.CreateBlock(x, y, _waterBlock);
+                Terrain.CreateBlock(x, y, _airBlock);
+                Terrain.CreateLiquidBlock(x, y, waterId);
                 GameManager.Instance.SetChunkBiome(x, y, biome);
             }
 
@@ -536,7 +539,7 @@ public class TerrainGeneration
         {
             for (y = startY; y < startY + _terrainConfiguration.ChunkSize; y++)
             {
-                if (!cluster.CompareBlock(_worldData[x, y].BlockData))
+                if (!cluster.CompareForbiddenBlock(_worldData[x, y].BlockData))
                 {
                     if (GenerateNoise(x, y, clusterData.Scale, clusterData.Amplitude, additionalSeed) >= clusterData.Intensity)
                     {
@@ -937,6 +940,7 @@ public class TerrainGeneration
         ushort endAdder = 0;
         ushort i;
         ushort j;
+        byte waterId = (byte)_waterBlock.GetId();
 
 
         //Fill list with potential blocks
@@ -1024,7 +1028,8 @@ public class TerrainGeneration
         //Create lake
         foreach (Vector2Ushort coord in coords)
         {
-            Terrain.CreateBlock(coord.x, coord.y, _waterBlock);
+            Terrain.CreateBlock(coord.x, coord.y, _airBlock);
+            Terrain.CreateLiquidBlock(coord.x, coord.y, waterId);
         }
 
         //Create air
@@ -1081,6 +1086,7 @@ public class TerrainGeneration
         ushort oasisHeight = (ushort)_randomVar.Next(_terrainConfiguration.MinOasisHeight, _terrainConfiguration.MaxOasisHeight);
         ushort x;
         ushort y;
+        byte waterId = (byte)_waterBlock.GetId();
 
         //Fill list with potential blocks
         for (x = startX; x < startX + oasisLength; x++)
@@ -1163,7 +1169,8 @@ public class TerrainGeneration
         //Create lake
         foreach (Vector2Ushort coord in coords)
         {
-            Terrain.CreateBlock(coord.x, coord.y, _waterBlock);
+            Terrain.CreateBlock(coord.x, coord.y, _airBlock);
+            Terrain.CreateLiquidBlock(coord.x, coord.y, waterId);
         }
 
         //Create air
@@ -1194,7 +1201,7 @@ public class TerrainGeneration
             for (y = _terrainConfiguration.Equator; y < _surfaceLevel.EndY; y++)
             {
                 currentBiomeId = GameManager.Instance.GetChunk(x, y).Biome.Id;
-                if (_worldData[x, y + 1].CompareBlock(_airBlock))
+                if (_worldData[x, y + 1].IsEmpty())
                 {
                     vector.x = x;
                     vector.y = y;
@@ -1254,11 +1261,11 @@ public class TerrainGeneration
                         chance = (byte)_randomVar.Next(0, 101);
                         if (plant.AllowedToSpawnOn.Contains(_worldData[x, y].BlockData) && chance <= plant.ChanceToSpawn)
                         {
-                            if (plant.IsBottomSpawn && _worldData[x, y + 1].CompareBlock(_airBlock))
+                            if (plant.IsBottomSpawn && _worldData[x, y + 1].IsEmpty())
                             {
                                 Terrain.CreateBlock(x, (ushort)(y + 1), plant);
                             }
-                            else if (plant.IsTopSpawn && _worldData[x, y - 1].CompareBlock(_airBlock))
+                            else if (plant.IsTopSpawn && _worldData[x, y - 1].IsEmpty())
                             {
                                 Terrain.CreateBlock(x, (ushort)(y - 1), plant);
                             }
