@@ -341,6 +341,7 @@ public class Terrain : MonoBehaviour
         bool needToFlow;
 
         BlockSO airBlock = GameManager.Instance.ObjectsAtlass.Air;
+        PlantSO plant;
 
         while (!GameManager.Instance.IsGameSession)
         {
@@ -401,7 +402,7 @@ public class Terrain : MonoBehaviour
                                     needToFlow = true;
 
                                     #region Move to the bottom side
-                                    if (bottomBlock.IsEmptyWithPlant() || (bottomBlock.IsLiquid() && bottomBlock.FlowValue != 100))
+                                    if (bottomBlock.IsEmptyOrPlant() || (bottomBlock.IsLiquid() && bottomBlock.FlowValue != 100))
                                     {
                                         //Determine rate of flow
                                         bottomFlow = (bottomBlock.IsLiquid() ? bottomBlock.FlowValue : 0);
@@ -441,7 +442,7 @@ public class Terrain : MonoBehaviour
                                     #endregion
 
                                     #region Move to the left side
-                                    if ((leftBlock.IsEmptyWithPlant() || leftBlock.IsLiquid()) && needToFlow)
+                                    if ((leftBlock.IsEmptyOrPlant() || leftBlock.IsLiquid()) && needToFlow)
                                     {
                                         //Determine rate of flow
                                         leftFlow = (leftBlock.IsLiquid() ? leftBlock.FlowValue : 0);
@@ -482,7 +483,7 @@ public class Terrain : MonoBehaviour
                                     #endregion
 
                                     #region Move to the right side
-                                    if ((rightBlock.IsEmptyWithPlant() || rightBlock.IsLiquid()) && needToFlow)
+                                    if ((rightBlock.IsEmptyOrPlant() || rightBlock.IsLiquid()) && needToFlow)
                                     {
                                         //Determine rate of flow
                                         rightFlow = (rightBlock.IsLiquid() ? rightBlock.FlowValue : 0);
@@ -535,7 +536,19 @@ public class Terrain : MonoBehaviour
 
                                 if (block.BlockType == BlockTypes.Plant)
                                 {
+                                    plant = block.BlockData as PlantSO;
+
                                     if (block.IsLiquid())
+                                    {
+                                        CreateBlock((ushort)x, (ushort)y, airBlock);
+                                    }
+
+                                    if (plant.IsTopBlockSolid && topBlock.IsEmpty())
+                                    {
+                                        CreateBlock((ushort)x, (ushort)y, airBlock);
+                                    }
+
+                                    if (plant.IsBottomBlockSolid && bottomBlock.IsEmpty())
                                     {
                                         CreateBlock((ushort)x, (ushort)y, airBlock);
                                     }
@@ -635,14 +648,14 @@ public class Terrain : MonoBehaviour
                     {
                         continue;
                     }
-                    if (plant.IsBottomSpawn)
+                    if (plant.IsBottomBlockSolid)
                     {
                         if (y + 1 <= maxY && topBlock.IsEmpty())
                         {
                             CreateBlock((ushort)x, (ushort)(y + 1), plant);
                         }
                     }
-                    if (plant.IsTopSpawn)
+                    if (plant.IsTopBlockSolid)
                     {
                         if (y - 1 >= minY && bottomBlock.IsEmpty())
                         {

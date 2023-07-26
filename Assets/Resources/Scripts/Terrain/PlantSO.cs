@@ -10,8 +10,8 @@ public class PlantSO : BlockSO
     [SerializeField] private BiomesID _biomeId;
     [SerializeField] private List<BlockSO> _allowedToSpawnOn;
     [SerializeField] private bool _canGrow = false;
-    [SerializeField] private bool _isBottomSpawn = true;
-    [SerializeField] private bool _isTopSpawn = false;
+    [SerializeField] private bool _isBottomBlockSolid = true;
+    [SerializeField] private bool _isTopBlockSolid = false;
     [SerializeField] private int _chanceToSpawn;
     [SerializeField] private int _chanceToGrow;
     [SerializeField] private bool _isBiomeSpecified;
@@ -61,29 +61,29 @@ public class PlantSO : BlockSO
         }
     }
 
-    public bool IsBottomSpawn
+    public bool IsBottomBlockSolid
     {
         get
         {
-            return _isBottomSpawn;
+            return _isBottomBlockSolid;
         }
 
         set
         {
-            _isBottomSpawn = value;
+            _isBottomBlockSolid = value;
         }
     }
 
-    public bool IsTopSpawn
+    public bool IsTopBlockSolid
     {
         get
         {
-            return _isTopSpawn;
+            return _isTopBlockSolid;
         }
 
         set
         {
-            _isTopSpawn = value;
+            _isTopBlockSolid = value;
         }
     }
 

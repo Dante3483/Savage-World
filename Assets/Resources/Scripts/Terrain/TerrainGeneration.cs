@@ -1201,15 +1201,20 @@ public class TerrainGeneration
             for (y = _terrainConfiguration.Equator; y < _surfaceLevel.EndY; y++)
             {
                 currentBiomeId = GameManager.Instance.GetChunk(x, y).Biome.Id;
-                if (_worldData[x, y + 1].IsEmpty())
+                if (!_worldData[x, y + 1].IsEmpty())
                 {
-                    vector.x = x;
-                    vector.y = y;
-                    _surfaceCoords.Add(vector);
-                    if (_worldData[x, y].CompareBlock(_dirtBlock))
-                    {
-                        Terrain.CreateBlock(x, y, GameManager.Instance.ObjectsAtlass.GetGrassByBiome(currentBiomeId));
-                    }
+                    continue;
+                }
+                if (_worldData[x, y + 1].IsLiquid())
+                {
+                    continue;
+                }
+                vector.x = x;
+                vector.y = y;
+                _surfaceCoords.Add(vector);
+                if (_worldData[x, y].CompareBlock(_dirtBlock))
+                {
+                    Terrain.CreateBlock(x, y, GameManager.Instance.ObjectsAtlass.GetGrassByBiome(currentBiomeId));
                 }
             }
         }
@@ -1261,12 +1266,28 @@ public class TerrainGeneration
                         chance = (byte)_randomVar.Next(0, 101);
                         if (plant.AllowedToSpawnOn.Contains(_worldData[x, y].BlockData) && chance <= plant.ChanceToSpawn)
                         {
-                            if (plant.IsBottomSpawn && _worldData[x, y + 1].IsEmpty())
+                            if (plant.IsBottomBlockSolid)
                             {
+                                if (!_worldData[x, y + 1].IsEmpty())
+                                {
+                                    continue;
+                                }
+                                if (_worldData[x, y + 1].IsLiquid())
+                                {
+                                    continue;
+                                }
                                 Terrain.CreateBlock(x, (ushort)(y + 1), plant);
                             }
-                            else if (plant.IsTopSpawn && _worldData[x, y - 1].IsEmpty())
+                            if (plant.IsTopBlockSolid)
                             {
+                                if (!_worldData[x, y - 1].IsEmpty())
+                                {
+                                    continue;
+                                }
+                                if (_worldData[x, y - 1].IsLiquid())
+                                {
+                                    continue;
+                                }
                                 Terrain.CreateBlock(x, (ushort)(y - 1), plant);
                             }
                         }
@@ -1337,7 +1358,12 @@ public class TerrainGeneration
                                 isValidPlace = false;
                                 break;
                             }
-                            if (!_worldData[x, y + 1].IsEmptyWithPlant())
+                            if (!_worldData[x + i, y + 1].IsEmptyOrPlant())
+                            {
+                                isValidPlace = false;
+                                break;
+                            }
+                            if (_worldData[x + i, y + 1].IsLiquid())
                             {
                                 isValidPlace = false;
                                 break;
@@ -1375,16 +1401,30 @@ public class TerrainGeneration
 
     private bool CreateTree(ushort x, ushort y, Tree tree, ref List<Vector3> coords)
     {
+        int blockX;
+        int blockY;
         foreach (Vector3 vector in tree.TrunkBlocks)
         {
-            if (!_worldData[x + (int)(vector.x - tree.Start.x), y].IsEmptyWithPlant())
+            blockX = x + (int)(vector.x - tree.Start.x);
+            blockY = y;
+            if (!_worldData[blockX, blockY].IsEmptyOrPlant())
+            {
+                return false;
+            }
+            if (_worldData[blockX, blockY].IsLiquid())
             {
                 return false;
             }
         }
         foreach (Vector3 vector in tree.TreeBlocks)
         {
-            if (!_worldData[x + (int)(vector.x - tree.Start.x), y].IsEmptyWithPlant())
+            blockX = x + (int)(vector.x - tree.Start.x);
+            blockY = y;
+            if (!_worldData[blockX, blockY].IsEmptyOrPlant())
+            {
+                return false;
+            }
+            if (_worldData[blockX, blockY].IsLiquid())
             {
                 return false;
             }
@@ -1443,16 +1483,20 @@ public class TerrainGeneration
                 {
                     for (y = _terrainConfiguration.Equator; y < _surfaceLevel.EndY; y++)
                     {
-                        if (_worldData[x, y].IsSolid() &&
-                            _worldData[x, y + 1].IsEmpty())
+                        if (!_worldData[x, y].IsSolid())
                         {
-                            chance = (byte)_randomVar.Next(0, 101);
-                            if (chance <= pickableItem.ChanceToSpawn)
-                            {
-                                vector.x = x;
-                                vector.y = y + 1;
-                                coords.Add(vector);
-                            }
+                            continue;
+                        }
+                        if (!_worldData[x, y + 1].IsEmpty())
+                        {
+                            continue;
+                        }
+                        chance = (byte)_randomVar.Next(0, 101);
+                        if (chance <= pickableItem.ChanceToSpawn)
+                        {
+                            vector.x = x;
+                            vector.y = y + 1;
+                            coords.Add(vector);
                         }
                     }
                 }

@@ -208,12 +208,12 @@ public struct WorldCellData
 
     public bool IsEmpty()
     {
-        return _blockType == BlockTypes.Abstract && !IsLiquid();
+        return _blockType == BlockTypes.Abstract;
     }
 
-    public bool IsEmptyWithPlant()
+    public bool IsPlant()
     {
-        return IsEmpty() || _blockType == BlockTypes.Plant;
+        return _blockType == BlockTypes.Plant;
     }
 
     public bool IsSolid()
@@ -224,6 +224,11 @@ public struct WorldCellData
     public bool IsLiquid()
     {
         return LiquidId != 255;
+    }
+
+    public bool IsEmptyOrPlant()
+    {
+        return _blockType == BlockTypes.Abstract || _blockType == BlockTypes.Plant;
     }
     #endregion
 }
