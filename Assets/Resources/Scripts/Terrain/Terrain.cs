@@ -226,7 +226,7 @@ public class Terrain : MonoBehaviour
 
                     //Liquid
                     liquidTiles[i] = null;
-                    if (block.IsLiquid())
+                    if (block.IsEmptyOrPlant() && block.IsLiquid())
                     {
                         liquidIndex = (byte)(block.FlowValue == 100f || block.IsFlowsDown ? 9 : block.FlowValue / 10);
                         liquidTiles[i] = allLiquidTiles[block.LiquidId][liquidIndex];
@@ -392,146 +392,165 @@ public class Terrain : MonoBehaviour
 
                                 if (block.BlockType == BlockTypes.Dust)
                                 {
-
-                                }
-
-                                if (block.IsLiquid())
-                                {
-                                    startFlowValue = block.FlowValue;
-                                    remainingFlowValue = startFlowValue;
-                                    needToFlow = true;
-
-                                    #region Move to the bottom side
-                                    if (bottomBlock.IsEmptyOrPlant() || (bottomBlock.IsLiquid() && bottomBlock.FlowValue != 100))
+                                    if (block.CurrentActionTime < block.GetDustActionTime())
                                     {
-                                        //Determine rate of flow
-                                        bottomFlow = (bottomBlock.IsLiquid() ? bottomBlock.FlowValue : 0);
-                                        flow = block.FlowValue;
-
-                                        //Constrain flow
-                                        if (flow + bottomFlow > maxFlowValue)
-                                        {
-                                            flow = (100 - bottomFlow);
-                                        }
-
-                                        //Update flow values
-                                        if (flow != 0)
-                                        {
-                                            remainingFlowValue -= flow;
-                                            block.FlowValue -= flow;
-
-                                            //liquidObjectData.CreationTime = DateTime.Now;
-
-                                            //If bottom block is not liquid
-                                            if (!bottomBlock.IsLiquid())
-                                            {
-                                                CreateLiquidBlock((ushort)x, (ushort)(y - 1), block.LiquidId);
-                                                bottomBlock.FlowValue = 0;
-                                            }
-                                            bottomBlock.FlowValue += flow;
-                                            bottomBlock.IsFlowsDown = true;
-                                        }
-                                    }
-
-                                    if (remainingFlowValue < minFlowValue)
-                                    {
-                                        block.FlowValue = 0f;
-                                        block.LiquidId = 255;
-                                        needToFlow = false;
-                                    }
-                                    #endregion
-
-                                    #region Move to the left side
-                                    if ((leftBlock.IsEmptyOrPlant() || leftBlock.IsLiquid()) && needToFlow)
-                                    {
-                                        //Determine rate of flow
-                                        leftFlow = (leftBlock.IsLiquid() ? leftBlock.FlowValue : 0);
-                                        flow = (leftFlow > remainingFlowValue ? 0 : (remainingFlowValue - leftFlow) / 4f);
-
-                                        //Constrain flow
-                                        if (flow + leftFlow > maxFlowValue)
-                                        {
-                                            flow = (100 - leftFlow);
-                                            //flow = remainingFlowValue;
-                                        }
-
-                                        //Update flow values
-                                        if (flow != 0)
-                                        {
-                                            remainingFlowValue -= flow;
-                                            block.FlowValue -= flow;
-
-                                            //liquidObjectData.CreationTime = DateTime.Now;
-
-                                            //If left block is not liquid
-                                            if (!leftBlock.IsLiquid())
-                                            {
-                                                CreateLiquidBlock((ushort)(x - 1), (ushort)y, block.LiquidId);
-                                                leftBlock.FlowValue = 0;
-                                            }
-                                            leftBlock.FlowValue += flow;
-                                            //downBlockData.IsPsevdoFull = true;
-                                        }
-                                    }
-
-                                    if (remainingFlowValue < minFlowValue)
-                                    {
-                                        block.FlowValue = 0f;
-                                        block.LiquidId = 255;
-                                        needToFlow = false;
-                                    }
-                                    #endregion
-
-                                    #region Move to the right side
-                                    if ((rightBlock.IsEmptyOrPlant() || rightBlock.IsLiquid()) && needToFlow)
-                                    {
-                                        //Determine rate of flow
-                                        rightFlow = (rightBlock.IsLiquid() ? rightBlock.FlowValue : 0);
-                                        flow = (rightFlow > remainingFlowValue ? 0 : (remainingFlowValue - rightFlow) / 3f);
-
-                                        //Constrain flow
-                                        if (flow + rightFlow > maxFlowValue)
-                                        {
-                                            flow = (100 - rightFlow);
-                                        }
-
-                                        //Update flow values
-                                        if (flow != 0)
-                                        {
-                                            remainingFlowValue -= flow;
-                                            block.FlowValue -= flow;
-
-                                            //liquidObjectData.CreationTime = DateTime.Now;
-
-                                            //If right block is not liquid
-                                            if (!rightBlock.IsLiquid())
-                                            {
-                                                CreateLiquidBlock((ushort)(x + 1), (ushort)y, block.LiquidId);
-                                                rightBlock.FlowValue = 0;
-                                            }
-                                            rightBlock.FlowValue += flow;
-                                            //downBlockData.IsPsevdoFull = true;
-                                        }
-                                    }
-
-                                    if (remainingFlowValue < minFlowValue)
-                                    {
-                                        block.FlowValue = 0f;
-                                        block.LiquidId = 255;
-                                    }
-                                    #endregion
-
-                                    #region Top side processing
-                                    if (topBlock.IsLiquid() && block.FlowValue != 100f)
-                                    {
-                                        block.IsFlowsDown = true;
+                                        block.CurrentActionTime++;
                                     }
                                     else
                                     {
-                                        block.IsFlowsDown = false;
+                                        block.CurrentActionTime = 0;
+                                        if (bottomBlock.IsEmpty())
+                                        {
+                                            CreateBlock((ushort)x, (ushort)(y - 1), block.BlockData);
+                                            CreateBlock((ushort)x, (ushort)y, airBlock);
+                                        }
                                     }
-                                    #endregion
+                                }
 
+                                if (block.IsLiquid() && block.IsEmptyOrPlant())
+                                {
+                                    if (block.CurrentActionTime < block.GetLiquidActionTime())
+                                    {
+                                        block.CurrentActionTime++;
+                                    }
+                                    else
+                                    {
+                                        block.CurrentActionTime = 0;
+                                        startFlowValue = block.FlowValue;
+                                        remainingFlowValue = startFlowValue;
+                                        needToFlow = true;
+
+                                        #region Move to the bottom side
+                                        if (bottomBlock.IsEmptyOrPlant() || (bottomBlock.IsLiquid() && bottomBlock.FlowValue != 100))
+                                        {
+                                            //Determine rate of flow
+                                            bottomFlow = (bottomBlock.IsLiquid() ? bottomBlock.FlowValue : 0);
+                                            flow = block.FlowValue;
+
+                                            //Constrain flow
+                                            if (flow + bottomFlow > maxFlowValue)
+                                            {
+                                                flow = (100 - bottomFlow);
+                                            }
+
+                                            //Update flow values
+                                            if (flow != 0)
+                                            {
+                                                remainingFlowValue -= flow;
+                                                block.FlowValue -= flow;
+
+                                                //liquidObjectData.CreationTime = DateTime.Now;
+
+                                                //If bottom block is not liquid
+                                                if (!bottomBlock.IsLiquid())
+                                                {
+                                                    CreateLiquidBlock((ushort)x, (ushort)(y - 1), block.LiquidId);
+                                                    bottomBlock.FlowValue = 0;
+                                                }
+                                                bottomBlock.FlowValue += flow;
+                                                bottomBlock.IsFlowsDown = true;
+                                            }
+                                        }
+
+                                        if (remainingFlowValue < minFlowValue)
+                                        {
+                                            block.FlowValue = 0f;
+                                            block.LiquidId = 255;
+                                            needToFlow = false;
+                                        }
+                                        #endregion
+
+                                        #region Move to the left side
+                                        if ((leftBlock.IsEmptyOrPlant() || leftBlock.IsLiquid()) && needToFlow)
+                                        {
+                                            //Determine rate of flow
+                                            leftFlow = (leftBlock.IsLiquid() ? leftBlock.FlowValue : 0);
+                                            flow = (leftFlow > remainingFlowValue ? 0 : (remainingFlowValue - leftFlow) / 4f);
+
+                                            //Constrain flow
+                                            if (flow + leftFlow > maxFlowValue)
+                                            {
+                                                flow = (100 - leftFlow);
+                                                //flow = remainingFlowValue;
+                                            }
+
+                                            //Update flow values
+                                            if (flow != 0)
+                                            {
+                                                remainingFlowValue -= flow;
+                                                block.FlowValue -= flow;
+
+                                                //liquidObjectData.CreationTime = DateTime.Now;
+
+                                                //If left block is not liquid
+                                                if (!leftBlock.IsLiquid())
+                                                {
+                                                    CreateLiquidBlock((ushort)(x - 1), (ushort)y, block.LiquidId);
+                                                    leftBlock.FlowValue = 0;
+                                                }
+                                                leftBlock.FlowValue += flow;
+                                                //downBlockData.IsPsevdoFull = true;
+                                            }
+                                        }
+
+                                        if (remainingFlowValue < minFlowValue)
+                                        {
+                                            block.FlowValue = 0f;
+                                            block.LiquidId = 255;
+                                            needToFlow = false;
+                                        }
+                                        #endregion
+
+                                        #region Move to the right side
+                                        if ((rightBlock.IsEmptyOrPlant() || rightBlock.IsLiquid()) && needToFlow)
+                                        {
+                                            //Determine rate of flow
+                                            rightFlow = (rightBlock.IsLiquid() ? rightBlock.FlowValue : 0);
+                                            flow = (rightFlow > remainingFlowValue ? 0 : (remainingFlowValue - rightFlow) / 3f);
+
+                                            //Constrain flow
+                                            if (flow + rightFlow > maxFlowValue)
+                                            {
+                                                flow = (100 - rightFlow);
+                                            }
+
+                                            //Update flow values
+                                            if (flow != 0)
+                                            {
+                                                remainingFlowValue -= flow;
+                                                block.FlowValue -= flow;
+
+                                                //liquidObjectData.CreationTime = DateTime.Now;
+
+                                                //If right block is not liquid
+                                                if (!rightBlock.IsLiquid())
+                                                {
+                                                    CreateLiquidBlock((ushort)(x + 1), (ushort)y, block.LiquidId);
+                                                    rightBlock.FlowValue = 0;
+                                                }
+                                                rightBlock.FlowValue += flow;
+                                                //downBlockData.IsPsevdoFull = true;
+                                            }
+                                        }
+
+                                        if (remainingFlowValue < minFlowValue)
+                                        {
+                                            block.FlowValue = 0f;
+                                            block.LiquidId = 255;
+                                        }
+                                        #endregion
+
+                                        #region Top side processing
+                                        if (topBlock.IsLiquid() && block.FlowValue != 100f)
+                                        {
+                                            block.IsFlowsDown = true;
+                                        }
+                                        else
+                                        {
+                                            block.IsFlowsDown = false;
+                                        }
+                                        #endregion
+                                    }
                                 }
 
                                 if (block.BlockType == BlockTypes.Plant)

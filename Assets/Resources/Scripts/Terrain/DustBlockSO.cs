@@ -5,6 +5,7 @@ public class DustBlockSO : BlockSO
 {
     #region Private fields
     [SerializeField] private DustBlocksID _id;
+    [SerializeField] private byte _fallingTime;
     #endregion
 
     #region Public fields
@@ -14,7 +15,18 @@ public class DustBlockSO : BlockSO
     #region Properties
 
     #endregion
+    public byte FallingTime
+    {
+        get
+        {
+            return _fallingTime;
+        }
 
+        set
+        {
+            _fallingTime = value;
+        }
+    }
     #region Methods
     public DustBlockSO()
     {

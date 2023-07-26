@@ -21,8 +21,8 @@ MonoBehaviour:
   _allowedToSpawnOn:
   - {fileID: 11400000, guid: 5c652c777cfdd1b4ba8ceee62bf0c0b9, type: 2}
   _canGrow: 1
-  _isBottomSpawn: 0
-  _isTopSpawn: 1
+  _isBottomBlockSolid: 0
+  _isTopBlockSolid: 1
   _chanceToSpawn: 25
   _chanceToGrow: 25
   _isBiomeSpecified: 0

@@ -542,7 +542,7 @@ public class GameManager : MonoBehaviour
 
     public void BreakBlock()
     {
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButtonDown(0))
         {
             Vector3 clickPosition = Input.mousePosition;
 

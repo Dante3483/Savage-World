@@ -11,6 +11,7 @@ public struct WorldCellData
     private BlockTypes _blockType;
     private BlockSO _blockData;
     private Vector2Ushort _coords;
+    private byte _currentActionTime;
     #endregion
 
     #region Liquid
@@ -128,6 +129,19 @@ public struct WorldCellData
             _isFlowsDown = value;
         }
     }
+
+    public byte CurrentActionTime
+    {
+        get
+        {
+            return _currentActionTime;
+        }
+
+        set
+        {
+            _currentActionTime = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -139,6 +153,7 @@ public struct WorldCellData
         _blockType = BlockTypes.Abstract;
         _blockData = GameManager.Instance.ObjectsAtlass.Air;
         _coords = new Vector2Ushort { x = xPosition, y = yPosition };
+        _currentActionTime = 0;
 
         _liquidId = 255;
         _isFlowsDown = false;
@@ -173,20 +188,6 @@ public struct WorldCellData
         return size;
     }
 
-    public void SetData(BlockSO block)
-    {
-        Id = block.GetId();
-        TileId = 255;
-        BlockType = block.Type;
-        BlockData = block;
-    }
-
-    public void SetData(byte id)
-    {
-        LiquidId = id;
-        FlowValue = 100f;
-    }
-
     public TileBase GetTile()
     {
         if (TileId != 255)
@@ -199,6 +200,30 @@ public struct WorldCellData
         }
         TileId = (byte)Random.Range(0, BlockData.Tiles.Count);
         return BlockData.Tiles[TileId];
+    }
+
+    public byte GetDustActionTime()
+    {
+        return (_blockData as DustBlockSO).FallingTime;
+    }
+
+    public byte GetLiquidActionTime()
+    {
+        return (GameManager.Instance.ObjectsAtlass.GetBlockById(BlockTypes.Liquid, (ushort)_liquidId) as LiquidBlockSO).FlowTime;
+    }
+
+    public void SetData(BlockSO block)
+    {
+        Id = block.GetId();
+        TileId = 255;
+        BlockType = block.Type;
+        BlockData = block;
+    }
+
+    public void SetData(byte id)
+    {
+        LiquidId = id;
+        FlowValue = 100f;
     }
 
     public bool CompareBlock(BlockSO block)
