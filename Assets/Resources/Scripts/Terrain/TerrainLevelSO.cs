@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,6 +10,7 @@ public class TerrainLevelSO : ScriptableObject
     [SerializeField] private byte _countOfVerticalChunks;
     [SerializeField] private ushort _startY;
     [SerializeField] private ushort _endY;
+    [SerializeField] private BlockSO _defaultBackground;
 
     [Header("Stone")]
     [SerializeField] private float _stoneAmplitude;
@@ -113,6 +112,19 @@ public class TerrainLevelSO : ScriptableObject
         set
         {
             _stoneScale = value;
+        }
+    }
+
+    public BlockSO DefaultBackground
+    {
+        get
+        {
+            return _defaultBackground;
+        }
+
+        set
+        {
+            _defaultBackground = value;
         }
     }
     #endregion

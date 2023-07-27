@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UIElements;
 
 public struct WorldCellData
 {
@@ -7,9 +8,13 @@ public struct WorldCellData
 
     #region Main
     private ushort _id;
-    private byte _tileId;
+    private byte _blockTileId;
+    private byte _backgroundTileId;
     private BlockTypes _blockType;
+
     private BlockSO _blockData;
+    private BlockSO _backgroundData;
+
     private Vector2Ushort _coords;
     private byte _currentActionTime;
     #endregion
@@ -19,6 +24,7 @@ public struct WorldCellData
     private bool _isFlowsDown;
     private float _flowValue;
     #endregion
+
     #endregion
 
     #region Public fields
@@ -65,16 +71,16 @@ public struct WorldCellData
         }
     }
 
-    public byte TileId
+    public byte BlockTileId
     {
         get
         {
-            return _tileId;
+            return _blockTileId;
         }
 
         set
         {
-            _tileId = value;
+            _blockTileId = value;
         }
     }
 
@@ -142,6 +148,32 @@ public struct WorldCellData
             _currentActionTime = value;
         }
     }
+
+    public BlockSO BackgroundData
+    {
+        get
+        {
+            return _backgroundData;
+        }
+
+        set
+        {
+            _backgroundData = value;
+        }
+    }
+
+    public byte BackgroundTileId
+    {
+        get
+        {
+            return _backgroundTileId;
+        }
+
+        set
+        {
+            _backgroundTileId = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -149,9 +181,11 @@ public struct WorldCellData
     {
         //Set Ait block by default
         _id = 0;
-        _tileId = 255;
+        _blockTileId = 255;
+        _backgroundTileId = 255;
         _blockType = BlockTypes.Abstract;
         _blockData = GameManager.Instance.ObjectsAtlass.Air;
+        _backgroundData = GameManager.Instance.ObjectsAtlass.AirBG;
         _coords = new Vector2Ushort { x = xPosition, y = yPosition };
         _currentActionTime = 0;
 
@@ -165,7 +199,7 @@ public struct WorldCellData
         return $"X: {_coords.x}\n" +
             $"Y: {_coords.y}\n" +
             $"ID: {_id}\n" +
-            $"Tile ID: {_tileId}\n" +
+            $"Tile ID: {_blockTileId}\n" +
             $"Block type: {_blockType}\n" +
             $"Name: {_blockData.name}\n" +
             $"Is liquid: {_liquidId != 255}\n" +
@@ -174,32 +208,47 @@ public struct WorldCellData
             $"Flow value: {_flowValue}";
     }
 
-    public int GetSize()
+    public TileBase GetBlockTile()
     {
-        int size = 0;
-        size += System.Runtime.InteropServices.Marshal.SizeOf(_id);
-        size += System.Runtime.InteropServices.Marshal.SizeOf(_tileId);
-        size += System.Runtime.InteropServices.Marshal.SizeOf(System.Enum.GetUnderlyingType(typeof(BlockTypes)));
-        size += System.IntPtr.Size;
-        size += System.Runtime.InteropServices.Marshal.SizeOf(_coords);
-        size += System.Runtime.InteropServices.Marshal.SizeOf(_liquidId);
-        size += System.Runtime.InteropServices.Marshal.SizeOf(_isFlowsDown);
-        size += System.Runtime.InteropServices.Marshal.SizeOf(_flowValue);
-        return size;
-    }
-
-    public TileBase GetTile()
-    {
-        if (TileId != 255)
+        if (BlockTileId != 255)
         {
-            return BlockData.Tiles[_tileId];
+            return BlockData.Tiles[BlockTileId];
         }
         if (BlockData.Tiles.Count == 0)
         {
             return null;
         }
-        TileId = (byte)Random.Range(0, BlockData.Tiles.Count);
-        return BlockData.Tiles[TileId];
+        BlockTileId = (byte)Random.Range(0, BlockData.Tiles.Count);
+        return BlockData.Tiles[BlockTileId];
+    }
+
+    public TileBase GetBackgroundTile()
+    {
+        if (BackgroundTileId != 255)
+        {
+            return BackgroundData.Tiles[BackgroundTileId];
+        }
+        if (BackgroundData.Tiles.Count == 0)
+        {
+            return null;
+        }
+        BackgroundTileId = (byte)Random.Range(0, BackgroundData.Tiles.Count);
+        return BackgroundData.Tiles[BackgroundTileId];
+    }
+
+    public BlockSO GetBlock()
+    {
+        return GameManager.Instance.ObjectsAtlass.Blocks[_blockType][_id];
+    }
+
+    public BlockSO GetLiquid()
+    {
+        return GameManager.Instance.ObjectsAtlass.Blocks[BlockTypes.Liquid][_liquidId];
+    }
+
+    public BlockSO GetBackground()
+    {
+        return GameManager.Instance.ObjectsAtlass.Blocks[BlockTypes.Background][0];
     }
 
     public byte GetDustActionTime()
@@ -209,21 +258,26 @@ public struct WorldCellData
 
     public byte GetLiquidActionTime()
     {
-        return (GameManager.Instance.ObjectsAtlass.GetBlockById(BlockTypes.Liquid, (ushort)_liquidId) as LiquidBlockSO).FlowTime;
+        return (GameManager.Instance.ObjectsAtlass.Blocks[BlockTypes.Liquid][_liquidId] as LiquidBlockSO).FlowTime;
     }
 
-    public void SetData(BlockSO block)
+    public void SetBlockData(BlockSO block)
     {
         Id = block.GetId();
-        TileId = 255;
+        BlockTileId = 255;
         BlockType = block.Type;
         BlockData = block;
     }
 
-    public void SetData(byte id)
+    public void SetBlockData(byte id)
     {
         LiquidId = id;
         FlowValue = 100f;
+    }
+
+    public void SetBackgroundData(BlockSO background)
+    {
+        BackgroundData = background;
     }
 
     public bool CompareBlock(BlockSO block)
@@ -254,6 +308,11 @@ public struct WorldCellData
     public bool IsEmptyOrPlant()
     {
         return _blockType == BlockTypes.Abstract || _blockType == BlockTypes.Plant;
+    }
+
+    public bool IsBackground()
+    {
+        return BackgroundData != GameManager.Instance.ObjectsAtlass.AirBG;
     }
     #endregion
 }

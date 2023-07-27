@@ -12,6 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59f531f6a3340ab429507659030aff89, type: 3}
   m_Name: MainTerrainConfiguration
   m_EditorClassIdentifier: 
+  Phase1: 1
+  Phase2: 1
+  Phase3: 1
+  Phase4: 1
+  Phase5: 1
+  Phase6: 1
+  Phase7: 1
+  Phase8: 1
+  Phase9: 1
+  Phase10: 1
+  Phase11: 1
+  Phase12: 1
   DefaultHorizontalChunksCount: 84
   DefaultVerticalChunksCount: 24
   CurrentHorizontalChunksCount: 84

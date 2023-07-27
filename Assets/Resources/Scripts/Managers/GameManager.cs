@@ -298,8 +298,6 @@ public class GameManager : MonoBehaviour
         StartCoroutine(PrintDebugInfo());
         StartCoroutine(UpdateObjects());
 
-        WorldCellData size = new WorldCellData(0, 0);
-        GeneralInfo += $"World cell size: {size.GetSize()}\n";
         UpdateGameState(GameState.GameInitializationState);
     }
 
@@ -488,19 +486,33 @@ public class GameManager : MonoBehaviour
     {
         Texture2D worldMap = new Texture2D(CurrentTerrainWidth, CurrentTerrainHeight);
         Texture2D biomesMap = new Texture2D(CurrentTerrainWidth, CurrentTerrainHeight);
+        Color cellColor;
+        Color backgroundColor;
+        Color biomeColor;
+        Color gridColor;
+        Color colorOnMap;
         for (int x = 0; x < CurrentTerrainWidth; x++)
         {
             for (int y = 0; y < CurrentTerrainHeight; y++)
             {
-                Color blockColor = WorldData[x, y].BlockData.ColorOnMap;
-                Color gridColor = new Color(blockColor.r - 0.2f, blockColor.g - 0.2f, blockColor.b - 0.2f, blockColor.a);
-                Color mapColor = x % 100 == 0 || y % 100 == 0 ? gridColor : blockColor;
-                worldMap.SetPixel(x, y, mapColor);
+                cellColor = WorldData[x, y].BlockData.ColorOnMap;
+                if (WorldData[x, y].IsBackground())
+                {
+                    cellColor = WorldData[x, y].BackgroundData.ColorOnMap;
+                }
+                if (WorldData[x, y].IsLiquid())
+                {
+                    cellColor = ObjectsAtlass.Blocks[BlockTypes.Liquid][WorldData[x, y].LiquidId].ColorOnMap;
+                }
 
-                Color biomeColor = GetChunk(x, y).Biome.ColorOnMap;
-                Color gridBiomeColor = new Color(biomeColor.r - 0.2f, biomeColor.g - 0.2f, biomeColor.b - 0.2f, biomeColor.a);
-                Color biomeMapColor = x % 100 == 0 || y % 100 == 0 ? gridBiomeColor : biomeColor;
-                biomesMap.SetPixel(x, y, biomeMapColor);
+                gridColor = new Color(cellColor.r - 0.2f, cellColor.g - 0.2f, cellColor.b - 0.2f, 1f);
+                colorOnMap = x % TerrainConfiguration.ChunkSize == 0 || y % TerrainConfiguration.ChunkSize == 0 ? gridColor : cellColor;
+                worldMap.SetPixel(x, y, colorOnMap);
+
+                biomeColor = GetChunk(x, y).Biome.ColorOnMap;
+                gridColor = new Color(cellColor.r - 0.2f, cellColor.g - 0.2f, cellColor.b - 0.2f, 1f);
+                colorOnMap = x % TerrainConfiguration.ChunkSize == 0 || y % TerrainConfiguration.ChunkSize == 0 ? gridColor : biomeColor;
+                biomesMap.SetPixel(x, y, colorOnMap);
             }
         }
         worldMap.Apply();

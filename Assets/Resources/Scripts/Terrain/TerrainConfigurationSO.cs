@@ -11,6 +11,20 @@ public class TerrainConfigurationSO : ScriptableObject
     #endregion
 
     #region Public fields
+    [Header("Turn on/off phases")]
+    public bool Phase1;
+    public bool Phase2;
+    public bool Phase3;
+    public bool Phase4;
+    public bool Phase5;
+    public bool Phase6;
+    public bool Phase7;
+    public bool Phase8;
+    public bool Phase9;
+    public bool Phase10;
+    public bool Phase11;
+    public bool Phase12;
+
     [Header("World size")]
     public byte DefaultHorizontalChunksCount;
     public byte DefaultVerticalChunksCount;

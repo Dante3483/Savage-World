@@ -24,5 +24,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: dfeead8138438064eb84108a931387b3, type: 2}
   - {fileID: 11400000, guid: 080b4b50d048b8449aa67e6280bacb40, type: 2}
   _type: 3
-  _colorOnMap: {r: 0.14901961, g: 0.35686275, b: 0.99607843, a: 1}
+  _colorOnMap: {r: 0.33333334, g: 0.68235296, b: 0.7568628, a: 1}
   _id: 0
+  _flowTime: 0

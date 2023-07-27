@@ -13,7 +13,7 @@ public class ObjectsAtlass : ScriptableObject
     #region Public fields
 
     #region Dictionaries
-    public Dictionary<BlockTypes, BlockSO[]> Blocks;
+    public Dictionary<BlockTypes, Dictionary<ushort, BlockSO>> Blocks;
     public Dictionary<BiomesID, BlockSO[]> Plants;
     public Dictionary<BiomesID, GameObject[]> Trees;
     public Dictionary<BiomesID, GameObject[]> PickableItems;
@@ -92,6 +92,13 @@ public class ObjectsAtlass : ScriptableObject
     public BlockSO Vine;
     #endregion
 
+    #region Background
+    [Header("Background")]
+    public BlockSO AirBG;
+    public BlockSO DirtBG;
+    public BlockSO StoneBG;
+    #endregion
+
     #region Trees
     [Header("Trees")]
     public GameObject Pine1;
@@ -114,43 +121,84 @@ public class ObjectsAtlass : ScriptableObject
     public void Initialize()
     {
         //Initialize dictionaries
-        Blocks = new Dictionary<BlockTypes, BlockSO[]>();
+        Blocks = new Dictionary<BlockTypes, Dictionary<ushort, BlockSO>>();
         Plants = new Dictionary<BiomesID, BlockSO[]>();
         Trees = new Dictionary<BiomesID, GameObject[]>();
         PickableItems = new Dictionary<BiomesID, GameObject[]>();
 
         //Fill lists
+        #region Abstract
+        Blocks.Add(BlockTypes.Abstract, new Dictionary<ushort, BlockSO>());
+        Blocks[BlockTypes.Abstract].Add(Air.GetId(), Air);
+        #endregion
+
         #region Solid
-        Blocks.Add(BlockTypes.Solid, new BlockSO[]
-        {
-            Dirt,
-            OceanDirtWithGrass,
-            DesertDirtWithGrass,
-            SavannahDirtWithGrass,
-            MeadowDirtWithGrass,
-            ForestDirtWithGrass,
-            SwampDirtWithGrass,
-            ConiferousForestDirtWithGrass,
-            Stone,
-            Clay,
-            IronOre,
-            CopperOre,
-        }.ToList().OrderBy(x => x.GetId()).ToArray());
+        Blocks.Add(BlockTypes.Solid, new Dictionary<ushort, BlockSO>());
+        Blocks[BlockTypes.Solid].Add(Dirt.GetId(), Dirt);
+        Blocks[BlockTypes.Solid].Add(OceanDirtWithGrass.GetId(), OceanDirtWithGrass);
+        Blocks[BlockTypes.Solid].Add(DesertDirtWithGrass.GetId(), DesertDirtWithGrass);
+        Blocks[BlockTypes.Solid].Add(SavannahDirtWithGrass.GetId(), SavannahDirtWithGrass);
+        Blocks[BlockTypes.Solid].Add(MeadowDirtWithGrass.GetId(), MeadowDirtWithGrass);
+        Blocks[BlockTypes.Solid].Add(ForestDirtWithGrass.GetId(), ForestDirtWithGrass);
+        Blocks[BlockTypes.Solid].Add(SwampDirtWithGrass.GetId(), SwampDirtWithGrass);
+        Blocks[BlockTypes.Solid].Add(ConiferousForestDirtWithGrass.GetId(), ConiferousForestDirtWithGrass);
+        Blocks[BlockTypes.Solid].Add(Stone.GetId(), Stone);
+        Blocks[BlockTypes.Solid].Add(Clay.GetId(), Clay);
+        Blocks[BlockTypes.Solid].Add(IronOre.GetId(), IronOre);
+        Blocks[BlockTypes.Solid].Add(CopperOre.GetId(), CopperOre);
         #endregion
 
         #region Dust
-        Blocks.Add(BlockTypes.Dust, new BlockSO[]
-        {
-            Sand,
-        }.ToList().OrderBy(x => x.GetId()).ToArray());
+        Blocks.Add(BlockTypes.Dust, new Dictionary<ushort, BlockSO>());
+        Blocks[BlockTypes.Dust].Add(Sand.GetId(), Sand);
         #endregion
 
         #region Liquid
-        Blocks.Add(BlockTypes.Liquid, new BlockSO[]
-        {
-            Water,
-        }.ToList().OrderBy(x => x.GetId()).ToArray());
+        Blocks.Add(BlockTypes.Liquid, new Dictionary<ushort, BlockSO>());
+        Blocks[BlockTypes.Liquid].Add(Water.GetId(), Water);
         #endregion
+
+        #region Plant
+        Blocks.Add(BlockTypes.Plant, new Dictionary<ushort, BlockSO>());
+        Blocks[BlockTypes.Plant].Add(CamelThorn.GetId(), CamelThorn);
+        Blocks[BlockTypes.Plant].Add(Aloe.GetId(), Aloe);
+        Blocks[BlockTypes.Plant].Add(BarrelCactus.GetId(), BarrelCactus);
+
+        Blocks[BlockTypes.Plant].Add(DryGrass.GetId(), DryGrass);
+        Blocks[BlockTypes.Plant].Add(DryBush.GetId(), DryBush);
+        Blocks[BlockTypes.Plant].Add(Tagete.GetId(), Tagete);
+        Blocks[BlockTypes.Plant].Add(Viola.GetId(), Viola);
+
+        Blocks[BlockTypes.Plant].Add(MeadowGrass.GetId(), MeadowGrass);
+        Blocks[BlockTypes.Plant].Add(Dandelion.GetId(), Dandelion);
+        Blocks[BlockTypes.Plant].Add(Centaurea.GetId(), Centaurea);
+        Blocks[BlockTypes.Plant].Add(Papaver.GetId(), Papaver);
+
+        Blocks[BlockTypes.Plant].Add(Mushroom.GetId(), Mushroom);
+        Blocks[BlockTypes.Plant].Add(ForestFern.GetId(), ForestFern);
+        Blocks[BlockTypes.Plant].Add(ForestGrass.GetId(), ForestGrass);
+        Blocks[BlockTypes.Plant].Add(Aster.GetId(), Aster);
+
+        //Blocks[BlockTypes.Plant].Add(Reed.GetId(), Reed);
+        //Blocks[BlockTypes.Plant].Add(SwampBush.GetId(), SwampBush);
+        //Blocks[BlockTypes.Plant].Add(SwampGrass.GetId(), SwampGrass);
+
+        Blocks[BlockTypes.Plant].Add(ConiferousForestBush.GetId(), ConiferousForestBush);
+        Blocks[BlockTypes.Plant].Add(Chamomile.GetId(), Chamomile);
+        Blocks[BlockTypes.Plant].Add(ConiferousForestGrass.GetId(), ConiferousForestGrass);
+        Blocks[BlockTypes.Plant].Add(ConiferousForestFern.GetId(), ConiferousForestFern);
+
+        Blocks[BlockTypes.Plant].Add(Vine.GetId(), Vine);
+        #endregion
+
+        #region Background
+        Blocks.Add(BlockTypes.Background, new Dictionary<ushort, BlockSO>());
+        Blocks[BlockTypes.Background].Add(AirBG.GetId(), AirBG);
+        Blocks[BlockTypes.Background].Add(DirtBG.GetId(), DirtBG);
+        Blocks[BlockTypes.Background].Add(StoneBG.GetId(), StoneBG);
+        #endregion
+
+        #region Sets
 
         #region Plants
 
@@ -337,6 +385,8 @@ public class ObjectsAtlass : ScriptableObject
 
         #endregion
 
+        #endregion
+
     }
 
     public BlockSO GetBlockById(BlockTypes type, object id)
@@ -365,25 +415,6 @@ public class ObjectsAtlass : ScriptableObject
             default: 
                 return null;
         }
-    }
-
-    public bool IsGrass(BlockSO block)
-    {
-        if (block.Type == BlockTypes.Solid)
-        {
-            switch (block.GetId())
-            {
-                case (ushort)SolidBlocksID.OceanGrass:
-                case (ushort)SolidBlocksID.DesertGrass:
-                case (ushort)SolidBlocksID.SavannahGrass:
-                case (ushort)SolidBlocksID.MeadowGrass:
-                case (ushort)SolidBlocksID.ForestGrass:
-                case (ushort)SolidBlocksID.SwampGrass:
-                case (ushort)SolidBlocksID.ConiferousForestGrass:
-                    return true;
-            }
-        }
-        return false;
     }
 
     public List<PlantSO> GetAllBiomePlants(BiomesID id)
@@ -432,6 +463,25 @@ public class ObjectsAtlass : ScriptableObject
             }
         }
         return result;
+    }
+
+    public bool IsGrass(BlockSO block)
+    {
+        if (block.Type == BlockTypes.Solid)
+        {
+            switch (block.GetId())
+            {
+                case (ushort)SolidBlocksID.OceanGrass:
+                case (ushort)SolidBlocksID.DesertGrass:
+                case (ushort)SolidBlocksID.SavannahGrass:
+                case (ushort)SolidBlocksID.MeadowGrass:
+                case (ushort)SolidBlocksID.ForestGrass:
+                case (ushort)SolidBlocksID.SwampGrass:
+                case (ushort)SolidBlocksID.ConiferousForestGrass:
+                    return true;
+            }
+        }
+        return false;
     }
     #endregion
 }

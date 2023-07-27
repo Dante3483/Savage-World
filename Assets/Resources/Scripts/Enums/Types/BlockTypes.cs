@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public enum BlockTypes: byte
 {
     Abstract = 0,
@@ -13,4 +9,6 @@ public enum BlockTypes: byte
     Liquid = 3,
 
     Plant = 4,
+
+    Background = 5,
 }

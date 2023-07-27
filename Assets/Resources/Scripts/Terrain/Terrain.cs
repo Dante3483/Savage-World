@@ -13,6 +13,7 @@ public class Terrain : MonoBehaviour
     [Header("Tilemaps")]
     [SerializeField] private Tilemap _blocksTilemap;
     [SerializeField] private Tilemap _liquidTilemap;
+    [SerializeField] private Tilemap _backgroundTilemap;
 
     [Header("Sections")]
     [SerializeField] private GameObject _trees;
@@ -81,6 +82,19 @@ public class Terrain : MonoBehaviour
             _liquidTilemap = value;
         }
     }
+
+    public Tilemap BackgroundTilemap
+    {
+        get
+        {
+            return _backgroundTilemap;
+        }
+
+        set
+        {
+            _backgroundTilemap = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -94,16 +108,25 @@ public class Terrain : MonoBehaviour
         {
             throw new NullReferenceException("BlockTilemap is null");
         }
+
         LiquidTilemap = transform.Find("LiquidTilemap").GetComponent<Tilemap>();
         if (LiquidTilemap == null)
         {
             throw new NullReferenceException("LiquidTilemap is null");
         }
+
+        BackgroundTilemap = transform.Find("BackgroundTilemap").GetComponent<Tilemap>();
+        if (BackgroundTilemap == null)
+        {
+            throw new NullReferenceException("BackgroundTilemap is null");
+        }
+
         Trees = transform.Find("Trees").gameObject;
         if (Trees == null)
         {
             throw new NullReferenceException("Trees is null");
         }
+
         PickableItems = transform.Find("PickableItems").gameObject;
         if (PickableItems == null)
         {
@@ -158,6 +181,7 @@ public class Terrain : MonoBehaviour
 
         TileBase[] blockTiles;
         TileBase[] liquidTiles;
+        TileBase[] backgroundTiles;
 
         List<List<TileBase>> allLiquidTiles = new List<List<TileBase>>()
         {
@@ -172,6 +196,7 @@ public class Terrain : MonoBehaviour
 
         ArrayObjectPool<TileBase> blockTilesPool = new ArrayObjectPool<TileBase>();
         ArrayObjectPool<TileBase> liquidTilesPool = new ArrayObjectPool<TileBase>();
+        ArrayObjectPool<TileBase> backgroundTilesPool = new ArrayObjectPool<TileBase>();
         ArrayObjectPool<Vector3Int> vectorsPool = new ArrayObjectPool<Vector3Int>();
 
         prevCameraRect = GetCameraRectInt();
@@ -189,6 +214,7 @@ public class Terrain : MonoBehaviour
 
             blockTiles = blockTilesPool.GetArray(arraySizeX * arraySizeY);
             liquidTiles = liquidTilesPool.GetArray(arraySizeX * arraySizeY);
+            backgroundTiles = backgroundTilesPool.GetArray(arraySizeX * arraySizeY);
             vectors = vectorsPool.GetArray(arraySizeX * arraySizeY);
 
             //Fill Tiles array with blocks to destroy
@@ -204,6 +230,7 @@ public class Terrain : MonoBehaviour
                         vectors[i] = vector;
                         blockTiles[i] = null;
                         liquidTiles[i] = null;
+                        backgroundTiles[i] = null;
                         i++;
                     }
                 }
@@ -222,7 +249,10 @@ public class Terrain : MonoBehaviour
                     vectors[i] = vector;
 
                     //Block
-                    blockTiles[i] = GameManager.Instance.WorldData[position.x, position.y].GetTile();
+                    blockTiles[i] = GameManager.Instance.WorldData[position.x, position.y].GetBlockTile();
+
+                    //Background
+                    backgroundTiles[i] = GameManager.Instance.WorldData[position.x, position.y].GetBackgroundTile();
 
                     //Liquid
                     liquidTiles[i] = null;
@@ -239,6 +269,7 @@ public class Terrain : MonoBehaviour
             //Change Tilemap using Vector's array and Tile's array
             BlocksTilemap.SetTiles(vectors, blockTiles);
             LiquidTilemap.SetTiles(vectors, liquidTiles);
+            BackgroundTilemap.SetTiles(vectors, backgroundTiles);
         }
     }
 
@@ -303,7 +334,7 @@ public class Terrain : MonoBehaviour
         int chunkSize = GameManager.Instance.TerrainConfiguration.ChunkSize;
         int horizontalChunkCount = GameManager.Instance.Chunks.GetLength(0);
         int verticalChunkCount = GameManager.Instance.Chunks.GetLength(1);
-        System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+        //System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
 
         int minX = 5;
         int minY = 5;
@@ -349,7 +380,7 @@ public class Terrain : MonoBehaviour
         }
         while (GameManager.Instance.IsGameSession)
         {
-            watch.Restart();
+            //watch.Restart();
 
             for (chunkX = 0; chunkX < horizontalChunkCount; chunkX++)
             {
@@ -578,12 +609,12 @@ public class Terrain : MonoBehaviour
                 }
             }
 
-            watch.Stop();
-            currentTime = watch.Elapsed.TotalSeconds;
-            GameManager.Instance.ProcessingSpeedInfo = "";
-            GameManager.Instance.ProcessingSpeedInfo += $"Block processing time: {currentTime}\n";
-            GameManager.Instance.ProcessingSpeedInfo += $"Difference: {prevTime - currentTime}";
-            prevTime = currentTime;
+            //watch.Stop();
+            //currentTime = watch.Elapsed.TotalSeconds;
+            //GameManager.Instance.ProcessingSpeedInfo = "";
+            //GameManager.Instance.ProcessingSpeedInfo += $"Block processing time: {currentTime}\n";
+            //GameManager.Instance.ProcessingSpeedInfo += $"Difference: {prevTime - currentTime}";
+            //prevTime = currentTime;
 
         }
     }
@@ -690,12 +721,17 @@ public class Terrain : MonoBehaviour
     #region Helpful
     public static void CreateBlock(ushort x, ushort y, BlockSO block)
     {
-        GameManager.Instance.WorldData[x, y].SetData(block);
+        GameManager.Instance.WorldData[x, y].SetBlockData(block);
     }
 
     public static void CreateLiquidBlock(ushort x, ushort y, byte id)
     {
-        GameManager.Instance.WorldData[x, y].SetData(id);
+        GameManager.Instance.WorldData[x, y].SetBlockData(id);
+    }
+
+    public static void CreateBackground(ushort x, ushort y, BlockSO block)
+    {
+        GameManager.Instance.WorldData[x, y].SetBackgroundData(block);
     }
 
     private RectInt GetCameraRectInt()

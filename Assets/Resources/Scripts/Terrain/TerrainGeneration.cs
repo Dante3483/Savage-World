@@ -22,6 +22,8 @@ public class TerrainGeneration
     private BlockSO _waterBlock;
     private BlockSO _sandBlock;
     private BlockSO _stoneBlock;
+    private BlockSO _stoneBG;
+    private BlockSO _dirtBG;
     private BiomeSO _nonBiom;
     private BiomeSO _ocean;
     private BiomeSO _desert;
@@ -65,6 +67,8 @@ public class TerrainGeneration
         _waterBlock = GameManager.Instance.ObjectsAtlass.Water;
         _sandBlock = GameManager.Instance.ObjectsAtlass.Sand;
         _stoneBlock = GameManager.Instance.ObjectsAtlass.Stone;
+        _dirtBG = GameManager.Instance.ObjectsAtlass.DirtBG;
+        _stoneBG = GameManager.Instance.ObjectsAtlass.StoneBG;
         _nonBiom = _terrainConfiguration.Biomes.Find(b => b.Id == BiomesID.NonBiom);
         _ocean = _terrainConfiguration.Biomes.Find(b => b.Id == BiomesID.Ocean);
         _desert = _terrainConfiguration.Biomes.Find(b => b.Id == BiomesID.Desert);
@@ -90,7 +94,10 @@ public class TerrainGeneration
         #region Phase 1 - Flat world generation
         _watch = System.Diagnostics.Stopwatch.StartNew();
 
-        CreateFlatWorld();
+        if (_terrainConfiguration.Phase1)
+        {
+            CreateFlatWorld();
+        }
 
         _watch.Stop();
         Debug.Log($"Phase 1: {_watch.Elapsed.TotalSeconds}");
@@ -102,7 +109,10 @@ public class TerrainGeneration
         #region Phase 2 - Landscape generation
         _watch.Restart();
 
-        CreateLandscape();
+        if (_terrainConfiguration.Phase2)
+        {
+            CreateLandscape();
+        }
 
         _watch.Stop();
         Debug.Log($"Phase 2: {_watch.Elapsed.TotalSeconds}");
@@ -114,7 +124,10 @@ public class TerrainGeneration
         #region Phase 3 - Biomes generation
         _watch.Restart();
 
-        CreateBiomes();
+        if (_terrainConfiguration.Phase3)
+        {
+            CreateBiomes();
+        }
 
         _watch.Stop();
         Debug.Log($"Phase 3: {_watch.Elapsed.TotalSeconds}");
@@ -126,7 +139,10 @@ public class TerrainGeneration
         #region Phase 4 - Clusters generation
         _watch.Restart();
 
-        CreateClusters();
+        if (_terrainConfiguration.Phase4)
+        {
+            CreateClusters();
+        }
 
         _watch.Stop();
         Debug.Log($"Phase 4: {_watch.Elapsed.TotalSeconds}");
@@ -138,7 +154,10 @@ public class TerrainGeneration
         #region Phase 5 - Caves generation
         _watch.Restart();
 
-        CreateCaves();
+        if (_terrainConfiguration.Phase5)
+        {
+            CreateCaves();
+        }
 
         _watch.Stop();
         Debug.Log($"Phase 5: {_watch.Elapsed.TotalSeconds}");
@@ -150,7 +169,10 @@ public class TerrainGeneration
         #region Phase 6 - Special caves generation
         _watch.Restart();
 
-        CreateSpecialCaves();
+        if (_terrainConfiguration.Phase6)
+        {
+            CreateSpecialCaves();
+        }
 
         _watch.Stop();
         Debug.Log($"Phase 6: {_watch.Elapsed.TotalSeconds}");
@@ -162,7 +184,10 @@ public class TerrainGeneration
         #region Phase 7 - Lakes generation
         _watch.Restart();
 
-        CreateLakes();
+        if (_terrainConfiguration.Phase7)
+        {
+            CreateLakes();
+        }
 
         _watch.Stop();
         Debug.Log($"Phase 7: {_watch.Elapsed.TotalSeconds}");
@@ -174,7 +199,10 @@ public class TerrainGeneration
         #region Phase 8 - Oasises generation
         _watch.Restart();
 
-        CreateOasises();
+        if (_terrainConfiguration.Phase8)
+        {
+            CreateOasises();
+        }
 
         _watch.Stop();
         Debug.Log($"Phase 8: {_watch.Elapsed.TotalSeconds}");
@@ -186,7 +214,10 @@ public class TerrainGeneration
         #region Phase 9 - Grass seeding
         _watch.Restart();
 
-        GrassSeeding();
+        if (_terrainConfiguration.Phase9)
+        {
+            GrassSeeding();
+        }
 
         _watch.Stop();
         Debug.Log($"Phase 9: {_watch.Elapsed.TotalSeconds}");
@@ -198,7 +229,10 @@ public class TerrainGeneration
         #region Phase 10 - Plants generation
         _watch.Restart();
 
-        CreatePlants();
+        if (_terrainConfiguration.Phase10)
+        {
+            CreatePlants();
+        }
 
         _watch.Stop();
         Debug.Log($"Phase 10: {_watch.Elapsed.TotalSeconds}");
@@ -210,7 +244,10 @@ public class TerrainGeneration
         #region Phase 11 - Tree generation
         _watch.Restart();
 
-        CreateTrees();
+        if (_terrainConfiguration.Phase11)
+        {
+            CreateTrees();
+        }
 
         _watch.Stop();
         Debug.Log($"Phase 11: {_watch.Elapsed.TotalSeconds}");
@@ -222,7 +259,10 @@ public class TerrainGeneration
         #region Phase 12 - Pickable items generation
         _watch.Restart();
 
-        CreatePickableItems();
+        if (_terrainConfiguration.Phase12)
+        {
+            CreatePickableItems();
+        }
 
         _watch.Stop();
         Debug.Log($"Phase 12: {_watch.Elapsed.TotalSeconds}");
@@ -244,11 +284,28 @@ public class TerrainGeneration
     {
         ushort x;
         ushort y;
+        TerrainLevelSO undergroundLevel = _terrainConfiguration.Levels.Find(l => l.Name == "Underground");
+        TerrainLevelSO preUndergroundLevel = _terrainConfiguration.Levels.Find(l => l.Name == "PreUnderground");
+
         for (x = 0; x < _currentTerrainWidth; x++)
         {
             for (y = 0; y <= _terrainConfiguration.Equator; y++)
             {
                 Terrain.CreateBlock(x, y, _dirtBlock);
+                if (y >= undergroundLevel.StartY && y <= undergroundLevel.EndY)
+                {
+                    Terrain.CreateBackground(x, y, undergroundLevel.DefaultBackground);
+                }
+
+                if (y >= preUndergroundLevel.StartY && y <= preUndergroundLevel.EndY)
+                {
+                    Terrain.CreateBackground(x, y, preUndergroundLevel.DefaultBackground);
+                }
+
+                if (y >= _surfaceLevel.StartY && y <= _surfaceLevel.EndY)
+                {
+                    Terrain.CreateBackground(x, y, _surfaceLevel.DefaultBackground);
+                }
             }
         }
     }
@@ -557,17 +614,19 @@ public class TerrainGeneration
     #region Phase 5
     private void CreateCaves()
     {
+        _threads.Clear();
         _caveMap = new float[_currentTerrainWidth, _currentTerrainHeight];
         _visitedCaveMap = new byte[_currentTerrainWidth, _currentTerrainHeight];
         List<Vector2Int> caveCoords = new List<Vector2Int>();
         short i = 0;
-        _threads.Clear();
+        ushort x;
+        ushort y;
 
         //Create noise map
-        foreach (Chunk chunk in GameManager.Instance.Chunks)
+        for (y = 0; y < _surfaceLevel.EndY; y += _terrainConfiguration.ChunkSize)
         {
             _threads.Add(new Thread(CreateCave));
-            _threads[i].Start(new Tuple<ushort, ushort>(chunk.Coords.x, chunk.Coords.y));
+            _threads[i].Start(y);
             i++;
         }
 
@@ -576,9 +635,6 @@ public class TerrainGeneration
         {
             thread.Join();
         }
-
-        ushort x;
-        ushort y;
 
         //Lerp noise
         for (x = 0; x < _currentTerrainWidth; x++)
@@ -622,9 +678,8 @@ public class TerrainGeneration
 
     private void CreateCave(object obj)
     {
-        Tuple<ushort, ushort> data = (Tuple<ushort, ushort>)obj;
-        ushort startX = (ushort)(data.Item1 * _terrainConfiguration.ChunkSize);
-        ushort startY = (ushort)(data.Item2 * _terrainConfiguration.ChunkSize);
+        ushort startX = 0;
+        ushort startY = (ushort)obj;
         ushort x;
         ushort y;
         int octaves = _terrainConfiguration.Octaves;
@@ -650,7 +705,7 @@ public class TerrainGeneration
         float sampleY;
         float perlinValue;
 
-        for (x = startX; x < startX + _terrainConfiguration.ChunkSize; x++)
+        for (x = startX; x < startX + _currentTerrainWidth; x++)
         {
             for (y = startY; y < startY + _terrainConfiguration.ChunkSize; y++)
             {
@@ -684,7 +739,6 @@ public class TerrainGeneration
             }
         }
 
-        data = null;
         randomVar = null;
         octaveOffset = null;
     }
@@ -737,6 +791,7 @@ public class TerrainGeneration
         //Define list of coords and air block
         List<Vector2Ushort> coords = new List<Vector2Ushort>();
         List<Vector2Ushort> stoneCoords = new List<Vector2Ushort>();
+        List<Vector2Ushort> backgroundCoords = new List<Vector2Ushort>();
         Vector2Ushort vector = new Vector2Ushort();
 
         //Create rectangle
@@ -838,11 +893,11 @@ public class TerrainGeneration
         //Create tunnel
         if (tunnelDirection == -1)
         {
-            CreateTunnel(tunnelDirection, startX, startY, ref coords, ref stoneCoords);
+            CreateTunnel(tunnelDirection, startX, startY, ref coords, ref stoneCoords, ref backgroundCoords);
         }
         else
         {
-            CreateTunnel(tunnelDirection, (ushort)(startX + length), startY, ref coords, ref stoneCoords);
+            CreateTunnel(tunnelDirection, (ushort)(startX + length), startY, ref coords, ref stoneCoords, ref backgroundCoords);
         }
 
 
@@ -857,6 +912,11 @@ public class TerrainGeneration
         {
             Terrain.CreateBlock(coord.x, coord.y, _stoneBlock);
         }
+        
+        foreach (Vector2Ushort coord in backgroundCoords)
+        {
+            Terrain.CreateBackground(coord.x, coord.y, _dirtBG);
+        }
 
         coords = null;
         stoneCoords = null;
@@ -864,11 +924,14 @@ public class TerrainGeneration
         return true;
     }
 
-    private void CreateTunnel(short direction, ushort startX, ushort startY, ref List<Vector2Ushort> coords, ref List<Vector2Ushort> stoneCoords)
+    private void CreateTunnel(short direction, ushort startX, ushort startY, 
+        ref List<Vector2Ushort> coords, ref List<Vector2Ushort> stoneCoords, ref List<Vector2Ushort> backgroundCoords)
     {
         short x = (short)startX;
         short y = (short)startY;
         int stepUp = 5;
+        int stepUpBackground = 5;
+        bool decreaseStep = false;
         int i;
         Vector2Ushort vector = new Vector2Ushort();
 
@@ -879,6 +942,17 @@ public class TerrainGeneration
                 vector.x = (ushort)x;
                 vector.y = (ushort)(y + i);
                 coords.Add(vector);
+            }
+
+            for (i = 0; i <= stepUpBackground; i++)
+            {
+                vector.x = (ushort)x;
+                vector.y = (ushort)(y + i);
+                backgroundCoords.Add(vector);
+                if (_worldData[x, y + i + 2].CompareBlock(_airBlock))
+                {
+                    decreaseStep = true;
+                }
             }
 
             if (_randomVar.Next(0, 2) == 1)
@@ -892,6 +966,10 @@ public class TerrainGeneration
             if (_randomVar.Next(0, 2) == 1)
             {
                 y++;
+                if (decreaseStep)
+                {
+                    stepUpBackground -= 2;
+                }
             }
             if (_worldData[x, y].CompareBlock(_airBlock))
             {
