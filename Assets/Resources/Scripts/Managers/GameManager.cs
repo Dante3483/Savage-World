@@ -311,10 +311,13 @@ public class GameManager : MonoBehaviour
         {
             Task.Run(() => DisplayChunks());
         }
-        Move();
-        BreakBlock();
-        PrintBlockDetail();
-        CreateWater();
+        if (IsGameSession)
+        {
+            Move();
+            BreakBlock();
+            PrintBlockDetail();
+            CreateWater();
+        }
     }
 
     public void UpdateGameState(object obj)
@@ -487,7 +490,6 @@ public class GameManager : MonoBehaviour
         Texture2D worldMap = new Texture2D(CurrentTerrainWidth, CurrentTerrainHeight);
         Texture2D biomesMap = new Texture2D(CurrentTerrainWidth, CurrentTerrainHeight);
         Color cellColor;
-        Color backgroundColor;
         Color biomeColor;
         Color gridColor;
         Color colorOnMap;
@@ -561,6 +563,8 @@ public class GameManager : MonoBehaviour
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
 
             Terrain.CreateBlock((ushort)worldPosition.x, (ushort)worldPosition.y, ObjectsAtlass.Air);
+
+            Terrain.CreateLight((ushort)worldPosition.x, (ushort)worldPosition.y, ObjectsAtlass.Air);
         }
     }
 

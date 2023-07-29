@@ -17,6 +17,8 @@ public struct WorldCellData
 
     private Vector2Ushort _coords;
     private byte _currentActionTime;
+
+    private float _intensity;
     #endregion
 
     #region Liquid
@@ -174,6 +176,19 @@ public struct WorldCellData
             _backgroundTileId = value;
         }
     }
+
+    public float Intensity
+    {
+        get
+        {
+            return _intensity;
+        }
+
+        set
+        {
+            _intensity = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -192,6 +207,8 @@ public struct WorldCellData
         _liquidId = 255;
         _isFlowsDown = false;
         _flowValue = 0;
+
+        _intensity = 0;
     }
 
     public override string ToString()
@@ -205,7 +222,8 @@ public struct WorldCellData
             $"Is liquid: {_liquidId != 255}\n" +
             $"Is flow down: {_isFlowsDown}\n" +
             $"Liquid ID: {_liquidId}\n" +
-            $"Flow value: {_flowValue}";
+            $"Flow value: {_flowValue}\n" +
+            $"Brightness: {_intensity}";
     }
 
     public TileBase GetBlockTile()
@@ -313,6 +331,11 @@ public struct WorldCellData
     public bool IsBackground()
     {
         return BackgroundData != GameManager.Instance.ObjectsAtlass.AirBG;
+    }
+
+    public bool IsEmptyBackground()
+    {
+        return BackgroundData.GetId() == 0;
     }
     #endregion
 }

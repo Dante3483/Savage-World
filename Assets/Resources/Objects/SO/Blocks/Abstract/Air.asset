@@ -15,4 +15,6 @@ MonoBehaviour:
   _tiles: []
   _type: 0
   _colorOnMap: {r: 0.6270203, g: 0.8686457, b: 0.9716981, a: 1}
+  _lightValue: 0
+  _isSourceOfLight: 0
   _id: 0

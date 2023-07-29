@@ -24,13 +24,14 @@ MonoBehaviour:
   Phase10: 1
   Phase11: 1
   Phase12: 1
+  Phase13: 1
   DefaultHorizontalChunksCount: 84
   DefaultVerticalChunksCount: 24
   CurrentHorizontalChunksCount: 84
   CurrentVerticalChunksCount: 24
   ChunkSize: 100
   Equator: 2150
-  DeepOceanY: 1897
+  DeepOceanY: 1875
   Levels:
   - {fileID: 11400000, guid: abfc12d2ebd9c244a95107aae1c41b37, type: 2}
   - {fileID: 11400000, guid: 318a27e219dd34042a9bc397b17bb678, type: 2}

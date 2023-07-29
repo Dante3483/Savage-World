@@ -24,6 +24,7 @@ public class TerrainConfigurationSO : ScriptableObject
     public bool Phase10;
     public bool Phase11;
     public bool Phase12;
+    public bool Phase13;
 
     [Header("World size")]
     public byte DefaultHorizontalChunksCount;

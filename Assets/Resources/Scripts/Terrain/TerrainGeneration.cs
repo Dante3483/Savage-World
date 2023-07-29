@@ -24,6 +24,7 @@ public class TerrainGeneration
     private BlockSO _stoneBlock;
     private BlockSO _stoneBG;
     private BlockSO _dirtBG;
+    private BlockSO _airBG;
     private BiomeSO _nonBiom;
     private BiomeSO _ocean;
     private BiomeSO _desert;
@@ -42,6 +43,7 @@ public class TerrainGeneration
     private List<Vector2Ushort> _surfaceCoords;
     private WorldCellData[,] _worldData;
     private List<Thread> _threads;
+    private Terrain _terrain;
     #endregion
 
     #region Public fields
@@ -55,7 +57,7 @@ public class TerrainGeneration
     #region Methods
 
     #region General
-    public TerrainGeneration(int seed, ref WorldCellData[,] worldData)
+    public TerrainGeneration(int seed, ref WorldCellData[,] worldData, Terrain terrain)
     {
         _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
         _randomVar = GameManager.Instance.RandomVar;
@@ -67,6 +69,7 @@ public class TerrainGeneration
         _waterBlock = GameManager.Instance.ObjectsAtlass.Water;
         _sandBlock = GameManager.Instance.ObjectsAtlass.Sand;
         _stoneBlock = GameManager.Instance.ObjectsAtlass.Stone;
+        _airBG = GameManager.Instance.ObjectsAtlass.AirBG;
         _dirtBG = GameManager.Instance.ObjectsAtlass.DirtBG;
         _stoneBG = GameManager.Instance.ObjectsAtlass.StoneBG;
         _nonBiom = _terrainConfiguration.Biomes.Find(b => b.Id == BiomesID.NonBiom);
@@ -84,12 +87,13 @@ public class TerrainGeneration
         _surfaceCoords = new List<Vector2Ushort>();
         _worldData = worldData;
         _threads = new List<Thread>();
+        _terrain = terrain;
     }
 
     public void StartTerrainGeneration()
     {
         _totalTime = 0f;
-        _step = 100f / 12;
+        _step = 100f / 13;
 
         #region Phase 1 - Flat world generation
         _watch = System.Diagnostics.Stopwatch.StartNew();
@@ -271,6 +275,21 @@ public class TerrainGeneration
         GameManager.Instance.LoadingValue += _step;
         #endregion
 
+        #region Phase 13 - Set light values
+        _watch.Restart();
+
+        if (_terrainConfiguration.Phase13)
+        {
+            SetLightValues();
+        }
+
+        _watch.Stop();
+        Debug.Log($"Phase 13: {_watch.Elapsed.TotalSeconds}");
+        GameManager.Instance.GeneralInfo += $"Phase 13: {_watch.Elapsed.TotalSeconds}\n";
+        _totalTime += _watch.Elapsed.TotalSeconds;
+        GameManager.Instance.LoadingValue += _step;
+        #endregion
+
         Debug.Log($"Total time: {_totalTime}");
         GameManager.Instance.GeneralInfo += $"Total time: {_totalTime}\n";
         GameManager.Instance.IsGameSession = true;
@@ -291,21 +310,30 @@ public class TerrainGeneration
         {
             for (y = 0; y <= _terrainConfiguration.Equator; y++)
             {
-                Terrain.CreateBlock(x, y, _dirtBlock);
+                _terrain.CreateBlock(x, y, _dirtBlock);
                 if (y >= undergroundLevel.StartY && y <= undergroundLevel.EndY)
                 {
-                    Terrain.CreateBackground(x, y, undergroundLevel.DefaultBackground);
+                    _terrain.CreateBackground(x, y, undergroundLevel.DefaultBackground);
                 }
 
                 if (y >= preUndergroundLevel.StartY && y <= preUndergroundLevel.EndY)
                 {
-                    Terrain.CreateBackground(x, y, preUndergroundLevel.DefaultBackground);
+                    _terrain.CreateBackground(x, y, preUndergroundLevel.DefaultBackground);
                 }
 
                 if (y >= _surfaceLevel.StartY && y <= _surfaceLevel.EndY)
                 {
-                    Terrain.CreateBackground(x, y, _surfaceLevel.DefaultBackground);
+                    _terrain.CreateBackground(x, y, _surfaceLevel.DefaultBackground);
                 }
+            }
+        }
+
+        for (x = 0; x < _currentTerrainWidth; x++)
+        {
+            for (y = (ushort)(_terrainConfiguration.Equator + 1); y < GameManager.Instance.CurrentTerrainHeight ; y++)
+            {
+                _terrain.CreateBlock(x, y, _airBlock);
+                _terrain.CreateBackground(x, y, _airBG);
             }
         }
     }
@@ -341,7 +369,7 @@ public class TerrainGeneration
                 height += (short)(startY + heightAdder);
                 for (y = startY; y <= height; y++)
                 {
-                    Terrain.CreateBlock(x, y, _dirtBlock);
+                    _terrain.CreateBlock(x, y, _dirtBlock);
                 }
                 vector.x = x;
                 vector.y = (ushort)(y - 1);
@@ -389,14 +417,14 @@ public class TerrainGeneration
             //Clear dirt above ocean
             for (y = startY; y <= startY + biome.MountainHeight; y++)
             {
-                Terrain.CreateBlock(x, y, _airBlock);
+                _terrain.CreateBlock(x, y, _airBlock);
             }
 
             //Create hole
             for (y = startY; y >= startY - downHeight; y--)
             {
-                Terrain.CreateBlock(x, y, _airBlock);
-                Terrain.CreateLiquidBlock(x, y, waterId);
+                _terrain.CreateBlock(x, y, _airBlock);
+                _terrain.CreateLiquidBlock(x, y, waterId);
                 GameManager.Instance.SetChunkBiome(x, y, biome);
             }
 
@@ -428,7 +456,7 @@ public class TerrainGeneration
                 {
                     break;
                 }
-                Terrain.CreateBlock(x, y, _airBlock);
+                _terrain.CreateBlock(x, y, _airBlock);
             }
 
             chanceToMoveUp = (byte)_randomVar.Next(0, 3);
@@ -455,7 +483,7 @@ public class TerrainGeneration
             {
                 if (_worldData[x, y].CompareBlock(_dirtBlock))
                 {
-                    Terrain.CreateBlock(x, y, _sandBlock);
+                    _terrain.CreateBlock(x, y, _sandBlock);
                     GameManager.Instance.SetChunkBiome(x, y, biome);
                 }
             }
@@ -478,7 +506,7 @@ public class TerrainGeneration
                 if (_worldData[x, y].CompareBlock(_sandBlock) &&
                     chanceToPulverize % 5 == 0)
                 {
-                    Terrain.CreateBlock(x, y, _dirtBlock);
+                    _terrain.CreateBlock(x, y, _dirtBlock);
                 }
             }
 
@@ -488,7 +516,7 @@ public class TerrainGeneration
                 if (_worldData[x, y].CompareBlock(_dirtBlock) &&
                     chanceToPulverize % 5 == 0)
                 {
-                    Terrain.CreateBlock(x, y, _sandBlock);
+                    _terrain.CreateBlock(x, y, _sandBlock);
                 }
             }
         }
@@ -504,7 +532,7 @@ public class TerrainGeneration
                 if (_worldData[x, y].CompareBlock(_dirtBlock) &&
                     chanceToPulverize % 5 == 0)
                 {
-                    Terrain.CreateBlock(x, y, _sandBlock);
+                    _terrain.CreateBlock(x, y, _sandBlock);
                 }
             }
 
@@ -514,7 +542,7 @@ public class TerrainGeneration
                 if (_worldData[x, y].CompareBlock(_sandBlock) &&
                     chanceToPulverize % 5 == 0)
                 {
-                    Terrain.CreateBlock(x, y, _dirtBlock);
+                    _terrain.CreateBlock(x, y, _dirtBlock);
                 }
             }
         }
@@ -600,7 +628,7 @@ public class TerrainGeneration
                 {
                     if (GenerateNoise(x, y, clusterData.Scale, clusterData.Amplitude, additionalSeed) >= clusterData.Intensity)
                     {
-                        Terrain.CreateBlock(x, y, data.Item2.Block);
+                        _terrain.CreateBlock(x, y, data.Item2.Block);
                     }
                 }
             }
@@ -665,7 +693,7 @@ public class TerrainGeneration
                     {
                         foreach (Vector2Int v in caveCoords)
                         {
-                            Terrain.CreateBlock((ushort)v.x, (ushort)v.y, _airBlock);
+                            _terrain.CreateBlock((ushort)v.x, (ushort)v.y, _airBlock);
                         }
                     }
                     caveCoords.Clear();
@@ -904,18 +932,18 @@ public class TerrainGeneration
         //Fill terrain with air blocks
         foreach (Vector2Ushort coord in coords)
         {
-            Terrain.CreateBlock(coord.x, coord.y, _airBlock);
+            _terrain.CreateBlock(coord.x, coord.y, _airBlock);
         }
 
         //Fill terrain with stone blocks
         foreach (Vector2Ushort coord in stoneCoords)
         {
-            Terrain.CreateBlock(coord.x, coord.y, _stoneBlock);
+            _terrain.CreateBlock(coord.x, coord.y, _stoneBlock);
         }
         
         foreach (Vector2Ushort coord in backgroundCoords)
         {
-            Terrain.CreateBackground(coord.x, coord.y, _dirtBG);
+            _terrain.CreateBackground(coord.x, coord.y, _dirtBG);
         }
 
         coords = null;
@@ -1106,14 +1134,14 @@ public class TerrainGeneration
         //Create lake
         foreach (Vector2Ushort coord in coords)
         {
-            Terrain.CreateBlock(coord.x, coord.y, _airBlock);
-            Terrain.CreateLiquidBlock(coord.x, coord.y, waterId);
+            _terrain.CreateBlock(coord.x, coord.y, _airBlock);
+            _terrain.CreateLiquidBlock(coord.x, coord.y, waterId);
         }
 
         //Create air
         foreach (Vector2Ushort coord in emptyCoords)
         {
-            Terrain.CreateBlock(coord.x, coord.y, _airBlock);
+            _terrain.CreateBlock(coord.x, coord.y, _airBlock);
         }
 
         coords = null;
@@ -1247,14 +1275,14 @@ public class TerrainGeneration
         //Create lake
         foreach (Vector2Ushort coord in coords)
         {
-            Terrain.CreateBlock(coord.x, coord.y, _airBlock);
-            Terrain.CreateLiquidBlock(coord.x, coord.y, waterId);
+            _terrain.CreateBlock(coord.x, coord.y, _airBlock);
+            _terrain.CreateLiquidBlock(coord.x, coord.y, waterId);
         }
 
         //Create air
         foreach (Vector2Ushort coord in emptyCoords)
         {
-            Terrain.CreateBlock(coord.x, coord.y, _airBlock);
+            _terrain.CreateBlock(coord.x, coord.y, _airBlock);
         }
 
         coords = null;
@@ -1292,7 +1320,7 @@ public class TerrainGeneration
                 _surfaceCoords.Add(vector);
                 if (_worldData[x, y].CompareBlock(_dirtBlock))
                 {
-                    Terrain.CreateBlock(x, y, GameManager.Instance.ObjectsAtlass.GetGrassByBiome(currentBiomeId));
+                    _terrain.CreateBlock(x, y, GameManager.Instance.ObjectsAtlass.GetGrassByBiome(currentBiomeId));
                 }
             }
         }
@@ -1354,7 +1382,7 @@ public class TerrainGeneration
                                 {
                                     continue;
                                 }
-                                Terrain.CreateBlock(x, (ushort)(y + 1), plant);
+                                _terrain.CreateBlock(x, (ushort)(y + 1), plant);
                             }
                             if (plant.IsTopBlockSolid)
                             {
@@ -1366,7 +1394,7 @@ public class TerrainGeneration
                                 {
                                     continue;
                                 }
-                                Terrain.CreateBlock(x, (ushort)(y - 1), plant);
+                                _terrain.CreateBlock(x, (ushort)(y - 1), plant);
                             }
                         }
                     }
@@ -1593,6 +1621,25 @@ public class TerrainGeneration
 
         allPickableItems = null;
         coords = null;
+    }
+    #endregion
+
+    #region Phase 13
+    private void SetLightValues()
+    {
+        //ushort x;
+        //ushort y;
+
+        //for (x = 0; x < _currentTerrainWidth; x++)
+        //{
+        //    for (y = 0; y < _currentTerrainHeight; y++)
+        //    {
+        //        if (_worldData[x, y].IsSourceOfLight)
+        //        {
+        //            _terrain.CreateLight(x, y, _worldData[x, y].BlockData);
+        //        }
+        //    }
+        //}
     }
     #endregion
 

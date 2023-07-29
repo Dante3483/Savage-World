@@ -18,6 +18,10 @@ public class Terrain : MonoBehaviour
     [Header("Sections")]
     [SerializeField] private GameObject _trees;
     [SerializeField] private GameObject _pickableItems;
+
+    private WorldCellData[,] _worldData;
+    private int _currenMapWidth;
+    private int _currenMapHeight;
     #region Threads
     private Thread _blockProcessingThread;
     private Thread _randomBlockProcessingThread;
@@ -138,10 +142,13 @@ public class Terrain : MonoBehaviour
     {
         try
         {
+            _worldData = worldData;
+            _currenMapWidth = GameManager.Instance.CurrentTerrainWidth;
+            _currenMapHeight = GameManager.Instance.CurrentTerrainHeight;
             GameManager.Instance.RandomVar = new System.Random(GameManager.Instance.Seed);
 
             //Start generation
-            TerrainGeneration terrainGeneration = new TerrainGeneration(GameManager.Instance.Seed, ref worldData);
+            TerrainGeneration terrainGeneration = new TerrainGeneration(GameManager.Instance.Seed, ref worldData, this);
             terrainGeneration.StartTerrainGeneration();
         }
         catch (Exception e)
@@ -366,8 +373,8 @@ public class Terrain : MonoBehaviour
         float leftFlow;
         float rightFlow;
 
-        double currentTime = 0;
-        double prevTime = 0;
+        //double currentTime = 0;
+        //double prevTime = 0;
 
         bool needToFlow;
 
@@ -719,19 +726,51 @@ public class Terrain : MonoBehaviour
     #endregion
 
     #region Helpful
-    public static void CreateBlock(ushort x, ushort y, BlockSO block)
+    public void CreateBlock(ushort x, ushort y, BlockSO block)
     {
-        GameManager.Instance.WorldData[x, y].SetBlockData(block);
+        _worldData[x, y].SetBlockData(block);
     }
 
-    public static void CreateLiquidBlock(ushort x, ushort y, byte id)
+    public void CreateLiquidBlock(ushort x, ushort y, byte id)
     {
-        GameManager.Instance.WorldData[x, y].SetBlockData(id);
+        _worldData[x, y].SetBlockData(id);
     }
 
-    public static void CreateBackground(ushort x, ushort y, BlockSO block)
+    public void CreateBackground(ushort x, ushort y, BlockSO block)
     {
-        GameManager.Instance.WorldData[x, y].SetBackgroundData(block);
+        _worldData[x, y].SetBackgroundData(block);
+    }
+
+    public void CreateLight(ushort x, ushort y, BlockSO block)
+    {
+        //int dx;
+        //int dy;
+        //float currentLightValue;
+        //float newLightValue;
+        //Queue<(int, int)> queue = new Queue<(int, int)>();
+        //queue.Enqueue((x, y));
+
+        //while (queue.Count > 0)
+        //{
+        //    (dx, dy) = queue.Dequeue();
+
+
+
+        //    AddToQueue(dx - 1, dy);
+        //    AddToQueue(dx + 1, dy);
+        //    AddToQueue(dx, dy - 1);
+        //    AddToQueue(dx, dy + 1);
+        //}
+
+        //void AddToQueue(int x, int y)
+        //{
+        //    if (IsInMapRange(x, y) && _worldData[x, y].LightValue < currentLightValue)
+        //    {
+        //        newLightValue = Mathf.Max(_worldData[x, y].LightValue, currentLightValue * 0.5f);
+        //        _worldData[x, y].LightValue = newLightValue;
+        //        queue.Enqueue((x, y));
+        //    }
+        //}
     }
 
     private RectInt GetCameraRectInt()
@@ -749,7 +788,7 @@ public class Terrain : MonoBehaviour
     #endregion
 
     #region Valid
-    public bool IsInMapRange(int x, int y)
+    public static bool IsInMapRange(int x, int y)
     {
         return x >= 0 && x < GameManager.Instance.CurrentTerrainWidth && y >= 0 && y < GameManager.Instance.CurrentTerrainHeight;
     }
