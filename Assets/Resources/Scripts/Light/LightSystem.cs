@@ -25,7 +25,6 @@ public class LightSystem : MonoBehaviour
     private void Start()
     {
         _lightMap = new Texture2D(100, 100);
-        _lightMapMaterial.SetTexture("_ShadowTex", _lightMap);
         _mainCamera = Camera.main;
         StartCoroutine(UpdateLight());
     }
@@ -38,19 +37,18 @@ public class LightSystem : MonoBehaviour
         int y;
         int dx;
         int dy;
+        int loopCount;
 
         float lightValue;
-
-        float currentLightValue;
         float newLightValue;
-
         float bgLightValute;
         float blockLightValue;
+
         Color color;
-        int loopCount;
         Renderer renderer = GetComponent<Renderer>();
         WorldCellData[,] _worldData = GameManager.Instance.WorldData;
         Queue<(int, int)> queue = new Queue<(int, int)> ();
+
         _lightValueMap = new float[100, 100];
 
         while (true)
@@ -159,7 +157,7 @@ public class LightSystem : MonoBehaviour
                 {
                     if (_worldData[dx, dy].IsSolid())
                     {
-                        return currentLightValue * 0.6f;
+                        return currentLightValue * 0.75f;
                     }
                     else
                     {
@@ -186,7 +184,9 @@ public class LightSystem : MonoBehaviour
                     _lightMap.SetPixel(x, y, color);
                 }
             }
+
             _lightMap.Apply();
+            _lightMapMaterial.SetTexture("_ShadowTex", _lightMap);
             renderer.material.mainTexture = _lightMap;
             renderer.material.mainTexture.filterMode = FilterMode.Point;
         }

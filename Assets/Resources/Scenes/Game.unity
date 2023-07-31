@@ -3119,7 +3119,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lightMap: {fileID: 0}
-  _lightMapMaterial: {fileID: 2100000, guid: fe658fd9e9b41cb45b8677bcee5923d8, type: 2}
+  _lightMapMaterial: {fileID: 2100000, guid: aad6ce3bdf63f3e4b97f1eecd95da9a3, type: 2}
 --- !u!212 &1804569940
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3140,7 +3140,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: fe658fd9e9b41cb45b8677bcee5923d8, type: 2}
+  - {fileID: 2100000, guid: aad6ce3bdf63f3e4b97f1eecd95da9a3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
