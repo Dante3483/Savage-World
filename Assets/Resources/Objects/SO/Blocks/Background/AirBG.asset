@@ -16,5 +16,5 @@ MonoBehaviour:
   _type: 5
   _colorOnMap: {r: 1, g: 1, b: 1, a: 0}
   _lightValue: 1
-  _isSourceOfLight: 1
-  _id: 0
+  _isSurfaceLight: 1
+  _id: 1

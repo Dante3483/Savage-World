@@ -11,4 +11,6 @@ public enum BlockTypes: byte
     Plant = 4,
 
     Background = 5,
+
+    Furniture = 6,
 }

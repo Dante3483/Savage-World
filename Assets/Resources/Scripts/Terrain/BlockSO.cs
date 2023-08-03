@@ -9,7 +9,7 @@ public abstract class BlockSO : ScriptableObject
     [SerializeField] private BlockTypes _type;
     [SerializeField] private Color _colorOnMap = Color.white;
     [SerializeField] private float _lightValue;
-    [SerializeField] private bool _isSourceOfLight;
+    [SerializeField] private bool _isSurfaceLight;
     #endregion
 
     #region Public fields
@@ -69,16 +69,16 @@ public abstract class BlockSO : ScriptableObject
         }
     }
 
-    public bool IsSourceOfLight
+    public bool IsSurfaceLight
     {
         get
         {
-            return _isSourceOfLight;
+            return _isSurfaceLight;
         }
 
         set
         {
-            _isSourceOfLight = value;
+            _isSurfaceLight = value;
         }
     }
     #endregion

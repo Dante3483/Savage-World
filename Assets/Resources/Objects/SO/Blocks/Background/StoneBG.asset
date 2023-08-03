@@ -16,4 +16,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 18c2179da5d7cc543aadb50d9738895f, type: 2}
   _type: 5
   _colorOnMap: {r: 0.17969622, g: 0.16817723, b: 0.18200001, a: 1}
-  _id: 2
+  _lightValue: 0
+  _isSurfaceLight: 0
+  _id: 3

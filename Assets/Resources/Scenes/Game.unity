@@ -604,15 +604,39 @@ Tilemap:
   m_Enabled: 1
   m_Tiles: {}
   m_AnimatedTiles: {}
-  m_TileAssetArray: []
-  m_TileSpriteArray: []
-  m_TileMatrixArray: []
-  m_TileColorArray: []
+  m_TileAssetArray:
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
+  m_TileSpriteArray:
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
+  m_TileMatrixArray:
+  - m_RefCount: 0
+    m_Data:
+      e00: -2.2291308e+28
+      e01: 0
+      e02: -3.3750038
+      e03: -3.3750038
+      e10: 6.14e-43
+      e11: 0
+      e12: 6.14e-43
+      e13: 6.14e-43
+      e20: -2.2617103e-18
+      e21: 1e-45
+      e22: 2.3728276e-19
+      e23: 3.62148e-29
+      e30: 4.5905e-41
+      e31: 0
+      e32: 6.15e-43
+      e33: 6.18e-43
+  m_TileColorArray:
+  - m_RefCount: 0
+    m_Data: {r: 3.9231e-41, g: 3.9231e-41, b: 3.9231e-41, a: 3.9231e-41}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: 0, y: 0, z: 0}
-  m_Size: {x: 0, y: 0, z: 1}
+  m_Size: {x: 3233, y: 2172, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
@@ -816,6 +840,7 @@ Transform:
   m_Children:
   - {fileID: 757566710}
   - {fileID: 1330428318}
+  - {fileID: 959524541}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -873,7 +898,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 8
+  orthographic size: 16
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1841,6 +1866,57 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 933249841}
   m_CullTransparentMesh: 1
+--- !u!1 &959524540
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 959524541}
+  - component: {fileID: 959524542}
+  m_Layer: 0
+  m_Name: TimeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &959524541
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 959524540}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 508288981}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &959524542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 959524540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe503b5ba122fb54a9d4b982b775645c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _minutes: 0
+  _hours: 0
+  _dayLightValue: 0
+  _currentColor: {r: 0, g: 0, b: 0, a: 0}
+  _dayColor: {r: 0.7882353, g: 0.9529412, b: 1, a: 1}
+  _eveningColor: {r: 1, g: 0.7221989, b: 0.30566037, a: 1}
+  _nightColor: {r: 0, g: 0.015686275, b: 0.05490196, a: 1}
 --- !u!1 &961164141
 GameObject:
   m_ObjectHideFlags: 0
@@ -3119,7 +3195,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lightMap: {fileID: 0}
-  _lightMapMaterial: {fileID: 2100000, guid: aad6ce3bdf63f3e4b97f1eecd95da9a3, type: 2}
+  _lightMapMaterial: {fileID: 2100000, guid: 796a4dc4081b83642b5f389cf0c25a37, type: 2}
+  _width: 100
+  _height: 100
 --- !u!212 &1804569940
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3140,7 +3218,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: aad6ce3bdf63f3e4b97f1eecd95da9a3, type: 2}
+  - {fileID: 2100000, guid: 796a4dc4081b83642b5f389cf0c25a37, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

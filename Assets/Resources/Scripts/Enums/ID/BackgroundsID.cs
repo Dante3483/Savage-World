@@ -1,8 +1,10 @@
 public enum BackgroundsID : ushort
 {
-    Air = 0,
+    Empty = 0,
 
-    Dirt = 1,
+    Air = 1,
 
-    Stone = 2,
+    Dirt = 2,
+
+    Stone = 3,
 }

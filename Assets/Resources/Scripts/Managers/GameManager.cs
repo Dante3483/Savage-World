@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int _seed;
     [SerializeField] private System.Random _randomVar;
     private string _generalInfo;
-    private string _blockInfo;
+    private Vector2Int _blockInfoCoords;
     private string _processingSpeedInfo;
     private float _loadingValue;
     private bool _isGameSession;
@@ -251,19 +251,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public string BlockInfo
-    {
-        get
-        {
-            return _blockInfo;
-        }
-
-        set
-        {
-            _blockInfo = value;
-        }
-    }
-
     public string ProcessingSpeedInfo
     {
         get
@@ -317,6 +304,7 @@ public class GameManager : MonoBehaviour
             BreakBlock();
             PrintBlockDetail();
             CreateWater();
+            CreateTorch();
         }
     }
 
@@ -532,7 +520,10 @@ public class GameManager : MonoBehaviour
         while (true)
         {
             _infoText.text = GeneralInfo;
-            _blockInfoText.text = BlockInfo;
+            if (IsGameSession)
+            {
+                _blockInfoText.text = _worldData[_blockInfoCoords.x, _blockInfoCoords.y].ToString();
+            }
             _ProcessingSpeedInfoText.text = ProcessingSpeedInfo;
             yield return null;
         }
@@ -563,8 +554,6 @@ public class GameManager : MonoBehaviour
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
 
             Terrain.CreateBlock((ushort)worldPosition.x, (ushort)worldPosition.y, ObjectsAtlass.Air);
-
-            Terrain.CreateLight((ushort)worldPosition.x, (ushort)worldPosition.y, ObjectsAtlass.Air);
         }
     }
 
@@ -576,7 +565,7 @@ public class GameManager : MonoBehaviour
 
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
 
-            BlockInfo = WorldData[(int)worldPosition.x, (int)worldPosition.y].ToString();
+            _blockInfoCoords = Vector2Int.FloorToInt(worldPosition);
         }
     }
 
@@ -589,6 +578,18 @@ public class GameManager : MonoBehaviour
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
 
             Terrain.CreateLiquidBlock((ushort)worldPosition.x, (ushort)worldPosition.y, (byte)ObjectsAtlass.Water.GetId());
+        }
+    }
+
+    public void CreateTorch()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            Vector3 clickPosition = Input.mousePosition;
+
+            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
+
+            Terrain.CreateBlock((ushort)worldPosition.x, (ushort)worldPosition.y, ObjectsAtlass.Torch);
         }
     }
     #endregion

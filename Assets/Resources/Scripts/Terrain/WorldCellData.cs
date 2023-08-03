@@ -18,7 +18,7 @@ public struct WorldCellData
     private Vector2Ushort _coords;
     private byte _currentActionTime;
 
-    private float _intensity;
+    private float _brightness;
     #endregion
 
     #region Liquid
@@ -177,16 +177,16 @@ public struct WorldCellData
         }
     }
 
-    public float Intensity
+    public float Brightness
     {
         get
         {
-            return _intensity;
+            return _brightness;
         }
 
         set
         {
-            _intensity = value;
+            _brightness = value;
         }
     }
     #endregion
@@ -208,7 +208,7 @@ public struct WorldCellData
         _isFlowsDown = false;
         _flowValue = 0;
 
-        _intensity = 0;
+        _brightness = 0;
     }
 
     public override string ToString()
@@ -223,7 +223,7 @@ public struct WorldCellData
             $"Is flow down: {_isFlowsDown}\n" +
             $"Liquid ID: {_liquidId}\n" +
             $"Flow value: {_flowValue}\n" +
-            $"Brightness: {_intensity}";
+            $"Brightness: {_brightness}";
     }
 
     public TileBase GetBlockTile()
@@ -285,17 +285,20 @@ public struct WorldCellData
         BlockTileId = 255;
         BlockType = block.Type;
         BlockData = block;
+        Brightness = 0f;
     }
 
     public void SetBlockData(byte id)
     {
         LiquidId = id;
         FlowValue = 100f;
+        Brightness = 0f;
     }
 
     public void SetBackgroundData(BlockSO background)
     {
         BackgroundData = background;
+        Brightness = 0f;
     }
 
     public bool CompareBlock(BlockSO block)
@@ -333,9 +336,14 @@ public struct WorldCellData
         return BackgroundData != GameManager.Instance.ObjectsAtlass.AirBG;
     }
 
-    public bool IsEmptyBackground()
+    public bool IsDayLightBlock()
     {
-        return BackgroundData.GetId() == 0;
+        return BackgroundData.GetId() == (ushort)BackgroundsID.Air;
+    }
+
+    public bool IsFullLiquidBlock()
+    {
+        return IsLiquid() && FlowValue == 100;
     }
     #endregion
 }

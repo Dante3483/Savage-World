@@ -99,6 +99,10 @@ public class ObjectsAtlass : ScriptableObject
     public BlockSO StoneBG;
     #endregion
 
+    #region Furniture
+    public BlockSO Torch;
+    #endregion
+
     #region Trees
     [Header("Trees")]
     public GameObject Pine1;
@@ -196,6 +200,11 @@ public class ObjectsAtlass : ScriptableObject
         Blocks[BlockTypes.Background].Add(AirBG.GetId(), AirBG);
         Blocks[BlockTypes.Background].Add(DirtBG.GetId(), DirtBG);
         Blocks[BlockTypes.Background].Add(StoneBG.GetId(), StoneBG);
+        #endregion
+
+        #region Furniture
+        Blocks.Add(BlockTypes.Furniture, new Dictionary<ushort, BlockSO>());
+        Blocks[BlockTypes.Furniture].Add(Torch.GetId(), Torch);
         #endregion
 
         #region Sets

@@ -2,10 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using static TMPro.Examples.TMP_ExampleScript_01;
 
 public class Terrain : MonoBehaviour
 {
@@ -739,38 +737,6 @@ public class Terrain : MonoBehaviour
     public void CreateBackground(ushort x, ushort y, BlockSO block)
     {
         _worldData[x, y].SetBackgroundData(block);
-    }
-
-    public void CreateLight(ushort x, ushort y, BlockSO block)
-    {
-        //int dx;
-        //int dy;
-        //float currentLightValue;
-        //float newLightValue;
-        //Queue<(int, int)> queue = new Queue<(int, int)>();
-        //queue.Enqueue((x, y));
-
-        //while (queue.Count > 0)
-        //{
-        //    (dx, dy) = queue.Dequeue();
-
-
-
-        //    AddToQueue(dx - 1, dy);
-        //    AddToQueue(dx + 1, dy);
-        //    AddToQueue(dx, dy - 1);
-        //    AddToQueue(dx, dy + 1);
-        //}
-
-        //void AddToQueue(int x, int y)
-        //{
-        //    if (IsInMapRange(x, y) && _worldData[x, y].LightValue < currentLightValue)
-        //    {
-        //        newLightValue = Mathf.Max(_worldData[x, y].LightValue, currentLightValue * 0.5f);
-        //        _worldData[x, y].LightValue = newLightValue;
-        //        queue.Enqueue((x, y));
-        //    }
-        //}
     }
 
     private RectInt GetCameraRectInt()
