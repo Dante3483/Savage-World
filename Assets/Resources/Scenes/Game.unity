@@ -3159,7 +3159,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1804569938}
   - component: {fileID: 1804569940}
-  - component: {fileID: 1804569939}
+  - component: {fileID: 1804569941}
   m_Layer: 0
   m_Name: Light
   m_TagString: Untagged
@@ -3176,28 +3176,12 @@ Transform:
   m_GameObject: {fileID: 1804569937}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 1000, y: 2150, z: 0}
-  m_LocalScale: {x: 100, y: 100, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 30800703}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1804569939
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1804569937}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fc75ae86e47c2d4992840928c3544d4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _lightMap: {fileID: 0}
-  _lightMapMaterial: {fileID: 2100000, guid: 796a4dc4081b83642b5f389cf0c25a37, type: 2}
-  _width: 100
-  _height: 100
 --- !u!212 &1804569940
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3218,7 +3202,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 796a4dc4081b83642b5f389cf0c25a37, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3250,6 +3234,26 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1804569941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1804569937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a55a80d81e513547a4e4aaaa07114f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _lightMap: {fileID: 0}
+  _lightMapMaterialLow: {fileID: 2100000, guid: fe658fd9e9b41cb45b8677bcee5923d8, type: 2}
+  _lightMapMaterialMedium: {fileID: 2100000, guid: aad6ce3bdf63f3e4b97f1eecd95da9a3, type: 2}
+  _lightMapMaterialHigh: {fileID: 2100000, guid: 796a4dc4081b83642b5f389cf0c25a37, type: 2}
+  _currentLightMapMaterial: {fileID: 0}
+  _width: 150
+  _height: 100
+  _isColoredMode: 1
 --- !u!1 &1848979392
 GameObject:
   m_ObjectHideFlags: 0

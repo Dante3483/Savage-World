@@ -18,7 +18,7 @@ public struct WorldCellData
     private Vector2Ushort _coords;
     private byte _currentActionTime;
 
-    private float _brightness;
+    public float Brightness;
     #endregion
 
     #region Liquid
@@ -176,19 +176,6 @@ public struct WorldCellData
             _backgroundTileId = value;
         }
     }
-
-    public float Brightness
-    {
-        get
-        {
-            return _brightness;
-        }
-
-        set
-        {
-            _brightness = value;
-        }
-    }
     #endregion
 
     #region Methods
@@ -208,7 +195,7 @@ public struct WorldCellData
         _isFlowsDown = false;
         _flowValue = 0;
 
-        _brightness = 0;
+        Brightness = 0;
     }
 
     public override string ToString()
@@ -219,11 +206,14 @@ public struct WorldCellData
             $"Tile ID: {_blockTileId}\n" +
             $"Block type: {_blockType}\n" +
             $"Name: {_blockData.name}\n" +
+            $"Background ID: {_backgroundData.GetId()}\n" +
+            $"Background type: {_backgroundData.Type}\n" +
+            $"Background name: {_backgroundData.name}\n" +
             $"Is liquid: {_liquidId != 255}\n" +
             $"Is flow down: {_isFlowsDown}\n" +
             $"Liquid ID: {_liquidId}\n" +
             $"Flow value: {_flowValue}\n" +
-            $"Brightness: {_brightness}";
+            $"Brightness: {Brightness}";
     }
 
     public TileBase GetBlockTile()
@@ -285,20 +275,17 @@ public struct WorldCellData
         BlockTileId = 255;
         BlockType = block.Type;
         BlockData = block;
-        Brightness = 0f;
     }
 
     public void SetBlockData(byte id)
     {
         LiquidId = id;
         FlowValue = 100f;
-        Brightness = 0f;
     }
 
     public void SetBackgroundData(BlockSO background)
     {
         BackgroundData = background;
-        Brightness = 0f;
     }
 
     public bool CompareBlock(BlockSO block)

@@ -426,6 +426,41 @@ public class GameManager : MonoBehaviour
     {
         return ref WorldData[x, y];
     }
+
+    public float GetBlockLight(int x, int y)
+    {
+        return WorldData[x, y].BlockData.LightValue;
+    }
+
+    public float GetBackgroundLight(int x, int y)
+    {
+        return WorldData[x, y].BackgroundData.LightValue;
+    }
+
+    public Color GetBlockColorLight(int x, int y)
+    {
+        return WorldData[x, y].BlockData.LightColor;
+    }
+
+    public Color GetBackgroundColorLight(int x, int y)
+    {
+        return WorldData[x, y].BackgroundData.LightColor;
+    }
+
+    public bool IsBlockSolid(int x, int y)
+    {
+        return WorldData[x, y].IsSolid();
+    }
+
+    public bool IsFullyLiquidBlock(int x, int y)
+    {
+        return WorldData[x, y].IsFullLiquidBlock();
+    }
+
+    public bool IsDayLightBlock(int x, int y)
+    {
+        return WorldData[x, y].IsDayLightBlock();
+    }
     #endregion
 
     #region Chunk
@@ -520,10 +555,6 @@ public class GameManager : MonoBehaviour
         while (true)
         {
             _infoText.text = GeneralInfo;
-            if (IsGameSession)
-            {
-                _blockInfoText.text = _worldData[_blockInfoCoords.x, _blockInfoCoords.y].ToString();
-            }
             _ProcessingSpeedInfoText.text = ProcessingSpeedInfo;
             yield return null;
         }
@@ -566,6 +597,9 @@ public class GameManager : MonoBehaviour
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
 
             _blockInfoCoords = Vector2Int.FloorToInt(worldPosition);
+
+            _blockInfoText.text = _worldData[_blockInfoCoords.x, _blockInfoCoords.y].ToString();
+            
         }
     }
 
