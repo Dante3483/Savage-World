@@ -1,10 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Threading;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime.Tree;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class TerrainGeneration
@@ -93,14 +90,15 @@ public class TerrainGeneration
     public void StartTerrainGeneration()
     {
         _totalTime = 0f;
-        _step = 100f / 13;
+        _step = 100f / 12;
 
         #region Phase 1 - Flat world generation
         _watch = System.Diagnostics.Stopwatch.StartNew();
 
         if (_terrainConfiguration.Phase1)
         {
-            CreateFlatWorld();
+            //CreateFlatWorld();
+            CreateFlatWorldParallel();
         }
 
         _watch.Stop();
@@ -145,7 +143,8 @@ public class TerrainGeneration
 
         if (_terrainConfiguration.Phase4)
         {
-            CreateClusters();
+            //CreateClusters();
+            CreateClustersParallel();
         }
 
         _watch.Stop();
@@ -160,7 +159,8 @@ public class TerrainGeneration
 
         if (_terrainConfiguration.Phase5)
         {
-            CreateCaves();
+            //CreateCaves();
+            CreateCavesParallel();
         }
 
         _watch.Stop();
@@ -275,21 +275,6 @@ public class TerrainGeneration
         GameManager.Instance.LoadingValue += _step;
         #endregion
 
-        #region Phase 13 - Set light values
-        _watch.Restart();
-
-        if (_terrainConfiguration.Phase13)
-        {
-            SetLightValues();
-        }
-
-        _watch.Stop();
-        Debug.Log($"Phase 13: {_watch.Elapsed.TotalSeconds}");
-        GameManager.Instance.GeneralInfo += $"Phase 13: {_watch.Elapsed.TotalSeconds}\n";
-        _totalTime += _watch.Elapsed.TotalSeconds;
-        GameManager.Instance.LoadingValue += _step;
-        #endregion
-
         Debug.Log($"Total time: {_totalTime}");
         GameManager.Instance.GeneralInfo += $"Total time: {_totalTime}\n";
         GameManager.Instance.IsGameSession = true;
@@ -326,16 +311,47 @@ public class TerrainGeneration
                     _terrain.CreateBackground(x, y, _surfaceLevel.DefaultBackground);
                 }
             }
-        }
-
-        for (x = 0; x < _currentTerrainWidth; x++)
-        {
-            for (y = (ushort)(_terrainConfiguration.Equator + 1); y < GameManager.Instance.CurrentTerrainHeight ; y++)
+            for (y = (ushort)(_terrainConfiguration.Equator + 1); y < GameManager.Instance.CurrentTerrainHeight; y++)
             {
                 _terrain.CreateBlock(x, y, _airBlock);
                 _terrain.CreateBackground(x, y, _airBG);
             }
         }
+    }
+
+    private void CreateFlatWorldParallel()
+    {
+        TerrainLevelSO undergroundLevel = _terrainConfiguration.Levels.Find(l => l.Name == "Underground");
+        TerrainLevelSO preUndergroundLevel = _terrainConfiguration.Levels.Find(l => l.Name == "PreUnderground");
+
+        Parallel.For(0, _currentTerrainWidth, (index) =>
+        {
+            ushort x = (ushort)index;
+            ushort y;
+            for (y = 0; y <= _terrainConfiguration.Equator; y++)
+            {
+                _terrain.CreateBlock(x, y, _dirtBlock);
+                if (y >= undergroundLevel.StartY && y <= undergroundLevel.EndY)
+                {
+                    _terrain.CreateBackground(x, y, undergroundLevel.DefaultBackground);
+                }
+
+                if (y >= preUndergroundLevel.StartY && y <= preUndergroundLevel.EndY)
+                {
+                    _terrain.CreateBackground(x, y, preUndergroundLevel.DefaultBackground);
+                }
+
+                if (y >= _surfaceLevel.StartY && y <= _surfaceLevel.EndY)
+                {
+                    _terrain.CreateBackground(x, y, _surfaceLevel.DefaultBackground);
+                }
+            }
+            for (y = (ushort)(_terrainConfiguration.Equator + 1); y < _currentTerrainHeight; y++)
+            {
+                _terrain.CreateBlock(x, y, _airBlock);
+                _terrain.CreateBackground(x, y, _airBG);
+            }
+        });
     }
     #endregion
 
@@ -637,6 +653,40 @@ public class TerrainGeneration
         data = null;
         cluster = null;
     }
+
+    private void CreateClustersParallel()
+    {
+        foreach (ClusterSO cluster in _terrainConfiguration.Clusters)
+        {
+            CreateClusterParallel(cluster, _randomVar.Next(0, 1000000));
+        }
+    }
+
+    private void CreateClusterParallel(ClusterSO cluster, int additionalSeed)
+    {
+        foreach (TerrainLevelSO level in _terrainConfiguration.Levels)
+        {
+            if (!cluster.ContainsLevel(level))
+            {
+                continue;
+            }
+            ClusterSO.ClusterData clusterData = cluster.GetClusterData(level);
+            Parallel.For(0, _currentTerrainWidth, (index) =>
+            {
+                ushort x = (ushort)index;
+                for (ushort y = level.StartY; y < level.EndY; y++)
+                {
+                    if (!cluster.CompareForbiddenBlock(_worldData[x, y].BlockData))
+                    {
+                        if (GenerateNoise(x, y, clusterData.Scale, clusterData.Amplitude, additionalSeed) >= clusterData.Intensity)
+                        {
+                            _terrain.CreateBlock(x, y, cluster.Block);
+                        }
+                    }
+                }
+            });
+        }
+    }
     #endregion
 
     #region Phase 5
@@ -769,6 +819,127 @@ public class TerrainGeneration
 
         randomVar = null;
         octaveOffset = null;
+    }
+
+    private void CreateCavesParallel()
+    {
+        _caveMap = new float[_currentTerrainWidth, _currentTerrainHeight];
+        _visitedCaveMap = new byte[_currentTerrainWidth, _currentTerrainHeight];
+        List<Vector2Int> caveCoords = new List<Vector2Int>();
+
+        bool isNonChunk;
+        int count;
+        int octaves = _terrainConfiguration.Octaves;
+        float scale = _terrainConfiguration.Scale;
+        float persistance = _terrainConfiguration.Persistance;
+        float lacunarity = _terrainConfiguration.Lacunarity;
+        Vector2[] octaveOffset = new Vector2[octaves];
+
+        for (byte i = 0; i < octaves; i++)
+        {
+            octaveOffset[i].x = _randomVar.Next(-100000, 100000);
+            octaveOffset[i].y = _randomVar.Next(-100000, 100000);
+        }
+
+        //Create noise map
+        System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+        Parallel.For(0, _currentTerrainWidth, (index) =>
+        {
+            ushort x = (ushort)index;
+            float amplitude;
+            float frequency;
+            float noiseHeight;
+            float sampleX;
+            float sampleY;
+            float perlinValue;
+
+            for (ushort y = 0; y < _currentTerrainHeight; y++)
+            {
+                amplitude = 1;
+                frequency = 1;
+                noiseHeight = 0;
+
+                for (byte i = 0; i < octaves; i++)
+                {
+                    sampleX = x / scale * frequency + octaveOffset[i].x;
+                    sampleY = y / scale * frequency + octaveOffset[i].y;
+
+                    perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
+                    noiseHeight += perlinValue * amplitude;
+                    amplitude *= persistance;
+                    frequency *= lacunarity;
+                }
+
+                _caveMap[x, y] = noiseHeight;
+            }
+        });
+        watch.Stop();
+        Debug.Log(watch.Elapsed.TotalSeconds);
+
+        //Find max and min noise height
+        watch.Restart();
+        Parallel.For(0, _currentTerrainWidth, (index) =>
+        {
+            float localMin = float.MaxValue;
+            float localMax = float.MinValue;
+
+            for (int y = 0; y < _currentTerrainHeight; y++)
+            {
+                float value = _caveMap[index, y];
+                localMin = Math.Min(localMin, value);
+                localMax = Math.Max(localMax, value);
+            }
+
+            lock (this)
+            {
+                _minNoiseHeight = Math.Min(_minNoiseHeight, localMin);
+                _maxNoiseHeight = Math.Max(_maxNoiseHeight, localMax);
+            }
+        });
+        watch.Stop();
+        Debug.Log(watch.Elapsed.TotalSeconds);
+
+        //Lerp noise
+        watch.Restart();
+        Parallel.For(0, _currentTerrainWidth, (index) =>
+        {
+            ushort x = (ushort)index;
+            for (ushort y = 0; y < _currentTerrainHeight; y++)
+            {
+                _caveMap[x, y] = Mathf.InverseLerp(_minNoiseHeight, _maxNoiseHeight, _caveMap[x, y]);
+            }
+        });
+        watch.Stop();
+        Debug.Log(watch.Elapsed.TotalSeconds);
+
+        //Create cave in conditions
+        watch.Restart();
+        for (ushort x = 0; x < _currentTerrainWidth; x++)
+        {
+            for (ushort y = 0; y < _currentTerrainHeight; y++)
+            {
+                if (_caveMap[x, y] <= _terrainConfiguration.Intensity && _visitedCaveMap[x, y] == 0)
+                {
+                    (count, isNonChunk) = FloodFill(x, y, _caveMap, ref caveCoords);
+                    if (!isNonChunk)
+                    {
+                        caveCoords.Clear();
+                        continue;
+                    }
+                    if ((count > _terrainConfiguration.MinSmallCaveSize && count < _terrainConfiguration.MaxSmallCaveSize) ||
+                        (count > _terrainConfiguration.MinLargeCaveSize && count < _terrainConfiguration.MaxLargeCaveSize))
+                    {
+                        foreach (Vector2Int v in caveCoords)
+                        {
+                            _terrain.CreateBlock((ushort)v.x, (ushort)v.y, _airBlock);
+                        }
+                    }
+                    caveCoords.Clear();
+                }
+            }
+        }
+        watch.Stop();
+        Debug.Log(watch.Elapsed.TotalSeconds);
     }
     #endregion
 
@@ -1621,25 +1792,6 @@ public class TerrainGeneration
 
         allPickableItems = null;
         coords = null;
-    }
-    #endregion
-
-    #region Phase 13
-    private void SetLightValues()
-    {
-        //ushort x;
-        //ushort y;
-
-        //for (x = 0; x < _currentTerrainWidth; x++)
-        //{
-        //    for (y = 0; y < _currentTerrainHeight; y++)
-        //    {
-        //        if (_worldData[x, y].IsSourceOfLight)
-        //        {
-        //            _terrain.CreateLight(x, y, _worldData[x, y].BlockData);
-        //        }
-        //    }
-        //}
     }
     #endregion
 

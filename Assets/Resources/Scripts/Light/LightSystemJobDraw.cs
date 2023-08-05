@@ -2,12 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
 using Unity.Jobs;
-using UnityEditor;
 using UnityEngine;
 
 public class LightSystemJobDraw : MonoBehaviour
 {
-
     #region Private fields
     [SerializeField] private Texture2D _lightMap;
     [SerializeField] private Material _lightMapMaterialLow;
@@ -18,18 +16,19 @@ public class LightSystemJobDraw : MonoBehaviour
     [SerializeField] private int _height;
     [SerializeField] private bool _isColoredMode;
 
-
     private int _startX;
     private int _startY;
     private int _loopCount;
     private Camera _mainCamera;
     private Vector3Int _intVector;
-    private NativeArray<float> _brightnessNativeArray;
-    private NativeArray<Color> _colorsNativeArray;
     private Color[] _colorsArray;
     private SpriteRenderer _renderer;
     private JobHandle _jobHandle;
     private MaterialPropertyBlock _materialPropertyBlock;
+    private WorldCellData[,] _worldData;
+
+    private NativeArray<float> _brightnessNativeArray;
+    private NativeArray<Color> _colorsNativeArray;
 
     private List<double> _timeList;
     private System.Diagnostics.Stopwatch _watch;
@@ -51,11 +50,13 @@ public class LightSystemJobDraw : MonoBehaviour
         _currentLightMapMaterial = _lightMapMaterialHigh;
         _lightMap = new Texture2D(_width, _height);
         _mainCamera = Camera.main;
-        _brightnessNativeArray = new NativeArray<float>(_width * _height, Allocator.Persistent);
-        _colorsNativeArray = new NativeArray<Color>(_width * _height, Allocator.Persistent);
         _colorsArray = new Color[_width * _height];
         _materialPropertyBlock = new MaterialPropertyBlock();
         _timeList = new List<double>();
+        _worldData = GameManager.Instance.WorldData;
+
+        _brightnessNativeArray = new NativeArray<float>(_width * _height, Allocator.Persistent);
+        _colorsNativeArray = new NativeArray<Color>(_width * _height, Allocator.Persistent);
 
         //Change localScale
         transform.localScale = new Vector3(_width, _height, 0);
@@ -92,7 +93,7 @@ public class LightSystemJobDraw : MonoBehaviour
         _watch = System.Diagnostics.Stopwatch.StartNew();
 #endif
         //Set camera color
-        _mainCamera.backgroundColor = TimeManager.instance.CurrentColor;
+        _mainCamera.backgroundColor = TimeManager.Instance.CurrentColor;
 
         //Set current light map material
         _renderer.material = _currentLightMapMaterial;
@@ -120,25 +121,25 @@ public class LightSystemJobDraw : MonoBehaviour
                 case 0:
                     {
                         LightSystemColorSpreadJob colorSpreadJob = new LightSystemColorSpreadJob(_startX, _startY, _width, _height, 0, _height - 1, 0, _isColoredMode, _brightnessNativeArray, _colorsNativeArray);
-                        _jobHandle = colorSpreadJob.Schedule(_width, 32);
+                        _jobHandle = colorSpreadJob.Schedule(_width, 1);
                     }
                     break;
                 case 1:
                     {
                         LightSystemColorSpreadJob colorSpreadJob = new LightSystemColorSpreadJob(_startX, _startY, _width, _height, 1, 0, _height - 1, _isColoredMode, _brightnessNativeArray, _colorsNativeArray);
-                        _jobHandle = colorSpreadJob.Schedule(_width, 32);
+                        _jobHandle = colorSpreadJob.Schedule(_width, 1);
                     }
                     break;
                 case 2:
                     {
                         LightSystemColorSpreadJob colorSpreadJob = new LightSystemColorSpreadJob(_startX, _startY, _width, _height, 2, 0, _width - 1, _isColoredMode, _brightnessNativeArray, _colorsNativeArray);
-                        _jobHandle = colorSpreadJob.Schedule(_height, 32);
+                        _jobHandle = colorSpreadJob.Schedule(_height, 1);
                     }
                     break;
                 case 3:
                     {
                         LightSystemColorSpreadJob colorSpreadJob = new LightSystemColorSpreadJob(_startX, _startY, _width, _height, 3, _width - 1, 0, _isColoredMode, _brightnessNativeArray, _colorsNativeArray);
-                        _jobHandle = colorSpreadJob.Schedule(_height, 32);
+                        _jobHandle = colorSpreadJob.Schedule(_height, 1);
                     }
                     break;
                 default:

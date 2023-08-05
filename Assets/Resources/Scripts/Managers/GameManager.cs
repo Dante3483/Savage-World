@@ -516,12 +516,13 @@ public class GameManager : MonoBehaviour
         Color biomeColor;
         Color gridColor;
         Color colorOnMap;
+
         for (int x = 0; x < CurrentTerrainWidth; x++)
         {
             for (int y = 0; y < CurrentTerrainHeight; y++)
             {
                 cellColor = WorldData[x, y].BlockData.ColorOnMap;
-                if (WorldData[x, y].IsBackground())
+                if (WorldData[x, y].IsEmpty())
                 {
                     cellColor = WorldData[x, y].BackgroundData.ColorOnMap;
                 }

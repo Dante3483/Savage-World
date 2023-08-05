@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "newCluster", menuName = "Terrain/Cluster")]
@@ -70,6 +71,11 @@ public class ClusterSO : ScriptableObject
     public bool CompareForbiddenBlock(BlockSO block)
     {
         return ForbiddenBlocks.Contains(block);
+    }
+
+    public bool ContainsLevel(TerrainLevelSO level)
+    {
+        return _variety.Where(c => c.Level == level).Count() == 1;
     }
 
     public ClusterData GetClusterData(TerrainLevelSO level)

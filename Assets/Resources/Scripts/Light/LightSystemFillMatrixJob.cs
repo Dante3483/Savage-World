@@ -78,8 +78,8 @@ public struct LightSystemFillMatrixJob : IJobParallelFor
             //IF block is day light source
             else if (_worldData[dx, dy].IsDayLightBlock())
             {
-                bgLightValue = Mathf.Lerp(0, 1, TimeManager.instance.DayLightValue);
-                bgLightColor = Color.Lerp(Color.black, Color.white, TimeManager.instance.DayLightValue);
+                bgLightValue = Mathf.Lerp(0, 1, TimeManager.Instance.DayLightValue);
+                bgLightColor = Color.Lerp(Color.black, Color.white, TimeManager.Instance.DayLightValue);
 
                 _brigtnessArray[index] = bgLightValue >= blockLightValue ? bgLightValue : blockLightValue;
 

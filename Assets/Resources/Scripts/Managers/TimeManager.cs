@@ -15,7 +15,7 @@ public class TimeManager : MonoBehaviour
     #endregion
 
     #region Public fields
-    public static TimeManager instance;
+    public static TimeManager Instance;
     #endregion
 
     #region Properties
@@ -49,7 +49,7 @@ public class TimeManager : MonoBehaviour
     #region Methods
     private void Awake()
     {
-        instance = this;
+        Instance = this;
     }
 
     private void Start()
