@@ -17,13 +17,17 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 313d14700fed6a7428e5293d5dca6fc0, type: 2}
   _type: 4
   _colorOnMap: {r: 0.35686275, g: 0.5176471, b: 0.2627451, a: 1}
+  _lightValue: 0
+  _lightColor: {r: 0, g: 0, b: 0, a: 1}
+  _isSurfaceLight: 0
+  _waterproof: 0
   _id: 7
   _biomeId: 5
   _allowedToSpawnOn:
   - {fileID: 11400000, guid: 95ae94fc45d66d641b8a222c3813a32d, type: 2}
   _canGrow: 0
-  _isBottomSpawn: 1
-  _isTopSpawn: 0
+  _isBottomBlockSolid: 1
+  _isTopBlockSolid: 0
   _chanceToSpawn: 25
   _chanceToGrow: 0
   _isBiomeSpecified: 1

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class TerrainGeneration
@@ -90,7 +91,7 @@ public class TerrainGeneration
     public void StartTerrainGeneration()
     {
         _totalTime = 0f;
-        _step = 100f / 12;
+        _step = 100f / 14;
 
         #region Phase 1 - Flat world generation
         _watch = System.Diagnostics.Stopwatch.StartNew();
@@ -271,6 +272,36 @@ public class TerrainGeneration
         _watch.Stop();
         Debug.Log($"Phase 12: {_watch.Elapsed.TotalSeconds}");
         GameManager.Instance.GeneralInfo += $"Phase 12: {_watch.Elapsed.TotalSeconds}\n";
+        _totalTime += _watch.Elapsed.TotalSeconds;
+        GameManager.Instance.LoadingValue += _step;
+        #endregion
+
+        #region Phase 13 - Set random tiles
+        _watch.Restart();
+
+        if (_terrainConfiguration.Phase13)
+        {
+            SetRandomTiles();
+        }
+
+        _watch.Stop();
+        Debug.Log($"Phase 13: {_watch.Elapsed.TotalSeconds}");
+        GameManager.Instance.GeneralInfo += $"Phase 13: {_watch.Elapsed.TotalSeconds}\n";
+        _totalTime += _watch.Elapsed.TotalSeconds;
+        GameManager.Instance.LoadingValue += _step;
+        #endregion
+
+        #region Phase 14 - Pre-block processing
+        _watch.Restart();
+
+        if (_terrainConfiguration.Phase14)
+        {
+            PreLaunchBlocksUpdate();
+        }
+
+        _watch.Stop();
+        Debug.Log($"Phase 14: {_watch.Elapsed.TotalSeconds}");
+        GameManager.Instance.GeneralInfo += $"Phase 14: {_watch.Elapsed.TotalSeconds}\n";
         _totalTime += _watch.Elapsed.TotalSeconds;
         GameManager.Instance.LoadingValue += _step;
         #endregion
@@ -1635,7 +1666,7 @@ public class TerrainGeneration
                                 isValidPlace = false;
                                 break;
                             }
-                            if (!_worldData[x + i, y + 1].IsEmptyOrPlant())
+                            if (!_worldData[x + i, y + 1].IsEmptyForTree())
                             {
                                 isValidPlace = false;
                                 break;
@@ -1684,7 +1715,7 @@ public class TerrainGeneration
         {
             blockX = x + (int)(vector.x - tree.Start.x);
             blockY = y;
-            if (!_worldData[blockX, blockY].IsEmptyOrPlant())
+            if (!_worldData[blockX, blockY].IsEmptyForTree())
             {
                 return false;
             }
@@ -1697,7 +1728,7 @@ public class TerrainGeneration
         {
             blockX = x + (int)(vector.x - tree.Start.x);
             blockY = y;
-            if (!_worldData[blockX, blockY].IsEmptyOrPlant())
+            if (!_worldData[blockX, blockY].IsEmptyForTree())
             {
                 return false;
             }
@@ -1792,6 +1823,51 @@ public class TerrainGeneration
 
         allPickableItems = null;
         coords = null;
+    }
+    #endregion
+
+    #region Phase 13
+    private void SetRandomTiles()
+    {
+        for (int x = 0; x < _currentTerrainWidth; x++)
+        {
+            for (int y = 0; y < _currentTerrainHeight; y++)
+            {
+                _worldData[x, y].SetRandomBlockTile(_randomVar);
+                _worldData[x, y].SetRandomBackgroundTile(_randomVar);
+            }
+        }
+    }
+    #endregion
+
+    #region Phase 14
+    private void PreLaunchBlocksUpdate()
+    {
+        try
+        {
+            Parallel.For(5, _currentTerrainWidth - 5, (index) =>
+            {
+                for (int y = 5; y < _currentTerrainHeight - 5; y++)
+                {
+                    if (_worldData[index, y].IsDust() && _worldData[index, y - 1].IsEmpty())
+                    {
+                        lock (_lockObject)
+                        {
+                            _terrain.NeedToUpdate.Add(new Vector2Ushort(index, y));
+                        }
+                    }
+                }
+            });
+
+            while (_terrain.NeedToUpdate.Count != 0)
+            {
+                _terrain.UpdateWorldData();
+            }
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
     }
     #endregion
 

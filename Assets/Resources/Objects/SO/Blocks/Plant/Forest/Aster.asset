@@ -15,13 +15,17 @@ MonoBehaviour:
   _tiles: []
   _type: 4
   _colorOnMap: {r: 0.19607843, g: 0.654902, b: 0.8235294, a: 1}
+  _lightValue: 0
+  _lightColor: {r: 0, g: 0, b: 0, a: 1}
+  _isSurfaceLight: 0
+  _waterproof: 0
   _id: 21
   _biomeId: 5
   _allowedToSpawnOn:
   - {fileID: 11400000, guid: 95ae94fc45d66d641b8a222c3813a32d, type: 2}
   _canGrow: 0
-  _isBottomSpawn: 1
-  _isTopSpawn: 0
+  _isBottomBlockSolid: 1
+  _isTopBlockSolid: 0
   _chanceToSpawn: 25
   _chanceToGrow: 0
   _isBiomeSpecified: 1

@@ -25,5 +25,11 @@ public struct Vector2Ushort
         this.x = x;
         this.y = y;
     }
+
+    public Vector2Ushort(int x, int y)
+    {
+        this.x = (ushort)x;
+        this.y = (ushort)y;
+    }
     #endregion
 }

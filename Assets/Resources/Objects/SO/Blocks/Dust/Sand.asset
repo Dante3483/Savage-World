@@ -16,5 +16,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1957a515606f4064d8e2f0c0da9e1432, type: 2}
   _type: 2
   _colorOnMap: {r: 0.9490196, g: 0.9254902, b: 0.70980394, a: 1}
+  _lightValue: 0
+  _lightColor: {r: 0, g: 0, b: 0, a: 1}
+  _isSurfaceLight: 0
+  _waterproof: 1
   _id: 0
-  _fallingTime: 5
+  _fallingTime: 0

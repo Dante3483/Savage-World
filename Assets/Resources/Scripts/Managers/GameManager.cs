@@ -362,14 +362,15 @@ public class GameManager : MonoBehaviour
 
             WorldData = new WorldCellData[_maxTerrainWidth, _maxTerrainHeight];
             float step = 50f / _maxTerrainWidth;
-            for (ushort x = 0; x < _maxTerrainWidth; x++)
+            Parallel.For(0, _maxTerrainWidth, (index) =>
             {
+                ushort x = (ushort)index;
                 for (ushort y = 0; y < _maxTerrainHeight; y++)
                 {
                     WorldData[x, y] = new WorldCellData(x, y);
                 }
                 LoadingValue += step;
-            }
+            });
 
             Chunks = new Chunk[TerrainConfiguration.CurrentHorizontalChunksCount, TerrainConfiguration.CurrentVerticalChunksCount];
             step = 50f / TerrainConfiguration.CurrentHorizontalChunksCount;
@@ -579,13 +580,19 @@ public class GameManager : MonoBehaviour
 
     public void BreakBlock()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
             Vector3 clickPosition = Input.mousePosition;
 
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
+            Vector3Int intPos = Vector3Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
 
-            Terrain.CreateBlock((ushort)worldPosition.x, (ushort)worldPosition.y, ObjectsAtlass.Air);
+            Terrain.CreateBlock((ushort)intPos.x, (ushort)intPos.y, ObjectsAtlass.Air);
+
+            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y));
+            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y + 1));
+            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y - 1));
+            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x - 1, intPos.y));
+            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x + 1, intPos.y));
         }
     }
 
@@ -606,13 +613,15 @@ public class GameManager : MonoBehaviour
 
     public void CreateWater()
     {
-        if (Input.GetMouseButton(2))
+        if (Input.GetMouseButtonDown(2))
         {
             Vector3 clickPosition = Input.mousePosition;
 
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
+            Vector3Int intPos = Vector3Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
 
-            Terrain.CreateLiquidBlock((ushort)worldPosition.x, (ushort)worldPosition.y, (byte)ObjectsAtlass.Water.GetId());
+            Terrain.CreateLiquidBlock((ushort)intPos.x, (ushort)intPos.y, (byte)ObjectsAtlass.Water.GetId());
+
+            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y));
         }
     }
 
@@ -622,9 +631,15 @@ public class GameManager : MonoBehaviour
         {
             Vector3 clickPosition = Input.mousePosition;
 
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
+            Vector3Int intPos = Vector3Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
 
-            Terrain.CreateBlock((ushort)worldPosition.x, (ushort)worldPosition.y, ObjectsAtlass.Torch);
+            Terrain.CreateBlock((ushort)intPos.x, (ushort)intPos.y, ObjectsAtlass.Torch);
+
+            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y));
+            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y + 1));
+            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y - 1));
+            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x - 1, intPos.y));
+            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x + 1, intPos.y));
         }
     }
     #endregion

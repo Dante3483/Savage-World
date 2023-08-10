@@ -1,13 +1,22 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class Terrain : MonoBehaviour
 {
     #region Private fields
+    [Header("Main")]
+    [SerializeField] private int _renderWidth;
+    [SerializeField] private int _renderHeight;
+    [SerializeField] private Camera _camera;
+
     [Header("Tilemaps")]
     [SerializeField] private Tilemap _blocksTilemap;
     [SerializeField] private Tilemap _liquidTilemap;
@@ -18,8 +27,26 @@ public class Terrain : MonoBehaviour
     [SerializeField] private GameObject _pickableItems;
 
     private WorldCellData[,] _worldData;
-    private int _currenMapWidth;
-    private int _currenMapHeight;
+
+    #region World data update
+    private HashSet<Vector2Ushort> _needToUpdate;
+    #endregion
+
+    #region World data render
+    private bool _firstRender;
+    private RectInt _currentCameraRect;
+    private RectInt _prevCameraRect;
+    private Vector3Int[] _tilesCoords;
+    private TileBase[] _blockTiles;
+    private TileBase[] _liquidTiles;
+    private TileBase[] _backgroundTiles;
+    private ArrayObjectPool<TileBase> _blockTilesPool;
+    private ArrayObjectPool<TileBase> _liquidTilesPool;
+    private ArrayObjectPool<TileBase> _backgroundTilesPool;
+    private ArrayObjectPool<Vector3Int> _tilesCoordsPool;
+    private List<List<TileBase>> _allLiquidTiles;
+    #endregion
+
     #region Threads
     private Thread _blockProcessingThread;
     private Thread _randomBlockProcessingThread;
@@ -97,6 +124,19 @@ public class Terrain : MonoBehaviour
             _backgroundTilemap = value;
         }
     }
+
+    public HashSet<Vector2Ushort> NeedToUpdate
+    {
+        get
+        {
+            return _needToUpdate;
+        }
+
+        set
+        {
+            _needToUpdate = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -104,7 +144,7 @@ public class Terrain : MonoBehaviour
     #region General
     private void Awake()
     {
-        //Setup tilemaps
+        #region Setup tilemaps
         BlocksTilemap = transform.Find("BlocksTilemap").GetComponent<Tilemap>();
         if (BlocksTilemap == null)
         {
@@ -122,7 +162,9 @@ public class Terrain : MonoBehaviour
         {
             throw new NullReferenceException("BackgroundTilemap is null");
         }
+        #endregion
 
+        #region Setup sections
         Trees = transform.Find("Trees").gameObject;
         if (Trees == null)
         {
@@ -134,6 +176,40 @@ public class Terrain : MonoBehaviour
         {
             throw new NullReferenceException("PickableItems is null");
         }
+        #endregion
+
+        #region Initialization
+        NeedToUpdate = new HashSet<Vector2Ushort>();
+        _camera = Camera.main;
+        _currentCameraRect = new RectInt();
+        _prevCameraRect = new RectInt();
+        _tilesCoords = new Vector3Int[_renderWidth * _renderHeight];
+        _blockTiles = new TileBase[_renderWidth * _renderHeight];
+        _liquidTiles = new TileBase[_renderWidth * _renderHeight];
+        _backgroundTiles = new TileBase[_renderWidth * _renderHeight];
+        _blockTilesPool = new ArrayObjectPool<TileBase>();
+        _liquidTilesPool = new ArrayObjectPool<TileBase>();
+        _backgroundTilesPool = new ArrayObjectPool<TileBase>();
+        _tilesCoordsPool = new ArrayObjectPool<Vector3Int>();
+        _firstRender = true;
+        #endregion
+    }
+
+    private void Start()
+    {
+        _allLiquidTiles = new List<List<TileBase>>()
+        {
+            GameManager.Instance.ObjectsAtlass.Water.Tiles,
+        };
+    }
+
+    private void Update()
+    {
+        if (GameManager.Instance.IsGameSession)
+        {
+            RenderWorldData();
+            UpdateWorldData();
+        }
     }
 
     public void CreateNewWorld(ref WorldCellData[,] worldData)
@@ -141,8 +217,6 @@ public class Terrain : MonoBehaviour
         try
         {
             _worldData = worldData;
-            _currenMapWidth = GameManager.Instance.CurrentTerrainWidth;
-            _currenMapHeight = GameManager.Instance.CurrentTerrainHeight;
             GameManager.Instance.RandomVar = new System.Random(GameManager.Instance.Seed);
 
             //Start generation
@@ -159,22 +233,26 @@ public class Terrain : MonoBehaviour
     public void StartCoroutinesAndThreads()
     {
         //Start update tilemaps
-        StartCoroutine(UpdateTilemaps());
+        //StartCoroutine(UpdateTilemaps());
 
         //Start update chunk activity
-        StartCoroutine(UpdateChunkActivity());
+        //StartCoroutine(UpdateChunkActivity());
 
         //Start block processing
-        _blockProcessingThread = new Thread(BlockProcessing);
-        _blockProcessingThread.Start();
+        //_blockProcessingThread = new Thread(BlockProcessing);
+        //_blockProcessingThread.Start();
+        //_blockProcessingThread = new Thread(BlockProcessingThreaded);
+        //_blockProcessingThread.Start();
 
         //Start random block processing
-        _randomBlockProcessingThread = new Thread(RandomBlockProcessing);
+        _randomBlockProcessingThread = new Thread(RandomUpdateWorldData);
         _randomBlockProcessingThread.Start();
     }
     #endregion
 
     #region Update
+
+    #region Old
     public IEnumerator UpdateTilemaps()
     {
         RectInt currentCameraRect = new RectInt();
@@ -208,7 +286,7 @@ public class Terrain : MonoBehaviour
 
         while (true)
         {
-            yield return null;
+            yield return new WaitForFixedUpdate();
 
             i = 0;
             currentCameraRect = GetCameraRectInt();
@@ -261,7 +339,7 @@ public class Terrain : MonoBehaviour
 
                     //Liquid
                     liquidTiles[i] = null;
-                    if (block.IsEmptyOrPlant() && block.IsLiquid())
+                    if (block.IsEmptyForLiquid() && block.IsLiquid())
                     {
                         liquidIndex = (byte)(block.FlowValue == 100f || block.IsFlowsDown ? 9 : block.FlowValue / 10);
                         liquidTiles[i] = allLiquidTiles[block.LiquidId][liquidIndex];
@@ -443,7 +521,7 @@ public class Terrain : MonoBehaviour
                                     }
                                 }
 
-                                if (block.IsLiquid() && block.IsEmptyOrPlant())
+                                if (block.IsLiquid() && block.IsEmptyForLiquid())
                                 {
                                     if (block.CurrentActionTime < block.GetLiquidActionTime())
                                     {
@@ -457,7 +535,7 @@ public class Terrain : MonoBehaviour
                                         needToFlow = true;
 
                                         #region Move to the bottom side
-                                        if (bottomBlock.IsEmptyOrPlant() || (bottomBlock.IsLiquid() && bottomBlock.FlowValue != 100))
+                                        if (bottomBlock.IsEmptyForLiquid() || (bottomBlock.IsLiquid() && bottomBlock.FlowValue != 100))
                                         {
                                             //Determine rate of flow
                                             bottomFlow = (bottomBlock.IsLiquid() ? bottomBlock.FlowValue : 0);
@@ -497,7 +575,7 @@ public class Terrain : MonoBehaviour
                                         #endregion
 
                                         #region Move to the left side
-                                        if ((leftBlock.IsEmptyOrPlant() || leftBlock.IsLiquid()) && needToFlow)
+                                        if ((leftBlock.IsEmptyForLiquid() || leftBlock.IsLiquid()) && needToFlow)
                                         {
                                             //Determine rate of flow
                                             leftFlow = (leftBlock.IsLiquid() ? leftBlock.FlowValue : 0);
@@ -538,7 +616,7 @@ public class Terrain : MonoBehaviour
                                         #endregion
 
                                         #region Move to the right side
-                                        if ((rightBlock.IsEmptyOrPlant() || rightBlock.IsLiquid()) && needToFlow)
+                                        if ((rightBlock.IsEmptyForLiquid() || rightBlock.IsLiquid()) && needToFlow)
                                         {
                                             //Determine rate of flow
                                             rightFlow = (rightBlock.IsLiquid() ? rightBlock.FlowValue : 0);
@@ -623,8 +701,330 @@ public class Terrain : MonoBehaviour
 
         }
     }
+    #endregion
 
-    public void RandomBlockProcessing()
+    #region Current
+    List<Vector2Ushort> vectors = new List<Vector2Ushort>();
+    public void UpdateWorldData()
+    {
+        vectors.Clear();
+        vectors.AddRange(NeedToUpdate);
+        NeedToUpdate.Clear();
+        //HashSet<Vector2Ushort> coords = new HashSet<Vector2Ushort>(NeedToUpdate);
+        //NeedToUpdate.Clear();
+
+        BlockSO airBlock = GameManager.Instance.ObjectsAtlass.Air;
+        PlantSO plant;
+
+        float minFlowValue = 0.1f;
+        float maxFlowValue = 100f;
+        float minForCounter = 0.01f;
+        float startFlowValue;
+        float remainingFlowValue;
+        float flow;
+        float bottomFlow;
+        float leftFlow;
+        float rightFlow;
+        bool needToFlow;
+        bool needToStop = false;
+
+        foreach (Vector2Ushort coord in vectors)
+        {
+            ushort x = coord.x;
+            ushort y = coord.y;
+
+            #region Set blocks
+            ref WorldCellData block = ref GameManager.Instance.GetWorldCellDataRef(x, y);
+            ref WorldCellData bottomBlock = ref GameManager.Instance.GetWorldCellDataRef(x, y - 1);
+            ref WorldCellData topBlock = ref GameManager.Instance.GetWorldCellDataRef(x, y + 1);
+            ref WorldCellData leftBlock = ref GameManager.Instance.GetWorldCellDataRef(x - 1, y);
+            ref WorldCellData rightBlock = ref GameManager.Instance.GetWorldCellDataRef(x + 1, y);
+            #endregion
+
+            if (!block.BlockData.Waterproof && block.IsLiquid())
+            {
+                CreateBlock(x, y, airBlock);
+            }
+
+            if (block.BlockType == BlockTypes.Abstract)
+            {
+
+            }
+
+            if (block.BlockType == BlockTypes.Solid)
+            {
+
+            }
+
+            if (block.BlockType == BlockTypes.Dust)
+            {
+                if (block.CurrentActionTime < block.GetDustActionTime())
+                {
+                    block.CurrentActionTime++;
+                    NeedToUpdate.Add(block.Coords);
+                }
+                else
+                {
+                    block.CurrentActionTime = 0;
+                    if (bottomBlock.IsEmpty())
+                    {
+                        CreateBlock(x, (ushort)(y - 1), block.BlockData);
+                        CreateBlock(x, y, airBlock);
+                        NeedToUpdate.Add(bottomBlock.Coords);
+                        if (topBlock.IsDust())
+                        {
+                            NeedToUpdate.Add(topBlock.Coords);
+                        }
+                    }
+                }
+            }
+
+            if (block.IsLiquid() && block.IsEmptyForLiquid())
+            {
+                if (block.CurrentActionTime < block.GetLiquidActionTime())
+                {
+                    block.CurrentActionTime++;
+                }
+                else
+                {
+                    block.CurrentActionTime = 0;
+                    startFlowValue = block.FlowValue;
+                    remainingFlowValue = startFlowValue;
+                    needToFlow = true;
+
+                    #region Move to the bottom side
+                    if (bottomBlock.IsEmptyForLiquid() || (bottomBlock.IsLiquid() && bottomBlock.FlowValue != 100))
+                    {
+                        //Determine rate of flow
+                        bottomFlow = (bottomBlock.IsLiquid() ? bottomBlock.FlowValue : 0);
+                        flow = block.FlowValue;
+
+                        //Constrain flow
+                        if (flow + bottomFlow > maxFlowValue)
+                        {
+                            flow = (100 - bottomFlow);
+                        }
+
+                        //Update flow values
+                        if (flow != 0)
+                        {
+                            remainingFlowValue -= flow;
+                            block.FlowValue -= flow;
+
+                            //If bottom block is not liquid
+                            if (!bottomBlock.IsLiquid())
+                            {
+                                CreateLiquidBlock(x, (ushort)(y - 1), block.LiquidId);
+                                bottomBlock.FlowValue = 0.0f;
+                                if (leftBlock.IsLiquid())
+                                {
+                                    NeedToUpdate.Add(leftBlock.Coords);
+                                    leftBlock.CountToStop = 0;
+                                }
+                                if (rightBlock.IsLiquid())
+                                {
+                                    NeedToUpdate.Add(rightBlock.Coords);
+                                    rightBlock.CountToStop = 0;
+                                }
+                            }
+                            bottomBlock.FlowValue += flow;
+                            bottomBlock.IsFlowsDown = true;
+                            bottomBlock.CountToStop = 0;
+                            NeedToUpdate.Add(bottomBlock.Coords);
+                            if (topBlock.IsLiquid())
+                            {
+                                NeedToUpdate.Add(topBlock.Coords);
+                                topBlock.CountToStop = 0;
+                            }
+                        }
+                    }
+
+                    if (remainingFlowValue < minFlowValue)
+                    {
+                        block.Drain();
+                        needToFlow = false;
+                    }
+                    #endregion
+
+                    #region Move to the left side
+                    if ((leftBlock.IsEmptyForLiquid() || leftBlock.IsLiquid()) && needToFlow)
+                    {
+                        //Determine rate of flow
+                        leftFlow = (leftBlock.IsLiquid() ? leftBlock.FlowValue : 0);
+                        flow = (leftFlow > remainingFlowValue ? 0 : (remainingFlowValue - leftFlow) / 4f);
+
+                        //Constrain flow
+                        if (flow + leftFlow > maxFlowValue)
+                        {
+                            flow = (100 - leftFlow);
+                        }
+
+                        if (flow <= minForCounter)
+                        {
+                            flow = 0;
+                        }
+
+                        //Update flow values
+                        if (flow != 0)
+                        {
+                            remainingFlowValue -= flow;
+                            block.FlowValue -= flow;
+
+                            //If left block is not liquid
+                            if (!leftBlock.IsLiquid())
+                            {
+                                CreateLiquidBlock((ushort)(x - 1), y, block.LiquidId);
+                                leftBlock.FlowValue = 0;
+                            }
+                            leftBlock.FlowValue += flow;
+                            leftBlock.CountToStop = 0;
+                            NeedToUpdate.Add(leftBlock.Coords);
+
+                            if (rightBlock.IsLiquid() && rightBlock.FlowValue > block.FlowValue)
+                            {
+                                NeedToUpdate.Add(rightBlock.Coords);
+                                rightBlock.CountToStop = 0;
+                            }
+                            if (topBlock.IsLiquid())
+                            {
+                                NeedToUpdate.Add(topBlock.Coords);
+                                topBlock.CountToStop = 0;
+                            }
+                        }
+                    }
+
+                    if (remainingFlowValue < minFlowValue)
+                    {
+                        block.Drain();
+                        needToFlow = false;
+                    }
+                    #endregion
+
+                    #region Move to the right side
+                    if ((rightBlock.IsEmptyForLiquid() || rightBlock.IsLiquid()) && needToFlow)
+                    {
+                        //Determine rate of flow
+                        rightFlow = (rightBlock.IsLiquid() ? rightBlock.FlowValue : 0);
+                        flow = (rightFlow > remainingFlowValue ? 0 : (remainingFlowValue - rightFlow) / 3f);
+
+                        //Constrain flow
+                        if (flow + rightFlow > maxFlowValue)
+                        {
+                            flow = (100 - rightFlow);
+                        }
+
+                        if (flow <= minForCounter)
+                        {
+                            flow = 0;
+                        }
+
+                        //Update flow values
+                        if (flow != 0)
+                        {
+                            remainingFlowValue -= flow;
+                            block.FlowValue -= flow;
+
+                            //If right block is not liquid
+                            if (!rightBlock.IsLiquid())
+                            {
+                                CreateLiquidBlock((ushort)(x + 1), y, block.LiquidId);
+                                rightBlock.FlowValue = 0;
+                            }
+                            rightBlock.FlowValue += flow;
+                            rightBlock.CountToStop = 0;
+                            NeedToUpdate.Add(rightBlock.Coords);
+
+                            if (leftBlock.IsLiquid() && leftBlock.FlowValue > block.FlowValue)
+                            {
+                                NeedToUpdate.Add(leftBlock.Coords);
+                                leftBlock.CountToStop = 0;
+                            }
+                            if (topBlock.IsLiquid())
+                            {
+                                NeedToUpdate.Add(topBlock.Coords);
+                                topBlock.CountToStop = 0;
+                            }
+                        }
+                    }
+
+                    if (remainingFlowValue < minFlowValue)
+                    {
+                        block.Drain();
+                    }
+                    #endregion
+
+                    #region Top side processing
+                    if (topBlock.IsLiquid())
+                    {
+                        block.IsFlowsDown = true;
+                    }
+                    else
+                    {
+                        block.IsFlowsDown = false;
+                    }
+                    if (block.IsLiquid() && bottomBlock.IsEmptyForLiquid())
+                    {
+                        bottomBlock.IsFlowsDown = true;
+                    }
+                    else
+                    {
+                        bottomBlock.IsFlowsDown = true;
+                    }
+                    #endregion
+
+                    if (startFlowValue - remainingFlowValue < minForCounter)
+                    {
+                        block.CountToStop++;
+                    }
+                    else
+                    {
+                        block.CountToStop = 0;
+                    }
+
+                    if (block.CountToStop >= 100)
+                    {
+                        block.CountToStop = 0;
+                        needToStop = true;
+                    }
+
+                    if (block.FlowValue >= 99 && block.FlowValue < 100)
+                    {
+                        block.FlowValue = 100f;
+                    }
+
+                    if (block.IsLiquid() && !needToStop)
+                    {
+                        NeedToUpdate.Add(block.Coords);
+                    }
+                }
+            }
+
+            if (block.BlockType == BlockTypes.Plant)
+            {
+                plant = block.BlockData as PlantSO;
+
+                if (plant.IsTopBlockSolid && topBlock.IsEmptyForPlant())
+                {
+                    if (bottomBlock.IsPlant() && bottomBlock.CompareBlock(block.BlockData))
+                    {
+                        NeedToUpdate.Add(bottomBlock.Coords);
+                    }
+                    CreateBlock((ushort)x, (ushort)y, airBlock);
+                }
+
+                if (plant.IsBottomBlockSolid && bottomBlock.IsEmptyForPlant())
+                {
+                    if (topBlock.IsPlant() && topBlock.CompareBlock(block.BlockData))
+                    {
+                        NeedToUpdate.Add(topBlock.Coords);
+                    }
+                    CreateBlock((ushort)x, (ushort)y, airBlock);
+                }
+            }
+        }
+    }
+
+    public void RandomUpdateWorldData()
     {
         ushort minX = 0;
         ushort minY = 0;
@@ -650,6 +1050,11 @@ public class Terrain : MonoBehaviour
         }
         while (GameManager.Instance.IsGameSession)
         {
+            if (!GameManager.Instance.IsGameSession)
+            {
+                continue;
+            }
+
             x = (ushort)randomVar.Next(minX, maxX + 1);
             y = (ushort)randomVar.Next(minY, maxY + 1);
 
@@ -721,12 +1126,105 @@ public class Terrain : MonoBehaviour
             }
         }
     }
+
+    public void RenderWorldData()
+    {
+        int i = 0;
+        int difX;
+        int difY;
+        int size;
+        object lockObject = new object();
+
+        if (_firstRender)
+        {
+            _prevCameraRect = GetCameraRectInt();
+            _firstRender = false;
+        }
+
+        _currentCameraRect = GetCameraRectInt();
+
+        //Calculate array size
+        difX = Mathf.Abs(_prevCameraRect.x - _currentCameraRect.x);
+
+        difY = Mathf.Abs(_prevCameraRect.y - _currentCameraRect.y);
+
+        if (difX >= _prevCameraRect.width || difY >= _prevCameraRect.height)
+        {
+            size = _prevCameraRect.width * _prevCameraRect.height * 2;
+        }
+        else
+        {
+            size = _prevCameraRect.width * _prevCameraRect.height + _currentCameraRect.height * difX + _currentCameraRect.width * difY - difX * difY;
+        }
+
+        _blockTiles = _blockTilesPool.GetArray(size);
+        _liquidTiles = _liquidTilesPool.GetArray(size);
+        _backgroundTiles = _backgroundTilesPool.GetArray(size);
+        _tilesCoords = _tilesCoordsPool.GetArray(size);
+
+        //Fill Tiles arrays with blocks to destroy
+        Vector3Int vector = new Vector3Int();
+        if (difX >= 1 || difY >= 1)
+        {
+            foreach (Vector2Int position in _prevCameraRect.allPositionsWithin)
+            {
+                if (!_currentCameraRect.Contains(position))
+                {
+                    vector.x = position.x;
+                    vector.y = position.y;
+                    _tilesCoords[i] = vector;
+                    _blockTiles[i] = null;
+                    _liquidTiles[i] = null;
+                    _backgroundTiles[i] = null;
+                    i++;
+                }
+            }
+            _prevCameraRect = _currentCameraRect;
+        }
+
+        foreach (Vector2Int position in _currentCameraRect.allPositionsWithin)
+        {
+            if (IsInMapRange(position.x, position.y))
+            {
+                vector.x = position.x;
+                vector.y = position.y;
+                _tilesCoords[i] = vector;
+
+                //Block
+                _blockTiles[i] = _worldData[position.x, position.y].GetBlockTile();
+
+                //Background
+                _backgroundTiles[i] = _worldData[position.x, position.y].GetBackgroundTile();
+
+                //Liquid
+                _liquidTiles[i] = null;
+                if (_worldData[position.x, position.y].IsEmptyForLiquid() && _worldData[position.x, position.y].IsLiquid())
+                {
+                    byte liquidIndex = (byte)(_worldData[position.x, position.y].FlowValue == 100f || _worldData[position.x, position.y].IsFlowsDown ? 9 : _worldData[position.x, position.y].FlowValue / 10);
+                    _liquidTiles[i] = _allLiquidTiles[_worldData[position.x, position.y].LiquidId][liquidIndex];
+                }
+
+                i++;
+            }
+        }
+
+        //Change Tilemap using Vector's array and Tile's array
+        BlocksTilemap.SetTiles(_tilesCoords, _blockTiles);
+        LiquidTilemap.SetTiles(_tilesCoords, _liquidTiles);
+        BackgroundTilemap.SetTiles(_tilesCoords, _backgroundTiles);
+    }
+    #endregion
+
     #endregion
 
     #region Helpful
     public void CreateBlock(ushort x, ushort y, BlockSO block)
     {
         _worldData[x, y].SetBlockData(block);
+        if (GameManager.Instance.IsGameSession)
+        {
+            _worldData[x, y].SetRandomBlockTile(GameManager.Instance.RandomVar);
+        }
     }
 
     public void CreateLiquidBlock(ushort x, ushort y, byte id)
@@ -737,6 +1235,10 @@ public class Terrain : MonoBehaviour
     public void CreateBackground(ushort x, ushort y, BlockSO block)
     {
         _worldData[x, y].SetBackgroundData(block);
+        if (GameManager.Instance.IsGameSession)
+        {
+            _worldData[x, y].SetRandomBackgroundTile(GameManager.Instance.RandomVar);
+        }
     }
 
     private RectInt GetCameraRectInt()

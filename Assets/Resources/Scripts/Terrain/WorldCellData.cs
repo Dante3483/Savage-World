@@ -1,6 +1,5 @@
-using UnityEngine;
+using System;
 using UnityEngine.Tilemaps;
-using UnityEngine.UIElements;
 
 public struct WorldCellData
 {
@@ -17,14 +16,13 @@ public struct WorldCellData
 
     private Vector2Ushort _coords;
     private byte _currentActionTime;
-
-    public float Brightness;
     #endregion
 
     #region Liquid
     private byte _liquidId;
     private bool _isFlowsDown;
     private float _flowValue;
+    private byte _countToStop;
     #endregion
 
     #endregion
@@ -176,6 +174,19 @@ public struct WorldCellData
             _backgroundTileId = value;
         }
     }
+
+    public byte CountToStop
+    {
+        get
+        {
+            return _countToStop;
+        }
+
+        set
+        {
+            _countToStop = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -183,8 +194,8 @@ public struct WorldCellData
     {
         //Set Ait block by default
         _id = 0;
-        _blockTileId = 255;
-        _backgroundTileId = 255;
+        _blockTileId = 0;
+        _backgroundTileId = 0;
         _blockType = BlockTypes.Abstract;
         _blockData = GameManager.Instance.ObjectsAtlass.Air;
         _backgroundData = GameManager.Instance.ObjectsAtlass.AirBG;
@@ -194,8 +205,7 @@ public struct WorldCellData
         _liquidId = 255;
         _isFlowsDown = false;
         _flowValue = 0;
-
-        Brightness = 0;
+        _countToStop = 0;
     }
 
     public override string ToString()
@@ -212,36 +222,34 @@ public struct WorldCellData
             $"Is liquid: {_liquidId != 255}\n" +
             $"Is flow down: {_isFlowsDown}\n" +
             $"Liquid ID: {_liquidId}\n" +
-            $"Flow value: {_flowValue}\n" +
-            $"Brightness: {Brightness}";
+            $"Flow value: {_flowValue}\n";
     }
 
     public TileBase GetBlockTile()
     {
-        if (BlockTileId != 255)
-        {
-            return BlockData.Tiles[BlockTileId];
-        }
         if (BlockData.Tiles.Count == 0)
         {
             return null;
         }
-        BlockTileId = (byte)Random.Range(0, BlockData.Tiles.Count);
         return BlockData.Tiles[BlockTileId];
+        //BlockTileId = (byte)Random.Range(0, BlockData.Tiles.Count);
+        //return BlockData.Tiles[BlockTileId];
     }
 
     public TileBase GetBackgroundTile()
     {
-        if (BackgroundTileId != 255)
-        {
-            return BackgroundData.Tiles[BackgroundTileId];
-        }
         if (BackgroundData.Tiles.Count == 0)
         {
             return null;
         }
-        BackgroundTileId = (byte)Random.Range(0, BackgroundData.Tiles.Count);
         return BackgroundData.Tiles[BackgroundTileId];
+        //if (BackgroundTileId != 255)
+        //{
+            
+        //}
+
+        //BackgroundTileId = (byte)Random.Range(0, BackgroundData.Tiles.Count);
+        //return BackgroundData.Tiles[BackgroundTileId];
     }
 
     public BlockSO GetBlock()
@@ -272,7 +280,6 @@ public struct WorldCellData
     public void SetBlockData(BlockSO block)
     {
         Id = block.GetId();
-        BlockTileId = 255;
         BlockType = block.Type;
         BlockData = block;
     }
@@ -286,6 +293,16 @@ public struct WorldCellData
     public void SetBackgroundData(BlockSO background)
     {
         BackgroundData = background;
+    }
+
+    public void SetRandomBlockTile(Random randomVar)
+    {
+        BlockTileId = (byte)randomVar.Next(0, BlockData.Tiles.Count);
+    }
+
+    public void SetRandomBackgroundTile(Random randomVar)
+    {
+        BackgroundTileId = (byte)randomVar.Next(0, BackgroundData.Tiles.Count);
     }
 
     public bool CompareBlock(BlockSO block)
@@ -308,14 +325,34 @@ public struct WorldCellData
         return _blockType == BlockTypes.Solid || _blockType == BlockTypes.Dust;
     }
 
+    public bool IsDust()
+    {
+        return _blockType == BlockTypes.Dust;
+    }
+
     public bool IsLiquid()
     {
         return LiquidId != 255;
     }
 
-    public bool IsEmptyOrPlant()
+    public bool IsFurniture()
+    {
+        return BlockType == BlockTypes.Furniture;
+    }
+
+    public bool IsEmptyForTree()
     {
         return _blockType == BlockTypes.Abstract || _blockType == BlockTypes.Plant;
+    }
+
+    public bool IsEmptyForLiquid()
+    {
+        return BlockType == BlockTypes.Abstract || BlockType == BlockTypes.Plant || BlockType == BlockTypes.Furniture;
+    }
+
+    public bool IsEmptyForPlant()
+    {
+        return BlockType == BlockTypes.Abstract || BlockType == BlockTypes.Furniture;
     }
 
     public bool IsBackground()
@@ -331,6 +368,12 @@ public struct WorldCellData
     public bool IsFullLiquidBlock()
     {
         return IsLiquid() && FlowValue == 100;
+    }
+
+    public void Drain()
+    {
+        FlowValue = 0f;
+        LiquidId = 255;
     }
     #endregion
 }

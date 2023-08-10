@@ -11,6 +11,7 @@ public abstract class BlockSO : ScriptableObject
     [SerializeField] private float _lightValue;
     [SerializeField] private Color _lightColor = Color.black;
     [SerializeField] private bool _isSurfaceLight;
+    [SerializeField] private bool _waterproof = true;
     #endregion
 
     #region Public fields
@@ -93,6 +94,19 @@ public abstract class BlockSO : ScriptableObject
         set
         {
             _lightColor = value;
+        }
+    }
+
+    public bool Waterproof
+    {
+        get
+        {
+            return _waterproof;
+        }
+
+        set
+        {
+            _waterproof = value;
         }
     }
     #endregion

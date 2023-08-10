@@ -18,4 +18,5 @@ MonoBehaviour:
   _lightValue: 0
   _lightColor: {r: 0, g: 0, b: 0, a: 1}
   _isSurfaceLight: 0
+  _waterproof: 1
   _id: 0
