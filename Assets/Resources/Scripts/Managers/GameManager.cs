@@ -6,12 +6,25 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+// KeyCode.H - Low quality of light system
+// KeyCode.J - Medium quality of light system
+// KeyCode.K - High quality of light system
+// KeyCode.G - Switch color light system
+// KeyCode.M - Create and save map
+// KeyCode.C - Display chunks
+// KeyCode.P - Set active player
+// KeyCode.L - Create torch
+// KeyCode.V - Player hurt
+// KeyCode.Space - Player jump
+// KeyCode.LeftShift - Player run
+
 public class GameManager : MonoBehaviour
 {
     #region Private fields
     [Header("Main")]
     [SerializeField] private GameState _gameState;
     [SerializeField] private TerrainConfigurationSO _terrainConfiguration;
+    [SerializeField] private GameObject _player;
     private WorldCellData[,] _worldData;
     private Chunk[,] _chunks;
 
@@ -25,8 +38,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int _seed;
     [SerializeField] private System.Random _randomVar;
     private string _generalInfo;
+    private string _otherInfo;
     private Vector2Int _blockInfoCoords;
-    private string _processingSpeedInfo;
     private float _loadingValue;
     private bool _isGameSession;
 
@@ -43,7 +56,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Slider _loadingSlider;
     [SerializeField] private TextMeshProUGUI _infoText;
     [SerializeField] private TextMeshProUGUI _blockInfoText;
-    [SerializeField] private TextMeshProUGUI _ProcessingSpeedInfoText;
+    [SerializeField] private TextMeshProUGUI _otherInformationText;
 
     [Header("Conditions")]
     [SerializeField] private bool _isStaticSeed;
@@ -251,16 +264,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public string ProcessingSpeedInfo
+    public string OtherInfo
     {
         get
         {
-            return _processingSpeedInfo;
+            return _otherInfo;
         }
 
         set
         {
-            _processingSpeedInfo = value;
+            _otherInfo = value;
         }
     }
     #endregion
@@ -298,9 +311,14 @@ public class GameManager : MonoBehaviour
         {
             Task.Run(() => DisplayChunks());
         }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            _player.SetActive(true);
+        }
+
         if (IsGameSession)
         {
-            Move();
             BreakBlock();
             PrintBlockDetail();
             CreateWater();
@@ -557,7 +575,7 @@ public class GameManager : MonoBehaviour
         while (true)
         {
             _infoText.text = GeneralInfo;
-            _ProcessingSpeedInfoText.text = ProcessingSpeedInfo;
+            _otherInformationText.text = OtherInfo;
             yield return null;
         }
     }
@@ -573,10 +591,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void Move()
-    {
-        Camera.main.transform.position = new Vector3(Camera.main.transform.position.x + Input.GetAxis("Horizontal"), Camera.main.transform.position.y + Input.GetAxis("Vertical"), -10);
-    }
+    //public void Move()
+    //{
+    //    Camera.main.transform.position = new Vector3(Camera.main.transform.position.x + Input.GetAxis("Horizontal"), Camera.main.transform.position.y + Input.GetAxis("Vertical"), -10);
+    //}
 
     public void BreakBlock()
     {

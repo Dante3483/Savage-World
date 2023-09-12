@@ -18,9 +18,11 @@ public class Terrain : MonoBehaviour
     [SerializeField] private Camera _camera;
 
     [Header("Tilemaps")]
+    [SerializeField] private TileBase _solidTileBase;
     [SerializeField] private Tilemap _blocksTilemap;
     [SerializeField] private Tilemap _liquidTilemap;
     [SerializeField] private Tilemap _backgroundTilemap;
+    [SerializeField] private Tilemap _solidTilemap;
 
     [Header("Sections")]
     [SerializeField] private GameObject _trees;
@@ -40,9 +42,11 @@ public class Terrain : MonoBehaviour
     private TileBase[] _blockTiles;
     private TileBase[] _liquidTiles;
     private TileBase[] _backgroundTiles;
+    private TileBase[] _solidTiles;
     private ArrayObjectPool<TileBase> _blockTilesPool;
     private ArrayObjectPool<TileBase> _liquidTilesPool;
     private ArrayObjectPool<TileBase> _backgroundTilesPool;
+    private ArrayObjectPool<TileBase> _solidTilesPool;
     private ArrayObjectPool<Vector3Int> _tilesCoordsPool;
     private List<List<TileBase>> _allLiquidTiles;
     #endregion
@@ -137,6 +141,19 @@ public class Terrain : MonoBehaviour
             _needToUpdate = value;
         }
     }
+
+    public Tilemap SolidTilemap
+    {
+        get
+        {
+            return _solidTilemap;
+        }
+
+        set
+        {
+            _solidTilemap = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -161,6 +178,12 @@ public class Terrain : MonoBehaviour
         if (BackgroundTilemap == null)
         {
             throw new NullReferenceException("BackgroundTilemap is null");
+        }
+
+        SolidTilemap = transform.Find("SolidTilemap").GetComponent<Tilemap>();
+        if (SolidTilemap == null)
+        {
+            throw new NullReferenceException("SolidTilemap is null");
         }
         #endregion
 
@@ -187,9 +210,11 @@ public class Terrain : MonoBehaviour
         _blockTiles = new TileBase[_renderWidth * _renderHeight];
         _liquidTiles = new TileBase[_renderWidth * _renderHeight];
         _backgroundTiles = new TileBase[_renderWidth * _renderHeight];
+        _solidTiles = new TileBase[_renderWidth * _renderHeight];
         _blockTilesPool = new ArrayObjectPool<TileBase>();
         _liquidTilesPool = new ArrayObjectPool<TileBase>();
         _backgroundTilesPool = new ArrayObjectPool<TileBase>();
+        _solidTilesPool = new ArrayObjectPool<TileBase>();
         _tilesCoordsPool = new ArrayObjectPool<Vector3Int>();
         _firstRender = true;
         #endregion
@@ -710,8 +735,8 @@ public class Terrain : MonoBehaviour
         vectors.Clear();
         vectors.AddRange(NeedToUpdate);
         NeedToUpdate.Clear();
-        //HashSet<Vector2Ushort> coords = new HashSet<Vector2Ushort>(NeedToUpdate);
-        //NeedToUpdate.Clear();
+
+        GameManager.Instance.OtherInfo = $"{vectors.Count} blocks need to update";
 
         BlockSO airBlock = GameManager.Instance.ObjectsAtlass.Air;
         PlantSO plant;
@@ -1133,7 +1158,6 @@ public class Terrain : MonoBehaviour
         int difX;
         int difY;
         int size;
-        object lockObject = new object();
 
         if (_firstRender)
         {
@@ -1160,6 +1184,7 @@ public class Terrain : MonoBehaviour
         _blockTiles = _blockTilesPool.GetArray(size);
         _liquidTiles = _liquidTilesPool.GetArray(size);
         _backgroundTiles = _backgroundTilesPool.GetArray(size);
+        _solidTiles = _solidTilesPool.GetArray(size);
         _tilesCoords = _tilesCoordsPool.GetArray(size);
 
         //Fill Tiles arrays with blocks to destroy
@@ -1186,6 +1211,7 @@ public class Terrain : MonoBehaviour
         {
             if (IsInMapRange(position.x, position.y))
             {
+                //ref WorldCellData block = ref GameManager.Instance.GetWorldCellDataRef(position.x, position.y);
                 vector.x = position.x;
                 vector.y = position.y;
                 _tilesCoords[i] = vector;
@@ -1204,6 +1230,12 @@ public class Terrain : MonoBehaviour
                     _liquidTiles[i] = _allLiquidTiles[_worldData[position.x, position.y].LiquidId][liquidIndex];
                 }
 
+                //Solid
+                _solidTiles[i] = null;
+                if (_worldData[position.x, position.y].IsSolid())
+                {
+                    _solidTiles[i] = _solidTileBase;
+                }
                 i++;
             }
         }
@@ -1212,6 +1244,7 @@ public class Terrain : MonoBehaviour
         BlocksTilemap.SetTiles(_tilesCoords, _blockTiles);
         LiquidTilemap.SetTiles(_tilesCoords, _liquidTiles);
         BackgroundTilemap.SetTiles(_tilesCoords, _backgroundTiles);
+        SolidTilemap.SetTiles(_tilesCoords, _solidTiles);
     }
     #endregion
 
