@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -13,11 +14,23 @@ public class PlayerMovement : MonoBehaviour
     [Header("Animation")]
     [SerializeField] private Animator _playerAnimator;
     [SerializeField] private string _currentAnimationState;
-    private PlayerAnimations _playerAnimations;
+    private PlayerAnimationsController _playerAnimations;
+
+    [Header("Collider")]
+    [SerializeField] private Vector2 _standingColliderSize;
+    [SerializeField] private Vector2 _standingColliderOffset;
+    [Space]
+    [SerializeField] private Vector2 _crouchingColliderSize;
+    [SerializeField] private Vector2 _crouchingColliderOffset;
+    [Space]
+    [SerializeField] private Vector2 _slidingColliderSize;
+    [SerializeField] private Vector2 _slidingColliderOffset;
 
     [Header("Movement")]
     [SerializeField] private float _gravityScale;
     [SerializeField] private int _movementDirection;
+    [SerializeField] private int _slidingDirection;
+    [SerializeField] private float _slidingCooldown;
 
     [Header("Layers")]
     [SerializeField] private LayerMask _groundLayer;
@@ -38,10 +51,15 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Flags")]
     [SerializeField] private bool _isGrounded;
-    [SerializeField] private bool _isJumpCooldownComplete;
     [SerializeField] private bool _isFacingRight;
     [SerializeField] private bool _isWallInFront;
     [SerializeField] private bool _isOnSlope;
+    [SerializeField] private bool _isJumpCooldownComplete;
+    [SerializeField] private bool _isMovementBlocked;
+    [SerializeField] private bool _isJumpBlocked;
+    [SerializeField] private bool _isFlipBlocked;
+    [SerializeField] private bool _isSlidingBlocked;
+    [SerializeField] private bool _isCancelSlidingBlocked;
     [SerializeField] private bool _isIdle;
     [SerializeField] private bool _isWalking;
     [SerializeField] private bool _isRunning;
@@ -49,6 +67,13 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private bool _isFalling;
     [SerializeField] private bool _isHurt;
     [SerializeField] private bool _isDeath;
+    [SerializeField] private bool _isPunch;
+    [SerializeField] private bool _isCrouch;
+    [SerializeField] private bool _isStartSliding;
+    [SerializeField] private bool _isSliding;
+    [SerializeField] private bool _isEndSliding;
+
+    private Coroutine _waitForMaxSlidingTime;
 
     #endregion
 
@@ -238,6 +263,149 @@ public class PlayerMovement : MonoBehaviour
             _isDeath = value;
         }
     }
+
+    public bool IsPunch
+    {
+        get
+        {
+            return _isPunch;
+        }
+
+        set
+        {
+            _isPunch = value;
+        }
+    }
+
+    public bool IsCrouch
+    {
+        get
+        {
+            return _isCrouch;
+        }
+
+        set
+        {
+            _isCrouch = value;
+        }
+    }
+
+    public bool IsSliding
+    {
+        get
+        {
+            return _isSliding;
+        }
+
+        set
+        {
+            _isSliding = value;
+        }
+    }
+
+    public bool IsMovementBlocked
+    {
+        get
+        {
+            return _isMovementBlocked;
+        }
+
+        set
+        {
+            _isMovementBlocked = value;
+        }
+    }
+
+    public int SlidingDirection
+    {
+        get
+        {
+            return _slidingDirection;
+        }
+
+        set
+        {
+            _slidingDirection = value;
+        }
+    }
+
+    public bool IsJumpBlocked
+    {
+        get
+        {
+            return _isJumpBlocked;
+        }
+
+        set
+        {
+            _isJumpBlocked = value;
+        }
+    }
+
+    public bool IsFlipBlocked
+    {
+        get
+        {
+            return _isFlipBlocked;
+        }
+
+        set
+        {
+            _isFlipBlocked = value;
+        }
+    }
+
+    public bool IsSlidingBlocked
+    {
+        get
+        {
+            return _isSlidingBlocked;
+        }
+
+        set
+        {
+            _isSlidingBlocked = value;
+        }
+    }
+
+    public bool IsStartSliding
+    {
+        get
+        {
+            return _isStartSliding;
+        }
+
+        set
+        {
+            _isStartSliding = value;
+        }
+    }
+
+    public bool IsEndSliding
+    {
+        get
+        {
+            return _isEndSliding;
+        }
+
+        set
+        {
+            _isEndSliding = value;
+        }
+    }
+
+    public bool IsCancelSlidingBlocked
+    {
+        get
+        {
+            return _isCancelSlidingBlocked;
+        }
+
+        set
+        {
+            _isCancelSlidingBlocked = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -251,100 +419,55 @@ public class PlayerMovement : MonoBehaviour
         _boxCollider = GetComponent<BoxCollider2D>();
         _playerDebugger = GetComponent<PlayerDebugger>();
         _playerAnimator = GetComponent<Animator>();
-        _playerAnimations = new PlayerAnimations();
+        _playerAnimations = GetComponent<PlayerAnimationsController>();
 
         _isFacingRight = true;
         _isJumpCooldownComplete = true;
+        _isSlidingBlocked = false;
         #endregion
     }
 
     private void FixedUpdate()
     {
+        #region Checkers
         GroundCheck();
         WallCheck();
         SlopeCheck();
         JumpingCheck();
         FallingCheck();
+        MovementAbilityCheck();
+        #endregion
+
+        ChangeCollider();
         Move();
         FixVelocity();
     }
 
     private void Update()
     {
+        if (Input.GetMouseButtonDown(0) && !IsPunch)
+        {
+            IsPunch = true;
+        }
         if (Input.GetKeyDown(KeyCode.V) && !IsHurt && !IsDeath)
         {
             IsHurt = true;
             IsDeath = _playerStats.DecreaseHealth(10);
         }
-        HorizontalMovementCheck();
-        Jump();
+
+        SetMovement();
+        SetJump();
         SetFriction();
         SelectAnimation();
     }
     #endregion
 
     #region Movement
-    private void Move()
-    {
-        if (IsDeath)
-        {
-            return;
-        }
-        float xSpeed = IsRunning ? _playerStats.RunningSpeed : _playerStats.WalkingSpeed;
-
-        if (IsGrounded && !IsOnSlope && !IsJumping && _rigidbody.velocity.y >= -0.05f)
-        {
-            _rigidbody.velocity = new Vector2(xSpeed * MovementDirection, 0.0f);
-        }
-        else if (IsGrounded && IsOnSlope && !IsJumping)
-        {
-            _rigidbody.velocity = new Vector2(xSpeed * _slopeNormalPerpendicular.x * -MovementDirection, xSpeed * _slopeNormalPerpendicular.y * -MovementDirection);
-        }
-        else if (!IsGrounded)
-        {
-            _rigidbody.velocity = new Vector2(xSpeed * MovementDirection, _rigidbody.velocity.y);
-        }
-    }
-
-    private void Jump()
-    {
-        if (IsDeath)
-        {
-            return;
-        }
-
-        if (IsGrounded && Input.GetKeyDown(KeyCode.Space))
-        {
-            IsJumping = true;
-            _rigidbody.velocity = Vector2.up * _playerStats.JumpForce;
-            //StartCoroutine(JumpCooldown());
-        }
-
-        if (Input.GetKeyUp(KeyCode.Space) && _rigidbody.velocity.y > 0)
-        {
-            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.y * 0.5f);
-        }
-    }
-
-    private void HurtComple()
-    {
-        IsHurt = false;
-    }
-    #endregion
-
-    #region Checkers
-    private void GroundCheck()
-    {
-        // Center bottom point
-        Vector3 origin = _boxCollider.bounds.center;
-        origin.y -= _boxCollider.bounds.extents.y;
-        _groundCheckBoxCast.BoxCast(origin, out bool result, _playerDebugger.EnableGroundCheckVizualization);
-        IsGrounded = result;
-    }
-
-    private void HorizontalMovementCheck()
+    private void SetMovement()
     {
         float inputX = Input.GetAxisRaw("Horizontal");
+
+        //If we move to the right
         if (inputX > 0f)
         {
             IsIdle = false;
@@ -355,6 +478,7 @@ public class PlayerMovement : MonoBehaviour
                 Flip();
             }
         }
+        //Else if we move to the left
         else if (inputX < 0f)
         {
             IsIdle = false;
@@ -365,6 +489,7 @@ public class PlayerMovement : MonoBehaviour
                 Flip();
             }
         }
+        //Else if we stand
         else
         {
             IsIdle = true;
@@ -372,7 +497,14 @@ public class PlayerMovement : MonoBehaviour
             MovementDirection = 0;
         }
 
-        if (IsWalking && Input.GetKey(KeyCode.LeftShift))
+        //If we crouch
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            IsCrouch = !IsCrouch;
+        }
+
+        //If we run
+        if (IsWalking && !IsCrouch && !IsWallInFront && Input.GetKey(KeyCode.LeftShift))
         {
             IsWalking = false;
             IsRunning = true;
@@ -382,13 +514,148 @@ public class PlayerMovement : MonoBehaviour
             IsRunning = false;
         }
 
+        //If we slide
+        if (IsRunning && !IsSliding && Input.GetKeyDown(KeyCode.C))
+        {
+            IsStartSliding = true;
+            IsCancelSlidingBlocked = true;
+            StartCoroutine(WaitForMinSlidingTime());
+            _waitForMaxSlidingTime = StartCoroutine(WaitForMaxSlidingTime());
+            SlidingDirection = MovementDirection;
+        }
+
+        if (IsSliding && !Input.GetKey(KeyCode.C) && !IsCancelSlidingBlocked)
+        {
+            IsEndSliding = true;
+            StopCoroutine(_waitForMaxSlidingTime);
+        }
+
+        //If the is a wall ahead
         if (IsWallInFront && MovementDirection == transform.right.x)
         {
             IsWalking = false;
             IsRunning = false;
+            if (IsSliding)
+            {
+                IsEndSliding = true;
+            }
             IsIdle = true;
             MovementDirection = 0;
         }
+    }
+
+    private void Move()
+    {
+        if (IsMovementBlocked)
+        {
+            _rigidbody.velocity = Vector2.zero;
+            return;
+        }
+
+        float xSpeed = _playerStats.WalkingSpeed;
+        if (IsRunning)
+        {
+            xSpeed = _playerStats.RunningSpeed;
+        }
+        if (IsCrouch)
+        {
+            xSpeed = _playerStats.CrouchWalkingSpeed;
+        }
+        if (IsSliding)
+        {
+            xSpeed = _playerStats.SlidingSpeed;
+        }
+
+        int movementDirection = IsSliding ? SlidingDirection : MovementDirection;
+
+        if (IsGrounded && !IsOnSlope && !IsJumping && _rigidbody.velocity.y >= -0.05f)
+        {
+            _rigidbody.velocity = new Vector2(xSpeed * movementDirection, 0.0f);
+        }
+        else if (IsGrounded && IsOnSlope && !IsJumping)
+        {
+            _rigidbody.velocity = new Vector2(xSpeed * _slopeNormalPerpendicular.x * -movementDirection, xSpeed * _slopeNormalPerpendicular.y * -movementDirection);
+        }
+        else if (!IsGrounded)
+        {
+            _rigidbody.velocity = new Vector2(xSpeed * movementDirection, _rigidbody.velocity.y);
+        }
+    }
+
+    private void SetJump()
+    {
+        if (IsJumpBlocked)
+        {
+            return;
+        }
+
+        if (IsGrounded && Input.GetKeyDown(KeyCode.Space))
+        {
+            IsJumping = true;
+            _rigidbody.velocity = Vector2.up * _playerStats.JumpForce;
+        }
+
+        if (Input.GetKeyUp(KeyCode.Space) && _rigidbody.velocity.y > 0)
+        {
+            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.y * 0.5f);
+        }
+    }
+
+    private void HurtComplete()
+    {
+        IsHurt = false;
+    }
+
+    private void PunchComplete()
+    {
+        IsPunch = false;
+    }
+
+    #region Sliding
+    private IEnumerator WaitForMinSlidingTime()
+    {
+        yield return new WaitForSeconds(_playerStats.SlidingMinTime);
+        IsCancelSlidingBlocked = false;
+    }
+
+    private IEnumerator WaitForMaxSlidingTime()
+    {
+        yield return new WaitForSeconds(_playerStats.SlidingMaxTime);
+        if (IsSliding)
+        {
+            IsEndSliding = true;
+        }
+    }
+
+    private void StartSlidingComplete()
+    {
+        IsStartSliding = false;
+        IsSliding = true;
+    }
+
+    private void EndSlidingComplete()
+    {
+        IsEndSliding = false;
+        StopSliding();
+    }
+
+    private void StopSliding()
+    {
+        IsSliding = false;
+        SlidingDirection = 0;
+    }
+    #endregion
+
+    #endregion
+
+    #region Checks
+    private void GroundCheck()
+    {
+        // Center bottom point
+        Vector3 origin = _boxCollider.bounds.center;
+        origin.y -= _boxCollider.bounds.extents.y;
+        _groundCheckBoxCast.BoxCast(origin, out bool result, _playerDebugger.EnableGroundCheckVizualization);
+        IsGrounded = result;
     }
 
     private void SlopeCheck()
@@ -475,6 +742,37 @@ public class PlayerMovement : MonoBehaviour
         if (IsFalling)
         {
             IsJumping = false;
+            StopSliding();
+        }
+    }
+
+    private void MovementAbilityCheck()
+    {
+        if (IsDeath || IsPunch || IsHurt || IsEndSliding)
+        {
+            IsMovementBlocked = true;
+        }
+        else
+        {
+            IsMovementBlocked = false;
+        }
+
+        if (IsDeath || IsPunch || IsHurt || IsSliding)
+        {
+            IsJumpBlocked = true;
+        }
+        else
+        {
+            IsJumpBlocked = false;
+        }
+
+        if (IsDeath || IsPunch || IsHurt || IsSliding)
+        {
+            IsFlipBlocked = true;
+        }
+        else
+        {
+            IsFlipBlocked = false;
         }
     }
     #endregion
@@ -482,7 +780,7 @@ public class PlayerMovement : MonoBehaviour
     #region Others
     private void Flip()
     {
-        if (IsDeath)
+        if (IsFlipBlocked)
         {
             return;
         }
@@ -500,7 +798,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void SetFriction()
     {
-        if (MovementDirection == 0)
+        if ((MovementDirection == 0 && SlidingDirection == 0) || IsMovementBlocked)
         {
             _rigidbody.sharedMaterial = _fullFriction;
         }
@@ -509,16 +807,55 @@ public class PlayerMovement : MonoBehaviour
             _rigidbody.sharedMaterial = _noFriction;
         }
     }
+
+    private void ChangeCollider()
+    {
+        if (IsCrouch)
+        {
+            _boxCollider.size = _crouchingColliderSize;
+            _boxCollider.offset = _crouchingColliderOffset;
+        }
+        else
+        {
+            _boxCollider.size = _standingColliderSize;
+            _boxCollider.offset = _standingColliderOffset;
+        }
+
+        if (IsSliding)
+        {
+            _boxCollider.size = _slidingColliderSize;
+            _boxCollider.offset = _slidingColliderOffset;
+        }
+    }
     #endregion
 
     #region Animations
     private void SelectAnimation()
     {
-        string newAnimationState = _playerAnimations.PlayerIdle;
+        string newAnimationState = "";
+
+        if (IsIdle)
+        {
+            if (IsCrouch)
+            {
+                newAnimationState = _playerAnimations.PlayerCrouchIdle;
+            }
+            else
+            {
+                newAnimationState = _playerAnimations.PlayerIdle;
+            }
+        }
 
         if (IsWalking)
         {
-            newAnimationState = _playerAnimations.PlayerWalk;
+            if (IsCrouch)
+            {
+                newAnimationState = _playerAnimations.PlayerCrouchWalk;
+            }
+            else
+            {
+                newAnimationState = _playerAnimations.PlayerWalk;
+            }
         }
 
         if (IsRunning)
@@ -536,14 +873,34 @@ public class PlayerMovement : MonoBehaviour
             newAnimationState = _playerAnimations.PlayerFall;
         }
 
+        if (IsPunch)
+        {
+            newAnimationState = _playerAnimations.PlayerPunch;
+        }
+
+        if (IsDeath && IsGrounded)
+        {
+            newAnimationState = _playerAnimations.PlayerDeath;
+        }
+
         if (IsHurt)
         {
             newAnimationState = _playerAnimations.PlayerHurt;
         }
 
-        if (!IsHurt && IsDeath && IsGrounded)
+        if (IsStartSliding)
         {
-            newAnimationState = _playerAnimations.PlayerDeath;
+            newAnimationState = _playerAnimations.PlayerStartSliding;
+        }
+
+        if (IsSliding)
+        {
+            newAnimationState = _playerAnimations.PlayerSliding;
+        }
+
+        if (IsEndSliding)
+        {
+            newAnimationState = _playerAnimations.PlayerEndSliding;
         }
 
         ChangeAnimationState(newAnimationState);

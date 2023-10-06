@@ -11,12 +11,13 @@ using UnityEngine.UI;
 // KeyCode.K - High quality of light system
 // KeyCode.G - Switch color light system
 // KeyCode.M - Create and save map
-// KeyCode.C - Display chunks
+// KeyCode.F - Display chunks
 // KeyCode.P - Set active player
 // KeyCode.L - Create torch
 // KeyCode.V - Player hurt
 // KeyCode.Space - Player jump
 // KeyCode.LeftShift - Player run
+// KeyCode.LeftShift + C - Player slide
 
 public class GameManager : MonoBehaviour
 {
@@ -307,7 +308,7 @@ public class GameManager : MonoBehaviour
         {
             SaveMapToPNG();
         }
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.F))
         {
             Task.Run(() => DisplayChunks());
         }
@@ -590,11 +591,6 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
     }
-
-    //public void Move()
-    //{
-    //    Camera.main.transform.position = new Vector3(Camera.main.transform.position.x + Input.GetAxis("Horizontal"), Camera.main.transform.position.y + Input.GetAxis("Vertical"), -10);
-    //}
 
     public void BreakBlock()
     {

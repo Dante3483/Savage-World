@@ -16,9 +16,20 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private float _currentMana;
 
     [Header("Movement")]
+    [Space]
+    [SerializeField] private float _gravityScale;
+    [Space]
     [SerializeField] private float _walkingSpeed;
+    [Space]
     [SerializeField] private float _runningSpeed;
+    [Space]
     [SerializeField] private float _jumpForce;
+    [Space]
+    [SerializeField] private float _crouchWalkingSpeed;
+    [Space]
+    [SerializeField] private float _slidingSpeed;
+    [SerializeField] private float _slidingMinTime;
+    [SerializeField] private float _slidingMaxTime;
     #endregion
 
     #region Public fields
@@ -142,6 +153,58 @@ public class PlayerStats : MonoBehaviour
             _jumpForce = value;
         }
     }
+
+    public float CrouchWalkingSpeed
+    {
+        get
+        {
+            return _crouchWalkingSpeed;
+        }
+
+        set
+        {
+            _crouchWalkingSpeed = value;
+        }
+    }
+
+    public float SlidingSpeed
+    {
+        get
+        {
+            return _slidingSpeed;
+        }
+
+        set
+        {
+            _slidingSpeed = value;
+        }
+    }
+
+    public float SlidingMinTime
+    {
+        get
+        {
+            return _slidingMinTime;
+        }
+
+        set
+        {
+            _slidingMinTime = value;
+        }
+    }
+
+    public float SlidingMaxTime
+    {
+        get
+        {
+            return _slidingMaxTime;
+        }
+
+        set
+        {
+            _slidingMaxTime = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -155,7 +218,6 @@ public class PlayerStats : MonoBehaviour
         _currentHealth = Mathf.Clamp(_currentHealth - healthCount, 0, _maxHealth);
 
         return _currentHealth == 0;
-        
     }
     #endregion
 }

@@ -17,7 +17,7 @@ MonoBehaviour:
   _type: 6
   _colorOnMap: {r: 0.9843138, g: 0.69411767, b: 0.19607845, a: 1}
   _lightValue: 1
-  _lightColor: {r: 1, g: 0.8850214, b: 0.6924528, a: 1}
+  _lightColor: {r: 1, g: 0.97529614, b: 0.66415095, a: 1}
   _isSurfaceLight: 0
   _waterproof: 0
   _id: 0
