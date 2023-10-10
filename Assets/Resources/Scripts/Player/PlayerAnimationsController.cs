@@ -92,7 +92,7 @@ public class PlayerAnimationsController: MonoBehaviour
             }
         }
 
-        if (_playerFlags.IsJump)
+        if (_playerFlags.IsRise)
         {
             newAnimationState = _playerJump;
         }
