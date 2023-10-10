@@ -124,8 +124,8 @@ public class PlayerMovementNew : MonoBehaviour
     {
         GroundCheck();
         SlopeCheck();
-        JumpingCheck();
-        FallingCheck();
+        RiseCheck();
+        FallCheck();
         WallInFrontCheck();
         CeilingCheck();
         SlideCheck();
@@ -192,7 +192,7 @@ public class PlayerMovementNew : MonoBehaviour
 
         if (_playerFlags.IsGrounded && Input.GetKeyDown(KeyCode.Space))
         {
-            _playerFlags.IsJump = true;
+            _playerFlags.IsRise = true;
             _rigidbody.velocity = Vector2.up * _playerStats.JumpForce;
         }
 
@@ -236,7 +236,7 @@ public class PlayerMovementNew : MonoBehaviour
 
     private void ReadSlide()
     {
-        if (_playerFlags.IsRun && !_playerFlags.IsJump && !_playerFlags.IsFall && !_playerFlags.IsSlide && Input.GetKeyDown(KeyCode.C))
+        if (_playerFlags.IsRun && !_playerFlags.IsRise && !_playerFlags.IsFall && !_playerFlags.IsSlide && Input.GetKeyDown(KeyCode.C))
         {
             _playerFlags.IsStartSlide = true;
             _playerFlags.IsCancelSlideBlocked = true;
@@ -278,11 +278,11 @@ public class PlayerMovementNew : MonoBehaviour
 
         float currentMovementDirection = _playerFlags.IsSlide ? _slideDirection : _movementDirection;
 
-        if (_playerFlags.IsGrounded && !_playerFlags.IsOnSlope && !_playerFlags.IsJump && _rigidbody.velocity.y >= -0.05f)
+        if (_playerFlags.IsGrounded && !_playerFlags.IsOnSlope && !_playerFlags.IsRise && _rigidbody.velocity.y >= -0.05f)
         {
             _rigidbody.velocity = new Vector2(xSpeed * currentMovementDirection, 0.0f);
         }
-        else if (_playerFlags.IsGrounded && _playerFlags.IsOnSlope && !_playerFlags.IsJump)
+        else if (_playerFlags.IsGrounded && _playerFlags.IsOnSlope && !_playerFlags.IsRise)
         {
             _rigidbody.velocity = new Vector2(xSpeed * _slopeNormalPerpendicular.x * -currentMovementDirection, xSpeed * _slopeNormalPerpendicular.y * -currentMovementDirection);
         }
@@ -348,20 +348,20 @@ public class PlayerMovementNew : MonoBehaviour
         _playerFlags.IsGrounded = result;
     }
 
-    private void JumpingCheck()
+    private void RiseCheck()
     {
         if (_rigidbody.velocity.y <= 0)
         {
-            _playerFlags.IsJump = false;
+            _playerFlags.IsRise = false;
         }
     }
 
-    private void FallingCheck()
+    private void FallCheck()
     {
         _playerFlags.IsFall = _rigidbody.velocity.y < 0.1f && !_playerFlags.IsGrounded && !_playerFlags.IsOnSlope;
         if (_playerFlags.IsFall)
         {
-            _playerFlags.IsJump = false;
+            _playerFlags.IsRise = false;
             StopSlide();
         }
     }
@@ -484,7 +484,7 @@ public class PlayerMovementNew : MonoBehaviour
 
     private void SetVelocity()
     {
-        if (_rigidbody.velocity.y > 0 && _playerFlags.IsOnSlope && !_playerFlags.IsJump)
+        if (_rigidbody.velocity.y > 0 && _playerFlags.IsOnSlope && !_playerFlags.IsRise)
         {
             _rigidbody.velocity *= 1.5f;
         }
