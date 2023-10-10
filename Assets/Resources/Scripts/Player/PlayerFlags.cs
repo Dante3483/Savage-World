@@ -7,7 +7,7 @@ public class PlayerFlags : MonoBehaviour
     [SerializeField] private bool _isIdle;
     [SerializeField] private bool _isWalk;
     [SerializeField] private bool _isRun;
-    [SerializeField] private bool _isJump;
+    [SerializeField] private bool _isRise;
     [SerializeField] private bool _isFall;
     [SerializeField] private bool _isCrouch;
     [SerializeField] private bool _isSlide;
@@ -79,16 +79,16 @@ public class PlayerFlags : MonoBehaviour
         }
     }
 
-    public bool IsJump
+    public bool IsRise
     {
         get
         {
-            return _isJump;
+            return _isRise;
         }
 
         set
         {
-            _isJump = value;
+            _isRise = value;
         }
     }
 
@@ -346,7 +346,7 @@ public class PlayerFlags : MonoBehaviour
         _isMovementBlocked = _isDeath || _isPunch || _isHurt || _isEndSlide;
         _isJumpBlocked = _isDeath || _isPunch || _isHurt || _isSlide || (_isCrouch && _isTouchCeiling);
         _isFlipBlocked = _isDeath || _isPunch || _isHurt || _isSlide;
-        _isSlopeCheckBlocked = _isWallInFront || _isJump;
+        _isSlopeCheckBlocked = _isWallInFront || _isRise;
     }
     #endregion
 }
