@@ -996,8 +996,8 @@ GameObject:
   - component: {fileID: 592257512}
   - component: {fileID: 592257513}
   - component: {fileID: 592257511}
-  - component: {fileID: 592257510}
   - component: {fileID: 592257515}
+  - component: {fileID: 592257510}
   m_Layer: 0
   m_Name: Slime
   m_TagString: Untagged
@@ -1036,6 +1036,10 @@ MonoBehaviour:
   _boxCollider: {fileID: 0}
   _npcFlags: {fileID: 0}
   _npcStats: {fileID: 0}
+  _movementDirection: 0
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
   _groundCheckBoxCast:
     _originOffset: {x: 0, y: 0, z: 0}
     _size: {x: 1, y: 1}
@@ -1047,7 +1051,16 @@ MonoBehaviour:
       m_Bits: 64
     _hitColor: {r: 0, g: 1, b: 0, a: 1}
     _notHitColor: {r: 1, g: 0, b: 0, a: 1}
+  _slopeCheckDistanceLeft: 0
+  _slopeCheckDistanceRight: 0
+  _slopeAngle: 0
+  _slopeNormalPerpendicular: {x: 0, y: 0}
+  _noFriction: {fileID: 6200000, guid: effc25d654d75ac4da8990d7cf05bf96, type: 2}
+  _fullFriction: {fileID: 6200000, guid: bd55736fb0ba2874480c595e02c9a5c4, type: 2}
   _jumpCooldown: 3
+  _attackCooldown: 0
+  _jumpXForce: 0
+  _attackXForce: 0
 --- !u!114 &592257511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1091,12 +1104,12 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 9
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
+  m_CollisionDetection: 1
+  m_Constraints: 4
 --- !u!61 &592257513
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1187,7 +1200,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cceab165e95cab44980220d91afc085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _jumpForce: 2
+  _maxHealth: 0
+  _currentHealth: 0
+  _maxMana: 0
+  _currentMana: 0
+  _gravityScale: 0
+  _walkingSpeed: 0
+  _jumpForce: 20
 --- !u!1 &613582385
 GameObject:
   m_ObjectHideFlags: 0

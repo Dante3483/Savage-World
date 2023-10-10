@@ -5,7 +5,11 @@ using UnityEngine;
 public class SlimeNPC : NPC
 {
     #region Private fields
+    [Header("Slime")]
     [SerializeField] private float _jumpCooldown;
+    [SerializeField] private float _attackCooldown;
+    [SerializeField] private float _jumpXForce;
+    [SerializeField] private float _attackXForce;
 
     #endregion
 
@@ -21,30 +25,53 @@ public class SlimeNPC : NPC
     private void FixedUpdate()
     {
         GroundCheck();
-        RisingCheck();
-        FallingCheck();
+        SlopeCheck();
+        RiseCheck();
+        FallCheck();
 
-        //_npcFlags.ChangeBlockFlagsState();
+        _npcFlags.IsMovementBlocked = _npcFlags.IsGrounded && !_npcFlags.IsRise;
 
+        Jump();
+
+        SetFriction();
+    }
+
+    public override void Jump()
+    {
+        DirectionalJump(_jumpXForce);
+        SetJumpCooldown();
+    }
+
+    public override void Attack()
+    {
+        DirectionalJump(_attackXForce);
+        SetJumpCooldown();
+    }
+
+    private void DirectionalJump(float horizontalForce)
+    {
+        if (_npcFlags.IsJumpBlocked)
+        {
+            return;
+        }
+
+        _rigidbody.velocity = new Vector2(_movementDirection * horizontalForce, _npcStats.JumpForce);
+        _npcFlags.IsRise = true;
+    }
+
+    private void SetJumpCooldown()
+    {
         if (!_npcFlags.IsJumpBlocked)
         {
-            Attack();
+            _npcFlags.IsJumpBlocked = true;
+            StartCoroutine(JumpWait());
         }
-    }
-    public override void Jump(Vector2 jumpDir)  
-    {
-        base.Jump(jumpDir);
-        _npcFlags.IsJumpBlocked = true;
-        StartCoroutine(JumpWait());
+
         IEnumerator JumpWait()
         {
             yield return new WaitForSeconds(_jumpCooldown);
-            _npcFlags.IsJumpBlocked= false;
+            _npcFlags.IsJumpBlocked = false;
         }
-    }
-    public override void Attack()
-    {
-        Jump(new Vector2(2,1));
     }
 
     #endregion
