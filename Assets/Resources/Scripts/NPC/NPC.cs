@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
 [RequireComponent(typeof(SpriteRenderer))]
@@ -15,6 +16,7 @@ public class NPC : MonoBehaviour
     [SerializeField] protected NPCFlags _npcFlags;
     [SerializeField] protected NPCStats _npcStats;
     [SerializeField] protected float _movementDirection;
+    [SerializeField] protected SpriteRenderer _spriteRenderer;
     ///
     [Header("Layers")]
     [SerializeField] private LayerMask _groundLayer;
@@ -30,6 +32,13 @@ public class NPC : MonoBehaviour
     [SerializeField] private PhysicsMaterial2D _noFriction;
     [SerializeField] private PhysicsMaterial2D _fullFriction;
     private RaycastUtil _slopeCheckRaycast;
+    ///
+    [Header("Attack properties")]
+    [SerializeField] private GameObject _attackCollider;
+    [SerializeField] private GameObject _hitCollider;
+    [SerializeField] private Transform _target;
+
+
     #endregion
 
     #region Public fields
@@ -37,16 +46,45 @@ public class NPC : MonoBehaviour
     #endregion
 
     #region Properties
+    public Transform Target
+    {
+        get
+        {
+            return _target;
+        }
 
+        set
+        {
+            _target = value;
+        }
+    }
     #endregion
 
     #region Methods
-    private void Awake()
+    public void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
         _npcFlags = GetComponent<NPCFlags>();
         _npcStats = GetComponent<NPCStats>();
         _boxCollider= GetComponent<BoxCollider2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        if (!transform.Find("AttackCollider"))
+        {
+            _attackCollider = new GameObject("AttackCollider");
+            _attackCollider.AddComponent<MobAttackController>();
+            _attackCollider.transform.parent = transform;
+            _attackCollider.transform.position = transform.position;
+        }
+
+        if (!transform.Find("HitCollider"))
+        {
+            _hitCollider = new GameObject("HitCollider");
+            _hitCollider.AddComponent<PolygonCollider2D>();
+            _hitCollider.GetComponent<PolygonCollider2D>().isTrigger = true;
+            _hitCollider.AddComponent<MobHitController>();
+            _hitCollider.transform.parent = transform;
+            _hitCollider.transform.position = transform.position;
+        }
         _npcFlags.IsFaceToTheRight =true;
         _npcFlags.IsIdle = true;
     }
@@ -62,7 +100,7 @@ public class NPC : MonoBehaviour
         float xSpeed = _npcStats.WalkingSpeed;
 
         float currentMovementDirection = _movementDirection;
-
+      
         if (_npcFlags.IsGrounded && !_npcFlags.IsOnSlope && !_npcFlags.IsRise && _rigidbody.velocity.y >= -0.05f)
         {
             _rigidbody.velocity = new Vector2(xSpeed * currentMovementDirection, 0.0f);

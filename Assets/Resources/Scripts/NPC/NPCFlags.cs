@@ -26,6 +26,11 @@ public class NPCFlags : MonoBehaviour
     ///
     [Header("Others")]
     [SerializeField] private bool _isFaceToTheRight;
+
+    ///
+    [Header("Attack/Targeting")]
+    [SerializeField] private bool _isOnTarget;
+    [SerializeField] private bool _isTargetInArea;
     #endregion
 
     #region Public fields
@@ -238,6 +243,32 @@ public class NPCFlags : MonoBehaviour
         set
         {
             _isFaceToTheRight = value;
+        }
+    }
+
+    public bool IsOnTarget
+    {
+        get
+        {
+            return _isOnTarget;
+        }
+
+        set
+        {
+            _isOnTarget = value;
+        }
+    }
+
+    public bool IsTargetInArea
+    {
+        get
+        {
+            return _isTargetInArea;
+        }
+
+        set
+        {
+            _isTargetInArea = value;
         }
     }
     #endregion

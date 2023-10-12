@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class SlimeNPC : NPC
 {
     #region Private fields
@@ -22,6 +23,11 @@ public class SlimeNPC : NPC
     #endregion
 
     #region Methods
+    private void Awake()
+    {
+        base.Awake();
+        Target = GameManager.Instance.GetPlayerTransform();
+    }
     private void FixedUpdate()
     {
         GroundCheck();
@@ -54,7 +60,14 @@ public class SlimeNPC : NPC
         {
             return;
         }
-
+        if (transform.position.x - Target.position.x < 0)
+        {
+            _movementDirection = 1;
+        }
+        else
+        {
+            _movementDirection = -1;
+        }
         _rigidbody.velocity = new Vector2(_movementDirection * horizontalForce, _npcStats.JumpForce);
         _npcFlags.IsRise = true;
     }

@@ -19,6 +19,11 @@ public class NPCStats : MonoBehaviour
     [SerializeField] private float _walkingSpeed;
     [Space]
     [SerializeField] private float _jumpForce;
+
+    [Header("Attack")]
+    [Space]
+    [SerializeField] private float _attackCooldown;
+
     #endregion
 
     #region Public fields
@@ -114,6 +119,19 @@ public class NPCStats : MonoBehaviour
         set
         {
             _walkingSpeed = value;
+        }
+    }
+
+    public float AttackCooldown
+    {
+        get
+        {
+            return _attackCooldown;
+        }
+
+        set
+        {
+            _attackCooldown = value;
         }
     }
     #endregion

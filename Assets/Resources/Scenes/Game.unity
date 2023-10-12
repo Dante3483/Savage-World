@@ -998,7 +998,7 @@ GameObject:
   - component: {fileID: 592257511}
   - component: {fileID: 592257515}
   - component: {fileID: 592257510}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Slime
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1037,6 +1037,7 @@ MonoBehaviour:
   _npcFlags: {fileID: 0}
   _npcStats: {fileID: 0}
   _movementDirection: 0
+  _spriteRenderer: {fileID: 0}
   _groundLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -1057,6 +1058,9 @@ MonoBehaviour:
   _slopeNormalPerpendicular: {x: 0, y: 0}
   _noFriction: {fileID: 6200000, guid: effc25d654d75ac4da8990d7cf05bf96, type: 2}
   _fullFriction: {fileID: 6200000, guid: bd55736fb0ba2874480c595e02c9a5c4, type: 2}
+  _attackCollider: {fileID: 0}
+  _hitCollider: {fileID: 0}
+  _target: {fileID: 0}
   _jumpCooldown: 3
   _attackCooldown: 0
   _jumpXForce: 0
@@ -1089,6 +1093,8 @@ MonoBehaviour:
   _isFlipBlocked: 0
   _isSlopeCheckBlocked: 0
   _isFaceToTheRight: 0
+  _isOnTarget: 0
+  _isTargetInArea: 0
 --- !u!50 &592257512
 Rigidbody2D:
   serializedVersion: 4
@@ -1207,6 +1213,7 @@ MonoBehaviour:
   _gravityScale: 0
   _walkingSpeed: 0
   _jumpForce: 20
+  _attackCooldown: 0
 --- !u!1 &613582385
 GameObject:
   m_ObjectHideFlags: 0
@@ -1569,7 +1576,7 @@ MonoBehaviour:
   _isIdle: 0
   _isWalk: 0
   _isRun: 0
-  _isJump: 0
+  _isRise: 0
   _isFall: 0
   _isCrouch: 0
   _isSlide: 0
