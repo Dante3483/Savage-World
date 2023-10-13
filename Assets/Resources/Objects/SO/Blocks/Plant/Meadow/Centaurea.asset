@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b0572a9e2a280b4396150628efcef6e, type: 3}
   m_Name: Centaurea
   m_EditorClassIdentifier: 
-  _tiles:
-  - {fileID: 11400000, guid: bfd04b0636577ed4885f9690797dcb00, type: 2}
-  - {fileID: 11400000, guid: 04f34fcce8fcfb44da30d968b39ae2e9, type: 2}
+  _sprites:
+  - {fileID: 21300000, guid: b10c30187ce66b043960a5fc8f552a6f, type: 3}
+  - {fileID: 21300000, guid: 23d376db41114974ca2bf89d09f464a4, type: 3}
   _type: 4
   _colorOnMap: {r: 0.3254902, g: 0.2509804, b: 0.5686275, a: 1}
   _lightValue: 0

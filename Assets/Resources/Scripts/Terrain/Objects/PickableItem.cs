@@ -1,6 +1,8 @@
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
+[RequireComponent(typeof(SpriteMask))]
+[RequireComponent(typeof(LightMask))]
 public class PickableItem : MonoBehaviour
 {
     #region Private fields

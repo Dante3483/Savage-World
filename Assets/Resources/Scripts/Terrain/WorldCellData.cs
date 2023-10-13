@@ -1,5 +1,7 @@
-using System;
+using Random = System.Random;
+using UnityEngine;
 using UnityEngine.Tilemaps;
+using System.Linq;
 
 public struct WorldCellData
 {
@@ -225,31 +227,40 @@ public struct WorldCellData
             $"Flow value: {_flowValue}\n";
     }
 
-    public TileBase GetBlockTile()
+    public Sprite GetBlockSprite()
     {
-        if (BlockData.Tiles.Count == 0)
+        if (BlockData.Sprites.Count == 0)
         {
             return null;
         }
-        return BlockData.Tiles[BlockTileId];
-        //BlockTileId = (byte)Random.Range(0, BlockData.Tiles.Count);
-        //return BlockData.Tiles[BlockTileId];
+        return BlockData.Sprites[BlockTileId];
     }
 
-    public TileBase GetBackgroundTile()
+    public Sprite GetBackgroundSprite()
     {
-        if (BackgroundData.Tiles.Count == 0)
+        if (BackgroundData.Sprites.Count == 0)
         {
             return null;
         }
-        return BackgroundData.Tiles[BackgroundTileId];
-        //if (BackgroundTileId != 255)
-        //{
-            
-        //}
+        return BackgroundData.Sprites[BackgroundTileId];
+    }
 
-        //BackgroundTileId = (byte)Random.Range(0, BackgroundData.Tiles.Count);
-        //return BackgroundData.Tiles[BackgroundTileId];
+    public Sprite GetLiquidSprite()
+    {
+        BlockSO liquidData = GetLiquid();
+        int count = liquidData.Sprites.Count;
+        if (count == 0)
+        {
+            return null;
+        }
+        if (_flowValue == 100f || _isFlowsDown)
+        {
+            return liquidData.Sprites.Last();
+        }
+        else
+        {
+            return liquidData.Sprites[(int)(_flowValue / count)];
+        }
     }
 
     public BlockSO GetBlock()
@@ -297,12 +308,12 @@ public struct WorldCellData
 
     public void SetRandomBlockTile(Random randomVar)
     {
-        BlockTileId = (byte)randomVar.Next(0, BlockData.Tiles.Count);
+        BlockTileId = (byte)randomVar.Next(0, BlockData.Sprites.Count);
     }
 
     public void SetRandomBackgroundTile(Random randomVar)
     {
-        BackgroundTileId = (byte)randomVar.Next(0, BackgroundData.Tiles.Count);
+        BackgroundTileId = (byte)randomVar.Next(0, BackgroundData.Sprites.Count);
     }
 
     public bool CompareBlock(BlockSO block)

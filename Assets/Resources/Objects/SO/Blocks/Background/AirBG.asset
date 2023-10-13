@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee8d6e7da3050a74eaa34cfc051d338e, type: 3}
   m_Name: AirBG
   m_EditorClassIdentifier: 
-  _tiles: []
+  _sprites: []
   _type: 5
   _colorOnMap: {r: 1, g: 1, b: 1, a: 0}
   _lightValue: 1
   _lightColor: {r: 1, g: 1, b: 1, a: 1}
   _isSurfaceLight: 1
+  _waterproof: 1
   _id: 1

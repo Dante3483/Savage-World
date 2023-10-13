@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b0572a9e2a280b4396150628efcef6e, type: 3}
   m_Name: Tagete
   m_EditorClassIdentifier: 
-  _tiles:
-  - {fileID: 11400000, guid: 5d1305d5dd3c2f048aaee8f0d89d0841, type: 2}
-  - {fileID: 11400000, guid: 8c81474b83a276b42a7cddd28f49a2ac, type: 2}
+  _sprites:
+  - {fileID: 21300000, guid: bdb5da868d869274fb713928335362ba, type: 3}
+  - {fileID: 21300000, guid: 0db8b1f0d6c9ba74488f05cf2d351330, type: 3}
   _type: 4
   _colorOnMap: {r: 0.9019608, g: 0.654902, b: 0.23137255, a: 1}
   _lightValue: 0

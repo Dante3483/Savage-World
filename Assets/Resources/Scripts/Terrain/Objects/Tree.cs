@@ -6,6 +6,8 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
+[RequireComponent(typeof(SpriteMask))]
+[RequireComponent(typeof(LightMask))]
 public class Tree : MonoBehaviour
 {
     #region Private fields

@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b0572a9e2a280b4396150628efcef6e, type: 3}
   m_Name: MeadowGrass
   m_EditorClassIdentifier: 
-  _tiles:
-  - {fileID: 11400000, guid: b9994c3152e74b24db2515be98a216a3, type: 2}
-  - {fileID: 11400000, guid: e25e39239ad69eb40b13792e36bd617a, type: 2}
-  - {fileID: 11400000, guid: 0edd353cf706d6e4eba7a1c00021641c, type: 2}
-  - {fileID: 11400000, guid: efdb2d284a0e03d4ba1142a1e81593a8, type: 2}
+  _sprites:
+  - {fileID: 21300000, guid: b81a9e7366b36834d8a6c6f930b55613, type: 3}
+  - {fileID: 21300000, guid: 8f6eecd481a6a4d438d1fad274c7fc2f, type: 3}
+  - {fileID: 21300000, guid: 13ffa4b78f3d4af4aa71d69fae372388, type: 3}
+  - {fileID: 21300000, guid: a26c9f75b79baff438b58763194666d7, type: 3}
   _type: 4
   _colorOnMap: {r: 0.6, g: 0.67058825, b: 0.29411766, a: 1}
   _lightValue: 0

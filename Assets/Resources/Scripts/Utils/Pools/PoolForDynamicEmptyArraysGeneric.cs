@@ -1,11 +1,21 @@
 using System.Collections.Generic;
 
-public class ArrayObjectPool<T>
+public class PoolForDynamicEmptyArraysGeneric<T>
 {
-    private Dictionary<int, T[]> _pool
-        = new Dictionary<int, T[]>();
+    #region Private fields
+    private Dictionary<int, T[]> _pool = new Dictionary<int, T[]>();
     private T[] _array;
+    #endregion
 
+    #region Public fields
+
+    #endregion
+
+    #region Properties
+
+    #endregion
+
+    #region Methods
     public T[] GetArray(int size)
     {
         if (_pool.ContainsKey(size))
@@ -19,4 +29,5 @@ public class ArrayObjectPool<T>
         }
         return _array;
     }
+    #endregion
 }

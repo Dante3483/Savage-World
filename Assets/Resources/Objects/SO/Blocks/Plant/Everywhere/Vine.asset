@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b0572a9e2a280b4396150628efcef6e, type: 3}
   m_Name: Vine
   m_EditorClassIdentifier: 
-  _tiles:
-  - {fileID: 11400000, guid: 0d095fd1ee32a724498021814299bb2e, type: 2}
+  _sprites:
+  - {fileID: 21300000, guid: e90d728e99fde454c93b7771584cb10f, type: 3}
   _type: 4
   _colorOnMap: {r: 0.36078432, g: 0.5058824, b: 0.227451, a: 1}
   _lightValue: 0

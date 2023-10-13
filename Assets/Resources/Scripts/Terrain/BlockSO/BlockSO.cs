@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 public abstract class BlockSO : ScriptableObject
 {
     #region Private fields
-    [SerializeField] private List<TileBase> _tiles;
+    [SerializeField] private List<Sprite> _sprites;
     [SerializeField] private BlockTypes _type;
     [SerializeField] private Color _colorOnMap = Color.white;
     [SerializeField] private float _lightValue;
@@ -32,16 +32,16 @@ public abstract class BlockSO : ScriptableObject
         }
     }
 
-    public List<TileBase> Tiles
+    public List<Sprite> Sprites
     {
         get
         {
-            return _tiles;
+            return _sprites;
         }
 
         set
         {
-            _tiles = value;
+            _sprites = value;
         }
     }
 

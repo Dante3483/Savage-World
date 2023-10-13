@@ -12,17 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43c569d0d16c1a940a0ffd9e6d02b360, type: 3}
   m_Name: Water
   m_EditorClassIdentifier: 
-  _tiles:
-  - {fileID: 11400000, guid: e09e745effdcb614b98558bc1998c13e, type: 2}
-  - {fileID: 11400000, guid: 6db6b758047ecae49b20ce527323c00d, type: 2}
-  - {fileID: 11400000, guid: 3c4d029a3ebba0549bd714248ffce0d8, type: 2}
-  - {fileID: 11400000, guid: f40ef2e751fe7ca438065f07d1d0b5a9, type: 2}
-  - {fileID: 11400000, guid: e94ee3dc4f45f1e4cad55b822bd45503, type: 2}
-  - {fileID: 11400000, guid: 9d156da8e32a4514f92d5b5528000c52, type: 2}
-  - {fileID: 11400000, guid: 59ab66c63db291b4fbc9740958326b3a, type: 2}
-  - {fileID: 11400000, guid: 7538f319c8aa3b746a588c13a4ebec87, type: 2}
-  - {fileID: 11400000, guid: dfeead8138438064eb84108a931387b3, type: 2}
-  - {fileID: 11400000, guid: 080b4b50d048b8449aa67e6280bacb40, type: 2}
+  _sprites:
+  - {fileID: 23152006, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
+  - {fileID: 87222841, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
+  - {fileID: -2025433904, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
+  - {fileID: 1812042232, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
+  - {fileID: -1488352492, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
+  - {fileID: 1730579905, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
+  - {fileID: 1289897579, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
+  - {fileID: -1918420053, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
+  - {fileID: 1424301513, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
+  - {fileID: -920549135, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
   _type: 3
   _colorOnMap: {r: 0.33333334, g: 0.68235296, b: 0.7568628, a: 1}
   _lightValue: 0

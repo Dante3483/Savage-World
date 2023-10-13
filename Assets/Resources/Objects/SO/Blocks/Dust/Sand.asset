@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14b719d074d086f4da2d8cde30ea358e, type: 3}
   m_Name: Sand
   m_EditorClassIdentifier: 
-  _tiles:
-  - {fileID: 11400000, guid: 1957a515606f4064d8e2f0c0da9e1432, type: 2}
+  _sprites:
+  - {fileID: 21300000, guid: 1f031b65104c1e24ead6cc50254ff9d8, type: 3}
   _type: 2
   _colorOnMap: {r: 0.9490196, g: 0.9254902, b: 0.70980394, a: 1}
   _lightValue: 0

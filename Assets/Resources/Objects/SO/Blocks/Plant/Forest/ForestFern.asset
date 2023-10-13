@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b0572a9e2a280b4396150628efcef6e, type: 3}
   m_Name: ForestFern
   m_EditorClassIdentifier: 
-  _tiles:
-  - {fileID: 11400000, guid: f03c93fccb25f734eb44e548d6efaea9, type: 2}
-  - {fileID: 11400000, guid: 313d14700fed6a7428e5293d5dca6fc0, type: 2}
+  _sprites:
+  - {fileID: 21300000, guid: ea5d3df40dd47e4448d2de644aea8182, type: 3}
+  - {fileID: 21300000, guid: 395ebc396beec6442a145c21747974e9, type: 3}
   _type: 4
   _colorOnMap: {r: 0.35686275, g: 0.5176471, b: 0.2627451, a: 1}
   _lightValue: 0
