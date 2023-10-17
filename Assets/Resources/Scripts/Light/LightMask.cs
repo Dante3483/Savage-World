@@ -7,6 +7,8 @@ public class LightMask : MonoBehaviour
     #region Private fields
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private SpriteMask _spriteMask;
+
+    private bool _isActive;
     #endregion
 
     #region Public fields
@@ -14,7 +16,18 @@ public class LightMask : MonoBehaviour
     #endregion
 
     #region Properties
+    public bool IsActive
+    {
+        get
+        {
+            return _isActive;
+        }
 
+        set
+        {
+            _isActive = value;
+        }
+    }
     #endregion
 
     #region Methods

@@ -16,6 +16,7 @@ namespace CustomTilemap
         [SerializeField] private SpriteRenderer _liquidLayerSpriteRenderer;
 
         private Sprite _spriteForMask;
+        private bool _firstInitialization;
         #endregion
 
         #region Public fields
@@ -23,42 +24,16 @@ namespace CustomTilemap
         #endregion
 
         #region Properties
-        public TileLayer BlockLayer
+        public Sprite SpriteForMask
         {
             get
             {
-                return _blockLayer;
+                return _spriteForMask;
             }
 
             set
             {
-                _blockLayer = value;
-            }
-        }
-
-        public TileLayer BackgroundLayer
-        {
-            get
-            {
-                return _backgroundLayer;
-            }
-
-            set
-            {
-                _backgroundLayer = value;
-            }
-        }
-
-        public TileLayer LiquidLayer
-        {
-            get
-            {
-                return _liquidLayer;
-            }
-
-            set
-            {
-                _liquidLayer = value;
+                _spriteForMask = value;
             }
         }
 
@@ -74,27 +49,14 @@ namespace CustomTilemap
                 _tilemap = value;
             }
         }
-
-        public Sprite SpriteForMask
-        {
-            get
-            {
-                return _spriteForMask;
-            }
-
-            set
-            {
-                _spriteForMask = value;
-            }
-        }
         #endregion
 
         #region Methods
         private void Awake()
         {
-            GameObject blockLayerGameObject = new GameObject("Block", typeof(SpriteRenderer), typeof(SpriteMask), typeof(TileLayer));
-            GameObject backgroundLayerGameObject = new GameObject("Background", typeof(SpriteRenderer), typeof(SpriteMask), typeof(TileLayer));
-            GameObject liquidLayerGameObject = new GameObject("Liquid", typeof(SpriteRenderer), typeof(SpriteMask), typeof(TileLayer));
+            GameObject blockLayerGameObject = new GameObject("Block", typeof(SpriteRenderer), typeof(TileLayer));
+            GameObject backgroundLayerGameObject = new GameObject("Background", typeof(SpriteRenderer), typeof(TileLayer));
+            GameObject liquidLayerGameObject = new GameObject("Liquid", typeof(SpriteRenderer), typeof(TileLayer));
 
             blockLayerGameObject.transform.parent = transform;
             backgroundLayerGameObject.transform.parent = transform;
@@ -107,13 +69,19 @@ namespace CustomTilemap
             _blockLayerSpriteRenderer = blockLayerGameObject.GetComponent<SpriteRenderer>();
             _backgroundLayerSpriteRenderer = backgroundLayerGameObject.GetComponent<SpriteRenderer>();
             _liquidLayerSpriteRenderer = liquidLayerGameObject.GetComponent<SpriteRenderer>();
+
+            _firstInitialization = true;
         }
 
-        private void Update()
+        private void Start()
         {
-            _blockLayerSpriteRenderer.sortingOrder = _tilemap.OrderInBlockLayer;
-            _backgroundLayerSpriteRenderer.sortingOrder = _tilemap.OrderInBackgroundLayer;
-            _liquidLayerSpriteRenderer.sortingOrder = _tilemap.OrderInLiquidLayer;
+            if (_firstInitialization)
+            {
+                _blockLayer.UpdateOrderInLayer(_tilemap.OrderInBlockLayer);
+                _backgroundLayer.UpdateOrderInLayer(_tilemap.OrderInBackgroundLayer);
+                _liquidLayer.UpdateOrderInLayer(_tilemap.OrderInLiquidLayer);
+                _firstInitialization = false;
+            }
         }
 
         public void UpdateSprite(TileSprites tileSprites)

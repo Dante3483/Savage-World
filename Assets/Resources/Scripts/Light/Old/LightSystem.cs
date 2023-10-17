@@ -19,7 +19,8 @@ public class LightSystem : MonoBehaviour
 //    [SerializeField] private Sprite _sprite;
 
 //    private Camera _mainCamera;
-//    private Vector3Int _intVector;
+//    private Vector3Int
+//    ;
 //    private float[,] _brightnessMatrix;
 //    private Color[,] _colorMatrix;
 //    private Color[] _colorsArray;

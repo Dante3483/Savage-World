@@ -20,6 +20,7 @@ public class LightSystemJobDraw : MonoBehaviour
     private int _startY;
     private int _loopCount;
     private Camera _mainCamera;
+    private Transform _mainCameraTransform;
     private Vector3Int _intVector;
     private Color[] _colorsArray;
     private SpriteRenderer _renderer;
@@ -29,9 +30,6 @@ public class LightSystemJobDraw : MonoBehaviour
 
     private NativeArray<float> _brightnessNativeArray;
     private NativeArray<Color> _colorsNativeArray;
-
-    private List<double> _timeList;
-    private System.Diagnostics.Stopwatch _watch;
     #endregion
 
     #region Public fields
@@ -50,9 +48,9 @@ public class LightSystemJobDraw : MonoBehaviour
         _currentLightMapMaterial = _lightMapMaterialHigh;
         _lightMap = new Texture2D(_width, _height);
         _mainCamera = Camera.main;
+        _mainCameraTransform = _mainCamera.transform;
         _colorsArray = new Color[_width * _height];
         _materialPropertyBlock = new MaterialPropertyBlock();
-        _timeList = new List<double>();
         _worldData = GameManager.Instance.WorldData;
 
         _brightnessNativeArray = new NativeArray<float>(_width * _height, Allocator.Persistent);
@@ -83,22 +81,20 @@ public class LightSystemJobDraw : MonoBehaviour
 
         if (GameManager.Instance.IsGameSession)
         {
-            UpdateLight();
+            //ExecutionTimeCalculator.Instance.Execute(() => UpdateLight());
+            UpdateLight(); //Execution time 3.4 ms
         }
     }
 
     private void UpdateLight()
     {
-#if UNITY_EDITOR
-        _watch = System.Diagnostics.Stopwatch.StartNew();
-#endif
         //Set camera color
         _mainCamera.backgroundColor = TimeManager.Instance.CurrentColor;
 
         //Set current light map material
         _renderer.material = _currentLightMapMaterial;
 
-        //Calculate current map position
+        //Calculate current map position (CAN BE FIXED)
         _intVector = Vector3Int.FloorToInt(_mainCamera.transform.position);
         _intVector.z = 10;
         transform.position = _intVector;
@@ -151,9 +147,12 @@ public class LightSystemJobDraw : MonoBehaviour
         }
 
         //Apply brightness and color array
-        LightSystemApplyBrightnessJob applyBrightnessJob = new LightSystemApplyBrightnessJob(_isColoredMode, _brightnessNativeArray, _colorsNativeArray);
-        _jobHandle = applyBrightnessJob.Schedule(_width * _height, 1);
-        _jobHandle.Complete();
+        if (!_isColoredMode)
+        {
+            LightSystemApplyBrightnessJob applyBrightnessJob = new LightSystemApplyBrightnessJob(_brightnessNativeArray, _colorsNativeArray);
+            _jobHandle = applyBrightnessJob.Schedule(_width * _height, 1);
+            _jobHandle.Complete();
+        }
 
         //Copy colors from native array to common
         _colorsNativeArray.CopyTo(_colorsArray);
@@ -167,12 +166,6 @@ public class LightSystemJobDraw : MonoBehaviour
         _renderer.SetPropertyBlock(_materialPropertyBlock);
         _renderer.sharedMaterial.mainTexture = _lightMap;
         _renderer.sharedMaterial.mainTexture.filterMode = FilterMode.Point;
-
-#if UNITY_EDITOR
-        _watch.Stop();
-        _timeList.Add(_watch.Elapsed.TotalSeconds);
-        Debug.Log($"Min: {_timeList.Min()}, Max: {_timeList.Max()}");
-#endif
     }
 
     private void OnDestroy()

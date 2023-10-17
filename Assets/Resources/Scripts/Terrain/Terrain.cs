@@ -149,7 +149,11 @@ public class Terrain : MonoBehaviour
     {
         if (GameManager.Instance.IsGameSession)
         {
-            RenderWorldData();
+            ExecutionTimeCalculator.Instance.Execute(() =>
+            {
+                RenderWorldData();
+            });
+            //RenderWorldData();
             UpdateWorldData();
         }
     }
@@ -620,14 +624,15 @@ public class Terrain : MonoBehaviour
         difX = Mathf.Abs(_prevCameraRect.x - _currentCameraRect.x);
         difY = Mathf.Abs(_prevCameraRect.y - _currentCameraRect.y);
 
-        FillSolidTilemap(difX, difY);
-        FillBlocksTilemap(difX, difY);
-        
+        //ExecutionTimeCalculator.Instance.Execute(() => FillSolidTilemap(difX, difY));
+        FillTilemaps(difX, difY); //Execution time 4.5 ms
+
         _prevCameraRect = _currentCameraRect;
     }
 
-    public void FillSolidTilemap(int difX, int difY)
+    public void FillTilemaps(int difX, int difY)
     {
+        CustomTilemap.TileSprites tileSprites = new CustomTilemap.TileSprites();
         int i = 0;
         int size;
 
@@ -665,38 +670,10 @@ public class Terrain : MonoBehaviour
         {
             if (IsInMapRange(position.x, position.y))
             {
+                //Coords
                 vector.x = position.x;
                 vector.y = position.y;
                 _tilesCoords[i] = vector;
-                _solidTiles[i] = null;
-
-                if (_worldData[position.x, position.y].IsSolid())
-                {
-                    _solidTiles[i] = _solidTileBase;
-                }
-                i++;
-            }
-        }
-
-        //Change Tilemap using Vector's array and Tile's array
-        _solidTilemap.SetTiles(_tilesCoords, _solidTiles);
-    }
-
-    public void FillBlocksTilemap(int difX, int difY)
-    {
-        Vector2 vector = new Vector2();
-        CustomTilemap.TileSprites tileSprites = new CustomTilemap.TileSprites();
-        List<Vector2> vectors = new List<Vector2>();
-        List<CustomTilemap.TileSprites> tilesSprites = new List<CustomTilemap.TileSprites>();
-
-        //Fill Tiles arrays with blocks to destroy
-        foreach (Vector2Int position in _currentCameraRect.allPositionsWithin)
-        {
-            if (IsInMapRange(position.x, position.y))
-            {
-                vector.x = position.x;
-                vector.y = position.y;
-                vectors.Add(vector);
 
                 //Block
                 tileSprites.BlockSprite = _worldData[position.x, position.y].GetBlockSprite();
@@ -710,12 +687,20 @@ public class Terrain : MonoBehaviour
                 {
                     tileSprites.LiquidSprite = _worldData[position.x, position.y].GetLiquidSprite();
                 }
-                tilesSprites.Add(tileSprites);
+                _blocksTilemap.SetTile(vector, tileSprites);
+
+                //Solid
+                _solidTiles[i] = null;
+                if (_worldData[position.x, position.y].IsSolid())
+                {
+                    _solidTiles[i] = _solidTileBase;
+                }
+                i++;
             }
         }
-
         //Change Tilemap using Vector's array and Tile's array
-        _blocksTilemap.SetTiles(vectors, tilesSprites);
+        _solidTilemap.SetTiles(_tilesCoords, _solidTiles);
+        _blocksTilemap.UpdateMask();
     }
     #endregion
 

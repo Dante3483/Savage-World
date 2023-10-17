@@ -1,7 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using Unity.Jobs;
 using Unity.Collections;
@@ -53,6 +49,18 @@ public struct LightSystemColorSpreadJob : IJobParallelFor
 
     public void Execute(int index)
     {
+        if (_isColoredMode)
+        {
+            SpreadColored(index);
+        }
+        else
+        {
+            SpreadBrightness(index);
+        }
+    }
+
+    private void SpreadBrightness(int index)
+    {
         WorldCellData[,] _worldData = GameManager.Instance.WorldData;
         int x = index % _width;
         int y = index % _height;
@@ -60,8 +68,120 @@ public struct LightSystemColorSpreadJob : IJobParallelFor
         int dy;
         int moveIndex;
         int nextMoveIndex;
-        int adder = 0;
+        int adder;
         float newLightValue;
+
+        for (int i = _startLoop; ; i += adder)
+        {
+            switch (_direction)
+            {
+                //If we spread from top to bottom
+                case 0:
+                    {
+                        moveIndex = index + i * _width;
+                        nextMoveIndex = index + (i - 1) * _width;
+                        dx = _startX + x;
+                        dy = _startY + i - 1;
+                        adder = -1;
+                    }
+                    break;
+                //If we spread from bottom to top
+                case 1:
+                    {
+                        moveIndex = index + i * _width;
+                        nextMoveIndex = index + (i + 1) * _width;
+                        dx = _startX + x;
+                        dy = _startY + i + 1;
+                        adder = 1;
+                    }
+                    break;
+                //If we spread from left to right
+                case 2:
+                    {
+                        moveIndex = index * _width + i;
+                        nextMoveIndex = index * _width + i + 1;
+                        dx = _startX + i + 1;
+                        dy = _startY + y;
+                        adder = 1;
+                    }
+                    break;
+                //If we spread from right to left
+                case 3:
+                    {
+                        moveIndex = index * _width + i;
+                        nextMoveIndex = index * _width + i - 1;
+                        dx = _startX + i - 1;
+                        dy = _startY + y;
+                        adder = -1;
+                    }
+                    break;
+                default:
+                    {
+                        moveIndex = 0;
+                        nextMoveIndex = 0;
+                        dx = _startX + x;
+                        dy = _startY + i - 1;
+                        adder = 0;
+                    }
+                    break;
+            }
+
+            newLightValue = IntensitySpread(dx, dy, _brigtnessArray[moveIndex]);
+
+            if (newLightValue <= 0.05f)
+            {
+                newLightValue = 0;
+            }
+
+            if (newLightValue > _brigtnessArray[nextMoveIndex])
+            {
+                _brigtnessArray[nextMoveIndex] = newLightValue;
+            }
+
+            if (i + adder == _endLoop)
+            {
+                break;
+            }
+        }
+
+        float IntensitySpread(int dx, int dy, float currentLightValue)
+        {
+            //If coords is in map range
+            if (Terrain.IsInMapRange(dx, dy))
+            {
+                //If block is solid
+                if (_worldData[dx, dy].IsSolid())
+                {
+                    return currentLightValue * 0.6f;
+                }
+                //If the block is liquid and flow value equals 1f
+                else if (_worldData[dx, dy].IsFullLiquidBlock())
+                {
+                    return currentLightValue * 0.8f;
+                }
+                //If it's air block
+                else
+                {
+                    return currentLightValue * 0.9f;
+                }
+            }
+            else
+            {
+                return 0f;
+            }
+        }
+    }
+
+    private void SpreadColored(int index)
+    {
+        WorldCellData[,] _worldData = GameManager.Instance.WorldData;
+        int x = index % _width;
+        int y = index % _height;
+        int dx;
+        int dy;
+        int moveIndex;
+        int nextMoveIndex;
+        int adder;
         Color newColor;
         Color color;
 
@@ -106,7 +226,7 @@ public struct LightSystemColorSpreadJob : IJobParallelFor
                         nextMoveIndex = index * _width + i - 1;
                         dx = _startX + i - 1;
                         dy = _startY + y;
-                        adder = - 1;
+                        adder = -1;
                     }
                     break;
                 default:
@@ -120,83 +240,40 @@ public struct LightSystemColorSpreadJob : IJobParallelFor
                     break;
             }
 
-            if (_isColoredMode)
+            newColor = IntensitySpreadColored(dx, dy, _colorArray[moveIndex]);
+            color = _colorArray[nextMoveIndex];
+
+            if (newColor.r <= 0.05f)
             {
-                newColor = IntensitySpreadColored(dx, dy, _colorArray[moveIndex]);
-                color = _colorArray[nextMoveIndex];
-
-                if (newColor.r <= 0.05f)
-                {
-                    newColor.r = 0f;
-                }
-                if (newColor.g <= 0.05f)
-                {
-                    newColor.g = 0f;
-                }
-                if (newColor.b <= 0.05f)
-                {
-                    newColor.b = 0f;
-                }
-
-                if (newColor.r > color.r)
-                {
-                    color.r = newColor.r;
-                }
-                if (newColor.g > color.g)
-                {
-                    color.g = newColor.g;
-                }
-                if (newColor.b > color.b)
-                {
-                    color.b = newColor.b;
-                }
-
-                _colorArray[nextMoveIndex] = color;
+                newColor.r = 0f;
             }
-            else
+            if (newColor.g <= 0.05f)
             {
-                newLightValue = IntensitySpread(dx, dy, _brigtnessArray[moveIndex]);
-
-                if (newLightValue <= 0.05f)
-                {
-                    newLightValue = 0;
-                }
-                if (newLightValue > _brigtnessArray[nextMoveIndex])
-                {
-                    _brigtnessArray[nextMoveIndex] = newLightValue;
-                }
+                newColor.g = 0f;
             }
+            if (newColor.b <= 0.05f)
+            {
+                newColor.b = 0f;
+            }
+
+            if (newColor.r > color.r)
+            {
+                color.r = newColor.r;
+            }
+            if (newColor.g > color.g)
+            {
+                color.g = newColor.g;
+            }
+            if (newColor.b > color.b)
+            {
+                color.b = newColor.b;
+            }
+
+            _colorArray[nextMoveIndex] = color;
 
             if (i + adder == _endLoop)
             {
                 break;
-            }
-        }
-
-        float IntensitySpread(int dx, int dy, float currentLightValue)
-        {
-            //If coords is in map range
-            if (Terrain.IsInMapRange(dx, dy))
-            {
-                //If block is solid
-                if (_worldData[dx, dy].IsSolid())
-                {
-                    return currentLightValue * 0.6f;
-                }
-                //If the block is liquid and flow value equals 1f
-                else if (_worldData[dx, dy].IsFullLiquidBlock())
-                {
-                    return currentLightValue * 0.8f;
-                }
-                //If it's air block
-                else
-                {
-                    return currentLightValue * 0.9f;
-                }
-            }
-            else
-            {
-                return 0f;
             }
         }
 

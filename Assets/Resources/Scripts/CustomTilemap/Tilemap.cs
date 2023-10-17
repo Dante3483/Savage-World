@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -9,7 +11,8 @@ namespace CustomTilemap
     {
         #region Private fields
         [Header("Main")]
-        [SerializeField] private int _size;
+        [SerializeField] private int _width;
+        [SerializeField] private int _height;
         [SerializeField] private Vector2 _tilesOffset = new Vector2(0.5f, 0.5f);
         [SerializeField] private SpriteMask _spriteMask;
 
@@ -22,10 +25,9 @@ namespace CustomTilemap
         [Header("Mask")]
         [SerializeField] private Sprite _maskSprite;
         [SerializeField] private Texture2D _maskTexture;
-        private Color[] _currentTile;
+        private Color[] _maskTextureColorArray;
         private Color[] _emptyTile;
         private Color _alphaZero = new Color(0, 0, 0, 0);
-        private PoolForStaticArraysGeneric<Sprite, Color> _rawTexturesPool;
         #endregion
 
         #region Public fields
@@ -78,10 +80,10 @@ namespace CustomTilemap
         {
             _spriteMask = GetComponent<SpriteMask>();
 
-            _tiles = new Tile[_size, _size];
-            for (int x = 0; x < _size; x++)
+            _tiles = new Tile[_width, _height];
+            for (int x = 0; x < _width; x++)
             {
-                for (int y = 0; y < _size; y++)
+                for (int y = 0; y < _height; y++)
                 {
                     GameObject gameObject = new GameObject("Tile", typeof(Tile));
                     gameObject.transform.parent = transform;
@@ -97,20 +99,20 @@ namespace CustomTilemap
 
         private void FixedUpdate()
         {
-            transform.position = Vector3Int.FloorToInt(Camera.main.transform.position) - new Vector3Int(_size / 2, _size / 2, -30);
+            transform.position = Vector3Int.FloorToInt(Camera.main.transform.position) - new Vector3Int(_width / 2, _height / 2, -30);
         }
 
-        public void SetTile(Vector2 position, TileSprites tileSprites)
+        public void SetTile(Vector3 position, TileSprites tileSprites)
         {
             GetWorldToLocal(position, out int x, out int y);
-            if (x < 0 || y < 0 || x >= _size || y >= _size)
+            if (x < 0 || y < 0 || x >= _width || y >= _height)
             {
                 return;
             }
             _tiles[x, y].UpdateSprite(tileSprites);
         }
 
-        public bool SetTiles(List<Vector2> positions, List<TileSprites> tilesSprites)
+        public bool SetTiles(List<Vector3> positions, List<TileSprites> tilesSprites)
         {
             if (positions.Count != tilesSprites.Count)
             {
@@ -120,7 +122,7 @@ namespace CustomTilemap
             {
                 SetTile(positions[i], tilesSprites[i]);
             }
-            UpdateMask();
+            //UpdateMask();
             return true;
         }
 
@@ -129,7 +131,7 @@ namespace CustomTilemap
             return transform.TransformPoint(new Vector2(x, y));
         }
 
-        public void GetWorldToLocal(Vector2 position, out int x, out int y)
+        public void GetWorldToLocal(Vector3 position, out int x, out int y)
         {
             Vector3 result = transform.InverseTransformPoint(position);
             x = (int)result.x;
@@ -138,46 +140,61 @@ namespace CustomTilemap
 
         public void InitializeMask()
         {
+            _maskTextureColorArray = new Color[_width * 16 * _height * 16];
             _emptyTile = new Color[16 * 16];
-            _currentTile = new Color[16 * 16];
 
             for (int i = 0; i < 16 * 16; i++)
             {
                 _emptyTile[i] = _alphaZero;
             }
 
-            _rawTexturesPool = new PoolForStaticArraysGeneric<Sprite, Color>();
-
-            _maskTexture = new Texture2D(_size * 16, _size * 16);
+            _maskTexture = new Texture2D(_width * 16, _height * 16);
             _maskTexture.filterMode = FilterMode.Point;
 
-            _maskSprite = Sprite.Create(_maskTexture, new Rect(0, 0, _size * 16, _size * 16), Vector2.zero, 16);
+            _maskSprite = Sprite.Create(_maskTexture, new Rect(0, 0, _width * 16, _height * 16), Vector2.zero, 16);
 
             _spriteMask.sprite = _maskSprite;
         }
 
         public void UpdateMask()
         {
-            for (int x = 0; x < _size; x++)
+            Parallel.For(0, _width, x =>
             {
-                for (int y = 0; y < _size; y++)
+                int sourceIndex;
+                int destinationIndex;
+                for (int y = 0; y < _height; y++)
                 {
-                    if (_tiles[x, y].SpriteForMask != null)
+                    for (int i = 0; i < 16; i++)
                     {
-                        bool result = _rawTexturesPool.GetArray(_tiles[x, y].SpriteForMask, ref _currentTile);
-                        if (!result)
+                        sourceIndex = i * 16;
+                        destinationIndex = y * (_width * 16 * 16) + i * (_width * 16) + x * 16;
+                        if (_tiles[x, y].SpriteForMask != null)
                         {
-                            _rawTexturesPool.SetArray(_tiles[x, y].SpriteForMask, _tiles[x, y].SpriteForMask.texture.GetPixels());
-                            _rawTexturesPool.GetArray(_tiles[x, y].SpriteForMask, ref _currentTile);
+                            Array.Copy(ObjectsAtlass.BlocksSpriteColorArray[_tiles[x, y].SpriteForMask], sourceIndex, _maskTextureColorArray, destinationIndex, 16);
                         }
-                        _maskTexture.SetPixels(x * 16, y * 16, 16, 16, _currentTile);
-                    }
-                    else
-                    {
-                        _maskTexture.SetPixels(x * 16, y * 16, 16, 16, _emptyTile);
+                        else
+                        {
+                            Array.Copy(_emptyTile, sourceIndex, _maskTextureColorArray, destinationIndex, 16);
+                        }
                     }
                 }
-            }
+            });
+            _maskTexture.SetPixels(_maskTextureColorArray);
+
+            //for (int x = 0; x < _width; x++)
+            //{
+            //    for (int y = 0; y < _height; y++)
+            //    {
+            //        if (_tiles[x, y].SpriteForMask != null)
+            //        {
+            //            _maskTexture.SetPixels(x * 16, y * 16, 16, 16, ObjectsAtlass.BlocksSpriteColorArray[_tiles[x, y].SpriteForMask]);
+            //        }
+            //        else
+            //        {
+            //            _maskTexture.SetPixels(x * 16, y * 16, 16, 16, _emptyTile);
+            //        }
+            //    }
+            //}
             _maskTexture.Apply();
         }
         #endregion

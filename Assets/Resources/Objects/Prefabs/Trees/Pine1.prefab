@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6575782603448844897}
   - component: {fileID: 6575782603448844896}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tree
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -68,7 +68,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6575782605094713051}
   - component: {fileID: 6575782605094713050}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: TreeTrunk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -129,9 +129,9 @@ GameObject:
   - component: {fileID: 499003393239788201}
   - component: {fileID: 3811589528595826195}
   - component: {fileID: 6575782605102750958}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Pine1
-  m_TagString: Untagged
+  m_TagString: Tree
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

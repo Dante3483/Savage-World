@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 707107608731550929}
   - component: {fileID: 365306474871434002}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tree
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -68,7 +68,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6860623747896336444}
   - component: {fileID: 3949147726514880108}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: TreeTrunk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -129,9 +129,9 @@ GameObject:
   - component: {fileID: 2831641190352483012}
   - component: {fileID: 7688520627474172260}
   - component: {fileID: 1647730251975947721}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cactus1
-  m_TagString: Untagged
+  m_TagString: Tree
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

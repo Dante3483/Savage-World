@@ -8,7 +8,6 @@ namespace CustomTilemap
     {
         #region Private fields
         [SerializeField] private SpriteRenderer _spriteRenderer;
-        [SerializeField] private SpriteMask _spriteMask;
         #endregion
 
         #region Public fields
@@ -27,15 +26,12 @@ namespace CustomTilemap
 
         public void UpdateSprite(Sprite sprite)
         {
-            if (sprite == null)
-            {
-                _spriteRenderer.enabled = false;
-            }
-            else
-            {
-                _spriteRenderer.enabled = true;
-            }
             _spriteRenderer.sprite = sprite;
+        }
+
+        public void UpdateOrderInLayer(int orderInLayer)
+        {
+            _spriteRenderer.sortingOrder = orderInLayer;
         }
         #endregion
     }
