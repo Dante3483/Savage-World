@@ -31,7 +31,6 @@ public class ObjectsActivityManager : MonoBehaviour
                 tree.gameObject.SetActive(true);
             }
         }
-
         foreach (Transform pickableItem in _pickableItems.transform)
         {
             if (Vector2.Distance(pickableItem.position, transform.position) > 40)

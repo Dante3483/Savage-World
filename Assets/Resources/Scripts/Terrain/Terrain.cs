@@ -149,11 +149,11 @@ public class Terrain : MonoBehaviour
     {
         if (GameManager.Instance.IsGameSession)
         {
-            ExecutionTimeCalculator.Instance.Execute(() =>
-            {
-                RenderWorldData();
-            });
-            //RenderWorldData();
+            //ExecutionTimeCalculator.Instance.Execute(() =>
+            //{
+            //    RenderWorldData();
+            //});
+            RenderWorldData();
             UpdateWorldData();
         }
     }
@@ -700,7 +700,7 @@ public class Terrain : MonoBehaviour
         }
         //Change Tilemap using Vector's array and Tile's array
         _solidTilemap.SetTiles(_tilesCoords, _solidTiles);
-        _blocksTilemap.UpdateMask();
+        //_blocksTilemap.UpdateMask();
     }
     #endregion
 

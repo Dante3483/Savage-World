@@ -1,0 +1,162 @@
+#pragma kernel FillMatrix
+#pragma kernel ColorSpread
+#pragma kernel ApplyBrightness
+
+struct WorldCellData
+{
+    float bgLightValue;
+    float blockLightValue;
+    int flags;
+};
+
+int _width;
+int _height;
+bool _isColoredMode;
+
+float _dayLightValue;
+
+int _spreadDirection;
+int _spreadStartLoop;
+int _spreadEndLoop;
+
+StructuredBuffer<WorldCellData> _worldData;
+RWStructuredBuffer<float> _brightness;
+RWTexture2D<float4> _texture;
+
+float IntensitySpread(int index, float value)
+{
+    int isSolid = _worldData[index].flags & 1;
+    int isFullLiquidBlock = _worldData[index].flags & 2;
+    
+    if (isSolid != 0)
+    {
+        return value * 0.6;
+    }
+    else if (isFullLiquidBlock != 0)
+    {
+        return value * 0.8;
+    }
+    else
+    {
+        return value * 0.9;
+    }
+
+}
+
+[numthreads(1, 1, 1)]
+void FillMatrix(uint3 id : SV_DispatchThreadID)
+{
+    float bgLightValue = _worldData[id.x + id.y].bgLightValue;
+    float blockLightValue = _worldData[id.x + id.y].blockLightValue;
+    int isSolid = _worldData[id.x + id.y].flags & 1;
+    int isFullLiquidBlock = _worldData[id.x + id.y].flags & 2;
+    int isDayLightBlock = _worldData[id.x + id.y].flags & 4;
+    
+    if (isSolid != 0 || isFullLiquidBlock != 0)
+    {
+        _brightness[id.x + id.y] = blockLightValue;
+    }
+    else if (isDayLightBlock != 0)
+    {
+        bgLightValue = lerp(0, 1, _dayLightValue);
+        if (bgLightValue >= blockLightValue)
+        {
+            _brightness[id.x + id.y] = bgLightValue;
+        }
+        else
+        {
+            _brightness[id.x + id.y] = blockLightValue;
+        }
+    }
+    else
+    {
+        if (bgLightValue > blockLightValue)
+        {
+            _brightness[id.x + id.y] = bgLightValue;
+        }
+        else
+        {
+            _brightness[id.x + id.y] = blockLightValue;
+        }
+    }
+}
+
+[numthreads(1, 1, 1)]
+void ColorSpread(uint3 id : SV_DispatchThreadID)
+{
+    int moveIndex;
+    int nextMoveIndex;
+    int adder;
+    float newLightValue;
+    
+    for (int i = _spreadStartLoop;; i += adder)
+    {
+        
+        switch (_spreadDirection)
+        {
+                //If we spread from top to bottom
+            case 0:
+                {
+                    moveIndex = id.x + i * _width;
+                    nextMoveIndex = id.x + (i - 1) * _width;
+                    adder = -1;
+                }
+                break;
+                //If we spread from bottom to top
+            case 1:
+                {
+                    moveIndex = id.x + i * _width;
+                    nextMoveIndex = id.x + (i + 1) * _width;
+                    adder = 1;
+                }
+                break;
+                //If we spread from left to right
+            case 2:
+                {
+                    moveIndex = id.x * _width + i;
+                    nextMoveIndex = id.x * _width + i + 1;
+                    adder = 1;
+                }
+                break;
+                //If we spread from right to left
+            case 3:
+                {
+                    moveIndex = id.x * _width + i;
+                    nextMoveIndex = id.x * _width + i - 1;
+                    adder = -1;
+                }
+                break;
+            default:
+                {
+                    moveIndex = 0;
+                    nextMoveIndex = 0;
+                    adder = 0;
+                }
+                break;
+        }
+        
+        newLightValue = IntensitySpread(nextMoveIndex, _brightness[moveIndex]);
+        
+        if (newLightValue <= 0.05f)
+        {
+            newLightValue = 0;
+        }
+
+        if (newLightValue > _brightness[nextMoveIndex])
+        {
+            _brightness[nextMoveIndex] = newLightValue;
+        }
+        
+        if (i + adder == _spreadEndLoop)
+        {
+            break;
+        }
+    }
+
+}
+
+[numthreads(1, 1, 1)]
+void ApplyBrightness(uint3 id : SV_DispatchThreadID)
+{
+    _texture[id.xy] = float4(1, 1, 1, 1) * _brightness[id.x + id.y * 150];
+}
