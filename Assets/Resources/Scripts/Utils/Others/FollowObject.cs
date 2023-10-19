@@ -6,6 +6,7 @@ public class FollowObject : MonoBehaviour
 {
     #region Private fields
     [SerializeField] private Transform _target;
+    [SerializeField] private bool _floorToInt;
     [SerializeField] private Vector3 _offset;
     #endregion
 
@@ -21,6 +22,10 @@ public class FollowObject : MonoBehaviour
     private void Update()
     {
         transform.position = new Vector3(_target.position.x + _offset.x, _target.position.y + _offset.y, _offset.z);
+        if (_floorToInt)
+        {
+            transform.position = Vector3Int.FloorToInt(transform.position);
+        }
     }
     #endregion
 }

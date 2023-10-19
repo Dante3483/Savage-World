@@ -372,6 +372,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _target: {fileID: 699589498}
+  _floorToInt: 0
   _offset: {x: 0, y: 0, z: 0}
 --- !u!1 &82710748
 GameObject:
@@ -896,6 +897,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _target: {fileID: 699589498}
+  _floorToInt: 0
   _offset: {x: 0, y: 0, z: -30}
 --- !u!1 &613582385
 GameObject:
@@ -3756,6 +3758,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a55a80d81e513547a4e4aaaa07114f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _computeShader: {fileID: 7200000, guid: 1bcabacfc0a9f0c438e910b51acf8be1, type: 3}
   _lightMapRenderTexture: {fileID: 0}
   _lightMapMaterialLow: {fileID: 2100000, guid: fe658fd9e9b41cb45b8677bcee5923d8, type: 2}
   _lightMapMaterialMedium: {fileID: 2100000, guid: aad6ce3bdf63f3e4b97f1eecd95da9a3, type: 2}
@@ -3764,7 +3767,6 @@ MonoBehaviour:
   _width: 150
   _height: 100
   _isColoredMode: 0
-  ComputeShader: {fileID: 7200000, guid: 1bcabacfc0a9f0c438e910b51acf8be1, type: 3}
 --- !u!1 &1848979392
 GameObject:
   m_ObjectHideFlags: 0
@@ -4047,6 +4049,7 @@ MonoBehaviour:
   _orderInLiquidLayer: 11
   _maskSprite: {fileID: 0}
   _maskTexture: {fileID: 0}
+  _renderTexture: {fileID: 0}
 --- !u!4 &1928249623
 Transform:
   m_ObjectHideFlags: 0

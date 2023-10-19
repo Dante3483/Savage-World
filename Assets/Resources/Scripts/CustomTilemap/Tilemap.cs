@@ -1,9 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace CustomTilemap
 {
@@ -25,9 +21,8 @@ namespace CustomTilemap
         [Header("Mask")]
         [SerializeField] private Sprite _maskSprite;
         [SerializeField] private Texture2D _maskTexture;
-        private Color[] _maskTextureColorArray;
-        private Color[] _emptyTile;
-        private Color _alphaZero = new Color(0, 0, 0, 0);
+        private Color32[] _emptyTile;
+        private Color32 _alphaZero = new Color32(0, 0, 0, 0);
         #endregion
 
         #region Public fields
@@ -102,6 +97,11 @@ namespace CustomTilemap
             transform.position = Vector3Int.FloorToInt(Camera.main.transform.position) - new Vector3Int(_width / 2, _height / 2, -30);
         }
 
+        private void LateUpdate()
+        {
+            UpdateMask();
+        }
+
         public void SetTile(Vector3 position, TileSprites tileSprites)
         {
             GetWorldToLocal(position, out int x, out int y);
@@ -122,7 +122,6 @@ namespace CustomTilemap
             {
                 SetTile(positions[i], tilesSprites[i]);
             }
-            //UpdateMask();
             return true;
         }
 
@@ -140,15 +139,15 @@ namespace CustomTilemap
 
         public void InitializeMask()
         {
-            _maskTextureColorArray = new Color[_width * 16 * _height * 16];
-            _emptyTile = new Color[16 * 16];
+            _emptyTile = new Color32[16 * 16];
 
             for (int i = 0; i < 16 * 16; i++)
             {
                 _emptyTile[i] = _alphaZero;
             }
 
-            _maskTexture = new Texture2D(_width * 16, _height * 16);
+            _maskTexture = new Texture2D(_width * 16, _height * 16, TextureFormat.Alpha8, false);
+            _maskTexture.wrapMode = TextureWrapMode.Clamp;
             _maskTexture.filterMode = FilterMode.Point;
 
             _maskSprite = Sprite.Create(_maskTexture, new Rect(0, 0, _width * 16, _height * 16), Vector2.zero, 16);
@@ -158,43 +157,20 @@ namespace CustomTilemap
 
         public void UpdateMask()
         {
-            Parallel.For(0, _width, x =>
+            for (int x = 0; x < _width; x++)
             {
-                int sourceIndex;
-                int destinationIndex;
                 for (int y = 0; y < _height; y++)
                 {
-                    for (int i = 0; i < 16; i++)
+                    if (_tiles[x, y].SpriteForMask != null)
                     {
-                        sourceIndex = i * 16;
-                        destinationIndex = y * (_width * 16 * 16) + i * (_width * 16) + x * 16;
-                        if (_tiles[x, y].SpriteForMask != null)
-                        {
-                            Array.Copy(ObjectsAtlass.BlocksSpriteColorArray[_tiles[x, y].SpriteForMask], sourceIndex, _maskTextureColorArray, destinationIndex, 16);
-                        }
-                        else
-                        {
-                            Array.Copy(_emptyTile, sourceIndex, _maskTextureColorArray, destinationIndex, 16);
-                        }
+                        _maskTexture.SetPixels32(x * 16, y * 16, 16, 16, ObjectsAtlass.BlocksSpriteColorArray[_tiles[x, y].SpriteForMask]);
+                    }
+                    else
+                    {
+                        _maskTexture.SetPixels32(x * 16, y * 16, 16, 16, _emptyTile);
                     }
                 }
-            });
-            _maskTexture.SetPixels(_maskTextureColorArray);
-
-            //for (int x = 0; x < _width; x++)
-            //{
-            //    for (int y = 0; y < _height; y++)
-            //    {
-            //        if (_tiles[x, y].SpriteForMask != null)
-            //        {
-            //            _maskTexture.SetPixels(x * 16, y * 16, 16, 16, ObjectsAtlass.BlocksSpriteColorArray[_tiles[x, y].SpriteForMask]);
-            //        }
-            //        else
-            //        {
-            //            _maskTexture.SetPixels(x * 16, y * 16, 16, 16, _emptyTile);
-            //        }
-            //    }
-            //}
+            }
             _maskTexture.Apply();
         }
         #endregion

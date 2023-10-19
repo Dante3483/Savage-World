@@ -18,7 +18,7 @@ public class ObjectsAtlass : ScriptableObject
     public Dictionary<BiomesID, GameObject[]> Trees;
     public Dictionary<BiomesID, GameObject[]> PickableItems;
 
-    public static Dictionary<Sprite, Color[]> BlocksSpriteColorArray;
+    public static Dictionary<Sprite, Color32[]> BlocksSpriteColorArray;
     #endregion
 
     #region Abstract blocks
@@ -131,7 +131,7 @@ public class ObjectsAtlass : ScriptableObject
         Plants = new Dictionary<BiomesID, BlockSO[]>();
         Trees = new Dictionary<BiomesID, GameObject[]>();
         PickableItems = new Dictionary<BiomesID, GameObject[]>();
-        BlocksSpriteColorArray = new Dictionary<Sprite, Color[]>();
+        BlocksSpriteColorArray = new Dictionary<Sprite, Color32[]>();
 
         //Fill lists
         #region Abstract
@@ -406,7 +406,7 @@ public class ObjectsAtlass : ScriptableObject
                 {
                     foreach (var sprite in block.Sprites)
                     {
-                        BlocksSpriteColorArray.Add(sprite, sprite.texture.GetPixels());
+                        BlocksSpriteColorArray.Add(sprite, sprite.texture.GetPixels32());
                     }
                 }
             }
