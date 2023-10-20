@@ -15,9 +15,11 @@ MonoBehaviour:
   _sprites:
   - {fileID: 21300000, guid: a76b88d21ad393646a041e023b197f59, type: 3}
   _type: 6
-  _colorOnMap: {r: 0.9843138, g: 0.69411767, b: 0.19607845, a: 1}
+  _colorOnMap: {r: 1, g: 0.6903905, b: 0.15471691, a: 1}
   _lightValue: 1
-  _lightColor: {r: 1, g: 0.97529614, b: 0.66415095, a: 1}
+  _lightColor:
+    serializedVersion: 2
+    rgba: 4285060863
   _isSurfaceLight: 0
   _waterproof: 0
   _id: 0

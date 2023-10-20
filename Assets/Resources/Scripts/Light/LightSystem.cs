@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
@@ -16,9 +15,9 @@ namespace LightSystem
         [SerializeField] private Material _lightMapMaterialMedium;
         [SerializeField] private Material _lightMapMaterialHigh;
         [SerializeField] private Material _currentLightMapMaterial;
-        [SerializeField] private int _width;
-        [SerializeField] private int _height;
-        [SerializeField] private bool _isColoredMode;
+        [SerializeField] private int _width = 150;
+        [SerializeField] private int _height = 100;
+        [SerializeField] private bool _isColoredMode = true;
         private int _startX;
         private int _startY;
         private int _loopCount;
@@ -38,9 +37,13 @@ namespace LightSystem
         #region Shader
         private ComputeBuffer _worldDataComputeArray;
         private ComputeBuffer _brightnessComputeArray;
-        private int _fillMatrixHandler;
-        private int _colorSpreadHandler;
-        private int _applyBrightnessHandler;
+        private ComputeBuffer _colorsComputeArray;
+        private int _fillLightBrightnessHandler;
+        private int _spreadLightBrightnessHandler;
+        private int _applyLightBrightnessHandler;
+        private int _fillLightColoredHandler;
+        private int _spreadLightColoredHandler;
+        private int _applyLightColoredHandler;
         #endregion
 
         #endregion
@@ -67,6 +70,7 @@ namespace LightSystem
 
             _currentLightMapMaterial = _lightMapMaterialHigh;
             _lightMapRenderTexture.enableRandomWrite = true;
+            _lightMapRenderTexture.filterMode = FilterMode.Point;
             _lightMapRenderTexture.Create();
             #endregion
 
@@ -77,16 +81,53 @@ namespace LightSystem
             #endregion
 
             #region Shader
-            _worldDataComputeArray = new ComputeBuffer(_width * _height, sizeof(float) * 2 + sizeof(int));
+            _worldDataComputeArray = new ComputeBuffer(_width * _height, sizeof(float) * 2 + sizeof(byte) * 8 + sizeof(int));
             _brightnessComputeArray = new ComputeBuffer(_width * _height, sizeof(float));
+            _colorsComputeArray = new ComputeBuffer(_width * _height, sizeof(float) * 4);
             #endregion
         }
 
         private void Start()
         {
-            _fillMatrixHandler = _computeShader.FindKernel("FillMatrix");
-            _colorSpreadHandler = _computeShader.FindKernel("ColorSpread");
-            _applyBrightnessHandler = _computeShader.FindKernel("ApplyBrightness");
+            #region Main
+            _fillLightBrightnessHandler = _computeShader.FindKernel("FillLightBrightness");
+            _spreadLightBrightnessHandler = _computeShader.FindKernel("SpreadLightBrightness");
+            _applyLightBrightnessHandler = _computeShader.FindKernel("ApplyLightBrightness");
+
+            _fillLightColoredHandler = _computeShader.FindKernel("FillLightColored");
+            _spreadLightColoredHandler = _computeShader.FindKernel("SpreadLightColored");
+            _applyLightColoredHandler = _computeShader.FindKernel("ApplyLightColored");
+
+            _computeShader.SetInt("_width", _width);
+            _computeShader.SetInt("_height", _height);
+            #endregion
+
+            #region FillLight
+            _computeShader.SetBuffer(_fillLightColoredHandler, "_worldData", _worldDataComputeArray);
+            _computeShader.SetBuffer(_fillLightColoredHandler, "_colors", _colorsComputeArray);
+            _computeShader.SetBuffer(_fillLightBrightnessHandler, "_worldData", _worldDataComputeArray);
+            _computeShader.SetBuffer(_fillLightBrightnessHandler, "_brightness", _brightnessComputeArray);
+            #endregion
+
+            #region SpreadLight
+            _computeShader.SetBuffer(_spreadLightColoredHandler, "_worldData", _worldDataComputeArray);
+            _computeShader.SetBuffer(_spreadLightColoredHandler, "_colors", _colorsComputeArray);
+            _computeShader.SetBuffer(_spreadLightBrightnessHandler, "_worldData", _worldDataComputeArray);
+            _computeShader.SetBuffer(_spreadLightBrightnessHandler, "_brightness", _brightnessComputeArray);
+            #endregion
+
+            #region ApplyLight
+            _computeShader.SetBuffer(_applyLightColoredHandler, "_colors", _colorsComputeArray);
+            _computeShader.SetBuffer(_applyLightBrightnessHandler, "_brightness", _brightnessComputeArray);
+            _computeShader.SetTexture(_applyLightColoredHandler, "_texture", _lightMapRenderTexture);
+            _computeShader.SetTexture(_applyLightBrightnessHandler, "_texture", _lightMapRenderTexture);
+            #endregion
+
+            #region Set material
+            _materialPropertyBlock.SetTexture("_ShadowTex", _lightMapRenderTexture);
+            _materialPropertyBlock.SetTexture("_MainTex", _lightMapRenderTexture);
+            _renderer.SetPropertyBlock(_materialPropertyBlock);
+            #endregion
         }
 
         private void Update()
@@ -110,7 +151,8 @@ namespace LightSystem
 
             if (GameManager.Instance.IsGameSession)
             {
-                UpdateLight();
+                ExecutionTimeCalculator.Instance.Execute(() => UpdateLight());
+                //UpdateLight();
             }
         }
 
@@ -132,44 +174,58 @@ namespace LightSystem
             _startY = _intVector.y - _height / 2;
 
             //Get world data for GPU
-            LightSystemGetWorldDataJob getWorldDataJob = new LightSystemGetWorldDataJob(_startX, _startY, _width, _height, _worldDataNativeArray);
+            LightSystemGetWorldDataJob getWorldDataJob = new LightSystemGetWorldDataJob(_startX, _startY, _width, _height, _isColoredMode, _worldDataNativeArray);
             _jobHandle = getWorldDataJob.Schedule(_width * _height, 64);
             _jobHandle.Complete();
 
             //Set data to compute arrays
             _worldDataComputeArray.SetData(_worldDataNativeArray);
-            _brightnessComputeArray.SetData(_brightnessNativeArray);
+            if (_isColoredMode)
+            {
+                _colorsComputeArray.SetData(_colorsNativeArray);
+            }
+            else
+            {
+                _brightnessComputeArray.SetData(_brightnessNativeArray);
+            }
 
-            //Fill brightness and color array with specified values
+            //Fill brightness or color array with specified values
             FillLight();
 
-            //Spread brightness and color
+            //Spread brightness or color
             SpreadLight();
 
-            //Apply brightness to color array
+            //Apply brightness or color array to texture
             ApplyLight();
-
-            //Change shader material properties
-            _materialPropertyBlock.SetTexture("_ShadowTex", _lightMapRenderTexture);
-            _renderer.SetPropertyBlock(_materialPropertyBlock);
-            _renderer.sharedMaterial.mainTexture = _lightMapRenderTexture;
-            _renderer.sharedMaterial.mainTexture.filterMode = FilterMode.Point;
         }
 
         public void FillLight()
         {
             _computeShader.SetFloat("_dayLightValue", TimeManager.Instance.DayLightValue);
-            _computeShader.SetBuffer(_fillMatrixHandler, "_brightness", _brightnessComputeArray);
-            _computeShader.SetBuffer(_fillMatrixHandler, "_worldData", _worldDataComputeArray);
-            _computeShader.Dispatch(_fillMatrixHandler, _width * _height, 1, 1);
+            if (_isColoredMode)
+            {
+                _computeShader.GetKernelThreadGroupSizes(_fillLightColoredHandler, out uint x, out _, out _);
+                _computeShader.Dispatch(_fillLightColoredHandler, (int)(_width * _height / x), 1, 1);
+            }
+            else
+            {
+                _computeShader.GetKernelThreadGroupSizes(_fillLightBrightnessHandler, out uint x, out _, out _);
+                _computeShader.Dispatch(_fillLightBrightnessHandler, (int)(_width * _height / x), 1, 1);
+            }
         }
 
         public void SpreadLight()
         {
+            uint x;
             _loopCount = 0;
-            _computeShader.SetInt("_width", _width);
-            _computeShader.SetInt("_height", _height);
-            _computeShader.SetBool("_isColoredMode", _isColoredMode);
+            if (_isColoredMode)
+            {
+                _computeShader.GetKernelThreadGroupSizes(_spreadLightColoredHandler, out x, out _, out _);
+            }
+            else
+            {
+                _computeShader.GetKernelThreadGroupSizes(_spreadLightBrightnessHandler, out x, out _, out _);
+            }
 
             while (_loopCount != 8)
             {
@@ -178,45 +234,65 @@ namespace LightSystem
                     case 0:
                         {
                             //Top-Down
-                            _computeShader.SetBuffer(_colorSpreadHandler, "_brightness", _brightnessComputeArray);
-                            _computeShader.SetBuffer(_colorSpreadHandler, "_worldData", _worldDataComputeArray);
                             _computeShader.SetInt("_spreadDirection", 0);
                             _computeShader.SetInt("_spreadStartLoop", _height - 1);
                             _computeShader.SetInt("_spreadEndLoop", 0);
-                            _computeShader.Dispatch(_colorSpreadHandler, _width, 1, 1);
+                            if (_isColoredMode)
+                            {
+                                _computeShader.Dispatch(_spreadLightColoredHandler, (int)(_width / x), 1, 1);
+                            }
+                            else
+                            {
+                                _computeShader.Dispatch(_spreadLightBrightnessHandler, (int)(_width / x), 1, 1);
+                            }
                         }
                         break;
                     case 1:
                         {
                             //Down-Top
-                            _computeShader.SetBuffer(_colorSpreadHandler, "_brightness", _brightnessComputeArray);
-                            _computeShader.SetBuffer(_colorSpreadHandler, "_worldData", _worldDataComputeArray);
                             _computeShader.SetInt("_spreadDirection", 1);
                             _computeShader.SetInt("_spreadStartLoop", 0);
                             _computeShader.SetInt("_spreadEndLoop", _height - 1);
-                            _computeShader.Dispatch(_colorSpreadHandler, _width, 1, 1);
+                            if (_isColoredMode)
+                            {
+                                _computeShader.Dispatch(_spreadLightColoredHandler, (int)(_width / x), 1, 1);
+                            }
+                            else
+                            {
+                                _computeShader.Dispatch(_spreadLightBrightnessHandler, (int)(_width / x), 1, 1);
+                            }
                         }
                         break;
                     case 2:
                         {
                             //Left-Right
-                            _computeShader.SetBuffer(_colorSpreadHandler, "_brightness", _brightnessComputeArray);
-                            _computeShader.SetBuffer(_colorSpreadHandler, "_worldData", _worldDataComputeArray);
                             _computeShader.SetInt("_spreadDirection", 2);
                             _computeShader.SetInt("_spreadStartLoop", 0);
                             _computeShader.SetInt("_spreadEndLoop", _width - 1);
-                            _computeShader.Dispatch(_colorSpreadHandler, _height, 1, 1);
+                            if (_isColoredMode)
+                            {
+                                _computeShader.Dispatch(_spreadLightColoredHandler, (int)(_height / x), 1, 1);
+                            }
+                            else
+                            {
+                                _computeShader.Dispatch(_spreadLightBrightnessHandler, (int)(_height / x), 1, 1);
+                            }
                         }
                         break;
                     case 3:
                         {
                             //Right-Left
-                            _computeShader.SetBuffer(_colorSpreadHandler, "_brightness", _brightnessComputeArray);
-                            _computeShader.SetBuffer(_colorSpreadHandler, "_worldData", _worldDataComputeArray);
                             _computeShader.SetInt("_spreadDirection", 3);
                             _computeShader.SetInt("_spreadStartLoop", _width - 1);
                             _computeShader.SetInt("_spreadEndLoop", 0);
-                            _computeShader.Dispatch(_colorSpreadHandler, _height, 1, 1);
+                            if (_isColoredMode)
+                            {
+                                _computeShader.Dispatch(_spreadLightColoredHandler, (int)(_height / x), 1, 1);
+                            }
+                            else
+                            {
+                                _computeShader.Dispatch(_spreadLightBrightnessHandler, (int)(_height / x), 1, 1);
+                            }
                         }
                         break;
                     default:
@@ -229,9 +305,16 @@ namespace LightSystem
 
         public void ApplyLight()
         {
-            _computeShader.SetBuffer(_applyBrightnessHandler, "_brightness", _brightnessComputeArray);
-            _computeShader.SetTexture(_applyBrightnessHandler, "_texture", _lightMapRenderTexture);
-            _computeShader.Dispatch(_applyBrightnessHandler, _width, _height, 1);
+            if (_isColoredMode)
+            {
+                _computeShader.GetKernelThreadGroupSizes(_applyLightColoredHandler, out uint x, out uint y, out _);
+                _computeShader.Dispatch(_applyLightColoredHandler, (int)(_width / x), (int)(_height / y), 1);
+            }
+            else
+            {
+                _computeShader.GetKernelThreadGroupSizes(_applyLightColoredHandler, out uint x, out uint y, out _);
+                _computeShader.Dispatch(_applyLightBrightnessHandler, (int)(_width / x), (int)(_height / y), 1);
+            }
         }
 
         private void OnDestroy()
@@ -244,6 +327,7 @@ namespace LightSystem
             //Release ComputeArray
             _worldDataComputeArray.Release();
             _brightnessComputeArray.Release();
+            _colorsComputeArray.Release();
 
             //Release RenderTexture
             _lightMapRenderTexture.Release();

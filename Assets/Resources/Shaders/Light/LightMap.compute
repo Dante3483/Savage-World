@@ -1,17 +1,21 @@
-#pragma kernel FillMatrix
-#pragma kernel ColorSpread
-#pragma kernel ApplyBrightness
+#pragma kernel FillLightBrightness
+#pragma kernel FillLightColored
+#pragma kernel SpreadLightBrightness
+#pragma kernel SpreadLightColored
+#pragma kernel ApplyLightBrightness
+#pragma kernel ApplyLightColored
 
 struct WorldCellData
 {
     float bgLightValue;
     float blockLightValue;
+    uint bgLightColor;
+    uint blockLightColor;
     int flags;
 };
 
 int _width;
 int _height;
-bool _isColoredMode;
 
 float _dayLightValue;
 
@@ -21,30 +25,21 @@ int _spreadEndLoop;
 
 StructuredBuffer<WorldCellData> _worldData;
 RWStructuredBuffer<float> _brightness;
+RWStructuredBuffer<float4> _colors;
 RWTexture2D<float4> _texture;
 
-float IntensitySpread(int index, float value)
+//Fill light region
+float4 ParseColor(uint color)
 {
-    int isSolid = _worldData[index].flags & 1;
-    int isFullLiquidBlock = _worldData[index].flags & 2;
-    
-    if (isSolid != 0)
-    {
-        return value * 0.6;
-    }
-    else if (isFullLiquidBlock != 0)
-    {
-        return value * 0.8;
-    }
-    else
-    {
-        return value * 0.9;
-    }
-
+    float r = ((color & 0x000000FF)) / 255.0;
+    float g = ((color & 0x0000FF00) >> 8) / 255.0;
+    float b = ((color & 0x00FF0000) >> 16) / 255.0;
+    float a = 1;
+    return float4(r, g, b, a);
 }
 
-[numthreads(1, 1, 1)]
-void FillMatrix(uint3 id : SV_DispatchThreadID)
+[numthreads(250, 1, 1)]
+void FillLightBrightness(uint3 id : SV_DispatchThreadID)
 {
     float bgLightValue = _worldData[id.x + id.y].bgLightValue;
     float blockLightValue = _worldData[id.x + id.y].blockLightValue;
@@ -81,8 +76,100 @@ void FillMatrix(uint3 id : SV_DispatchThreadID)
     }
 }
 
-[numthreads(1, 1, 1)]
-void ColorSpread(uint3 id : SV_DispatchThreadID)
+[numthreads(250, 1, 1)]
+void FillLightColored(uint3 id : SV_DispatchThreadID)
+{
+    float4 blLightColor = ParseColor(_worldData[id.x + id.y].bgLightColor);
+    float4 blockLightColor = ParseColor(_worldData[id.x + id.y].blockLightColor);
+    float4 color;
+    int isSolid = _worldData[id.x + id.y].flags & 1;
+    int isFullLiquidBlock = _worldData[id.x + id.y].flags & 2;
+    int isDayLightBlock = _worldData[id.x + id.y].flags & 4;
+
+    if (isSolid != 0 || isFullLiquidBlock != 0)
+    {
+        _colors[id.x + id.y] = blockLightColor;
+    }
+    else if (isDayLightBlock != 0)
+    {
+        blLightColor = lerp(float4(0, 0, 0, 0), float4(1, 1, 1, 1), _dayLightValue);
+        color = blLightColor + blockLightColor;
+        if (color.r > 1)
+        {
+            color.r = 1;
+        }
+        if (color.g > 1)
+        {
+            color.g = 1;
+        }
+        if (color.b > 1)
+        {
+            color.b = 1;
+        }
+        _colors[id.x + id.y] = color;
+    }
+    else
+    {
+        color = blockLightColor;
+        if (blLightColor.r > color.r)
+        {
+            color.r = blLightColor.r;
+        }
+        if (blLightColor.g > color.g)
+        {
+            color.g = blLightColor.g;
+        }
+        if (blLightColor.b > color.b)
+        {
+            color.b = blLightColor.b;
+        }
+        _colors[id.x + id.y] = color;
+    }
+}
+
+//LightSpread region
+float IntensitySpreadBrightness(int index, float value)
+{
+    int isSolid = _worldData[index].flags & 1;
+    int isFullLiquidBlock = _worldData[index].flags & 2;
+    
+    if (isSolid != 0)
+    {
+        return value * 0.6;
+    }
+    else if (isFullLiquidBlock != 0)
+    {
+        return value * 0.8;
+    }
+    else
+    {
+        return value * 0.9;
+    }
+
+}
+
+float4 IntensitySpreadColor(int index, float4 value)
+{
+    int isSolid = _worldData[index].flags & 1;
+    int isFullLiquidBlock = _worldData[index].flags & 2;
+    
+    if (isSolid != 0)
+    {
+        return value * 0.6;
+    }
+    else if (isFullLiquidBlock != 0)
+    {
+        return value * 0.8;
+    }
+    else
+    {
+        return value * 0.9;
+    }
+
+}
+
+[numthreads(50, 1, 1)]
+void SpreadLightBrightness(uint3 id : SV_DispatchThreadID)
 {
     int moveIndex;
     int nextMoveIndex;
@@ -91,10 +178,9 @@ void ColorSpread(uint3 id : SV_DispatchThreadID)
     
     for (int i = _spreadStartLoop;; i += adder)
     {
-        
         switch (_spreadDirection)
         {
-                //If we spread from top to bottom
+            //If we spread from top to bottom
             case 0:
                 {
                     moveIndex = id.x + i * _width;
@@ -102,7 +188,7 @@ void ColorSpread(uint3 id : SV_DispatchThreadID)
                     adder = -1;
                 }
                 break;
-                //If we spread from bottom to top
+            //If we spread from bottom to top
             case 1:
                 {
                     moveIndex = id.x + i * _width;
@@ -110,7 +196,7 @@ void ColorSpread(uint3 id : SV_DispatchThreadID)
                     adder = 1;
                 }
                 break;
-                //If we spread from left to right
+            //If we spread from left to right
             case 2:
                 {
                     moveIndex = id.x * _width + i;
@@ -118,7 +204,7 @@ void ColorSpread(uint3 id : SV_DispatchThreadID)
                     adder = 1;
                 }
                 break;
-                //If we spread from right to left
+            //If we spread from right to left
             case 3:
                 {
                     moveIndex = id.x * _width + i;
@@ -135,7 +221,7 @@ void ColorSpread(uint3 id : SV_DispatchThreadID)
                 break;
         }
         
-        newLightValue = IntensitySpread(nextMoveIndex, _brightness[moveIndex]);
+        newLightValue = IntensitySpreadBrightness(nextMoveIndex, _brightness[moveIndex]);
         
         if (newLightValue <= 0.05f)
         {
@@ -152,11 +238,109 @@ void ColorSpread(uint3 id : SV_DispatchThreadID)
             break;
         }
     }
-
 }
 
-[numthreads(1, 1, 1)]
-void ApplyBrightness(uint3 id : SV_DispatchThreadID)
+[numthreads(50, 1, 1)]
+void SpreadLightColored(uint3 id : SV_DispatchThreadID)
 {
-    _texture[id.xy] = float4(1, 1, 1, 1) * _brightness[id.x + id.y * 150];
+    int moveIndex;
+    int nextMoveIndex;
+    int adder;
+    float4 newLightColor;
+    float4 color;
+    
+    for (int i = _spreadStartLoop;; i += adder)
+    {
+        switch (_spreadDirection)
+        {
+            //If we spread from top to bottom
+            case 0:
+                {
+                    moveIndex = id.x + i * _width;
+                    nextMoveIndex = id.x + (i - 1) * _width;
+                    adder = -1;
+                }
+                break;
+            //If we spread from bottom to top
+            case 1:
+                {
+                    moveIndex = id.x + i * _width;
+                    nextMoveIndex = id.x + (i + 1) * _width;
+                    adder = 1;
+                }
+                break;
+            //If we spread from left to right
+            case 2:
+                {
+                    moveIndex = id.x * _width + i;
+                    nextMoveIndex = id.x * _width + i + 1;
+                    adder = 1;
+                }
+                break;
+            //If we spread from right to left
+            case 3:
+                {
+                    moveIndex = id.x * _width + i;
+                    nextMoveIndex = id.x * _width + i - 1;
+                    adder = -1;
+                }
+                break;
+            default:
+                {
+                    moveIndex = 0;
+                    nextMoveIndex = 0;
+                    adder = 0;
+                }
+                break;
+        }
+        
+        newLightColor = IntensitySpreadColor(nextMoveIndex, _colors[moveIndex]);
+        color = _colors[nextMoveIndex];
+        
+        if (newLightColor.r < 0.05)
+        {
+            newLightColor.r = 0;
+        }
+        if (newLightColor.g < 0.05)
+        {
+            newLightColor.g = 0;
+        }
+        if (newLightColor.b < 0.05)
+        {
+            newLightColor.b = 0;
+        }
+
+        if (newLightColor.r > color.r)
+        {
+            color.r = newLightColor.r;
+        }
+        if (newLightColor.g > color.g)
+        {
+            color.g = newLightColor.g;
+        }
+        if (newLightColor.b > color.b)
+        {
+            color.b = newLightColor.b;
+        }
+        
+        _colors[nextMoveIndex] = color;
+        
+        if (i + adder == _spreadEndLoop)
+        {
+            break;
+        }
+    }
+}
+
+//LightApply region
+[numthreads(30, 20, 1)]
+void ApplyLightBrightness(uint3 id : SV_DispatchThreadID)
+{
+    _texture[id.xy] = float4(1, 1, 1, 1) * _brightness[id.x + id.y * _width];
+}
+
+[numthreads(30, 20, 1)]
+void ApplyLightColored(uint3 id : SV_DispatchThreadID)
+{
+    _texture[id.xy] = _colors[id.x + id.y * _width];
 }

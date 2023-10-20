@@ -14,6 +14,7 @@ namespace LightSystem
         private int _startY;
         private int _width;
         private int _height;
+        private bool _isColoredMode;
         private NativeArray<WorldCellDataGPU> _worldData;
         #endregion
 
@@ -26,12 +27,13 @@ namespace LightSystem
         #endregion
 
         #region Methods
-        public LightSystemGetWorldDataJob(int startX, int startY, int width, int height, NativeArray<WorldCellDataGPU> worldData)
+        public LightSystemGetWorldDataJob(int startX, int startY, int width, int height, bool isColoredMode, NativeArray<WorldCellDataGPU> worldData)
         {
             _startX = startX;
             _startY = startY;
             _width = width;
             _height = height;
+            _isColoredMode = isColoredMode;
             _worldData = worldData;
         }
 
@@ -44,8 +46,17 @@ namespace LightSystem
             int dx = _startX + x;
             int dy = _startY + y;
 
-            data.BlockLightValue = globalWorldData[dx, dy].BlockData.LightValue;
-            data.BgLightValue = globalWorldData[dx, dy].BackgroundData.LightValue;
+            if (_isColoredMode)
+            {
+                data.BlockLightColor = globalWorldData[dx, dy].BlockData.LightColor;
+                data.BgLightColor = globalWorldData[dx, dy].BackgroundData.LightColor;
+            }
+            else
+            {
+                data.BlockLightValue = globalWorldData[dx, dy].BlockData.LightValue;
+                data.BgLightValue = globalWorldData[dx, dy].BackgroundData.LightValue;
+            }
+
             data.Flags = 0;
 
             if (globalWorldData[dx, dy].IsSolid())

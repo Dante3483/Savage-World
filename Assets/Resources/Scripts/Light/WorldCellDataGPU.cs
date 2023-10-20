@@ -1,3 +1,7 @@
+using System.Drawing;
+using Unity.Mathematics;
+using UnityEngine;
+
 namespace LightSystem
 {
     public struct WorldCellDataGPU
@@ -5,6 +9,8 @@ namespace LightSystem
         #region Private fields
         private float _bgLightValue;
         private float _blockLightValue;
+        private Color32 _bgLightColor;
+        private Color32 _blockLightColor;
         private int _flags;
         #endregion
 
@@ -49,6 +55,32 @@ namespace LightSystem
             set
             {
                 _flags = value;
+            }
+        }
+
+        public Color32 BgLightColor
+        {
+            get
+            {
+                return _bgLightColor;
+            }
+
+            set
+            {
+                _bgLightColor = value;
+            }
+        }
+
+        public Color32 BlockLightColor
+        {
+            get
+            {
+                return _blockLightColor;
+            }
+
+            set
+            {
+                _blockLightColor = value;
             }
         }
         #endregion
