@@ -1442,6 +1442,7 @@ GameObject:
   - component: {fileID: 699589501}
   - component: {fileID: 699589500}
   - component: {fileID: 699589499}
+  - component: {fileID: 699589508}
   m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
@@ -4426,6 +4427,7 @@ MonoBehaviour:
   _orderInLiquidLayer: 11
   _maskSprite: {fileID: 0}
   _maskTexture: {fileID: 0}
+  _liquidMaterial: {fileID: 2100000, guid: 1f195482888639a4d9d7818d532199ce, type: 2}
 --- !u!4 &1928249623
 Transform:
   m_ObjectHideFlags: 0
@@ -4483,7 +4485,7 @@ SpriteMask:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 0}
-  m_MaskAlphaCutoff: 1
+  m_MaskAlphaCutoff: 0.1
   m_FrontSortingLayerID: 0
   m_BackSortingLayerID: 0
   m_FrontSortingLayer: 0

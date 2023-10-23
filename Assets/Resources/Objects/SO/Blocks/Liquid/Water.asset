@@ -13,16 +13,16 @@ MonoBehaviour:
   m_Name: Water
   m_EditorClassIdentifier: 
   _sprites:
-  - {fileID: 23152006, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
-  - {fileID: 87222841, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
-  - {fileID: -2025433904, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
-  - {fileID: 1812042232, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
-  - {fileID: -1488352492, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
-  - {fileID: 1730579905, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
-  - {fileID: 1289897579, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
-  - {fileID: -1918420053, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
-  - {fileID: 1424301513, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
-  - {fileID: -920549135, guid: 456a3b82f87ced644b04c97baa6a9fa5, type: 3}
+  - {fileID: 21300000, guid: 515d555c6ddc07a4ba5a751857871798, type: 3}
+  - {fileID: 21300000, guid: adacbdb7a29af67468808003acf71eda, type: 3}
+  - {fileID: 21300000, guid: 2560be433e1a85d4babc5b93d77d6688, type: 3}
+  - {fileID: 21300000, guid: 88af3d1addd7c6f429a9758f4f0a44e7, type: 3}
+  - {fileID: 21300000, guid: cee29d7a4682396459a577dbe0017240, type: 3}
+  - {fileID: 21300000, guid: 88342bc42ec16d741b5fb6280cf337c8, type: 3}
+  - {fileID: 21300000, guid: d829ef64f51acd74aaa40f06f917bb7d, type: 3}
+  - {fileID: 21300000, guid: 0cfeb4945cfc98144a7b80a763734dbc, type: 3}
+  - {fileID: 21300000, guid: a5bff5b7f402900419c6b8ced20d16e2, type: 3}
+  - {fileID: 21300000, guid: 2cc1b2133bcbe1842b1a79b5f4840606, type: 3}
   _type: 3
   _colorOnMap: {r: 0.33333334, g: 0.68235296, b: 0.7568628, a: 1}
   _lightValue: 0

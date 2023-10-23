@@ -40,9 +40,9 @@ Material:
     m_Floats:
     - _CellDensity: 1.5
     - _PixelsIntensity: 16
-    - _RotationSpeed: 0.25
+    - _RotationSpeed: 0.7
     - _powerValue: 4
     m_Colors:
     - _MovementSpeed: {r: 0, g: 0, b: 0, a: 0}
-    - _liquidColor: {r: 0.1192595, g: 0.811885, b: 0.9433962, a: 1}
+    - _liquidColor: {r: 0, g: 0.30876803, b: 0.3679245, a: 1}
   m_BuildTextureStacks: []

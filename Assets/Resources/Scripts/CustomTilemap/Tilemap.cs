@@ -23,10 +23,12 @@ namespace CustomTilemap
         [SerializeField] private Texture2D _maskTexture;
         private Color32[] _emptyTile;
         private Color32 _alphaZero = new Color32(0, 0, 0, 0);
+
+        [Header("Block materials")]
+        [SerializeField] private Material _liquidMaterial;
         #endregion
 
         #region Public fields
-        public Material _material;
         #endregion
 
         #region Properties
@@ -66,6 +68,19 @@ namespace CustomTilemap
             set
             {
                 _orderInLiquidLayer = value;
+            }
+        }
+
+        public Material LiquidMaterial
+        {
+            get
+            {
+                return _liquidMaterial;
+            }
+
+            set
+            {
+                _liquidMaterial = value;
             }
         }
         #endregion

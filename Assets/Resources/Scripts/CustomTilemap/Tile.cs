@@ -77,11 +77,13 @@ namespace CustomTilemap
         {
             if (_firstInitialization)
             {
+                //Set order
                 _blockLayer.UpdateOrderInLayer(_tilemap.OrderInBlockLayer);
                 _backgroundLayer.UpdateOrderInLayer(_tilemap.OrderInBackgroundLayer);
                 _liquidLayer.UpdateOrderInLayer(_tilemap.OrderInLiquidLayer);
 
-                _liquidLayerSpriteRenderer.sharedMaterial = _tilemap._material;
+                //Set material
+                _liquidLayerSpriteRenderer.sharedMaterial = _tilemap.LiquidMaterial;
 
                 _firstInitialization = false;
             }
