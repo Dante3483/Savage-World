@@ -58,6 +58,19 @@ public class NPC : MonoBehaviour
             _target = value;
         }
     }
+
+    public NPCFlags NpcFlags
+    {
+        get
+        {
+            return _npcFlags;
+        }
+
+        set
+        {
+            _npcFlags = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -68,6 +81,11 @@ public class NPC : MonoBehaviour
         _npcStats = GetComponent<NPCStats>();
         _boxCollider= GetComponent<BoxCollider2D>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        _npcFlags.IsFaceToTheRight =true;
+        _npcFlags.IsIdle = true;
+    }
+    public void OnValidate()
+    {
         if (!transform.Find("AttackCollider"))
         {
             _attackCollider = new GameObject("AttackCollider");
@@ -85,10 +103,7 @@ public class NPC : MonoBehaviour
             _hitCollider.transform.parent = transform;
             _hitCollider.transform.position = transform.position;
         }
-        _npcFlags.IsFaceToTheRight =true;
-        _npcFlags.IsIdle = true;
     }
-        
     public virtual void Move()
     {
         if (_npcFlags.IsMovementBlocked)

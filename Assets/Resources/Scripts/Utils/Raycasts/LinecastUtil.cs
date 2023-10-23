@@ -90,11 +90,11 @@ public struct LinecastUtil
     #endregion
 
     #region Methods
-    public RaycastHit2D CheckLinecast(Vector3 _vFrom, Vector3 _vTo,  out bool result, bool needVizualize = true)
+    public RaycastHit2D CheckLinecast(Vector3 vFrom, Vector3 vTo,  out bool result, bool needVizualize = true)
     {
         Color rayColor;
 
-        RaycastHit2D hit = Physics2D.Linecast(VFrom, VTo, LayerMask);
+        RaycastHit2D hit = Physics2D.Linecast(vFrom, vTo, LayerMask);
         if (hit)
         {
             result = true;
@@ -108,7 +108,7 @@ public struct LinecastUtil
 
         if (needVizualize)
         {
-            Debug.DrawLine(VFrom, VTo, rayColor);
+            Debug.DrawLine(vFrom, vTo, rayColor);
         }
 
         return hit;

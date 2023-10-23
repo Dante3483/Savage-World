@@ -34,7 +34,10 @@ public class SlimeNPC : NPC
         SlopeCheck();
         RiseCheck();
         FallCheck();
-
+        if (NpcFlags.IsTargetInArea)
+        {
+            Attack();
+        }
         _npcFlags.IsMovementBlocked = _npcFlags.IsGrounded && !_npcFlags.IsRise;
 
         Jump();

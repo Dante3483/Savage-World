@@ -7,7 +7,6 @@ public class MobAttackController : MonoBehaviour
 {
     #region Private fields
     [SerializeField] private NPC _npc;   
-    [SerializeField] private NPCFlags _npcFlags;
     [SerializeField] private BoxCollider2D _boxCollider;
     [SerializeField] private LinecastUtil _groundCheck;
     [SerializeField] private BoxCastUtil _checkTarget;
@@ -72,18 +71,18 @@ public class MobAttackController : MonoBehaviour
     {
         if (_npc.Target != null)
         {
-            Vector3 startPosition = transform.parent.transform.position;
+            Vector3 startPosition = transform.parent.position;
             Vector3 endPosition = _npc.Target.position;
             var lineResult = GroundCheck.CheckLinecast(startPosition, endPosition, out bool result, true);
-            var areaResult = _checkTarget.BoxCast(transform.position, gameObject.transform.parent.gameObject);
+            var areaResult = _checkTarget.BoxCast(transform.position, transform.parent.gameObject);
          
             if (!lineResult && areaResult)
             {
-                _npcFlags.IsTargetInArea = true;
+                Npc.NpcFlags.IsTargetInArea = true;
             }
             else
             {
-                _npcFlags.IsTargetInArea = false;
+                Npc.NpcFlags.IsTargetInArea = false;
             }
         }
     }
