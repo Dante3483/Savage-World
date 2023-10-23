@@ -342,6 +342,59 @@ public struct BoxCastUtil
 
         return hit;
     }
+    public RaycastHit2D BoxCast(Vector3 origin, GameObject self, Color hitColor, Color notHitColor, bool needVizualize = true)
+    {
+        Color rayColor;
+        origin += OriginOffset;
+
+        RaycastHit2D hit = Physics2D.BoxCast(origin, Size, Angle, Direction, Distance, LayerMask);
+
+        bool result = hit.collider != null && hit.collider.gameObject != self;
+        if (result)
+        {
+            rayColor = hitColor;
+        }
+        else
+        {
+            rayColor = notHitColor;
+        }
+        if (needVizualize)
+        {
+            Vector2 halfSize = Size / 2f;
+            Vector2 leftBottom = origin - new Vector3(halfSize.x, halfSize.y);
+            Vector2 leftTop = origin - new Vector3(halfSize.x, -halfSize.y);
+            Vector2 rightBottom = origin + new Vector3(halfSize.x, -halfSize.y);
+            Vector2 rightTop = origin + new Vector3(halfSize.x, halfSize.y);
+
+            if (Direction.x < 0)
+            {
+                leftBottom.x -= Distance;
+                leftTop.x -= Distance;
+            }
+            if (Direction.x > 0)
+            {
+                rightBottom.x += Distance;
+                rightTop.x += Distance;
+            }
+            if (Direction.y < 0)
+            {
+                leftBottom.y -= Distance;
+                rightBottom.y -= Distance;
+            }
+            if (Direction.y > 0)
+            {
+                leftTop.y += Distance;
+                rightTop.y += Distance;
+            }
+
+            Debug.DrawLine(leftBottom, leftTop, rayColor);
+            Debug.DrawLine(leftTop, rightTop, rayColor);
+            Debug.DrawLine(rightTop, rightBottom, rayColor);
+            Debug.DrawLine(rightBottom, leftBottom, rayColor);
+        }
+
+        return hit;
+    }
 
     public RaycastHit2D[] BoxCastAll(Vector3 origin, out bool result, bool needVizualize = true)
     {

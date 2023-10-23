@@ -437,6 +437,14 @@ public class GameManager : MonoBehaviour
         Terrain.CreateNewWorld(ref _worldData);
         IsLoadingProgressActive = false;
     }
+    public Vector3 GetPlayerPosition() 
+    {
+        return _player.transform.position;
+    }
+    public Transform GetPlayerTransform()
+    {
+        return _player.transform;
+    }
     #endregion
 
     #region Helpful

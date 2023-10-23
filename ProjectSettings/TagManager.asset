@@ -10,13 +10,13 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - NPC
   - Water
   - UI
   - Ground
   - Tree
   - PickableItem
-  - 
+  - Player
   - 
   - 
   - 
