@@ -3766,7 +3766,7 @@ MonoBehaviour:
   _currentLightMapMaterial: {fileID: 0}
   _width: 150
   _height: 100
-  _isColoredMode: 0
+  _isColoredMode: 1
 --- !u!1 &1848979392
 GameObject:
   m_ObjectHideFlags: 0

@@ -80,6 +80,9 @@ namespace CustomTilemap
                 _blockLayer.UpdateOrderInLayer(_tilemap.OrderInBlockLayer);
                 _backgroundLayer.UpdateOrderInLayer(_tilemap.OrderInBackgroundLayer);
                 _liquidLayer.UpdateOrderInLayer(_tilemap.OrderInLiquidLayer);
+
+                _liquidLayerSpriteRenderer.sharedMaterial = _tilemap._material;
+
                 _firstInitialization = false;
             }
         }

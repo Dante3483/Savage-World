@@ -26,7 +26,7 @@ namespace CustomTilemap
         #endregion
 
         #region Public fields
-
+        public Material _material;
         #endregion
 
         #region Properties

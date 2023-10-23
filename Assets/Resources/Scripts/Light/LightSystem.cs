@@ -151,8 +151,7 @@ namespace LightSystem
 
             if (GameManager.Instance.IsGameSession)
             {
-                ExecutionTimeCalculator.Instance.Execute(() => UpdateLight());
-                //UpdateLight();
+                UpdateLight();
             }
         }
 

@@ -1174,7 +1174,7 @@
     "m_SlotType": 0,
     "m_Hidden": false,
     "m_ShaderOutputName": "_IsColoredMode",
-    "m_StageCapability": 2,
+    "m_StageCapability": 3,
     "m_Value": false,
     "m_DefaultValue": false
 }
@@ -1823,7 +1823,7 @@
     "m_SlotType": 0,
     "m_Hidden": false,
     "m_ShaderOutputName": "_IsColoredMode",
-    "m_StageCapability": 2,
+    "m_StageCapability": 3,
     "m_Value": false,
     "m_DefaultValue": false
 }
@@ -2014,7 +2014,7 @@
     "m_SlotType": 0,
     "m_Hidden": false,
     "m_ShaderOutputName": "_IsColoredMode",
-    "m_StageCapability": 2,
+    "m_StageCapability": 3,
     "m_Value": false,
     "m_DefaultValue": false
 }
@@ -2567,7 +2567,7 @@
     "m_SlotType": 0,
     "m_Hidden": false,
     "m_ShaderOutputName": "_IsColoredMode",
-    "m_StageCapability": 2,
+    "m_StageCapability": 3,
     "m_Value": false,
     "m_DefaultValue": false
 }

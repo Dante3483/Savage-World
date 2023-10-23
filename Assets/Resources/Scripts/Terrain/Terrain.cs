@@ -136,7 +136,6 @@ public class Terrain : MonoBehaviour
         _firstRender = true;
         #endregion
     }
-
     private void Start()
     {
         //_allLiquidTiles = new List<List<TileBase>>()
@@ -145,12 +144,19 @@ public class Terrain : MonoBehaviour
         //};
     }
 
+    private void FixedUpdate()
+    {
+        if (GameManager.Instance.IsGameSession)
+        {
+            UpdateWorldData();
+        }
+    }
+
     private void Update()
     {
         if (GameManager.Instance.IsGameSession)
         {
             RenderWorldData();
-            UpdateWorldData();
         }
     }
 
