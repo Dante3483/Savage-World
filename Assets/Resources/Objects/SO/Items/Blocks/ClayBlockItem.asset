@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cfc0007050f10c438964fce730d01e1, type: 3}
+  m_Name: ClayBlockItem
+  m_EditorClassIdentifier: 
+  _id: 3
+  _itemType: 1
+  _itemRarity: {fileID: 11400000, guid: 1ab80723928f4cf4f8323c6f1fff4622, type: 2}
+  _isStackable: 1
+  _maxStackSize: 999
+  _name: Clay block
+  _using: Can be placed
+  _description: 
+  _itemImage: {fileID: 0}
+  _blockToPlace: {fileID: 11400000, guid: 73ff087286672b04b9204ebbc38cef50, type: 2}
