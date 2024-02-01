@@ -16,7 +16,7 @@ public class ObjectsAtlass : ScriptableObject
     public Dictionary<BlockTypes, Dictionary<ushort, BlockSO>> Blocks;
     public Dictionary<BiomesID, BlockSO[]> Plants;
     public Dictionary<BiomesID, GameObject[]> Trees;
-    public Dictionary<BiomesID, GameObject[]> PickableItems;
+    public Dictionary<BiomesID, GameObject[]> PickUpItems;
 
     public static Dictionary<Sprite, Color32[]> BlocksSpriteColorArray;
     #endregion
@@ -111,8 +111,8 @@ public class ObjectsAtlass : ScriptableObject
     public GameObject Cactus1;
     #endregion
 
-    #region Pickable items
-    [Header("Pickable items")]
+    #region PickUp items
+    [Header("PickUp items")]
     public GameObject Rock1;
     public GameObject Log1;
     #endregion
@@ -130,7 +130,7 @@ public class ObjectsAtlass : ScriptableObject
         Blocks = new Dictionary<BlockTypes, Dictionary<ushort, BlockSO>>();
         Plants = new Dictionary<BiomesID, BlockSO[]>();
         Trees = new Dictionary<BiomesID, GameObject[]>();
-        PickableItems = new Dictionary<BiomesID, GameObject[]>();
+        PickUpItems = new Dictionary<BiomesID, GameObject[]>();
         BlocksSpriteColorArray = new Dictionary<Sprite, Color32[]>();
 
         //Fill lists
@@ -215,7 +215,7 @@ public class ObjectsAtlass : ScriptableObject
         #region Plants
 
         #region Non-biome
-        Plants.Add(BiomesID.NonBiom, new BlockSO[]
+        Plants.Add(BiomesID.NonBiome, new BlockSO[]
         {
             Vine
         });
@@ -339,24 +339,24 @@ public class ObjectsAtlass : ScriptableObject
 
         #endregion
 
-        #region Pickable items
+        #region PickUp items
 
         #region Ocean
-        PickableItems.Add(BiomesID.Ocean, new GameObject[]
+        PickUpItems.Add(BiomesID.Ocean, new GameObject[]
         {
 
         });
         #endregion
 
         #region Desert
-        PickableItems.Add(BiomesID.Desert, new GameObject[]
+        PickUpItems.Add(BiomesID.Desert, new GameObject[]
         {
 
         });
         #endregion
 
         #region Savannah
-        PickableItems.Add(BiomesID.Savannah, new GameObject[]
+        PickUpItems.Add(BiomesID.Savannah, new GameObject[]
         {
             Rock1,
             Log1,
@@ -364,7 +364,7 @@ public class ObjectsAtlass : ScriptableObject
         #endregion
 
         #region Meadow
-        PickableItems.Add(BiomesID.Meadow, new GameObject[]
+        PickUpItems.Add(BiomesID.Meadow, new GameObject[]
         {
             Rock1,
             Log1,
@@ -372,7 +372,7 @@ public class ObjectsAtlass : ScriptableObject
         #endregion
 
         #region Forest
-        PickableItems.Add(BiomesID.Forest, new GameObject[]
+        PickUpItems.Add(BiomesID.Forest, new GameObject[]
         {
             Rock1,
             Log1,
@@ -380,7 +380,7 @@ public class ObjectsAtlass : ScriptableObject
         #endregion
 
         #region Swamp
-        PickableItems.Add(BiomesID.Swamp, new GameObject[]
+        PickUpItems.Add(BiomesID.Swamp, new GameObject[]
         {
             Rock1,
             Log1,
@@ -388,7 +388,7 @@ public class ObjectsAtlass : ScriptableObject
         #endregion
 
         #region Coniferous forest
-        PickableItems.Add(BiomesID.ConiferousForest, new GameObject[]
+        PickUpItems.Add(BiomesID.ConiferousForest, new GameObject[]
         {
             Rock1,
             Log1,
@@ -477,16 +477,16 @@ public class ObjectsAtlass : ScriptableObject
         return result;
     }
 
-    public List<PickableItem> GetAllBiomePickableItems(BiomesID id)
+    public List<PickUpItem> GetAllBiomePickUpItems(BiomesID id)
     {
-        List<PickableItem> result = new List<PickableItem>();
-        if (PickableItems.ContainsKey(id))
+        List<PickUpItem> result = new List<PickUpItem>();
+        if (PickUpItems.ContainsKey(id))
         {
-            foreach (GameObject pickableItemObject in PickableItems[id])
+            foreach (GameObject pickUpItemObject in PickUpItems[id])
             {
-                if (pickableItemObject.GetComponent<PickableItem>() is PickableItem pickableItem)
+                if (pickUpItemObject.GetComponent<PickUpItem>() is PickUpItem pickUpItem)
                 {
-                    result.Add(pickableItem);
+                    result.Add(pickUpItem);
                 }
             }
         }

@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(SpriteMask))]
 [RequireComponent(typeof(LightMask))]
-public class PickableItem : MonoBehaviour
+public class PickUpItem : MonoBehaviour
 {
     #region Private fields
     [SerializeField]private PickableItemsID _id;

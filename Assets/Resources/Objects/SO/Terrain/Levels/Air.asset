@@ -12,7 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1397bfbe14d7dd3499ec4f091e2773c8, type: 3}
   m_Name: Air
   m_EditorClassIdentifier: 
-  _name: Air
+  _id: 1
   _countOfVerticalChunks: 2
-  _startY: 0
-  _endY: 0
+  _startY: 2200
+  _endY: 2399
+  _defaultBackground: {fileID: 11400000, guid: 4f7bf36ef6dc2b44991b536faedf8fe0, type: 2}
+  _stoneAmplitude: 0
+  _stoneScale: 0
+  _stoneIntensity: 0
+  _biomes: 

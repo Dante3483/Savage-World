@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 220fe6937979db64d9271989b859a0ac, type: 3}
-  m_Name: NonBiom
+  m_Name: NonBiome
   m_EditorClassIdentifier: 
   _id: 0
   _percentage: 0

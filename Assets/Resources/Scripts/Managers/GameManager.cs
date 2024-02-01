@@ -513,7 +513,7 @@ public class GameManager : MonoBehaviour
     public void SetChunkBiome(int x, int y, BiomeSO biome)
     {
         Chunk chunk = GetChunk(x, y);
-        if (chunk.Biome.Id == BiomesID.NonBiom)
+        if (chunk.Biome.Id == BiomesID.NonBiome)
         {
             Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize].Biome = biome;
         }

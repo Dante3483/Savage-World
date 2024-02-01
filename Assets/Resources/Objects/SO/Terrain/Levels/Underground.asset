@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1397bfbe14d7dd3499ec4f091e2773c8, type: 3}
   m_Name: Underground
   m_EditorClassIdentifier: 
-  _name: Underground
+  _id: 4
   _countOfVerticalChunks: 17
   _startY: 0
   _endY: 1699

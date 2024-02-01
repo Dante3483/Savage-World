@@ -1,6 +1,6 @@
 public enum BiomesID : byte
 {
-    NonBiom = 0,
+    NonBiome = 0,
 
     Ocean = 1,
 

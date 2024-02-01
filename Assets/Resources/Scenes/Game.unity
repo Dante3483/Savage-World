@@ -192,7 +192,7 @@ MonoBehaviour:
   _solidTilemap: {fileID: 0}
   _blocksTilemap: {fileID: 0}
   _trees: {fileID: 0}
-  _pickableItems: {fileID: 0}
+  _pickUpItems: {fileID: 0}
 --- !u!1 &70073721
 GameObject:
   m_ObjectHideFlags: 0
@@ -358,7 +358,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _trees: {fileID: 884038811}
-  _pickableItems: {fileID: 1278595433}
+  _pickUpItems: {fileID: 0}
 --- !u!114 &75088927
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3282,7 +3282,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1278595434}
   m_Layer: 0
-  m_Name: PickableItems
+  m_Name: PickUpItems
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

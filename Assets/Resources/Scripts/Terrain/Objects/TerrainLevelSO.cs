@@ -6,7 +6,7 @@ public class TerrainLevelSO : ScriptableObject
 {
     #region Private fields
     [Header("Main")]
-    [SerializeField] private string _name;
+    [SerializeField] private TerrainLevelId _id;
     [SerializeField] private byte _countOfVerticalChunks;
     [SerializeField] private ushort _startY;
     [SerializeField] private ushort _endY;
@@ -34,19 +34,6 @@ public class TerrainLevelSO : ScriptableObject
         set
         {
             _countOfVerticalChunks = value;
-        }
-    }
-
-    public string Name
-    {
-        get
-        {
-            return _name;
-        }
-
-        set
-        {
-            _name = value;
         }
     }
 
@@ -125,6 +112,19 @@ public class TerrainLevelSO : ScriptableObject
         set
         {
             _defaultBackground = value;
+        }
+    }
+
+    public TerrainLevelId Id
+    {
+        get
+        {
+            return _id;
+        }
+
+        set
+        {
+            _id = value;
         }
     }
     #endregion

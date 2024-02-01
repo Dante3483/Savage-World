@@ -11,32 +11,16 @@ public class TerrainConfigurationSO : ScriptableObject
     #endregion
 
     #region Public fields
-    [Header("Turn on/off phases")]
-    public bool Phase1;
-    public bool Phase2;
-    public bool Phase3;
-    public bool Phase4;
-    public bool Phase5;
-    public bool Phase6;
-    public bool Phase7;
-    public bool Phase8;
-    public bool Phase9;
-    public bool Phase10;
-    public bool Phase11;
-    public bool Phase12;
-    public bool Phase13;
-    public bool Phase14;
-
     [Header("World size")]
-    public byte DefaultHorizontalChunksCount;
-    public byte DefaultVerticalChunksCount;
-    public byte CurrentHorizontalChunksCount;
-    public byte CurrentVerticalChunksCount;
-    public byte ChunkSize;
+    public int DefaultHorizontalChunksCount;
+    public int DefaultVerticalChunksCount;
+    public int CurrentHorizontalChunksCount;
+    public int CurrentVerticalChunksCount;
+    public int ChunkSize;
 
     [Header("World data")]
-    public ushort Equator;
-    public ushort DeepOceanY;
+    public int Equator;
+    public int DeepOceanY;
     public List<TerrainLevelSO> Levels;
     public List<BiomeSO> Biomes;
     public List<ClusterSO> Clusters;
@@ -44,9 +28,9 @@ public class TerrainConfigurationSO : ScriptableObject
     [Header("Caves")]
     public float Scale;
     public float Intensity;
-    public int Octaves;
     public float Persistance;
     public float Lacunarity;
+    public int Octaves;
     public int MinSmallCaveSize;
     public int MaxSmallCaveSize;
     public int MinLargeCaveSize;
@@ -77,7 +61,19 @@ public class TerrainConfigurationSO : ScriptableObject
     #endregion
 
     #region Properties
+    public TerrainLevelSO AirLevel { get => Levels.Find(l => l.Id == TerrainLevelId.Air); }
+    public TerrainLevelSO SurfaceLevel { get => Levels.Find(l => l.Id == TerrainLevelId.Surface); }
+    public TerrainLevelSO PreUndergroundLevel { get => Levels.Find(l => l.Id == TerrainLevelId.PreUnderground); }
+    public TerrainLevelSO UndergroundLevel { get => Levels.Find(l => l.Id == TerrainLevelId.Underground); }
 
+    public BiomeSO NonBiome { get => Biomes.Find(b => b.Id == BiomesID.NonBiome); }
+    public BiomeSO Ocean { get => Biomes.Find(b => b.Id == BiomesID.Ocean); }
+    public BiomeSO Desert { get => Biomes.Find(b => b.Id == BiomesID.Desert); }
+    public BiomeSO Savannah { get => Biomes.Find(b => b.Id == BiomesID.Savannah); }
+    public BiomeSO Meadow { get => Biomes.Find(b => b.Id == BiomesID.Meadow); }
+    public BiomeSO Forest { get => Biomes.Find(b => b.Id == BiomesID.Forest); }
+    public BiomeSO Swamp { get => Biomes.Find(b => b.Id == BiomesID.Swamp); }
+    public BiomeSO ConiferousForest { get => Biomes.Find(b => b.Id == BiomesID.ConiferousForest); }
     #endregion
 
     #region Methods
@@ -95,7 +91,7 @@ public class TerrainConfigurationSO : ScriptableObject
             y += levelHeight;
 
             //Skip if level is Air
-            if (level.Name == "Air")
+            if (level.Id == TerrainLevelId.Air)
             {
                 continue;
             }
@@ -110,7 +106,7 @@ public class TerrainConfigurationSO : ScriptableObject
         ushort x = 0;
         foreach (BiomeSO biome in Biomes)
         {
-            if (biome.Id == BiomesID.NonBiom)
+            if (biome.Id == BiomesID.NonBiome)
             {
                 continue;
             }
@@ -125,6 +121,11 @@ public class TerrainConfigurationSO : ScriptableObject
             x += biomeLength;
         }
         #endregion
+    }
+
+    public BiomeSO GetBiome(BiomesID biomeID)
+    {
+        return Biomes.Find(b => b.Id == biomeID);
     }
     #endregion
 }

@@ -19,7 +19,7 @@ public class Terrain : MonoBehaviour
 
     [Header("Sections")]
     [SerializeField] private GameObject _trees;
-    [SerializeField] private GameObject _pickableItems;
+    [SerializeField] private GameObject _pickUpItems;
 
     private WorldCellData[,] _worldData;
 
@@ -64,16 +64,16 @@ public class Terrain : MonoBehaviour
         }
     }
 
-    public GameObject PickableItems
+    public GameObject PickUpItems
     {
         get
         {
-            return _pickableItems;
+            return _pickUpItems;
         }
 
         set
         {
-            _pickableItems = value;
+            _pickUpItems = value;
         }
     }
 
@@ -117,10 +117,10 @@ public class Terrain : MonoBehaviour
             throw new NullReferenceException("Trees is null");
         }
 
-        PickableItems = transform.Find("PickableItems").gameObject;
-        if (PickableItems == null)
+        PickUpItems = transform.Find("PickUpItems").gameObject;
+        if (PickUpItems == null)
         {
-            throw new NullReferenceException("PickableItems is null");
+            throw new NullReferenceException("PickUpItems is null");
         }
         #endregion
 
@@ -135,13 +135,6 @@ public class Terrain : MonoBehaviour
         _tilesCoordsPool = new PoolForDynamicEmptyArraysGeneric<Vector3Int>();
         _firstRender = true;
         #endregion
-    }
-    private void Start()
-    {
-        //_allLiquidTiles = new List<List<TileBase>>()
-        //{
-        //    GameManager.Instance.ObjectsAtlass.Water.Sprites,
-        //};
     }
 
     private void FixedUpdate()
@@ -168,7 +161,7 @@ public class Terrain : MonoBehaviour
             GameManager.Instance.RandomVar = new System.Random(GameManager.Instance.Seed);
 
             //Start generation
-            TerrainGeneration terrainGeneration = new TerrainGeneration(GameManager.Instance.Seed, ref worldData, this);
+            TerrainGeneration terrainGeneration = new TerrainGeneration();
             terrainGeneration.StartTerrainGeneration();
         }
         catch (Exception e)
@@ -706,7 +699,7 @@ public class Terrain : MonoBehaviour
     #endregion
 
     #region Helpful
-    public void CreateBlock(ushort x, ushort y, BlockSO block)
+    public void CreateBlock(int x, int y, BlockSO block)
     {
         _worldData[x, y].SetBlockData(block);
         if (GameManager.Instance.IsGameSession)
@@ -715,12 +708,12 @@ public class Terrain : MonoBehaviour
         }
     }
 
-    public void CreateLiquidBlock(ushort x, ushort y, byte id)
+    public void CreateLiquidBlock(int x, int y, byte id)
     {
-        _worldData[x, y].SetBlockData(id);
+        _worldData[x, y].SetLiquidBlockData(id);
     }
 
-    public void CreateBackground(ushort x, ushort y, BlockSO block)
+    public void CreateBackground(int x, int y, BlockSO block)
     {
         _worldData[x, y].SetBackgroundData(block);
         if (GameManager.Instance.IsGameSession)

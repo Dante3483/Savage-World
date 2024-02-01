@@ -295,7 +295,13 @@ public struct WorldCellData
         BlockData = block;
     }
 
-    public void SetBlockData(byte id)
+    public void SetLiquidBlockData(BlockSO liquid)
+    {
+        LiquidId = (byte)liquid.GetId();
+        FlowValue = 100f;
+    }
+
+    public void SetLiquidBlockData(byte id)
     {
         LiquidId = id;
         FlowValue = 100f;
