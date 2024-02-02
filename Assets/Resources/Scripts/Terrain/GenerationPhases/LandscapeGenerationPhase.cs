@@ -39,6 +39,11 @@ public class LandscapeGenerationPhase : IGenerationPhase
 
         foreach (BiomeSO biome in terrainConfiguration.Biomes)
         {
+            //Skip NonBiome
+            if (biome.Id == BiomesID.NonBiome)
+            {
+                continue;
+            }
             //Calculate difference of height between two biomes
             firstHeight = (int)(startY + Mathf.PerlinNoise((biome.StartX + seed) / biome.MountainCompression, seed / biome.MountainCompression) * biome.MountainHeight);
             dif = prevHeight != -1 ? prevHeight - firstHeight : 0;
@@ -50,7 +55,7 @@ public class LandscapeGenerationPhase : IGenerationPhase
             {
                 //Calculate maximum height
                 height = (int)(Mathf.PerlinNoise((x + seed) / biome.MountainCompression, seed / biome.MountainCompression) * biome.MountainHeight);
-                height += (short)(startY + heightAdder);
+                height += startY + heightAdder;
                 for (y = startY; y <= height; y++)
                 {
                     terrain.CreateBlock(x, y, dirtBlock);
@@ -62,7 +67,7 @@ public class LandscapeGenerationPhase : IGenerationPhase
                 //Change diference
                 if (heightAdder != 0)
                 {
-                    heightAdder += (short)(sign * randomVar.Next(0, 2));
+                    heightAdder += sign * randomVar.Next(0, 2);
                 }
             }
             prevHeight = height;

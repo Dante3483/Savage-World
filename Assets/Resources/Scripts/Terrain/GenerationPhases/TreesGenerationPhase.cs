@@ -65,7 +65,7 @@ public class TreesGenerationPhase : IGenerationPhase
                     endX = currentBiome.EndX;
                 }
 
-                for (x = startX; x <= endX - tree.Width; x++)
+                for (x = startX; x <= endX - tree.Width - 5; x++)
                 {
                     for (y = _terrainConfiguration.Equator; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
                     {

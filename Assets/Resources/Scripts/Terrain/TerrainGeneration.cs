@@ -20,23 +20,64 @@ public class TerrainGeneration
 
     public TerrainGeneration()
     {
-        _generationPhases = new List<IGenerationPhase>
+        TerrainConfigurationSO terrainConfiguration = GameManager.Instance.TerrainConfiguration;
+        _generationPhases = new List<IGenerationPhase>();
+        if (terrainConfiguration.FlatWorldGeneration)
         {
-            new FlatWorldGenerationPhase(),
-            new LandscapeGenerationPhase(),
-            new BiomesGenerationPhase(),
-            new ClustersGenerationPhase(),
-            new CavesGenerationPhase(),
-            new StarterCavesGenerationPhase(),
-            new LakesGenerationPhase(),
-            new OasisesGenerationPhase(),
-            new GrassSeedingGenerationPhase(),
-            new PlantsGenerationPhase(),
-            new TreesGenerationPhase(),
-            new PickUpItemsGenerationPhase(),
-            new SetRandomTilesGenerationPhase(),
-            new BlockProcessingGenerationPhase()
-        };
+            _generationPhases.Add(new FlatWorldGenerationPhase());
+        }
+        if (terrainConfiguration.LandscapeGeneration)
+        {
+            _generationPhases.Add(new LandscapeGenerationPhase());
+        }
+        if (terrainConfiguration.BiomesGeneration)
+        {
+            _generationPhases.Add(new BiomesGenerationPhase());
+        }
+        if (terrainConfiguration.ClustersGeneration)
+        {
+            _generationPhases.Add(new ClustersGenerationPhase());
+        }
+        if (terrainConfiguration.CavesGeneration)
+        {
+            _generationPhases.Add(new CavesGenerationPhase());
+        }
+        if (terrainConfiguration.StarterCavesGeneration)
+        {
+            _generationPhases.Add(new StarterCavesGenerationPhase());
+        }
+        if (terrainConfiguration.LakesGeneration)
+        {
+            _generationPhases.Add(new LakesGenerationPhase());
+        }
+        if (terrainConfiguration.OasisesGeneration)
+        {
+            _generationPhases.Add(new OasisesGenerationPhase());
+        }
+        if (terrainConfiguration.GrassSeeding)
+        {
+            _generationPhases.Add(new GrassSeedingGenerationPhase());
+        }
+        if (terrainConfiguration.PlantsGeneration)
+        {
+            _generationPhases.Add(new PlantsGenerationPhase());
+        }
+        if (terrainConfiguration.TreesGeneration)
+        {
+            _generationPhases.Add(new TreesGenerationPhase());
+        }
+        if (terrainConfiguration.PickUpItemsGeneration)
+        {
+            _generationPhases.Add(new PickUpItemsGenerationPhase());
+        }
+        if (terrainConfiguration.SetRandomTiles)
+        {
+            _generationPhases.Add(new SetRandomTilesGenerationPhase());
+        }
+        if (terrainConfiguration.BlockProcessing)
+        {
+            _generationPhases.Add(new BlockProcessingGenerationPhase());
+        }
         SurfaceCoords = new List<Vector2Int>();
     }
 

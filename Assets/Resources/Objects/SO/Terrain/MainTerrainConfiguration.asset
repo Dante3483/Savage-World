@@ -12,36 +12,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59f531f6a3340ab429507659030aff89, type: 3}
   m_Name: MainTerrainConfiguration
   m_EditorClassIdentifier: 
-  Phase1: 1
-  Phase2: 1
-  Phase3: 1
-  Phase4: 1
-  Phase5: 1
-  Phase6: 1
-  Phase7: 1
-  Phase8: 1
-  Phase9: 1
-  Phase10: 1
-  Phase11: 1
-  Phase12: 1
-  Phase13: 1
-  Phase14: 1
+  DisableAll: 0
+  EnableAll: 0
+  FlatWorldGeneration: 1
+  LandscapeGeneration: 1
+  BiomesGeneration: 1
+  ClustersGeneration: 1
+  CavesGeneration: 1
+  StarterCavesGeneration: 1
+  LakesGeneration: 1
+  OasisesGeneration: 1
+  GrassSeeding: 1
+  PlantsGeneration: 1
+  TreesGeneration: 1
+  PickUpItemsGeneration: 1
+  SetRandomTiles: 1
+  BlockProcessing: 1
   DefaultHorizontalChunksCount: 84
   DefaultVerticalChunksCount: 24
   CurrentHorizontalChunksCount: 84
   CurrentVerticalChunksCount: 24
   ChunkSize: 100
   Equator: 2150
-  DeepOceanY: 1899
+  DeepOceanY: 1876
   Levels:
   - {fileID: 11400000, guid: abfc12d2ebd9c244a95107aae1c41b37, type: 2}
   - {fileID: 11400000, guid: 318a27e219dd34042a9bc397b17bb678, type: 2}
   - {fileID: 11400000, guid: 630aa759ed86328409a86c5fa46ef795, type: 2}
   - {fileID: 11400000, guid: 9846cc9e5b1d2be428660e3d881e8d90, type: 2}
-  AirLevel: {fileID: 11400000, guid: abfc12d2ebd9c244a95107aae1c41b37, type: 2}
-  SurfaceLevel: {fileID: 11400000, guid: 318a27e219dd34042a9bc397b17bb678, type: 2}
-  PreUndergroundLevel: {fileID: 11400000, guid: 630aa759ed86328409a86c5fa46ef795, type: 2}
-  UndergroundLevel: {fileID: 11400000, guid: 9846cc9e5b1d2be428660e3d881e8d90, type: 2}
   Biomes:
   - {fileID: 11400000, guid: 6b283d4b4f1de6e4997b8bc29a8a2643, type: 2}
   - {fileID: 11400000, guid: 43e08cdcaaf358e4a9e8a3563ccb3924, type: 2}
@@ -51,14 +49,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a821a3f5d872d1242b84c3040dd2dc87, type: 2}
   - {fileID: 11400000, guid: 46597d3879444a34d91e75e371753597, type: 2}
   - {fileID: 11400000, guid: b7b9e251eac8dc549a09ebf3f31b6ef8, type: 2}
-  NonBiome: {fileID: 11400000, guid: 6b283d4b4f1de6e4997b8bc29a8a2643, type: 2}
-  Ocean: {fileID: 11400000, guid: 43e08cdcaaf358e4a9e8a3563ccb3924, type: 2}
-  Desert: {fileID: 11400000, guid: f56a44bec5cf4634b977a662ba16432a, type: 2}
-  Savannah: {fileID: 11400000, guid: 8633f2e87d1b8624684ce0eb39c9e9f3, type: 2}
-  Meadow: {fileID: 11400000, guid: 134df956adb0a4b4db96103dfb56c203, type: 2}
-  Forest: {fileID: 11400000, guid: a821a3f5d872d1242b84c3040dd2dc87, type: 2}
-  Swamp: {fileID: 11400000, guid: 46597d3879444a34d91e75e371753597, type: 2}
-  ConiferousForest: {fileID: 11400000, guid: b7b9e251eac8dc549a09ebf3f31b6ef8, type: 2}
   Clusters:
   - {fileID: 11400000, guid: a8ba2ac30db5fb74ea3c9e2a973e3dfa, type: 2}
   - {fileID: 11400000, guid: 204034f2de6044b43b23136483e12de8, type: 2}

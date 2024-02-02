@@ -358,7 +358,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _trees: {fileID: 884038811}
-  _pickUpItems: {fileID: 0}
+  _pickUpItems: {fileID: 1278595433}
 --- !u!114 &75088927
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -11,6 +11,23 @@ public class TerrainConfigurationSO : ScriptableObject
     #endregion
 
     #region Public fields
+    [Header("Phases enable/disable")]
+    public bool DisableAll;
+    public bool EnableAll;
+    public bool FlatWorldGeneration;
+    public bool LandscapeGeneration;
+    public bool BiomesGeneration;
+    public bool ClustersGeneration;
+    public bool CavesGeneration;
+    public bool StarterCavesGeneration;
+    public bool LakesGeneration;
+    public bool OasisesGeneration;
+    public bool GrassSeeding;
+    public bool PlantsGeneration;
+    public bool TreesGeneration;
+    public bool PickUpItemsGeneration;
+    public bool SetRandomTiles;
+    public bool BlockProcessing;
     [Header("World size")]
     public int DefaultHorizontalChunksCount;
     public int DefaultVerticalChunksCount;
@@ -79,6 +96,45 @@ public class TerrainConfigurationSO : ScriptableObject
     #region Methods
     private void OnValidate()
     {
+        #region Flags
+        if (DisableAll)
+        {
+            DisableAll = false;
+            FlatWorldGeneration = false;
+            LandscapeGeneration = false;
+            BiomesGeneration = false;
+            ClustersGeneration = false;
+            CavesGeneration = false;
+            StarterCavesGeneration = false;
+            LakesGeneration = false;
+            OasisesGeneration = false;
+            GrassSeeding = false;
+            PlantsGeneration = false;
+            TreesGeneration = false;
+            PickUpItemsGeneration = false;
+            SetRandomTiles = false;
+            BlockProcessing = false;
+        }
+        if (EnableAll)
+        {
+            EnableAll = false;
+            FlatWorldGeneration = true;
+            LandscapeGeneration = true;
+            BiomesGeneration = true;
+            ClustersGeneration = true;
+            CavesGeneration = true;
+            StarterCavesGeneration = true;
+            LakesGeneration = true;
+            OasisesGeneration = true;
+            GrassSeeding = true;
+            PlantsGeneration = true;
+            TreesGeneration = true;
+            PickUpItemsGeneration = true;
+            SetRandomTiles = true;
+            BlockProcessing = true;
+        }
+        #endregion
+
         #region Calculate levels
         ushort y = 0;
         Equator = 0;
