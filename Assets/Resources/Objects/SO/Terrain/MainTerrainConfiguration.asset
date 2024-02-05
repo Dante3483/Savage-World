@@ -28,6 +28,7 @@ MonoBehaviour:
   PickUpItemsGeneration: 1
   SetRandomTiles: 1
   BlockProcessing: 1
+  SaveLoadTest: 0
   DefaultHorizontalChunksCount: 84
   DefaultVerticalChunksCount: 24
   CurrentHorizontalChunksCount: 84

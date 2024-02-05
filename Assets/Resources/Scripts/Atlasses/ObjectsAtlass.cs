@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "newObjectsAtlass", menuName = "Atlasses/Objects")]
@@ -12,11 +12,13 @@ public class ObjectsAtlass : ScriptableObject
 
     #region Public fields
 
-    #region Dictionaries
+    #region Sets
     public Dictionary<BlockTypes, Dictionary<ushort, BlockSO>> Blocks;
-    public Dictionary<BiomesID, BlockSO[]> Plants;
-    public Dictionary<BiomesID, GameObject[]> Trees;
-    public Dictionary<BiomesID, GameObject[]> PickUpItems;
+    public Dictionary<BiomesID, BlockSO[]> BiomePlants;
+    public Dictionary<TreesID, Tree> Trees;
+    public Dictionary<BiomesID, Tree[]> BiomeTrees;
+    public Dictionary<PickUpItemsID, PickUpItem> PickUpItems;
+    public Dictionary<BiomesID, PickUpItem[]> BiomePickUpItems;
 
     public static Dictionary<Sprite, Color32[]> BlocksSpriteColorArray;
     #endregion
@@ -107,14 +109,14 @@ public class ObjectsAtlass : ScriptableObject
 
     #region Trees
     [Header("Trees")]
-    public GameObject Pine1;
-    public GameObject Cactus1;
+    public Tree Pine1;
+    public Tree Cactus1;
     #endregion
 
     #region PickUp items
     [Header("PickUp items")]
-    public GameObject Rock1;
-    public GameObject Log1;
+    public PickUpItem Rock1;
+    public PickUpItem Log1;
     #endregion
 
     #endregion
@@ -128,9 +130,11 @@ public class ObjectsAtlass : ScriptableObject
     {
         //Initialize dictionaries
         Blocks = new Dictionary<BlockTypes, Dictionary<ushort, BlockSO>>();
-        Plants = new Dictionary<BiomesID, BlockSO[]>();
-        Trees = new Dictionary<BiomesID, GameObject[]>();
-        PickUpItems = new Dictionary<BiomesID, GameObject[]>();
+        BiomePlants = new Dictionary<BiomesID, BlockSO[]>();
+        Trees = new Dictionary<TreesID, Tree>();
+        BiomeTrees = new Dictionary<BiomesID, Tree[]>();
+        PickUpItems = new Dictionary<PickUpItemsID, PickUpItem>();
+        BiomePickUpItems = new Dictionary<BiomesID, PickUpItem[]>();
         BlocksSpriteColorArray = new Dictionary<Sprite, Color32[]>();
 
         //Fill lists
@@ -215,21 +219,21 @@ public class ObjectsAtlass : ScriptableObject
         #region Plants
 
         #region Non-biome
-        Plants.Add(BiomesID.NonBiome, new BlockSO[]
+        BiomePlants.Add(BiomesID.NonBiome, new BlockSO[]
         {
             Vine
         });
         #endregion
 
         #region Ocean
-        Plants.Add(BiomesID.Ocean, new BlockSO[]
+        BiomePlants.Add(BiomesID.Ocean, new BlockSO[]
         {
 
         });
         #endregion
 
         #region Desert
-        Plants.Add(BiomesID.Desert, new BlockSO[]
+        BiomePlants.Add(BiomesID.Desert, new BlockSO[]
         {
             CamelThorn,
             Aloe,
@@ -238,7 +242,7 @@ public class ObjectsAtlass : ScriptableObject
         #endregion
 
         #region Savannah
-        Plants.Add(BiomesID.Savannah, new BlockSO[]
+        BiomePlants.Add(BiomesID.Savannah, new BlockSO[]
         {
             DryGrass,
             DryBush,
@@ -248,7 +252,7 @@ public class ObjectsAtlass : ScriptableObject
         #endregion
 
         #region Meadow
-        Plants.Add(BiomesID.Meadow, new BlockSO[]
+        BiomePlants.Add(BiomesID.Meadow, new BlockSO[]
         {
             MeadowGrass,
             Dandelion,
@@ -258,7 +262,7 @@ public class ObjectsAtlass : ScriptableObject
         #endregion
 
         #region Forest
-        Plants.Add(BiomesID.Forest, new BlockSO[]
+        BiomePlants.Add(BiomesID.Forest, new BlockSO[]
         {
             Mushroom,
             ForestFern,
@@ -268,14 +272,14 @@ public class ObjectsAtlass : ScriptableObject
         #endregion
 
         #region Swamp
-        Plants.Add(BiomesID.Swamp, new BlockSO[]
+        BiomePlants.Add(BiomesID.Swamp, new BlockSO[]
         {
 
         });
         #endregion
 
         #region Coniferous forest
-        Plants.Add(BiomesID.ConiferousForest, new BlockSO[]
+        BiomePlants.Add(BiomesID.ConiferousForest, new BlockSO[]
         {
             ConiferousForestBush,
             Chamomile,
@@ -288,50 +292,55 @@ public class ObjectsAtlass : ScriptableObject
 
         #region Trees
 
+        #region All
+        Trees.Add(TreesID.Pine, Pine1);
+        Trees.Add(TreesID.Cactus, Cactus1);
+        #endregion
+
         #region Ocean
-        Trees.Add(BiomesID.Ocean, new GameObject[]
+        BiomeTrees.Add(BiomesID.Ocean, new Tree[]
         {
 
         });
         #endregion
 
         #region Desert
-        Trees.Add(BiomesID.Desert, new GameObject[]
+        BiomeTrees.Add(BiomesID.Desert, new Tree[]
         {
             Cactus1,
         });
         #endregion
 
         #region Savannah
-        Trees.Add(BiomesID.Savannah, new GameObject[]
+        BiomeTrees.Add(BiomesID.Savannah, new Tree[]
         {
             Pine1,
         });
         #endregion
 
         #region Meadow
-        Trees.Add(BiomesID.Meadow, new GameObject[]
+        BiomeTrees.Add(BiomesID.Meadow, new Tree[]
         {
             Pine1,
         });
         #endregion
 
         #region Forest
-        Trees.Add(BiomesID.Forest, new GameObject[]
+        BiomeTrees.Add(BiomesID.Forest, new Tree[]
         {
             Pine1,
         });
         #endregion
 
         #region Swamp
-        Trees.Add(BiomesID.Swamp, new GameObject[]
+        BiomeTrees.Add(BiomesID.Swamp, new Tree[]
         {
             Pine1,
         });
         #endregion
 
         #region Coniferous forest
-        Trees.Add(BiomesID.ConiferousForest, new GameObject[]
+        BiomeTrees.Add(BiomesID.ConiferousForest, new Tree[]
         {
             Pine1,
         });
@@ -341,22 +350,27 @@ public class ObjectsAtlass : ScriptableObject
 
         #region PickUp items
 
+        #region All
+        PickUpItems.Add(PickUpItemsID.Rock, Rock1);
+        PickUpItems.Add(PickUpItemsID.Log, Log1);
+        #endregion
+
         #region Ocean
-        PickUpItems.Add(BiomesID.Ocean, new GameObject[]
+        BiomePickUpItems.Add(BiomesID.Ocean, new PickUpItem[]
         {
 
         });
         #endregion
 
         #region Desert
-        PickUpItems.Add(BiomesID.Desert, new GameObject[]
+        BiomePickUpItems.Add(BiomesID.Desert, new PickUpItem[]
         {
 
         });
         #endregion
 
         #region Savannah
-        PickUpItems.Add(BiomesID.Savannah, new GameObject[]
+        BiomePickUpItems.Add(BiomesID.Savannah, new PickUpItem[]
         {
             Rock1,
             Log1,
@@ -364,7 +378,7 @@ public class ObjectsAtlass : ScriptableObject
         #endregion
 
         #region Meadow
-        PickUpItems.Add(BiomesID.Meadow, new GameObject[]
+        BiomePickUpItems.Add(BiomesID.Meadow, new PickUpItem[]
         {
             Rock1,
             Log1,
@@ -372,7 +386,7 @@ public class ObjectsAtlass : ScriptableObject
         #endregion
 
         #region Forest
-        PickUpItems.Add(BiomesID.Forest, new GameObject[]
+        BiomePickUpItems.Add(BiomesID.Forest, new PickUpItem[]
         {
             Rock1,
             Log1,
@@ -380,7 +394,7 @@ public class ObjectsAtlass : ScriptableObject
         #endregion
 
         #region Swamp
-        PickUpItems.Add(BiomesID.Swamp, new GameObject[]
+        BiomePickUpItems.Add(BiomesID.Swamp, new PickUpItem[]
         {
             Rock1,
             Log1,
@@ -388,7 +402,7 @@ public class ObjectsAtlass : ScriptableObject
         #endregion
 
         #region Coniferous forest
-        PickUpItems.Add(BiomesID.ConiferousForest, new GameObject[]
+        BiomePickUpItems.Add(BiomesID.ConiferousForest, new PickUpItem[]
         {
             Rock1,
             Log1,
@@ -448,9 +462,9 @@ public class ObjectsAtlass : ScriptableObject
     public List<PlantSO> GetAllBiomePlants(BiomesID id)
     {
         List<PlantSO> result = new List<PlantSO>();
-        if (Plants.ContainsKey(id))
+        if (BiomePlants.ContainsKey(id))
         {
-            foreach (BlockSO block in Plants[id])
+            foreach (BlockSO block in BiomePlants[id])
             {
                 if (block is PlantSO plant)
                 {
@@ -461,36 +475,32 @@ public class ObjectsAtlass : ScriptableObject
         return result;
     }
 
-    public List<Tree> GetAllBiomeTrees(BiomesID id)
+    public Tree[] GetAllBiomeTrees(BiomesID id)
     {
-        List<Tree> result = new List<Tree>();
-        if (Trees.ContainsKey(id))
+        if (BiomeTrees.ContainsKey(id))
         {
-            foreach (GameObject treeObject in Trees[id])
-            {
-                if (treeObject.GetComponent<Tree>() is Tree tree)
-                {
-                    result.Add(tree);
-                }
-            }
+            return BiomeTrees[id];
         }
-        return result;
+        return null;
     }
 
-    public List<PickUpItem> GetAllBiomePickUpItems(BiomesID id)
+    public Tree GetTreeById(TreesID id)
     {
-        List<PickUpItem> result = new List<PickUpItem>();
-        if (PickUpItems.ContainsKey(id))
+        return Trees[id];
+    }
+
+    public PickUpItem[] GetAllBiomePickUpItems(BiomesID id)
+    {
+        if (BiomePickUpItems.ContainsKey(id))
         {
-            foreach (GameObject pickUpItemObject in PickUpItems[id])
-            {
-                if (pickUpItemObject.GetComponent<PickUpItem>() is PickUpItem pickUpItem)
-                {
-                    result.Add(pickUpItem);
-                }
-            }
+            return BiomePickUpItems[id];
         }
-        return result;
+        return null;
+    }
+
+    public PickUpItem GetPickUpItemById(PickUpItemsID id)
+    {
+        return PickUpItems[id];
     }
 
     public bool IsGrass(BlockSO block)

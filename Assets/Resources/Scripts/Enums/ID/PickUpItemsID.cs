@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PickableItemsID : byte
+public enum PickUpItemsID : byte
 {
     Rock = 0,
 

@@ -22,12 +22,12 @@ public class PickUpItemsGenerationPhase : IGenerationPhase
     public void StartPhase()
     {
         //Create surface collected items
-        Dictionary<BiomesID, List<PickUpItem>> allPickUpItems = null;
+        Dictionary<BiomesID, PickUpItem[]> allPickUpItems = null;
         List<Vector3> coords = new List<Vector3>();
         Vector3 vector = new Vector3();
         ThreadsManager.Instance.AddAction(() =>
         {
-            allPickUpItems = new Dictionary<BiomesID, List<PickUpItem>>()
+            allPickUpItems = new Dictionary<BiomesID, PickUpItem[]>()
             {
                 //{ BiomesID.NonBiom, GameManager.Instance.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.NonBiom) },
                 //{ BiomesID.Ocean, GameManager.Instance.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.Ocean) },

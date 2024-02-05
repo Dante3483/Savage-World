@@ -22,11 +22,11 @@ public class TreesGenerationPhase : IGenerationPhase
     public void StartPhase()
     {
         //Create surface trees
-        Dictionary<BiomesID, List<Tree>> allTrees = null;
+        Dictionary<BiomesID, Tree[]> allTrees = null;
         List<Vector3> coords = new List<Vector3>();
         ThreadsManager.Instance.AddAction(() =>
         {
-            allTrees = new Dictionary<BiomesID, List<Tree>>()
+            allTrees = new Dictionary<BiomesID, Tree[]>()
             {
                 //{ BiomesID.NonBiom, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.NonBiom) },
                 //{ BiomesID.Ocean, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Ocean) },

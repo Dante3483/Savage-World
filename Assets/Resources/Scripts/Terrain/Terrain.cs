@@ -702,9 +702,18 @@ public class Terrain : MonoBehaviour
     public void CreateBlock(int x, int y, BlockSO block)
     {
         _worldData[x, y].SetBlockData(block);
-        if (GameManager.Instance.IsGameSession)
+        if (GameManager.Instance.IsGameSession && !GameManager.Instance.IsWorldLoading)
         {
             _worldData[x, y].SetRandomBlockTile(GameManager.Instance.RandomVar);
+        }
+    }
+
+    public void CreateBackground(int x, int y, BlockSO block)
+    {
+        _worldData[x, y].SetBackgroundData(block);
+        if (GameManager.Instance.IsGameSession && !GameManager.Instance.IsWorldLoading)
+        {
+            _worldData[x, y].SetRandomBackgroundTile(GameManager.Instance.RandomVar);
         }
     }
 
@@ -713,13 +722,14 @@ public class Terrain : MonoBehaviour
         _worldData[x, y].SetLiquidBlockData(id);
     }
 
-    public void CreateBackground(int x, int y, BlockSO block)
+    public void CreateLiquidBlock(int x, int y, byte id, float flowValue)
     {
-        _worldData[x, y].SetBackgroundData(block);
-        if (GameManager.Instance.IsGameSession)
-        {
-            _worldData[x, y].SetRandomBackgroundTile(GameManager.Instance.RandomVar);
-        }
+        _worldData[x, y].SetLiquidBlockData(id, flowValue);
+    }
+
+    public void SetTileId(int x, int y, byte tileId)
+    {
+        _worldData[x, y].TileId = tileId;
     }
 
     private RectInt GetCameraRectInt()

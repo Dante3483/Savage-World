@@ -3,15 +3,17 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Linq;
 
+//Firt 4 bit of _tileId = blockTileId
+//Last 4 bit of _tileId = backgroundTileId
 public struct WorldCellData
 {
     #region Private fields
 
     #region Main
-    private ushort _id;
-    private byte _blockTileId;
-    private byte _backgroundTileId;
-    private BlockTypes _blockType;
+    private ushort _blockId; //Save
+    private ushort _backgroundId; //Save
+    private byte _tileId; //Save
+    private BlockTypes _blockType; //Save
 
     private BlockSO _blockData;
     private BlockSO _backgroundData;
@@ -21,9 +23,9 @@ public struct WorldCellData
     #endregion
 
     #region Liquid
-    private byte _liquidId;
+    private byte _liquidId; //Save
     private bool _isFlowsDown;
-    private float _flowValue;
+    private float _flowValue; //Save
     private byte _countToStop;
     #endregion
 
@@ -34,16 +36,29 @@ public struct WorldCellData
     #endregion
 
     #region Properties
-    public ushort Id
+    public ushort BlockId
     {
         get
         {
-            return _id;
+            return _blockId;
         }
 
         set
         {
-            _id = value;
+            _blockId = value;
+        }
+    }
+
+    public ushort BackgroundId
+    {
+        get
+        {
+            return _backgroundId;
+        }
+
+        set
+        {
+            _backgroundId = value;
         }
     }
 
@@ -73,16 +88,42 @@ public struct WorldCellData
         }
     }
 
-    public byte BlockTileId
+    public byte TileId
     {
         get
         {
-            return _blockTileId;
+            return _tileId;
         }
 
         set
         {
-            _blockTileId = value;
+            _tileId = value;
+        }
+    }
+
+    public byte BlockTileId
+    {
+        get
+        {
+            return (byte)((byte)(_tileId & 0b0000_1111));
+        }
+
+        set
+        {
+            _tileId = (byte)((_tileId & 0b1111_0000) | value);
+        }
+    }
+
+    public byte BackgroundTileId
+    {
+        get
+        {
+            return (byte)(_tileId >> 4);
+        }
+
+        set
+        {
+            _tileId = (byte)((_tileId & 0b0000_1111) | (value << 4));
         }
     }
 
@@ -164,19 +205,6 @@ public struct WorldCellData
         }
     }
 
-    public byte BackgroundTileId
-    {
-        get
-        {
-            return _backgroundTileId;
-        }
-
-        set
-        {
-            _backgroundTileId = value;
-        }
-    }
-
     public byte CountToStop
     {
         get
@@ -195,9 +223,9 @@ public struct WorldCellData
     public WorldCellData(ushort xPosition, ushort yPosition)
     {
         //Set Ait block by default
-        _id = 0;
-        _blockTileId = 0;
-        _backgroundTileId = 0;
+        _blockId = 0;
+        _backgroundId = 0;
+        _tileId = 0;
         _blockType = BlockTypes.Abstract;
         _blockData = GameManager.Instance.ObjectsAtlass.Air;
         _backgroundData = GameManager.Instance.ObjectsAtlass.AirBG;
@@ -214,8 +242,8 @@ public struct WorldCellData
     {
         return $"X: {_coords.x}\n" +
             $"Y: {_coords.y}\n" +
-            $"ID: {_id}\n" +
-            $"Tile ID: {_blockTileId}\n" +
+            $"ID: {_blockId}\n" +
+            $"Tile ID: {BlockTileId}\n" +
             $"Block type: {_blockType}\n" +
             $"Name: {_blockData.name}\n" +
             $"Background ID: {_backgroundData.GetId()}\n" +
@@ -265,7 +293,7 @@ public struct WorldCellData
 
     public BlockSO GetBlock()
     {
-        return GameManager.Instance.ObjectsAtlass.Blocks[_blockType][_id];
+        return GameManager.Instance.ObjectsAtlass.Blocks[_blockType][_blockId];
     }
 
     public BlockSO GetLiquid()
@@ -290,7 +318,7 @@ public struct WorldCellData
 
     public void SetBlockData(BlockSO block)
     {
-        Id = block.GetId();
+        BlockId = block.GetId();
         BlockType = block.Type;
         BlockData = block;
     }
@@ -307,8 +335,15 @@ public struct WorldCellData
         FlowValue = 100f;
     }
 
+    public void SetLiquidBlockData(byte id, float flowValue)
+    {
+        LiquidId = id;
+        FlowValue = flowValue;
+    }
+
     public void SetBackgroundData(BlockSO background)
     {
+        BackgroundId = background.GetId();
         BackgroundData = background;
     }
 
@@ -317,9 +352,19 @@ public struct WorldCellData
         BlockTileId = (byte)randomVar.Next(0, BlockData.Sprites.Count);
     }
 
+    public void SetBlockTile(byte tileId)
+    {
+        BlockTileId = tileId;
+    }
+
     public void SetRandomBackgroundTile(Random randomVar)
     {
         BackgroundTileId = (byte)randomVar.Next(0, BackgroundData.Sprites.Count);
+    }
+
+    public void SetBackgroundTile(byte tileId)
+    {
+        BackgroundTileId = tileId;
     }
 
     public bool CompareBlock(BlockSO block)

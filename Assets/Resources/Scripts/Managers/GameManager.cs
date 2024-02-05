@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int _currentTerrainHeight;
 
     [Header("Session data")]
+    [SerializeField] private string _worldName;
     [SerializeField] private int _seed;
     [SerializeField] private System.Random _randomVar;
     private string _generalInfo;
@@ -43,6 +44,7 @@ public class GameManager : MonoBehaviour
     private Vector2Int _blockInfoCoords;
     private float _loadingValue;
     private bool _isGameSession;
+    private bool _isWorldLoading;
 
     [Header("Atlasses")]
     [SerializeField] private ObjectsAtlass _objectsAtlass;
@@ -277,6 +279,32 @@ public class GameManager : MonoBehaviour
             _otherInfo = value;
         }
     }
+
+    public string WorldName
+    {
+        get
+        {
+            return _worldName;
+        }
+
+        set
+        {
+            _worldName = value;
+        }
+    }
+
+    public bool IsWorldLoading
+    {
+        get
+        {
+            return _isWorldLoading;
+        }
+
+        set
+        {
+            _isWorldLoading = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -437,10 +465,12 @@ public class GameManager : MonoBehaviour
         Terrain.CreateNewWorld(ref _worldData);
         IsLoadingProgressActive = false;
     }
+
     public Vector3 GetPlayerPosition() 
     {
         return _player.transform.position;
     }
+
     public Transform GetPlayerTransform()
     {
         return _player.transform;
@@ -516,6 +546,14 @@ public class GameManager : MonoBehaviour
         if (chunk.Biome.Id == BiomesID.NonBiome)
         {
             Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize].Biome = biome;
+        }
+    }
+
+    public void SetChunkBiome(Chunk chunk, BiomeSO biome)
+    {
+        if (chunk.Biome.Id == BiomesID.NonBiome)
+        {
+            Chunks[chunk.Coords.x, chunk.Coords.y].Biome = biome;
         }
     }
 

@@ -6,7 +6,7 @@ using UnityEngine;
 public class PickUpItem : MonoBehaviour
 {
     #region Private fields
-    [SerializeField]private PickableItemsID _id;
+    [SerializeField]private PickUpItemsID _id;
     [SerializeField] private int _chanceToSpawn;
     private Vector2Int _intPosition = new Vector2Int();
     #endregion
@@ -16,7 +16,7 @@ public class PickUpItem : MonoBehaviour
     #endregion
 
     #region Properties
-    public PickableItemsID Id
+    public PickUpItemsID Id
     {
         get
         {

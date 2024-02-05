@@ -28,6 +28,8 @@ public class TerrainConfigurationSO : ScriptableObject
     public bool PickUpItemsGeneration;
     public bool SetRandomTiles;
     public bool BlockProcessing;
+    [Header("Phases for tests")]
+    public bool SaveLoadTest;
     [Header("World size")]
     public int DefaultHorizontalChunksCount;
     public int DefaultVerticalChunksCount;

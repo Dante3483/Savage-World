@@ -78,6 +78,11 @@ public class TerrainGeneration
         {
             _generationPhases.Add(new BlockProcessingGenerationPhase());
         }
+        if (terrainConfiguration.SaveLoadTest)
+        {
+            _generationPhases.Clear();
+            _generationPhases.Add(new SaveLoadTestGenerationPhase());
+        }
         SurfaceCoords = new List<Vector2Int>();
     }
 
