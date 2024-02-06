@@ -171,6 +171,23 @@ public class Terrain : MonoBehaviour
         }
     }
 
+    public void LoadWorld(ref WorldCellData[,] worldData)
+    {
+        try
+        {
+            _worldData = worldData;
+
+            //Start loading
+            SaveLoadManager.Instance.Load();
+            GameManager.Instance.RandomVar = new System.Random(GameManager.Instance.Seed);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            throw e;
+        }
+    }
+
     public void StartCoroutinesAndThreads()
     {
         //Start random block processing

@@ -18,7 +18,6 @@ using UnityEngine.UI;
 // KeyCode.Space - Player jump
 // KeyCode.LeftShift - Player run
 // KeyCode.LeftShift + C - Player slide
-
 public class GameManager : MonoBehaviour
 {
     #region Private fields
@@ -36,6 +35,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int _currentTerrainHeight;
 
     [Header("Session data")]
+    [SerializeField] private string _playerName;
     [SerializeField] private string _worldName;
     [SerializeField] private int _seed;
     [SerializeField] private System.Random _randomVar;
@@ -305,6 +305,19 @@ public class GameManager : MonoBehaviour
             _isWorldLoading = value;
         }
     }
+
+    public string PlayerName
+    {
+        get
+        {
+            return _playerName;
+        }
+
+        set
+        {
+            _playerName = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -381,6 +394,15 @@ public class GameManager : MonoBehaviour
                     }
                     _terrainGameObject.SetActive(true);
                     Task.Run(() => HandleNewGameState());
+                    _terrain.StartCoroutinesAndThreads();
+                }
+                break;
+            case GameState.LoadGameState:
+                {
+                    //Set random seed
+                    IsGameSession = false;
+                    _terrainGameObject.SetActive(true);
+                    Task.Run(() => HandleLoadGameState());
                     _terrain.StartCoroutinesAndThreads();
                 }
                 break;
@@ -464,6 +486,16 @@ public class GameManager : MonoBehaviour
         //Create new world
         Terrain.CreateNewWorld(ref _worldData);
         IsLoadingProgressActive = false;
+    }
+
+    private void HandleLoadGameState()
+    {
+        Debug.Log("Load game state");
+
+        //Load world
+        Terrain.LoadWorld(ref _worldData);
+        IsMenuActive = false;
+        IsGameSession = true;
     }
 
     public Vector3 GetPlayerPosition() 

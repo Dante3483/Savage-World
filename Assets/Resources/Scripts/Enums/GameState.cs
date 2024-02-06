@@ -9,4 +9,6 @@ public enum GameState
     MainMenuState = 1,
 
     NewGameState = 2,
+
+    LoadGameState = 3,
 }

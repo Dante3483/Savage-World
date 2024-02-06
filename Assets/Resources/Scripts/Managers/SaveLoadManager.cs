@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
@@ -12,6 +10,8 @@ public class SaveLoadManager : MonoBehaviour
     #region Private fields
     private List<int> _worldColumnIndexes;
     private int _worldCellsSize;
+    private string _directoryPathPlayers;
+    private string _directoryPathWorlds;
     #endregion
 
     #region Public fields
@@ -25,6 +25,9 @@ public class SaveLoadManager : MonoBehaviour
     #region Methods
     private void Awake()
     {
+        _directoryPathPlayers = Application.dataPath + "/Saves" + "/Players";
+        _directoryPathWorlds = Application.dataPath + "/Saves" + "/Worlds";
+
         Instance = this;
     }
 
@@ -32,25 +35,19 @@ public class SaveLoadManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.V))
         {
-            ExecutionTimeCalculator.Instance.Execute(() => ManualSave());
-        }
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            GameManager.Instance.IsWorldLoading = true;
-            ExecutionTimeCalculator.Instance.Execute(() => ManualLoad());
-            GameManager.Instance.IsWorldLoading = false;
+            ExecutionTimeCalculator.Instance.Execute(() => Save());
         }
     }
 
-    private void ManualSave()
+    public void Save()
     {
         _worldColumnIndexes = new List<int>();
 
-        string directoryPathWorld = Application.dataPath + "/Saves" + $"/{GameManager.Instance.WorldName}";
-        string savePathWorld = directoryPathWorld + $"/{GameManager.Instance.WorldName}.save.sw";
-        string metaPathWorld = directoryPathWorld + $"/{GameManager.Instance.WorldName}.save.swm";
+        string directoryPath = _directoryPathWorlds + $"/{GameManager.Instance.WorldName}";
+        string savePathWorld = directoryPath + $"/{GameManager.Instance.WorldName}.sw.world";
+        string metaPathWorld = directoryPath + $"/{GameManager.Instance.WorldName}.swm.world";
 
-        Directory.CreateDirectory(directoryPathWorld);
+        Directory.CreateDirectory(directoryPath);
 
         using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(savePathWorld, FileMode.Create)))
         {
@@ -76,13 +73,13 @@ public class SaveLoadManager : MonoBehaviour
         Debug.Log("Save Complete");
     }
 
-    private void ManualLoad()
+    public void Load()
     {
         _worldColumnIndexes = new List<int>();
 
-        string directoryPathWorld = Application.dataPath + "/Saves" + $"/{GameManager.Instance.WorldName}";
-        string savePathWorld = directoryPathWorld + $"/{GameManager.Instance.WorldName}.save.sw";
-        string metaPathWorld = directoryPathWorld + $"/{GameManager.Instance.WorldName}.save.swm";
+        string directoryPath = _directoryPathWorlds + $"/{GameManager.Instance.WorldName}";
+        string savePathWorld = directoryPath + $"/{GameManager.Instance.WorldName}.sw.world";
+        string metaPathWorld = directoryPath + $"/{GameManager.Instance.WorldName}.swm.world";
 
         using (BinaryReader binaryReader = new BinaryReader(File.Open(metaPathWorld, FileMode.Open)))
         {
@@ -97,10 +94,13 @@ public class SaveLoadManager : MonoBehaviour
             Debug.Log("Chunks loaded");
             LoadWorldCellData(binaryReader);
             Debug.Log("World loaded");
-            LoadTrees(binaryReader);
-            Debug.Log("Trees loaded");
-            LoadPickUpItems(binaryReader);
-            Debug.Log("PickUp items loaded");
+            ThreadsManager.Instance.AddAction(() =>
+            {
+                LoadTrees(binaryReader);
+                Debug.Log("Trees loaded");
+                LoadPickUpItems(binaryReader);
+                Debug.Log("PickUp items loaded");
+            });
             //SavePlayer(binaryWriter);
             //Debug.Log("Player loaded");
         }
@@ -361,7 +361,7 @@ public class SaveLoadManager : MonoBehaviour
                     }
                     else
                     {
-                        liquidId = 0;
+                        liquidId = 255;
                         flowValue = 0f;
                     }
 
@@ -383,10 +383,7 @@ public class SaveLoadManager : MonoBehaviour
                         terrain.CreateBlock(x, y + i, block);
                         terrain.CreateBackground(x, y + i, background);
                         terrain.SetTileId(x, y + i, tileId);
-                        if (isLiquid)
-                        {
-                            terrain.CreateLiquidBlock(x, y + i, liquidId, flowValue);
-                        }
+                        terrain.CreateLiquidBlock(x, y + i, liquidId, flowValue);
                     }
 
                     y += count;
