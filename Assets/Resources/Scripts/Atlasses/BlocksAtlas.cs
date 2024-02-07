@@ -15,25 +15,108 @@ public class BlocksAtlas : ScriptableObject
     [FormerlySerializedAs("Background blocks")][SerializeField] private BlockSO[] _backgroundBlocks;
     [FormerlySerializedAs("Furniture blocks")][SerializeField] private BlockSO[] _furnitureBlocks;
 
+    private Dictionary<BlockTypes, Dictionary<ushort, BlockSO>> _blockByTypeAndId;
     private Dictionary<BiomesID, BlockSO> _grassByBiome;
     private Dictionary<BiomesID, List<BlockSO>> _plantsByBiome;
-    private Dictionary<Sprite, Color32[]> _blocksColorArrayBySprite; 
     #endregion
 
     #region Public fields
-
+    public static Dictionary<Sprite, Color32[]> BlocksColorArrayBySprite;
     #endregion
 
     #region Properties
+    public BlockSO Air
+    {
+        get
+        {
+            return GetBlockByTypeAndId(BlockTypes.Abstract, AbstractBlocksID.Air);
+        }
+    }
 
+    public BlockSO AirBG
+    {
+        get
+        {
+            return GetBlockByTypeAndId(BlockTypes.Background, BackgroundsID.Air);
+        }
+    }
+
+    public BlockSO Dirt
+    {
+        get
+        {
+            return GetBlockByTypeAndId(BlockTypes.Solid, SolidBlocksID.Dirt);
+        }
+    }
+
+    public BlockSO DirtBG
+    {
+        get
+        {
+            return GetBlockByTypeAndId(BlockTypes.Background, BackgroundsID.Dirt);
+        }
+    }
+
+    public BlockSO Stone
+    {
+        get
+        {
+            return GetBlockByTypeAndId(BlockTypes.Solid, SolidBlocksID.Stone);
+        }
+    }
+
+    public BlockSO Sand
+    {
+        get
+        {
+            return GetBlockByTypeAndId(BlockTypes.Dust, DustBlocksID.Sand);
+        }
+    }
+
+    public BlockSO Water
+    {
+        get
+        {
+            return GetBlockByTypeAndId(BlockTypes.Liquid, LiquidBlocksID.Water);
+        }
+    }
     #endregion
 
     #region Methods
     public void InitializeAtlas()
     {
+        InitializeSetBlockByTypeAndId();
         InitializeSetGrassByBiome();
         InitializeSetPlantsByBiome();
         InitalizeSetBlocksColorArrayBySprite();
+    }
+
+    private void InitializeSetBlockByTypeAndId()
+    {
+        _blockByTypeAndId = new Dictionary<BlockTypes, Dictionary<ushort, BlockSO>>();
+
+        BlockTypes[] blockTypes = (BlockTypes[])Enum.GetValues(typeof(BlockTypes));
+        foreach (BlockTypes blockType in blockTypes)
+        {
+            _blockByTypeAndId.Add(blockType, new Dictionary<ushort, BlockSO>());
+        }
+
+        AddBlocksToSetFromArray(_abstractBlocks);
+        AddBlocksToSetFromArray(_solidBlocks);
+        AddBlocksToSetFromArray(_dustBlocks);
+        AddBlocksToSetFromArray(_liquidBlocks);
+        AddBlocksToSetFromArray(_plantBlocks);
+        AddBlocksToSetFromArray(_backgroundBlocks);
+        AddBlocksToSetFromArray(_furnitureBlocks);
+
+        void AddBlocksToSetFromArray(BlockSO[] _blockArray)
+        {
+            foreach (BlockSO block in _blockArray)
+            {
+                _blockByTypeAndId[block.Type].Add(block.GetId(), block);
+            }
+        }
+
     }
 
     private void InitializeSetGrassByBiome()
@@ -67,7 +150,7 @@ public class BlocksAtlas : ScriptableObject
 
     private void InitalizeSetBlocksColorArrayBySprite()
     {
-        _blocksColorArrayBySprite = new Dictionary<Sprite, Color32[]>();
+        BlocksColorArrayBySprite = new Dictionary<Sprite, Color32[]>();
 
         ThreadsManager.Instance.AddAction(() =>
         {
@@ -75,7 +158,7 @@ public class BlocksAtlas : ScriptableObject
             {
                 foreach (Sprite sprite in block.Sprites)
                 {
-                    _blocksColorArrayBySprite.Add(sprite, sprite.texture.GetPixels32());
+                    BlocksColorArrayBySprite.Add(sprite, sprite.texture.GetPixels32());
                 }
             }
         });
@@ -83,25 +166,7 @@ public class BlocksAtlas : ScriptableObject
 
     public BlockSO GetBlockByTypeAndId(BlockTypes blockType, object id)
     {
-        switch (blockType)
-        {
-            case BlockTypes.Abstract:
-                return _abstractBlocks[(ushort)id];
-            case BlockTypes.Solid:
-                return _solidBlocks[(ushort)id];
-            case BlockTypes.Dust:
-                return _dustBlocks[(ushort)id];
-            case BlockTypes.Liquid:
-                return _liquidBlocks[(ushort)id];
-            case BlockTypes.Plant:
-                return _plantBlocks[(ushort)id];
-            case BlockTypes.Background:
-                return _backgroundBlocks[(ushort)id];
-            case BlockTypes.Furniture:
-                return _furnitureBlocks[(ushort)id];
-            default:
-                return null;
-        }
+        return _blockByTypeAndId[blockType][(ushort)id];
     }
 
     public BlockSO GetGrassByBiome(BiomesID biomeID)

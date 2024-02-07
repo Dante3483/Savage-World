@@ -205,7 +205,7 @@ public class Terrain : MonoBehaviour
 
         GameManager.Instance.OtherInfo = $"{vectors.Count} blocks need to update";
 
-        BlockSO airBlock = GameManager.Instance.ObjectsAtlass.Air;
+        BlockSO airBlock = GameManager.Instance.BlocksAtlas.Air;
         PlantSO plant;
 
         float minFlowValue = 0.1f;

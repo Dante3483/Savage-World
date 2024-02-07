@@ -31,8 +31,8 @@ public class FlatWorldGenerationPhase : IGenerationPhase
 
         Terrain terrain = GameManager.Instance.Terrain;
 
-        BlockSO dirtBlock = GameManager.Instance.ObjectsAtlass.Dirt;
-        BlockSO airBlock = GameManager.Instance.ObjectsAtlass.Air;
+        BlockSO dirtBlock = GameManager.Instance.BlocksAtlas.Dirt;
+        BlockSO airBlock = GameManager.Instance.BlocksAtlas.Air;
 
         Parallel.For(0, terrainWidth, (index) =>
         {

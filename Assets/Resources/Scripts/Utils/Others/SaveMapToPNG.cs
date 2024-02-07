@@ -48,7 +48,7 @@ public class SaveMapToPNG : MonoBehaviour
                 }
                 if (GameManager.Instance.WorldData[x, y].IsLiquid())
                 {
-                    cellColor = GameManager.Instance.ObjectsAtlass.Blocks[BlockTypes.Liquid][GameManager.Instance.WorldData[x, y].LiquidId].ColorOnMap;
+                    cellColor = GameManager.Instance.BlocksAtlas.GetBlockByTypeAndId(BlockTypes.Liquid, GameManager.Instance.WorldData[x, y].LiquidId).ColorOnMap;
                 }
 
                 gridColor = new Color(cellColor.r - 0.2f, cellColor.g - 0.2f, cellColor.b - 0.2f, 1f);

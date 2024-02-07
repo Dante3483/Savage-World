@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using TMPro;
@@ -53,9 +54,6 @@ public class GameManager : MonoBehaviour
     private Vector2Int _blockInfoCoords;
     private float _loadingValue;
 
-    [Header("Atlasses")]
-    [SerializeField] private ObjectsAtlass _objectsAtlass;
-
     [Header("Terrain")]
     [SerializeField] private GameObject _terrainGameObject;
     private Terrain _terrain;
@@ -92,16 +90,68 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public ObjectsAtlass ObjectsAtlass
+    public BlocksAtlas BlocksAtlas
     {
         get
         {
-            return _objectsAtlass;
+            return _blocksAtlas;
         }
 
         set
         {
-            _objectsAtlass = value;
+            _blocksAtlas = value;
+        }
+    }
+
+    public TreesAtlas TreesAtlas
+    {
+        get
+        {
+            return _treesAtlas;
+        }
+
+        set
+        {
+            _treesAtlas = value;
+        }
+    }
+
+    public PickUpItemsAtlas PickUpItemsAtlas
+    {
+        get
+        {
+            return _pickUpItemsAtlas;
+        }
+
+        set
+        {
+            _pickUpItemsAtlas = value;
+        }
+    }
+
+    public string PlayerName
+    {
+        get
+        {
+            return _playerName;
+        }
+
+        set
+        {
+            _playerName = value;
+        }
+    }
+
+    public string WorldName
+    {
+        get
+        {
+            return _worldName;
+        }
+
+        set
+        {
+            _worldName = value;
         }
     }
 
@@ -274,32 +324,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public string PlayerName
-    {
-        get
-        {
-            return _playerName;
-        }
-
-        set
-        {
-            _playerName = value;
-        }
-    }
-
-    public string WorldName
-    {
-        get
-        {
-            return _worldName;
-        }
-
-        set
-        {
-            _worldName = value;
-        }
-    }
-
     public bool IsGameSession
     {
         get
@@ -313,45 +337,6 @@ public class GameManager : MonoBehaviour
         get
         {
             return _currentGameState == GameState.LoadGameState;
-        }
-    }
-
-    public BlocksAtlas BlocksAtlas
-    {
-        get
-        {
-            return _blocksAtlas;
-        }
-
-        set
-        {
-            _blocksAtlas = value;
-        }
-    }
-
-    public TreesAtlas TreesAtlas
-    {
-        get
-        {
-            return _treesAtlas;
-        }
-
-        set
-        {
-            _treesAtlas = value;
-        }
-    }
-
-    public PickUpItemsAtlas PickUpItemsAtlas
-    {
-        get
-        {
-            return _pickUpItemsAtlas;
-        }
-
-        set
-        {
-            _pickUpItemsAtlas = value;
         }
     }
     #endregion
@@ -446,13 +431,24 @@ public class GameManager : MonoBehaviour
         try
         {
             var watch = Stopwatch.StartNew();
+            List<Action> initializationSteps = new List<Action>()
+            {
+                InitializeAtlases,
+                DefineTerrainWidthAndHeight,
+                InitializeWorldData,
+                InitializeChunks,
+            };
+            float loadingStep = 100f / initializationSteps.Count;
+
             IsMenuActive = false;
             IsLoadingProgressActive = true;
 
-            DefineTerrainWidthAndHeight();
-            InitializeWorldData();
-            InitializeChunks();
-            InitializeAtlases();
+            foreach (Action initializationStep in initializationSteps)
+            {
+                initializationStep?.Invoke();
+                LoadingValue += loadingStep;
+            }
+
             watch.Stop();
             Debug.Log($"Game initialization: {watch.Elapsed.TotalSeconds}");
             GeneralInfo += $"Game initialization: {watch.Elapsed.TotalSeconds}\n";
@@ -468,41 +464,9 @@ public class GameManager : MonoBehaviour
 
     private void InitializeAtlases()
     {
-
         _blocksAtlas.InitializeAtlas();
         _treesAtlas.InitializeAtlas();
         _pickUpItemsAtlas.InitializeAtlas();
-        //_objectsAtlass.Initialize();
-    }
-
-    private void InitializeChunks()
-    {
-        Chunks = new Chunk[TerrainConfiguration.CurrentHorizontalChunksCount, TerrainConfiguration.CurrentVerticalChunksCount];
-        float step = 50f / TerrainConfiguration.CurrentHorizontalChunksCount;
-        for (byte x = 0; x < TerrainConfiguration.CurrentHorizontalChunksCount; x++)
-        {
-            for (byte y = 0; y < TerrainConfiguration.CurrentVerticalChunksCount; y++)
-            {
-                Chunks[x, y] = new Chunk(x, y);
-            }
-            LoadingValue += step;
-        }
-    }
-
-    private void InitializeWorldData()
-    {
-        float step = 50f / _maxTerrainWidth;
-        WorldData = new WorldCellData[_maxTerrainWidth, _maxTerrainHeight];
-
-        Parallel.For(0, _maxTerrainWidth, (index) =>
-        {
-            ushort x = (ushort)index;
-            for (ushort y = 0; y < _maxTerrainHeight; y++)
-            {
-                WorldData[x, y] = new WorldCellData(x, y);
-            }
-            LoadingValue += step;
-        });
     }
 
     private void DefineTerrainWidthAndHeight()
@@ -512,6 +476,34 @@ public class GameManager : MonoBehaviour
 
         _currentTerrainWidth = TerrainConfiguration.CurrentHorizontalChunksCount * TerrainConfiguration.ChunkSize;
         _currentTerrainHeight = TerrainConfiguration.CurrentVerticalChunksCount * TerrainConfiguration.ChunkSize;
+    }
+
+    private void InitializeWorldData()
+    {
+        WorldData = new WorldCellData[_maxTerrainWidth, _maxTerrainHeight];
+        BlockSO airBlock = BlocksAtlas.Air;
+        BlockSO airBGBlock = BlocksAtlas.AirBG;
+
+        Parallel.For(0, _maxTerrainWidth, (index) =>
+        {
+            ushort x = (ushort)index;
+            for (ushort y = 0; y < _maxTerrainHeight; y++)
+            {
+                WorldData[x, y] = new WorldCellData(x, y, airBlock, airBGBlock);
+            }
+        });
+    }
+
+    private void InitializeChunks()
+    {
+        Chunks = new Chunk[TerrainConfiguration.CurrentHorizontalChunksCount, TerrainConfiguration.CurrentVerticalChunksCount];
+        for (byte x = 0; x < TerrainConfiguration.CurrentHorizontalChunksCount; x++)
+        {
+            for (byte y = 0; y < TerrainConfiguration.CurrentVerticalChunksCount; y++)
+            {
+                Chunks[x, y] = new Chunk(x, y);
+            }
+        }
     }
 
     private void HandleMainMenuState()
@@ -627,7 +619,7 @@ public class GameManager : MonoBehaviour
 
             Vector3Int intPos = Vector3Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
 
-            Terrain.CreateBlock((ushort)intPos.x, (ushort)intPos.y, ObjectsAtlass.Air);
+            Terrain.CreateBlock((ushort)intPos.x, (ushort)intPos.y, _blocksAtlas.Air);
 
             Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y));
             Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y + 1));
@@ -660,7 +652,7 @@ public class GameManager : MonoBehaviour
 
             Vector3Int intPos = Vector3Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
 
-            Terrain.CreateLiquidBlock((ushort)intPos.x, (ushort)intPos.y, (byte)ObjectsAtlass.Water.GetId());
+            Terrain.CreateLiquidBlock((ushort)intPos.x, (ushort)intPos.y, (byte)_blocksAtlas.Water.GetId());
 
             Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y));
         }
@@ -674,7 +666,7 @@ public class GameManager : MonoBehaviour
 
             Vector3Int intPos = Vector3Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
 
-            Terrain.CreateBlock((ushort)intPos.x, (ushort)intPos.y, ObjectsAtlass.Torch);
+            Terrain.CreateBlock((ushort)intPos.x, (ushort)intPos.y, _blocksAtlas.GetBlockByTypeAndId(BlockTypes.Furniture, FurnitureBlocksID.Torch));
 
             Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y));
             Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y + 1));

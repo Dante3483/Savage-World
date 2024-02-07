@@ -178,7 +178,7 @@ namespace CustomTilemap
                 {
                     if (_tiles[x, y].SpriteForMask != null)
                     {
-                        _maskTexture.SetPixels32(x * 16, y * 16, 16, 16, ObjectsAtlass.BlocksSpriteColorArray[_tiles[x, y].SpriteForMask]);
+                        _maskTexture.SetPixels32(x * 16, y * 16, 16, 16, BlocksAtlas.BlocksColorArrayBySprite[_tiles[x, y].SpriteForMask]);
                     }
                     else
                     {

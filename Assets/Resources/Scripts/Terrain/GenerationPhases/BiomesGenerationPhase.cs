@@ -7,10 +7,10 @@ public class BiomesGenerationPhase : IGenerationPhase
     private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
     private Terrain _terrain = GameManager.Instance.Terrain;
     private Random _randomVar = GameManager.Instance.RandomVar;
-    private BlockSO _dirtBlock = GameManager.Instance.ObjectsAtlass.Dirt;
-    private BlockSO _sandBlock = GameManager.Instance.ObjectsAtlass.Sand;
-    private BlockSO _waterBlock = GameManager.Instance.ObjectsAtlass.Water;
-    private BlockSO _airBlock = GameManager.Instance.ObjectsAtlass.Air;
+    private BlockSO _dirtBlock = GameManager.Instance.BlocksAtlas.Dirt;
+    private BlockSO _sandBlock = GameManager.Instance.BlocksAtlas.Sand;
+    private BlockSO _waterBlock = GameManager.Instance.BlocksAtlas.Water;
+    private BlockSO _airBlock = GameManager.Instance.BlocksAtlas.Air;
     #endregion
 
     #region Public fields

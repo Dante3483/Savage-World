@@ -28,10 +28,10 @@ public class SaveLoadTestGenerationPhase : IGenerationPhase
 
         Terrain terrain = GameManager.Instance.Terrain;
 
-        BlockSO dirtBlock = GameManager.Instance.ObjectsAtlass.Dirt;
-        BlockSO stoneBlock = GameManager.Instance.ObjectsAtlass.Stone;
-        BlockSO dirtBG = GameManager.Instance.ObjectsAtlass.DirtBG;
-        BlockSO waterBlock = GameManager.Instance.ObjectsAtlass.Water;
+        BlockSO dirtBlock = GameManager.Instance.BlocksAtlas.Dirt;
+        BlockSO stoneBlock = GameManager.Instance.BlocksAtlas.Stone;
+        BlockSO dirtBG = GameManager.Instance.BlocksAtlas.DirtBG;
+        BlockSO waterBlock = GameManager.Instance.BlocksAtlas.Water;
 
         Parallel.For(0, terrainWidth, (index) =>
         {

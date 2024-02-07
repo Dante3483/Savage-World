@@ -9,8 +9,8 @@ public class LakesGenerationPhase : IGenerationPhase
     private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
     private Terrain _terrain = GameManager.Instance.Terrain;
     private Random _randomVar = GameManager.Instance.RandomVar;
-    private BlockSO _waterBlock = GameManager.Instance.ObjectsAtlass.Water;
-    private BlockSO _airBlock = GameManager.Instance.ObjectsAtlass.Air;
+    private BlockSO _waterBlock = GameManager.Instance.BlocksAtlas.Water;
+    private BlockSO _airBlock = GameManager.Instance.BlocksAtlas.Air;
     #endregion
 
     #region Public fields

@@ -304,7 +304,6 @@ public class SaveLoadManager : MonoBehaviour
     {
         Terrain terrain = GameManager.Instance.Terrain;
         BlocksAtlas blockAtlas = GameManager.Instance.BlocksAtlas;
-        ObjectsAtlass objectsAtlass = GameManager.Instance.ObjectsAtlass;
 
         byte[] worldData = binaryReader.ReadBytes(_worldCellsSize);
         try

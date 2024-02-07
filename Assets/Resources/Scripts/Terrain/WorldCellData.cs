@@ -220,15 +220,15 @@ public struct WorldCellData
     #endregion
 
     #region Methods
-    public WorldCellData(ushort xPosition, ushort yPosition)
+    public WorldCellData(ushort xPosition, ushort yPosition, BlockSO block, BlockSO background)
     {
         //Set Ait block by default
         _blockId = 0;
         _backgroundId = 0;
         _tileId = 0;
         _blockType = BlockTypes.Abstract;
-        _blockData = GameManager.Instance.ObjectsAtlass.Air;
-        _backgroundData = GameManager.Instance.ObjectsAtlass.AirBG;
+        _blockData = block;
+        _backgroundData = background;
         _coords = new Vector2Ushort { x = xPosition, y = yPosition };
         _currentActionTime = 0;
 
@@ -291,19 +291,9 @@ public struct WorldCellData
         }
     }
 
-    public BlockSO GetBlock()
-    {
-        return GameManager.Instance.ObjectsAtlass.Blocks[_blockType][_blockId];
-    }
-
     public BlockSO GetLiquid()
     {
-        return GameManager.Instance.ObjectsAtlass.Blocks[BlockTypes.Liquid][_liquidId];
-    }
-
-    public BlockSO GetBackground()
-    {
-        return GameManager.Instance.ObjectsAtlass.Blocks[BlockTypes.Background][0];
+        return GameManager.Instance.BlocksAtlas.GetBlockByTypeAndId(BlockTypes.Liquid, _liquidId);
     }
 
     public byte GetDustActionTime()
@@ -313,7 +303,7 @@ public struct WorldCellData
 
     public byte GetLiquidActionTime()
     {
-        return (GameManager.Instance.ObjectsAtlass.Blocks[BlockTypes.Liquid][_liquidId] as LiquidBlockSO).FlowTime;
+        return (GameManager.Instance.BlocksAtlas.GetBlockByTypeAndId(BlockTypes.Liquid, _liquidId) as LiquidBlockSO).FlowTime;
     }
 
     public void SetBlockData(BlockSO block)
@@ -321,12 +311,6 @@ public struct WorldCellData
         BlockId = block.GetId();
         BlockType = block.Type;
         BlockData = block;
-    }
-
-    public void SetLiquidBlockData(BlockSO liquid)
-    {
-        LiquidId = (byte)liquid.GetId();
-        FlowValue = 100f;
     }
 
     public void SetLiquidBlockData(byte id)
@@ -352,19 +336,9 @@ public struct WorldCellData
         BlockTileId = (byte)randomVar.Next(0, BlockData.Sprites.Count);
     }
 
-    public void SetBlockTile(byte tileId)
-    {
-        BlockTileId = tileId;
-    }
-
     public void SetRandomBackgroundTile(Random randomVar)
     {
         BackgroundTileId = (byte)randomVar.Next(0, BackgroundData.Sprites.Count);
-    }
-
-    public void SetBackgroundTile(byte tileId)
-    {
-        BackgroundTileId = tileId;
     }
 
     public bool CompareBlock(BlockSO block)
@@ -419,7 +393,7 @@ public struct WorldCellData
 
     public bool IsBackground()
     {
-        return BackgroundData != GameManager.Instance.ObjectsAtlass.AirBG;
+        return BackgroundData != GameManager.Instance.BlocksAtlas.AirBG;
     }
 
     public bool IsDayLightBlock()
