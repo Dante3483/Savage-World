@@ -105,7 +105,7 @@ public class TerrainGeneration
 
         Debug.Log($"Total time: {totalTime}");
         GameManager.Instance.GeneralInfo += $"Total time: {totalTime}\n";
-        GameManager.Instance.IsGameSession = true;
+        //GameManager.Instance.IsGameSession = true;
     }
 
     #endregion

@@ -291,6 +291,7 @@ MonoBehaviour:
   _distanceEachOthers: 5
   _offset: {x: 0, y: 0}
   _start: {x: 7, y: 0}
+  _biomesToSpawn: 0300000004000000050000000600000007000000
   _chanceToSpawn: 25
   _widthToSpawn: 3
   _treeBlocks:

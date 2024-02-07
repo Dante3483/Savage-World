@@ -7,12 +7,6 @@ using UnityEngine;
 public class ObjectsAtlass : ScriptableObject
 {
     #region Private fields
-
-    #endregion
-
-    #region Public fields
-
-    #region Sets
     public Dictionary<BlockTypes, Dictionary<ushort, BlockSO>> Blocks;
     public Dictionary<BiomesID, BlockSO[]> BiomePlants;
     public Dictionary<TreesID, Tree> Trees;
@@ -21,6 +15,12 @@ public class ObjectsAtlass : ScriptableObject
     public Dictionary<BiomesID, PickUpItem[]> BiomePickUpItems;
 
     public static Dictionary<Sprite, Color32[]> BlocksSpriteColorArray;
+    #endregion
+
+    #region Public fields
+
+    #region Sets
+
     #endregion
 
     #region Abstract blocks
@@ -501,25 +501,6 @@ public class ObjectsAtlass : ScriptableObject
     public PickUpItem GetPickUpItemById(PickUpItemsID id)
     {
         return PickUpItems[id];
-    }
-
-    public bool IsGrass(BlockSO block)
-    {
-        if (block.Type == BlockTypes.Solid)
-        {
-            switch (block.GetId())
-            {
-                case (ushort)SolidBlocksID.OceanGrass:
-                case (ushort)SolidBlocksID.DesertGrass:
-                case (ushort)SolidBlocksID.SavannahGrass:
-                case (ushort)SolidBlocksID.MeadowGrass:
-                case (ushort)SolidBlocksID.ForestGrass:
-                case (ushort)SolidBlocksID.SwampGrass:
-                case (ushort)SolidBlocksID.ConiferousForestGrass:
-                    return true;
-            }
-        }
-        return false;
     }
     #endregion
 }

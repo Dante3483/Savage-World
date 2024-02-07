@@ -23,6 +23,7 @@ public class Tree : MonoBehaviour
     [SerializeField] private Vector2 _start;
 
     [Header("Spawn Properties")]
+    [SerializeField] private BiomesID[] _biomesToSpawn;
     [SerializeField] private float _chanceToSpawn;
     [SerializeField] private int _widthToSpawn;
     [SerializeField] private List<Vector3> _treeBlocks;
@@ -175,6 +176,19 @@ public class Tree : MonoBehaviour
         set
         {
             _distanceEachOthers = value;
+        }
+    }
+
+    public BiomesID[] BiomesToSpawn
+    {
+        get
+        {
+            return _biomesToSpawn;
+        }
+
+        set
+        {
+            _biomesToSpawn = value;
         }
     }
     #endregion

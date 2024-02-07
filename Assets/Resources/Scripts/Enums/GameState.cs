@@ -4,11 +4,15 @@ using UnityEngine;
 
 public enum GameState
 {
-    GameInitializationState = 0,
+    GameInitializationState,
 
-    MainMenuState = 1,
+    MainMenuState,
 
-    NewGameState = 2,
+    NewGameState,
 
-    LoadGameState = 3,
+    LoadGameState,
+
+    GameSession,
+
+    CloseApplication,
 }

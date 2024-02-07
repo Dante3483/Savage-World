@@ -47,7 +47,7 @@ public class GrassSeedingGenerationPhase : IGenerationPhase
                 TerrainGeneration.SurfaceCoords.Add(vector);
                 if (_worldData[x, y].CompareBlock(_dirtBlock))
                 {
-                    _terrain.CreateBlock(x, y, GameManager.Instance.ObjectsAtlass.GetGrassByBiome(currentBiomeId));
+                    _terrain.CreateBlock(x, y, GameManager.Instance.BlocksAtlas.GetGrassByBiome(currentBiomeId));
                 }
             }
         }

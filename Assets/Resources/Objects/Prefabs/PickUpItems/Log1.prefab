@@ -165,4 +165,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _id: 1
+  _biomesToSpawn: 0300000004000000050000000600000007000000
   _chanceToSpawn: 25

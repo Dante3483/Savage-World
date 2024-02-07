@@ -22,20 +22,20 @@ public class TreesGenerationPhase : IGenerationPhase
     public void StartPhase()
     {
         //Create surface trees
-        Dictionary<BiomesID, Tree[]> allTrees = null;
+        Dictionary<BiomesID, List<Tree>> allTrees = null;
         List<Vector3> coords = new List<Vector3>();
         ThreadsManager.Instance.AddAction(() =>
         {
-            allTrees = new Dictionary<BiomesID, Tree[]>()
+            allTrees = new Dictionary<BiomesID, List<Tree>>()
             {
                 //{ BiomesID.NonBiom, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.NonBiom) },
                 //{ BiomesID.Ocean, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Ocean) },
-                { BiomesID.Desert, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Desert) },
-                { BiomesID.Savannah, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Savannah) },
-                { BiomesID.Meadow, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Meadow) },
-                { BiomesID.Forest, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Forest) },
-                { BiomesID.Swamp, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Swamp) },
-                { BiomesID.ConiferousForest, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.ConiferousForest) },
+                { BiomesID.Desert, GameManager.Instance.TreesAtlas.GetTreesByBiome(BiomesID.Desert) },
+                { BiomesID.Savannah, GameManager.Instance.TreesAtlas.GetTreesByBiome(BiomesID.Savannah) },
+                { BiomesID.Meadow, GameManager.Instance.TreesAtlas.GetTreesByBiome(BiomesID.Meadow) },
+                { BiomesID.Forest, GameManager.Instance.TreesAtlas.GetTreesByBiome(BiomesID.Forest) },
+                { BiomesID.Swamp, GameManager.Instance.TreesAtlas.GetTreesByBiome(BiomesID.Swamp) },
+                { BiomesID.ConiferousForest, GameManager.Instance.TreesAtlas.GetTreesByBiome(BiomesID.ConiferousForest) },
             };
         });
         BiomeSO currentBiome;

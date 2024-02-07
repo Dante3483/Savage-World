@@ -18,7 +18,9 @@ MonoBehaviour:
   _type: 4
   _colorOnMap: {r: 0.27450982, g: 0.54509807, b: 0.3647059, a: 1}
   _lightValue: 0
-  _lightColor: {r: 0, g: 0, b: 0, a: 1}
+  _lightColor:
+    serializedVersion: 2
+    rgba: 4278190080
   _isSurfaceLight: 0
   _waterproof: 0
   _id: 10

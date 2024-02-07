@@ -22,21 +22,21 @@ public class PickUpItemsGenerationPhase : IGenerationPhase
     public void StartPhase()
     {
         //Create surface collected items
-        Dictionary<BiomesID, PickUpItem[]> allPickUpItems = null;
+        Dictionary<BiomesID, List<PickUpItem>> allPickUpItems = null;
         List<Vector3> coords = new List<Vector3>();
         Vector3 vector = new Vector3();
         ThreadsManager.Instance.AddAction(() =>
         {
-            allPickUpItems = new Dictionary<BiomesID, PickUpItem[]>()
+            allPickUpItems = new Dictionary<BiomesID, List<PickUpItem>>()
             {
                 //{ BiomesID.NonBiom, GameManager.Instance.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.NonBiom) },
                 //{ BiomesID.Ocean, GameManager.Instance.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.Ocean) },
-                { BiomesID.Desert, GameManager.Instance.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.Desert) },
-                { BiomesID.Savannah, GameManager.Instance.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.Savannah) },
-                { BiomesID.Meadow, GameManager.Instance.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.Meadow) },
-                { BiomesID.Forest, GameManager.Instance.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.Forest) },
-                { BiomesID.Swamp, GameManager.Instance.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.Swamp) },
-                { BiomesID.ConiferousForest, GameManager.Instance.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.ConiferousForest) },
+                { BiomesID.Desert, GameManager.Instance.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Desert) },
+                { BiomesID.Savannah, GameManager.Instance.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Savannah) },
+                { BiomesID.Meadow, GameManager.Instance.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Meadow) },
+                { BiomesID.Forest, GameManager.Instance.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Forest) },
+                { BiomesID.Swamp, GameManager.Instance.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Swamp) },
+                { BiomesID.ConiferousForest, GameManager.Instance.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.ConiferousForest) },
             };
         });
         BiomeSO currentBiome;
