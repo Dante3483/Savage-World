@@ -28,8 +28,10 @@ public class TerrainConfigurationSO : ScriptableObject
     public bool PickUpItemsGeneration;
     public bool SetRandomTiles;
     public bool BlockProcessing;
+
     [Header("Phases for tests")]
     public bool SaveLoadTest;
+
     [Header("World size")]
     public int DefaultHorizontalChunksCount;
     public int DefaultVerticalChunksCount;
@@ -55,7 +57,7 @@ public class TerrainConfigurationSO : ScriptableObject
     public int MinLargeCaveSize;
     public int MaxLargeCaveSize;
 
-    [Header("Special cave")]
+    [Header("Starter caves")]
     public int StarterCaveChance;
     public int MinStarterCaveLength;
     public int MaxStarterCaveLength;

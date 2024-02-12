@@ -9,9 +9,9 @@ public class StarterCavesGenerationPhase : IGenerationPhase
     private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
     private Terrain _terrain = GameManager.Instance.Terrain;
     private Random _randomVar = GameManager.Instance.RandomVar;
-    private BlockSO _stoneBlock = GameManager.Instance.ObjectsAtlass.Stone;
-    private BlockSO _airBlock = GameManager.Instance.ObjectsAtlass.Air;
-    private BlockSO _dirtBG = GameManager.Instance.ObjectsAtlass.DirtBG;
+    private BlockSO _stoneBlock = GameManager.Instance.BlocksAtlas.Stone;
+    private BlockSO _airBlock = GameManager.Instance.BlocksAtlas.Air;
+    private BlockSO _dirtBG = GameManager.Instance.BlocksAtlas.DirtBG;
     #endregion
 
     #region Public fields

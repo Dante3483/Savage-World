@@ -6,8 +6,13 @@ using UnityEngine;
 public class PickUpItem : MonoBehaviour
 {
     #region Private fields
-    [SerializeField]private PickUpItemsID _id;
+    [Header("Main Properties")]
+    [SerializeField] private PickUpItemsID _id;
+
+    [Header("Spawn Properties")]
+    [SerializeField] private BiomesID[] _biomesToSpawn;
     [SerializeField] private int _chanceToSpawn;
+
     private Vector2Int _intPosition = new Vector2Int();
     #endregion
 
@@ -39,6 +44,19 @@ public class PickUpItem : MonoBehaviour
         set
         {
             _chanceToSpawn = value;
+        }
+    }
+
+    public BiomesID[] BiomesToSpawn
+    {
+        get
+        {
+            return _biomesToSpawn;
+        }
+
+        set
+        {
+            _biomesToSpawn = value;
         }
     }
     #endregion

@@ -22,16 +22,16 @@ public class PlantsGenerationPhase : IGenerationPhase
     public void StartPhase()
     {
         //Create surface plants
-        List<List<PlantSO>> allPlants = new List<List<PlantSO>>()
+        List<List<BlockSO>> allPlants = new List<List<BlockSO>>()
         {
-            GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.NonBiome),
+            GameManager.Instance.BlocksAtlas.GetPlantsByBiome(BiomesID.NonBiome),
             //GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.Ocean),
-            GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.Desert),
-            GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.Savannah),
-            GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.Meadow),
-            GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.Forest),
+            GameManager.Instance.BlocksAtlas.GetPlantsByBiome(BiomesID.Desert),
+            GameManager.Instance.BlocksAtlas.GetPlantsByBiome(BiomesID.Savannah),
+            GameManager.Instance.BlocksAtlas.GetPlantsByBiome(BiomesID.Meadow),
+            GameManager.Instance.BlocksAtlas.GetPlantsByBiome(BiomesID.Forest),
             //GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.Swamp),
-            GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.ConiferousForest),
+            GameManager.Instance.BlocksAtlas.GetPlantsByBiome(BiomesID.ConiferousForest),
         };
         BiomeSO currentBiome;
         int chance;
@@ -41,7 +41,7 @@ public class PlantsGenerationPhase : IGenerationPhase
         int y;
         int terrainWidth = GameManager.Instance.CurrentTerrainWidth;
 
-        foreach (List<PlantSO> plants in allPlants)
+        foreach (List<BlockSO> plants in allPlants)
         {
             foreach (PlantSO plant in plants)
             {

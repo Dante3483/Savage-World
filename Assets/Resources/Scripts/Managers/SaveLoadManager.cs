@@ -303,7 +303,7 @@ public class SaveLoadManager : MonoBehaviour
     private void LoadWorldCellData(BinaryReader binaryReader)
     {
         Terrain terrain = GameManager.Instance.Terrain;
-        ObjectsAtlass objectsAtlass = GameManager.Instance.ObjectsAtlass;
+        BlocksAtlas blockAtlas = GameManager.Instance.BlocksAtlas;
 
         byte[] worldData = binaryReader.ReadBytes(_worldCellsSize);
         try
@@ -375,8 +375,8 @@ public class SaveLoadManager : MonoBehaviour
                         count++;
                     }
 
-                    block = objectsAtlass.GetBlockById(blockType, blockId);
-                    background = objectsAtlass.GetBlockById(BlockTypes.Background, backgroundId);
+                    block = blockAtlas.GetBlockByTypeAndId(blockType, blockId);
+                    background = blockAtlas.GetBlockByTypeAndId(BlockTypes.Background, backgroundId);
 
                     for (int i = 0; i < count; i++)
                     {
@@ -412,7 +412,7 @@ public class SaveLoadManager : MonoBehaviour
             position.x = binaryReader.ReadUInt16();
             position.y = binaryReader.ReadUInt16();
 
-            Tree tree = GameManager.Instance.ObjectsAtlass.GetTreeById(treeId);
+            Tree tree = GameManager.Instance.TreesAtlas.GetTreeById(treeId);
 
             GameObject treeGameObject = GameObject.Instantiate(tree.gameObject, position, Quaternion.identity, GameManager.Instance.Terrain.Trees.transform);
             treeGameObject.name = tree.gameObject.name;
@@ -435,7 +435,7 @@ public class SaveLoadManager : MonoBehaviour
             position.x = binaryReader.ReadUInt16();
             position.y = binaryReader.ReadUInt16();
 
-            PickUpItem pickUpItem = GameManager.Instance.ObjectsAtlass.GetPickUpItemById(pickUpItemId);
+            PickUpItem pickUpItem = GameManager.Instance.PickUpItemsAtlas.GetPickUpItemById(pickUpItemId);
 
             GameObject pickUpItemGameObject = GameObject.Instantiate(pickUpItem.gameObject, position, Quaternion.identity, GameManager.Instance.Terrain.PickUpItems.transform);
             pickUpItemGameObject.name = pickUpItem.gameObject.name;

@@ -1,4 +1,4 @@
-public enum BiomesID : byte
+public enum BiomesID
 {
     NonBiome = 0,
 

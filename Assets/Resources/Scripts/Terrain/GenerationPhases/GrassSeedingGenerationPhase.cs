@@ -8,7 +8,7 @@ public class GrassSeedingGenerationPhase : IGenerationPhase
     private WorldCellData[,] _worldData = GameManager.Instance.WorldData;
     private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
     private Terrain _terrain = GameManager.Instance.Terrain;
-    private BlockSO _dirtBlock = GameManager.Instance.ObjectsAtlass.Dirt;
+    private BlockSO _dirtBlock = GameManager.Instance.BlocksAtlas.Dirt;
     #endregion
 
     #region Public fields
@@ -47,7 +47,7 @@ public class GrassSeedingGenerationPhase : IGenerationPhase
                 TerrainGeneration.SurfaceCoords.Add(vector);
                 if (_worldData[x, y].CompareBlock(_dirtBlock))
                 {
-                    _terrain.CreateBlock(x, y, GameManager.Instance.ObjectsAtlass.GetGrassByBiome(currentBiomeId));
+                    _terrain.CreateBlock(x, y, GameManager.Instance.BlocksAtlas.GetGrassByBiome(currentBiomeId));
                 }
             }
         }

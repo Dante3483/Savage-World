@@ -22,7 +22,7 @@ public class LandscapeGenerationPhase : IGenerationPhase
         Terrain terrain = GameManager.Instance.Terrain;
         Random randomVar = GameManager.Instance.RandomVar;
 
-        BlockSO dirtBlock = GameManager.Instance.ObjectsAtlass.Dirt;
+        BlockSO dirtBlock = GameManager.Instance.BlocksAtlas.Dirt;
 
         int startY = terrainConfiguration.Equator + 1;
         int seed = GameManager.Instance.Seed;
