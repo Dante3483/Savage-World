@@ -5,7 +5,7 @@ using Random = System.Random;
 public class PickUpItemsGenerationPhase : IGenerationPhase
 {
     #region Private fields
-    private WorldCellData[,] _worldData = GameManager.Instance.WorldData;
+    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
     private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
     private Random _randomVar = GameManager.Instance.RandomVar;
     #endregion
@@ -25,7 +25,7 @@ public class PickUpItemsGenerationPhase : IGenerationPhase
         Dictionary<BiomesID, List<PickUpItem>> allPickUpItems = null;
         List<Vector3> coords = new List<Vector3>();
         Vector3 vector = new Vector3();
-        ThreadsManager.Instance.AddAction(() =>
+        ActionInMainThreadUtil.Instance.Invoke(() =>
         {
             allPickUpItems = new Dictionary<BiomesID, List<PickUpItem>>()
             {
@@ -86,7 +86,7 @@ public class PickUpItemsGenerationPhase : IGenerationPhase
                     }
                 }
 
-                ThreadsManager.Instance.AddAction(() =>
+                ActionInMainThreadUtil.Instance.Invoke(() =>
                 {
                     foreach (Vector3 coord in coords)
                     {

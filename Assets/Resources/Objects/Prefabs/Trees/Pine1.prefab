@@ -16,7 +16,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6575782603448844897
 Transform:
   m_ObjectHideFlags: 0
@@ -74,7 +74,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6575782605094713051
 Transform:
   m_ObjectHideFlags: 0
@@ -129,6 +129,7 @@ GameObject:
   - component: {fileID: 499003393239788201}
   - component: {fileID: 3811589528595826195}
   - component: {fileID: 6575782605102750958}
+  - component: {fileID: 2912482996647810455}
   m_Layer: 7
   m_Name: Pine1
   m_TagString: Tree
@@ -509,3 +510,29 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 95ae94fc45d66d641b8a222c3813a32d, type: 2}
   - {fileID: 11400000, guid: 5c0e1fc1ac899384595a8d2a3187d403, type: 2}
   - {fileID: 11400000, guid: 9fe56d2388bc6d2419f50928e29ecd80, type: 2}
+--- !u!61 &2912482996647810455
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6575782605102750959}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 9.375, y: 12.5}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 18.75, y: 25}
+    newSize: {x: 18.75, y: 25}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 18.75, y: 25}
+  m_EdgeRadius: 0

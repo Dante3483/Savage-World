@@ -41,21 +41,21 @@ public class SaveMapToPNG : MonoBehaviour
         {
             for (int y = 0; y < terrainHeight; y++)
             {
-                cellColor = GameManager.Instance.WorldData[x, y].BlockData.ColorOnMap;
-                if (GameManager.Instance.WorldData[x, y].IsEmpty())
+                cellColor = WorldDataManager.Instance.WorldData[x, y].BlockData.ColorOnMap;
+                if (WorldDataManager.Instance.WorldData[x, y].IsEmpty())
                 {
-                    cellColor = GameManager.Instance.WorldData[x, y].BackgroundData.ColorOnMap;
+                    cellColor = WorldDataManager.Instance.WorldData[x, y].BackgroundData.ColorOnMap;
                 }
-                if (GameManager.Instance.WorldData[x, y].IsLiquid())
+                if (WorldDataManager.Instance.WorldData[x, y].IsLiquid())
                 {
-                    cellColor = GameManager.Instance.BlocksAtlas.GetBlockByTypeAndId(BlockTypes.Liquid, GameManager.Instance.WorldData[x, y].LiquidId).ColorOnMap;
+                    cellColor = GameManager.Instance.BlocksAtlas.GetBlockById(WorldDataManager.Instance.WorldData[x, y].LiquidId).ColorOnMap;
                 }
 
                 gridColor = new Color(cellColor.r - 0.2f, cellColor.g - 0.2f, cellColor.b - 0.2f, 1f);
                 colorOnMap = x % GameManager.Instance.TerrainConfiguration.ChunkSize == 0 || y % GameManager.Instance.TerrainConfiguration.ChunkSize == 0 ? gridColor : cellColor;
                 worldMap.SetPixel(x, y, colorOnMap);
 
-                biomeColor = GameManager.Instance.GetChunk(x, y).Biome.ColorOnMap;
+                biomeColor = ChunksManager.Instance.GetChunk(x, y).Biome.ColorOnMap;
                 gridColor = new Color(cellColor.r - 0.2f, cellColor.g - 0.2f, cellColor.b - 0.2f, 1f);
                 colorOnMap = x % GameManager.Instance.TerrainConfiguration.ChunkSize == 0 || y % GameManager.Instance.TerrainConfiguration.ChunkSize == 0 ? gridColor : biomeColor;
                 biomesMap.SetPixel(x, y, colorOnMap);

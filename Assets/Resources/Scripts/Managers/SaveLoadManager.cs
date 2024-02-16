@@ -9,9 +9,7 @@ public class SaveLoadManager : MonoBehaviour
 {
     #region Private fields
     private List<int> _worldColumnIndexes;
-    private int _worldCellsSize;
-    private string _directoryPathPlayers;
-    private string _directoryPathWorlds;
+    private int _worldColumnSize;
     #endregion
 
     #region Public fields
@@ -25,9 +23,6 @@ public class SaveLoadManager : MonoBehaviour
     #region Methods
     private void Awake()
     {
-        _directoryPathPlayers = Application.dataPath + "/Saves" + "/Players";
-        _directoryPathWorlds = Application.dataPath + "/Saves" + "/Worlds";
-
         Instance = this;
     }
 
@@ -39,80 +34,12 @@ public class SaveLoadManager : MonoBehaviour
         }
     }
 
-    public void Save()
-    {
-        _worldColumnIndexes = new List<int>();
-
-        string directoryPath = _directoryPathWorlds + $"/{GameManager.Instance.WorldName}";
-        string savePathWorld = directoryPath + $"/{GameManager.Instance.WorldName}.sw.world";
-        string metaPathWorld = directoryPath + $"/{GameManager.Instance.WorldName}.swm.world";
-
-        Directory.CreateDirectory(directoryPath);
-
-        using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(savePathWorld, FileMode.Create)))
-        {
-            Debug.Log("Save data to: " + savePathWorld);
-            SaveChunks(binaryWriter);
-            Debug.Log("Chunks saved");
-            SaveWorldCellData(binaryWriter);
-            Debug.Log("World saved");
-            SaveTrees(binaryWriter);
-            Debug.Log("Trees saved");
-            SavePickUpItems(binaryWriter);
-            Debug.Log("PickUp items saved");
-            //SavePlayer(binaryWriter);
-            //Debug.Log("Player saved");
-        }
-
-        using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(metaPathWorld, FileMode.Create)))
-        {
-            Debug.Log("Save data to: " + metaPathWorld);
-            SaveMetaData(binaryWriter);
-            Debug.Log("Meta data saved");
-        }
-        Debug.Log("Save Complete");
-    }
-
-    public void Load()
-    {
-        _worldColumnIndexes = new List<int>();
-
-        string directoryPath = _directoryPathWorlds + $"/{GameManager.Instance.WorldName}";
-        string savePathWorld = directoryPath + $"/{GameManager.Instance.WorldName}.sw.world";
-        string metaPathWorld = directoryPath + $"/{GameManager.Instance.WorldName}.swm.world";
-
-        using (BinaryReader binaryReader = new BinaryReader(File.Open(metaPathWorld, FileMode.Open)))
-        {
-            Debug.Log("Load data from: " + metaPathWorld);
-            LoadMetaData(binaryReader);
-        }
-
-        using (BinaryReader binaryReader = new BinaryReader(File.Open(savePathWorld, FileMode.Open)))
-        {
-            Debug.Log("Load data from: " + savePathWorld);
-            LoadChunks(binaryReader);
-            Debug.Log("Chunks loaded");
-            LoadWorldCellData(binaryReader);
-            Debug.Log("World loaded");
-            ThreadsManager.Instance.AddAction(() =>
-            {
-                LoadTrees(binaryReader);
-                Debug.Log("Trees loaded");
-                LoadPickUpItems(binaryReader);
-                Debug.Log("PickUp items loaded");
-            });
-            //SavePlayer(binaryWriter);
-            //Debug.Log("Player loaded");
-        }
-        Debug.Log("Load Complete");
-    }
-
     private void SaveMetaData(BinaryWriter binaryWriter)
     {
         binaryWriter.Write(GameManager.Instance.Seed);
         binaryWriter.Write(GameManager.Instance.CurrentTerrainWidth);
         binaryWriter.Write(GameManager.Instance.CurrentTerrainHeight);
-        binaryWriter.Write(_worldCellsSize);
+        binaryWriter.Write(_worldColumnSize);
 
         foreach (var worldColumnIndex in _worldColumnIndexes)
         {
@@ -122,7 +49,7 @@ public class SaveLoadManager : MonoBehaviour
 
     private void SaveChunks(BinaryWriter binaryWriter)
     {
-        foreach (var chunk in GameManager.Instance.Chunks)
+        foreach (var chunk in ChunksManager.Instance.Chunks)
         {
             binaryWriter.Write((byte)chunk.Biome.Id);
         }
@@ -131,12 +58,12 @@ public class SaveLoadManager : MonoBehaviour
     private void SaveWorldCellData(BinaryWriter binaryWriter)
     {
         int startColumn = 0;
-        for(int x = 0; x < GameManager.Instance.CurrentTerrainWidth; x++)
+        for (int x = 0; x < GameManager.Instance.CurrentTerrainWidth; x++)
         {
             _worldColumnIndexes.Add(startColumn);
             for (int y = 0; y < GameManager.Instance.CurrentTerrainHeight; y++)
             {
-                ref WorldCellData data = ref GameManager.Instance.WorldData[x, y];
+                ref WorldCellData data = ref WorldDataManager.Instance.WorldData[x, y];
 
                 //Flag bits:
                 //1 - BlockID
@@ -175,7 +102,7 @@ public class SaveLoadManager : MonoBehaviour
                 int countOfSameObject = 0;
                 while (Terrain.IsInMapRange(x, y + iterator))
                 {
-                    ref WorldCellData nextData = ref GameManager.Instance.WorldData[x, y + iterator];
+                    ref WorldCellData nextData = ref WorldDataManager.Instance.WorldData[x, y + iterator];
                     if (data.BlockId != nextData.BlockId)
                     {
                         break;
@@ -251,7 +178,7 @@ public class SaveLoadManager : MonoBehaviour
                 #endregion
             }
         }
-        _worldCellsSize = startColumn;
+        _worldColumnSize = startColumn;
     }
 
     private void SaveTrees(BinaryWriter binaryWriter)
@@ -283,7 +210,7 @@ public class SaveLoadManager : MonoBehaviour
         GameManager.Instance.Seed = binaryReader.ReadInt32();
         GameManager.Instance.CurrentTerrainWidth = binaryReader.ReadInt32();
         GameManager.Instance.CurrentTerrainHeight = binaryReader.ReadInt32();
-        _worldCellsSize = binaryReader.ReadInt32();
+        _worldColumnSize = binaryReader.ReadInt32();
 
         for (int x = 0; x < GameManager.Instance.CurrentTerrainWidth; x++)
         {
@@ -294,9 +221,9 @@ public class SaveLoadManager : MonoBehaviour
     private void LoadChunks(BinaryReader binaryReader)
     {
         TerrainConfigurationSO terrainConfiguration = GameManager.Instance.TerrainConfiguration;
-        foreach (var chunk in GameManager.Instance.Chunks)
+        foreach (var chunk in ChunksManager.Instance.Chunks)
         {
-            GameManager.Instance.SetChunkBiome(chunk, terrainConfiguration.GetBiome((BiomesID)binaryReader.ReadByte()));
+            ChunksManager.Instance.SetChunkBiome(chunk, terrainConfiguration.GetBiome((BiomesID)binaryReader.ReadByte()));
         }
     }
 
@@ -305,7 +232,7 @@ public class SaveLoadManager : MonoBehaviour
         Terrain terrain = GameManager.Instance.Terrain;
         BlocksAtlas blockAtlas = GameManager.Instance.BlocksAtlas;
 
-        byte[] worldData = binaryReader.ReadBytes(_worldCellsSize);
+        byte[] worldData = binaryReader.ReadBytes(_worldColumnSize);
         try
         {
             Parallel.For(0, GameManager.Instance.CurrentTerrainWidth, index =>
@@ -440,6 +367,75 @@ public class SaveLoadManager : MonoBehaviour
             GameObject pickUpItemGameObject = GameObject.Instantiate(pickUpItem.gameObject, position, Quaternion.identity, GameManager.Instance.Terrain.PickUpItems.transform);
             pickUpItemGameObject.name = pickUpItem.gameObject.name;
         }
+    }
+
+    public void Save()
+    {
+        _worldColumnIndexes = new List<int>();
+
+        string worldDirectory = StaticInfo.WorldsDirectory + $"/{GameManager.Instance.WorldName}";
+        string worldSaveFile = worldDirectory + $"/{GameManager.Instance.WorldName}.sw.world";
+        string worldMetaFile = worldDirectory + $"/{GameManager.Instance.WorldName}.swm.world";
+
+        Directory.CreateDirectory(worldDirectory);
+
+        using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(worldSaveFile, FileMode.Create)))
+        {
+            Debug.Log("Save data to: " + worldSaveFile);
+            SaveChunks(binaryWriter);
+            Debug.Log("Chunks saved");
+            SaveWorldCellData(binaryWriter);
+            Debug.Log("World saved");
+            SaveTrees(binaryWriter);
+            Debug.Log("Trees saved");
+            SavePickUpItems(binaryWriter);
+            Debug.Log("PickUp items saved");
+            //SavePlayer(binaryWriter);
+            //Debug.Log("Player saved");
+        }
+
+        using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(worldMetaFile, FileMode.Create)))
+        {
+            Debug.Log("Save data to: " + worldMetaFile);
+            SaveMetaData(binaryWriter);
+            Debug.Log("Meta data saved");
+        }
+        Debug.Log("Save Complete");
+    }
+
+    public void Load()
+    {
+        _worldColumnIndexes = new List<int>();
+
+        string worldDirectory = StaticInfo.WorldsDirectory + $"/{GameManager.Instance.WorldName}";
+        string worldSaveFile = worldDirectory + $"/{GameManager.Instance.WorldName}.sw.world";
+        string worldMetaFile = worldDirectory + $"/{GameManager.Instance.WorldName}.swm.world";
+
+        float loadingStep = 100f / 5f;
+
+        using (BinaryReader binaryReader = new BinaryReader(File.Open(worldMetaFile, FileMode.Open)))
+        {
+            LoadMetaData(binaryReader);
+            GameManager.Instance.LoadingValue += loadingStep;
+        }
+
+        using (BinaryReader binaryReader = new BinaryReader(File.Open(worldSaveFile, FileMode.Open)))
+        {
+            LoadChunks(binaryReader);
+            GameManager.Instance.LoadingValue += loadingStep;
+            LoadWorldCellData(binaryReader);
+            GameManager.Instance.LoadingValue += loadingStep;
+            ActionInMainThreadUtil.Instance.Invoke(() =>
+            {
+                LoadTrees(binaryReader);
+                GameManager.Instance.LoadingValue += loadingStep;
+                LoadPickUpItems(binaryReader);
+                GameManager.Instance.LoadingValue += loadingStep;
+            });
+            //SavePlayer(binaryWriter);
+            //Debug.Log("Player loaded");
+        }
+        Debug.Log("Load Complete");
     }
     #endregion
 }

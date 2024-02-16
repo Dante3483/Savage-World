@@ -3,7 +3,7 @@ using Random = System.Random;
 public class BiomesGenerationPhase : IGenerationPhase
 {
     #region Private fields
-    private WorldCellData[,] _worldData = GameManager.Instance.WorldData;
+    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
     private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
     private Terrain _terrain = GameManager.Instance.Terrain;
     private Random _randomVar = GameManager.Instance.RandomVar;
@@ -62,7 +62,7 @@ public class BiomesGenerationPhase : IGenerationPhase
             {
                 _terrain.CreateBlock(x, y, _airBlock);
                 _terrain.CreateLiquidBlock(x, y, waterId);
-                GameManager.Instance.SetChunkBiome(x, y, biome);
+                ChunksManager.Instance.SetChunkBiome(x, y, biome);
             }
 
             chanceToMoveDown = (byte)_randomVar.Next(0, 6);
@@ -120,7 +120,7 @@ public class BiomesGenerationPhase : IGenerationPhase
                 if (_worldData[x, y].CompareBlock(_dirtBlock))
                 {
                     _terrain.CreateBlock(x, y, _sandBlock);
-                    GameManager.Instance.SetChunkBiome(x, y, biome);
+                    ChunksManager.Instance.SetChunkBiome(x, y, biome);
                 }
             }
         }
@@ -213,7 +213,7 @@ public class BiomesGenerationPhase : IGenerationPhase
     {
         for (int x = biome.StartX; x < biome.EndX; x += _terrainConfiguration.ChunkSize)
         {
-            GameManager.Instance.SetChunkBiome(x, _terrainConfiguration.Equator, biome);
+            ChunksManager.Instance.SetChunkBiome(x, _terrainConfiguration.Equator, biome);
         }
     }
     #endregion

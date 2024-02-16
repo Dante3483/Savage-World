@@ -5,7 +5,7 @@ using UnityEngine;
 public class GrassSeedingGenerationPhase : IGenerationPhase
 {
     #region Private fields
-    private WorldCellData[,] _worldData = GameManager.Instance.WorldData;
+    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
     private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
     private Terrain _terrain = GameManager.Instance.Terrain;
     private BlockSO _dirtBlock = GameManager.Instance.BlocksAtlas.Dirt;
@@ -33,7 +33,7 @@ public class GrassSeedingGenerationPhase : IGenerationPhase
         {
             for (y = _terrainConfiguration.Equator; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
             {
-                currentBiomeId = GameManager.Instance.GetChunk(x, y).Biome.Id;
+                currentBiomeId = ChunksManager.Instance.GetChunk(x, y).Biome.Id;
                 if (!_worldData[x, y + 1].IsEmpty())
                 {
                     continue;

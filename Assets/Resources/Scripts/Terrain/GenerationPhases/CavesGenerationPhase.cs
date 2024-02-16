@@ -164,7 +164,7 @@ public class CavesGenerationPhase : IGenerationPhase
                 vector.x = x;
                 vector.y = y;
                 connected.Add(new Vector2Int(x, y));
-                if (GameManager.Instance.GetChunk(x, y).Biome.Id != BiomesID.NonBiome)
+                if (ChunksManager.Instance.GetChunk(x, y).Biome.Id != BiomesID.NonBiome)
                 {
                     isNonChunk = false;
                 }

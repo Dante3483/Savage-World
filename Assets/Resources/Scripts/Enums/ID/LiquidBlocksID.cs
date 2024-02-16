@@ -1,4 +1,4 @@
-public enum LiquidBlocksID : byte
+public enum LiquidBlocksID : ushort
 {
     Water = 0,
 }

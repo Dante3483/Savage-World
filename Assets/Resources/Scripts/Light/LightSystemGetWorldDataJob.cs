@@ -39,7 +39,7 @@ namespace LightSystem
 
         public void Execute(int index)
         {
-            WorldCellData[,] globalWorldData = GameManager.Instance.WorldData;
+            WorldCellData[,] globalWorldData = WorldDataManager.Instance.WorldData;
             WorldCellDataGPU data = new WorldCellDataGPU();
             int x = index % _width;
             int y = index / _width;

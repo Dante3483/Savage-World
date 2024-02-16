@@ -29,7 +29,7 @@ public class BlocksAtlas : ScriptableObject
     {
         get
         {
-            return GetBlockByTypeAndId(BlockTypes.Abstract, AbstractBlocksID.Air);
+            return GetBlockById(AbstractBlocksID.Air);
         }
     }
 
@@ -37,7 +37,7 @@ public class BlocksAtlas : ScriptableObject
     {
         get
         {
-            return GetBlockByTypeAndId(BlockTypes.Background, BackgroundsID.Air);
+            return GetBlockById(BackgroundsID.Air);
         }
     }
 
@@ -45,7 +45,7 @@ public class BlocksAtlas : ScriptableObject
     {
         get
         {
-            return GetBlockByTypeAndId(BlockTypes.Solid, SolidBlocksID.Dirt);
+            return GetBlockById(SolidBlocksID.Dirt);
         }
     }
 
@@ -53,7 +53,7 @@ public class BlocksAtlas : ScriptableObject
     {
         get
         {
-            return GetBlockByTypeAndId(BlockTypes.Background, BackgroundsID.Dirt);
+            return GetBlockById(BackgroundsID.Dirt);
         }
     }
 
@@ -61,7 +61,7 @@ public class BlocksAtlas : ScriptableObject
     {
         get
         {
-            return GetBlockByTypeAndId(BlockTypes.Solid, SolidBlocksID.Stone);
+            return GetBlockById(SolidBlocksID.Stone);
         }
     }
 
@@ -69,7 +69,7 @@ public class BlocksAtlas : ScriptableObject
     {
         get
         {
-            return GetBlockByTypeAndId(BlockTypes.Dust, DustBlocksID.Sand);
+            return GetBlockById(DustBlocksID.Sand);
         }
     }
 
@@ -77,7 +77,7 @@ public class BlocksAtlas : ScriptableObject
     {
         get
         {
-            return GetBlockByTypeAndId(BlockTypes.Liquid, LiquidBlocksID.Water);
+            return GetBlockById(LiquidBlocksID.Water);
         }
     }
     #endregion
@@ -116,20 +116,19 @@ public class BlocksAtlas : ScriptableObject
                 _blockByTypeAndId[block.Type].Add(block.GetId(), block);
             }
         }
-
     }
 
     private void InitializeSetGrassByBiome()
     {
         _grassByBiome = new Dictionary<BiomesID, BlockSO>
         {
-            { BiomesID.Ocean, GetBlockByTypeAndId(BlockTypes.Solid, SolidBlocksID.OceanGrass) },
-            { BiomesID.Desert, GetBlockByTypeAndId(BlockTypes.Solid, SolidBlocksID.DesertGrass) },
-            { BiomesID.Savannah, GetBlockByTypeAndId(BlockTypes.Solid, SolidBlocksID.SavannahGrass) },
-            { BiomesID.Meadow, GetBlockByTypeAndId(BlockTypes.Solid, SolidBlocksID.MeadowGrass) },
-            { BiomesID.Forest, GetBlockByTypeAndId(BlockTypes.Solid, SolidBlocksID.ForestGrass) },
-            { BiomesID.Swamp, GetBlockByTypeAndId(BlockTypes.Solid, SolidBlocksID.SwampGrass) },
-            { BiomesID.ConiferousForest, GetBlockByTypeAndId(BlockTypes.Solid, SolidBlocksID.ConiferousForestGrass) }
+            { BiomesID.Ocean, GetBlockById(SolidBlocksID.OceanGrass) },
+            { BiomesID.Desert, GetBlockById(SolidBlocksID.DesertGrass) },
+            { BiomesID.Savannah, GetBlockById(SolidBlocksID.SavannahGrass) },
+            { BiomesID.Meadow, GetBlockById(SolidBlocksID.MeadowGrass) },
+            { BiomesID.Forest, GetBlockById(SolidBlocksID.ForestGrass) },
+            { BiomesID.Swamp, GetBlockById(SolidBlocksID.SwampGrass) },
+            { BiomesID.ConiferousForest, GetBlockById(SolidBlocksID.ConiferousForestGrass) }
         };
     }
 
@@ -152,13 +151,16 @@ public class BlocksAtlas : ScriptableObject
     {
         BlocksColorArrayBySprite = new Dictionary<Sprite, Color32[]>();
 
-        ThreadsManager.Instance.AddAction(() =>
+        ActionInMainThreadUtil.Instance.Invoke(() =>
         {
-            foreach (BlockSO block in _solidBlocks)
+            foreach (var blocks in _blockByTypeAndId.Values)
             {
-                foreach (Sprite sprite in block.Sprites)
+                foreach (BlockSO block in blocks.Values)
                 {
-                    BlocksColorArrayBySprite.Add(sprite, sprite.texture.GetPixels32());
+                    foreach (Sprite sprite in block.Sprites)
+                    {
+                        BlocksColorArrayBySprite.Add(sprite, sprite.texture.GetPixels32());
+                    }
                 }
             }
         });
@@ -167,6 +169,46 @@ public class BlocksAtlas : ScriptableObject
     public BlockSO GetBlockByTypeAndId(BlockTypes blockType, object id)
     {
         return _blockByTypeAndId[blockType][(ushort)id];
+    }
+
+    public BlockSO GetBlockById(AbstractBlocksID id)
+    {
+        return _blockByTypeAndId[BlockTypes.Abstract][(ushort)id];
+    }
+
+    public BlockSO GetBlockById(SolidBlocksID id)
+    {
+        return _blockByTypeAndId[BlockTypes.Solid][(ushort)id];
+    }
+
+    public BlockSO GetBlockById(DustBlocksID id)
+    {
+        return _blockByTypeAndId[BlockTypes.Dust][(ushort)id];
+    }
+
+    public BlockSO GetBlockById(byte id)
+    {
+        return _blockByTypeAndId[BlockTypes.Liquid][(ushort)id];
+    }
+
+    public BlockSO GetBlockById(LiquidBlocksID id)
+    {
+        return _blockByTypeAndId[BlockTypes.Liquid][(ushort)id];
+    }
+
+    public BlockSO GetBlockById(PlantsID id)
+    {
+        return _blockByTypeAndId[BlockTypes.Plant][(ushort)id];
+    }
+
+    public BlockSO GetBlockById(BackgroundsID id)
+    {
+        return _blockByTypeAndId[BlockTypes.Background][(ushort)id];
+    }
+
+    public BlockSO GetBlockById(FurnitureBlocksID id)
+    {
+        return _blockByTypeAndId[BlockTypes.Furniture][(ushort)id];
     }
 
     public BlockSO GetGrassByBiome(BiomesID biomeID)

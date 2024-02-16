@@ -6,7 +6,7 @@ using Random = System.Random;
 public class OasisesGenerationPhase : IGenerationPhase
 {
     #region Private fields
-    private WorldCellData[,] _worldData = GameManager.Instance.WorldData;
+    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
     private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
     private Terrain _terrain = GameManager.Instance.Terrain;
     private Random _randomVar = GameManager.Instance.RandomVar;

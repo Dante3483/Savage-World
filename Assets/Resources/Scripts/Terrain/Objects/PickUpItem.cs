@@ -62,11 +62,18 @@ public class PickUpItem : MonoBehaviour
     #endregion
 
     #region Methods
+    private void Awake()
+    {
+        GetComponent<SpriteRenderer>().enabled = false;
+        GetComponent<SpriteMask>().enabled = false;
+        GetComponent<LightMask>().enabled = false;
+    }
+
     private void Update()
     {
         _intPosition.x = Mathf.FloorToInt(transform.position.x);
         _intPosition.y = Mathf.FloorToInt(transform.position.y);
-        if (GameManager.Instance.WorldData[_intPosition.x, _intPosition.y - 1].IsEmpty())
+        if (WorldDataManager.Instance.WorldData[_intPosition.x, _intPosition.y - 1].IsEmpty())
         {
             DeleteObject();
         }
@@ -77,5 +84,4 @@ public class PickUpItem : MonoBehaviour
         Destroy(gameObject);
     }
     #endregion
-
 }

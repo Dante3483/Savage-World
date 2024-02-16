@@ -194,6 +194,13 @@ public class Tree : MonoBehaviour
     #endregion
 
     #region Methods
+    private void Awake()
+    {
+        GetComponent<SpriteRenderer>().enabled = false;
+        GetComponent<SpriteMask>().enabled = false;
+        GetComponent<LightMask>().enabled = false;
+    }
+
     private void OnValidate()
     {
         if (_updateFields)

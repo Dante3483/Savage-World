@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using Random = System.Random;
 using Stopwatch = System.Diagnostics.Stopwatch;
@@ -14,13 +15,9 @@ using Stopwatch = System.Diagnostics.Stopwatch;
 // KeyCode.K - High quality of light system
 // KeyCode.G - Switch color light system
 // KeyCode.M - Create and save map
-// KeyCode.F - Display chunks
 // KeyCode.P - Set active player
 // KeyCode.L - Create torch
-// KeyCode.V - Player hurt
-// KeyCode.Space - Player jump
-// KeyCode.LeftShift - Player run
-// KeyCode.LeftShift + C - Player slide
+// KeyCode.O - Enable/Disable debug UI
 public class GameManager : MonoBehaviour
 {
     #region Private fields
@@ -34,42 +31,27 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TreesAtlas _treesAtlas;
     [SerializeField] private PickUpItemsAtlas _pickUpItemsAtlas;
 
-    [Header("World data")]
-    [SerializeField] private int _maxTerrainWidth;
-    [SerializeField] private int _maxTerrainHeight;
-
     [Header("Session data")]
     [SerializeField] private string _playerName;
     [SerializeField] private string _worldName;
     [SerializeField] private int _seed;
     [SerializeField] private int _currentTerrainWidth;
     [SerializeField] private int _currentTerrainHeight;
-    private Random _randomVar;
-    private WorldCellData[,] _worldData;
-    private Chunk[,] _chunks;
-
-    [Header("Debug")]
-    private string _generalInfo;
-    private string _otherInfo;
-    private Vector2Int _blockInfoCoords;
-    private float _loadingValue;
 
     [Header("Terrain")]
     [SerializeField] private GameObject _terrainGameObject;
-    private Terrain _terrain;
-
-    [Header("UI")]
-    [SerializeField] private Canvas _mainMenu;
-    [SerializeField] private Canvas _loadingProgress;
-    [SerializeField] private Slider _loadingSlider;
-    [SerializeField] private TextMeshProUGUI _infoText;
-    [SerializeField] private TextMeshProUGUI _blockInfoText;
-    [SerializeField] private TextMeshProUGUI _otherInformationText;
 
     [Header("Conditions")]
     [SerializeField] private bool _isStaticSeed;
     [SerializeField] private bool _isMenuActive;
     [SerializeField] private bool _isLoadingProgressActive;
+
+    private List<string> _playerNames;
+    private List<string> _worldNames;
+    private Random _randomVar;
+    private Terrain _terrain;
+    private float _loadingValue;
+    private string _phasesInfo;
     #endregion
 
     #region Public fields
@@ -207,32 +189,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public WorldCellData[,] WorldData
-    {
-        get
-        {
-            return _worldData;
-        }
-
-        set
-        {
-            _worldData = value;
-        }
-    }
-
-    public Chunk[,] Chunks
-    {
-        get
-        {
-            return _chunks;
-        }
-
-        set
-        {
-            _chunks = value;
-        }
-    }
-
     public bool IsStaticSeed
     {
         get
@@ -246,7 +202,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public System.Random RandomVar
+    public Random RandomVar
     {
         get
         {
@@ -256,45 +212,6 @@ public class GameManager : MonoBehaviour
         set
         {
             _randomVar = value;
-        }
-    }
-
-    public string GeneralInfo
-    {
-        get
-        {
-            return _generalInfo;
-        }
-
-        set
-        {
-            _generalInfo = value;
-        }
-    }
-
-    public bool IsMenuActive
-    {
-        get
-        {
-            return _isMenuActive;
-        }
-
-        set
-        {
-            _isMenuActive = value;
-        }
-    }
-
-    public bool IsLoadingProgressActive
-    {
-        get
-        {
-            return _isLoadingProgressActive;
-        }
-
-        set
-        {
-            _isLoadingProgressActive = value;
         }
     }
 
@@ -308,19 +225,6 @@ public class GameManager : MonoBehaviour
         set
         {
             _loadingValue = value;
-        }
-    }
-
-    public string OtherInfo
-    {
-        get
-        {
-            return _otherInfo;
-        }
-
-        set
-        {
-            _otherInfo = value;
         }
     }
 
@@ -339,37 +243,70 @@ public class GameManager : MonoBehaviour
             return _currentGameState == GameState.LoadGameState;
         }
     }
+
+    public string PhasesInfo
+    {
+        get
+        {
+            return _phasesInfo;
+        }
+
+        set
+        {
+            _phasesInfo = value;
+        }
+    }
+
+    public List<string> PlayerNames
+    {
+        get
+        {
+            return _playerNames;
+        }
+
+        set
+        {
+            _playerNames = value;
+        }
+    }
+
+    public List<string> WorldNames
+    {
+        get
+        {
+            return _worldNames;
+        }
+
+        set
+        {
+            _worldNames = value;
+        }
+    }
     #endregion
 
     #region Methods
     private void OnApplicationQuit()
     {
         UpdateGameState(GameState.CloseApplication);
-        //IsGameSession = false;
     }
 
     private void Awake()
     {
         Instance = this;
+
         _terrain = _terrainGameObject.GetComponent<Terrain>();
         _terrainGameObject.SetActive(false);
+
+        StaticInfo.Initialize();
     }
 
     private void Start()
     {
-        StartCoroutine(PrintDebugInfo());
-        StartCoroutine(UpdateObjects());
-
         UpdateGameState(GameState.GameInitializationState);
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            Task.Run(() => DisplayChunks());
-        }
-
         if (Input.GetKeyDown(KeyCode.P))
         {
             _player.SetActive(true);
@@ -378,7 +315,6 @@ public class GameManager : MonoBehaviour
         if (IsGameSession)
         {
             BreakBlock();
-            PrintBlockDetail();
             CreateWater();
             CreateTorch();
         }
@@ -434,32 +370,63 @@ public class GameManager : MonoBehaviour
             List<Action> initializationSteps = new List<Action>()
             {
                 InitializeAtlases,
-                DefineTerrainWidthAndHeight,
-                InitializeWorldData,
-                InitializeChunks,
+                InitializePlayersData,
+                InitializeWorldsData,
+                WorldDataManager.Instance.Initialize,
+                ChunksManager.Instance.Initialize,
+                _terrain.Initialize,
             };
+            
             float loadingStep = 100f / initializationSteps.Count;
 
-            IsMenuActive = false;
-            IsLoadingProgressActive = true;
+            UIManager.Instance.MainMenuUI.IsActive = false;
+            UIManager.Instance.MainMenuProgressBarUI.IsActive = true;
 
             foreach (Action initializationStep in initializationSteps)
             {
                 initializationStep?.Invoke();
-                LoadingValue += loadingStep;
+                _loadingValue += loadingStep;
             }
 
             watch.Stop();
             Debug.Log($"Game initialization: {watch.Elapsed.TotalSeconds}");
-            GeneralInfo += $"Game initialization: {watch.Elapsed.TotalSeconds}\n";
+            _phasesInfo += $"Game initialization: {watch.Elapsed.TotalSeconds}\n";
 
             UpdateGameState(GameState.MainMenuState);
         }
         catch (Exception e)
         {
             Debug.LogException(e);
-            throw e;
         }
+    }
+
+    private void HandleMainMenuState()
+    {
+        UIManager.Instance.MainMenuUI.IsActive = true;
+        UIManager.Instance.MainMenuProgressBarUI.IsActive = false;
+    }
+
+    private void HandleNewGameState()
+    {
+        UIManager.Instance.MainMenuUI.IsActive = false;
+        UIManager.Instance.MainMenuProgressBarUI.IsActive = true;
+        ResetLoadingValue();
+
+        Terrain.CreateNewWorld();
+        UIManager.Instance.MainMenuProgressBarUI.IsActive = false;
+
+        UpdateGameState(GameState.GameSession);
+    }
+
+    private void HandleLoadGameState()
+    {
+        UIManager.Instance.MainMenuProgressBarUI.IsActive = true;
+        ResetLoadingValue();
+
+        Terrain.LoadWorld();
+        UIManager.Instance.MainMenuProgressBarUI.IsActive = false;
+
+        UpdateGameState(GameState.GameSession);
     }
 
     private void InitializeAtlases()
@@ -469,148 +436,56 @@ public class GameManager : MonoBehaviour
         _pickUpItemsAtlas.InitializeAtlas();
     }
 
-    private void DefineTerrainWidthAndHeight()
+    private void InitializePlayersData()
     {
-        _maxTerrainWidth = TerrainConfiguration.DefaultHorizontalChunksCount * TerrainConfiguration.ChunkSize;
-        _maxTerrainHeight = TerrainConfiguration.DefaultVerticalChunksCount * TerrainConfiguration.ChunkSize;
-
-        _currentTerrainWidth = TerrainConfiguration.CurrentHorizontalChunksCount * TerrainConfiguration.ChunkSize;
-        _currentTerrainHeight = TerrainConfiguration.CurrentVerticalChunksCount * TerrainConfiguration.ChunkSize;
+        GetAllPlayerNames();
     }
 
-    private void InitializeWorldData()
+    private void InitializeWorldsData()
     {
-        WorldData = new WorldCellData[_maxTerrainWidth, _maxTerrainHeight];
-        BlockSO airBlock = BlocksAtlas.Air;
-        BlockSO airBGBlock = BlocksAtlas.AirBG;
-
-        Parallel.For(0, _maxTerrainWidth, (index) =>
-        {
-            ushort x = (ushort)index;
-            for (ushort y = 0; y < _maxTerrainHeight; y++)
-            {
-                WorldData[x, y] = new WorldCellData(x, y, airBlock, airBGBlock);
-            }
-        });
+        GetAllWorldNames();
     }
 
-    private void InitializeChunks()
+    private void GetAllPlayerNames()
     {
-        Chunks = new Chunk[TerrainConfiguration.CurrentHorizontalChunksCount, TerrainConfiguration.CurrentVerticalChunksCount];
-        for (byte x = 0; x < TerrainConfiguration.CurrentHorizontalChunksCount; x++)
+        DirectoryInfo directoryInfo = new DirectoryInfo(StaticInfo.PlayersDirectory);
+        FileInfo[] filesInfo = directoryInfo.GetFiles("*.sw.player");
+        _playerNames = new List<string>();
+        foreach (FileInfo fileInfo in filesInfo)
         {
-            for (byte y = 0; y < TerrainConfiguration.CurrentVerticalChunksCount; y++)
-            {
-                Chunks[x, y] = new Chunk(x, y);
-            }
+            _playerNames.Add(fileInfo.Name.Replace(".sw.player", ""));
         }
     }
 
-    private void HandleMainMenuState()
+    private void GetAllWorldNames()
     {
-        TurnOnMenu();
+        DirectoryInfo directoryInfo = new DirectoryInfo(StaticInfo.WorldsDirectory);
+        DirectoryInfo[] directoriesInfo = directoryInfo.GetDirectories();
+        _worldNames = new List<string>();
+        foreach (DirectoryInfo directoryIndo in directoriesInfo)
+        {
+            _worldNames.Add(directoryIndo.Name);
+        }
     }
 
-    private void TurnOnMenu()
+    private void ResetLoadingValue()
     {
-        IsMenuActive = true;
-        IsLoadingProgressActive = false;
-    }
-
-    private void TurnOffMenu()
-    {
-        IsMenuActive = false;
-    }
-
-    private void HandleNewGameState()
-    {
-        Debug.Log("New game state");
-
-        IsMenuActive = false;
-        IsLoadingProgressActive = true;
         LoadingValue = 0;
-
-        //Create new world
-        Terrain.CreateNewWorld(ref _worldData);
-        IsLoadingProgressActive = false;
     }
 
-    private void HandleLoadGameState()
-    {
-        Debug.Log("Load game state");
-
-        //Load world
-        Terrain.LoadWorld(ref _worldData);
-        IsMenuActive = false;
-        //IsGameSession = true;
-    }
-
+    //Delete
     public Vector3 GetPlayerPosition()
     {
         return _player.transform.position;
     }
 
+    //Delete
     public Transform GetPlayerTransform()
     {
         return _player.transform;
     }
 
-    public ref WorldCellData GetWorldCellDataRef(int x, int y)
-    {
-        return ref WorldData[x, y];
-    }
-
-    private void DisplayChunks()
-    {
-        foreach (Chunk chunk in Chunks)
-        {
-            Debug.Log(chunk.ToString());
-        }
-    }
-
-    public Chunk GetChunk(int x, int y)
-    {
-        return Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize];
-    }
-
-    public void SetChunkBiome(int x, int y, BiomeSO biome)
-    {
-        Chunk chunk = GetChunk(x, y);
-        if (chunk.Biome.Id == BiomesID.NonBiome)
-        {
-            Chunks[x / TerrainConfiguration.ChunkSize, y / TerrainConfiguration.ChunkSize].Biome = biome;
-        }
-    }
-
-    public void SetChunkBiome(Chunk chunk, BiomeSO biome)
-    {
-        if (chunk.Biome.Id == BiomesID.NonBiome)
-        {
-            Chunks[chunk.Coords.x, chunk.Coords.y].Biome = biome;
-        }
-    }
-
-    public IEnumerator PrintDebugInfo()
-    {
-        while (true)
-        {
-            _infoText.text = GeneralInfo;
-            _otherInformationText.text = OtherInfo;
-            yield return null;
-        }
-    }
-
-    public IEnumerator UpdateObjects()
-    {
-        while (true)
-        {
-            _mainMenu.gameObject.SetActive(IsMenuActive);
-            _loadingProgress.gameObject.SetActive(IsLoadingProgressActive);
-            _loadingSlider.value = LoadingValue;
-            yield return null;
-        }
-    }
-
+    //Delete
     public void BreakBlock()
     {
         if (Input.GetMouseButton(0))
@@ -629,21 +504,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void PrintBlockDetail()
-    {
-        if (Input.GetMouseButtonDown(1))
-        {
-            Vector3 clickPosition = Input.mousePosition;
 
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
-
-            _blockInfoCoords = Vector2Int.FloorToInt(worldPosition);
-
-            _blockInfoText.text = _worldData[_blockInfoCoords.x, _blockInfoCoords.y].ToString();
-
-        }
-    }
-
+    //Delete
     public void CreateWater()
     {
         if (Input.GetMouseButtonDown(2))
@@ -658,6 +520,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    //Delete
     public void CreateTorch()
     {
         if (Input.GetKeyDown(KeyCode.L))
@@ -666,7 +529,7 @@ public class GameManager : MonoBehaviour
 
             Vector3Int intPos = Vector3Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
 
-            Terrain.CreateBlock((ushort)intPos.x, (ushort)intPos.y, _blocksAtlas.GetBlockByTypeAndId(BlockTypes.Furniture, FurnitureBlocksID.Torch));
+            Terrain.CreateBlock((ushort)intPos.x, (ushort)intPos.y, _blocksAtlas.GetBlockById(FurnitureBlocksID.Torch));
 
             Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y));
             Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y + 1));

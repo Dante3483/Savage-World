@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 public class BlockProcessingGenerationPhase : IGenerationPhase
 {
     #region Private fields
-    private WorldCellData[,] _worldData = GameManager.Instance.WorldData;
+    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
     private Terrain _terrain = GameManager.Instance.Terrain;
     #endregion
 

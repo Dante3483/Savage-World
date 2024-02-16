@@ -3,7 +3,7 @@ using Random = System.Random;
 public class SetRandomTilesGenerationPhase : IGenerationPhase
 {
     #region Private fields
-    private WorldCellData[,] _worldData = GameManager.Instance.WorldData;
+    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
     private Random _randomVar = GameManager.Instance.RandomVar;
     #endregion
 

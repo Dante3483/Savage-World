@@ -158,7 +158,7 @@ namespace LightSystem
         private void UpdateLight()
         {
             //Set camera color
-            _mainCamera.backgroundColor = TimeManager.Instance.CurrentColor;
+            _mainCamera.backgroundColor = GameTimeUtil.Instance.CurrentColor;
 
             //Set current light map material
             _renderer.material = _currentLightMapMaterial;
@@ -200,7 +200,7 @@ namespace LightSystem
 
         public void FillLight()
         {
-            _computeShader.SetFloat("_dayLightValue", TimeManager.Instance.DayLightValue);
+            _computeShader.SetFloat("_dayLightValue", GameTimeUtil.Instance.DayLightValue);
             if (_isColoredMode)
             {
                 _computeShader.GetKernelThreadGroupSizes(_fillLightColoredHandler, out uint x, out _, out _);

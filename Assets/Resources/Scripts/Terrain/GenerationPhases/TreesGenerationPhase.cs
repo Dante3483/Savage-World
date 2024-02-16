@@ -5,7 +5,7 @@ using Random = System.Random;
 public class TreesGenerationPhase : IGenerationPhase
 {
     #region Private fields
-    private WorldCellData[,] _worldData = GameManager.Instance.WorldData;
+    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
     private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
     private Random _randomVar = GameManager.Instance.RandomVar;
     #endregion
@@ -24,7 +24,7 @@ public class TreesGenerationPhase : IGenerationPhase
         //Create surface trees
         Dictionary<BiomesID, List<Tree>> allTrees = null;
         List<Vector3> coords = new List<Vector3>();
-        ThreadsManager.Instance.AddAction(() =>
+        ActionInMainThreadUtil.Instance.Invoke(() =>
         {
             allTrees = new Dictionary<BiomesID, List<Tree>>()
             {
@@ -102,7 +102,7 @@ public class TreesGenerationPhase : IGenerationPhase
                     }
                 }
 
-                ThreadsManager.Instance.AddAction(() =>
+                ActionInMainThreadUtil.Instance.Invoke(() =>
                 {
                     foreach (Vector3 coord in coords)
                     {

@@ -29,11 +29,11 @@ MonoBehaviour:
   SetRandomTiles: 1
   BlockProcessing: 1
   SaveLoadTest: 0
-  DefaultHorizontalChunksCount: 84
-  DefaultVerticalChunksCount: 24
-  CurrentHorizontalChunksCount: 84
-  CurrentVerticalChunksCount: 24
+  TerrainWidth: 8400
+  TerrainHeight: 2400
   ChunkSize: 100
+  HorizontalChunksCount: 84
+  VerticalChunksCount: 24
   Equator: 2150
   DeepOceanY: 1876
   Levels:
