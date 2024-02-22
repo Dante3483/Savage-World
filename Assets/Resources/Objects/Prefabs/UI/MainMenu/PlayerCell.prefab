@@ -136,9 +136,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerName: {fileID: 3660705782085899122}
-  _onPlayerSelect:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &7112229366081103453
 GameObject:
   m_ObjectHideFlags: 0
@@ -209,8 +206,8 @@ MonoBehaviour:
 
 '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: c69e579921082c441ba88e2a62346da1, type: 2}
+  m_sharedMaterial: {fileID: 7703001875883808541, guid: c69e579921082c441ba88e2a62346da1, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

@@ -1,0 +1,132 @@
+using Inventory;
+using Items;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Random = UnityEngine.Random;
+
+public class InventoryController : MonoBehaviour
+{
+    #region Private fields
+    [Header("Main")]
+    [SerializeField] private UIInventoryPage _inventoryUI;
+    [SerializeField] private InventorySO _inventoryData;
+
+    [SerializeField] private List<ItemSO> _initStorageItems;
+    [SerializeField] private List<ItemSO> _initHotbarItems;
+    [SerializeField] private List<ItemSO> _initAccessoriesItems;
+
+    [SerializeField] private float _minTimeToTakeItem;
+    [SerializeField] private float _maxTimeToTakeItem;
+    [SerializeField] private float _stepToLerpTimeToTakeItem;
+    [SerializeField] private float _currentTimeToTakeItem;
+
+    private Coroutine _takeItemCoroutine;
+    private bool _isTurboTakeItem;
+    #endregion
+
+    #region Public fields
+
+    #endregion
+
+    #region Properties
+
+    #endregion
+
+    #region Methods
+    private void Awake()
+    {
+        PrepareUI();
+        PrepareInventoryData();
+        _currentTimeToTakeItem = _maxTimeToTakeItem;
+    }
+
+    private void PrepareUI()
+    {
+        _inventoryUI.InitializePage(_inventoryData.StorageSize, _inventoryData.HotbarSize / 2, _inventoryData.AccessoriesSize);
+
+        _inventoryUI.OnDraggingItem += HandleDragItem;
+        _inventoryUI.OnStartTakeItem += HandleStartTakeItem;
+        _inventoryUI.OnStopTakeItem += HandleStopTakeItem;
+    }
+
+    public void PrepareInventoryData()
+    {
+        _inventoryData.Initialize();
+        _inventoryData.OnStorageChanged += HandleUpdateStorageUI;
+        _inventoryData.OnHotbarChanged += HandleUpdateHotbarUI;
+        _inventoryData.OnAccessoriesChanged += HandleUpdateAccessoriesUI;
+
+        foreach(ItemSO item in _initStorageItems)
+        {
+            _inventoryData.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Storage);
+        }
+        foreach (ItemSO item in _initHotbarItems)
+        {
+            _inventoryData.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Hotbar);
+        }
+        foreach (ItemSO item in _initAccessoriesItems)
+        {
+            _inventoryData.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Accessories);
+        }
+    }
+
+    private void HandleUpdateStorageUI(InventoryItem[] storageState)
+    {
+        for (int i = 0; i < storageState.Length; i++)
+        {
+            _inventoryUI.UpdateStorageItemData(i, storageState[i].Item?.ItemImage, storageState[i].Quantity);
+        }
+    }
+
+    private void HandleUpdateHotbarUI(InventoryItem[] hotbarState, int startIndex, int count)
+    {
+        for (int i = startIndex; i < count; i++)
+        {
+            _inventoryUI.UpdateHotbarItemData(i, hotbarState[i].Item?.ItemImage, hotbarState[i].Quantity);
+        }
+    }
+     
+    private void HandleUpdateAccessoriesUI(InventoryItem[] accessoriesState)
+    {
+        for (int i = 0; i < accessoriesState.Length; i++)
+        {
+            _inventoryUI.UpdateAccessoriesItemData(i, accessoriesState[i].Item?.ItemImage);
+        }
+    }
+
+    private void HandleDragItem(int itemIndex, ItemLocations itemLocation)
+    {
+        _inventoryData.TakeItem(itemIndex, itemLocation);
+        //InventoryUI.CreateDraggedItem(inventoryItem.Item.ItemImage, inventoryItem.Quantity);
+    }
+
+    private void HandleStartTakeItem(int itemIndex, ItemLocations itemLocation)
+    {
+        if (_takeItemCoroutine == null)
+        {
+            _currentTimeToTakeItem = _inventoryData.CompareItemWithBuffer(itemIndex, itemLocation) ? _currentTimeToTakeItem : _maxTimeToTakeItem;
+            _takeItemCoroutine = StartCoroutine(TakeItemCoroutine(itemIndex, itemLocation));
+        }
+    }
+
+    private void HandleStopTakeItem()
+    {
+        _currentTimeToTakeItem = _maxTimeToTakeItem;
+        if (_takeItemCoroutine != null)
+        {
+            StopCoroutine(_takeItemCoroutine);
+            _takeItemCoroutine = null;
+        }
+    }
+
+    private IEnumerator TakeItemCoroutine(int index, ItemLocations location)
+    {
+        _isTurboTakeItem = _currentTimeToTakeItem <= (_minTimeToTakeItem + _minTimeToTakeItem / 10);
+        _inventoryData.TakeItem(index, location, _isTurboTakeItem ? 5 : 1);
+        yield return new WaitForSeconds(_currentTimeToTakeItem);
+        _currentTimeToTakeItem = Mathf.Lerp(_currentTimeToTakeItem, _minTimeToTakeItem, _stepToLerpTimeToTakeItem);
+        _takeItemCoroutine = null;
+    }
+    #endregion
+}

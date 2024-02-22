@@ -35,7 +35,7 @@ namespace Items
         {
             ItemType = ItemTypes.Block;
             IsStackable = true;
-            MaxStackSize = 999;
+            MaxStackSize = 9999;
             Using = "Can be placed";
         }
 

@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a4aeed76b201e74fa156f1d231a4b00, type: 3}
+  m_Name: Inventory
+  m_EditorClassIdentifier: 
+  _storageItems:
+  - Quantity: 9999
+    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
+  - Quantity: 9999
+    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
+  - Quantity: 9999
+    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
+  - Quantity: 9999
+    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
+  - Quantity: 9999
+    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
+  - Quantity: 6079
+    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  _hotbarItems:
+  - Quantity: 9999
+    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  _accessoriesItems:
+  - Quantity: 9999
+    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
+  - Quantity: 3093
+    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  - Quantity: 0
+    Item: {fileID: 0}
+  _helmetItem:
+    Quantity: 0
+    Item: {fileID: 0}
+  _chestplateItem:
+    Quantity: 0
+    Item: {fileID: 0}
+  _leggingsItem:
+    Quantity: 0
+    Item: {fileID: 0}
+  _bufferItem:
+    Quantity: 0
+    Item: {fileID: 0}
+  _storageSize: 36
+  _hotbarSize: 10
+  _accessoriesSize: 6

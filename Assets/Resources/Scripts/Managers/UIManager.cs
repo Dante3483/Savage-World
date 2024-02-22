@@ -13,6 +13,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private UIPage _debugPhasesInfoUI;
     [SerializeField] private UIPage _debugBlockInfoUI;
 
+    [Header("InGame")]
+    [SerializeField] private UIPage _inventoryUI;
+
     #endregion
 
     #region Public fields
@@ -65,6 +68,8 @@ public class UIManager : MonoBehaviour
 
         _debugPhasesInfoUI.IsActive = false;
         _debugBlockInfoUI.IsActive = false;
+
+        _inventoryUI.IsActive = false;
     }
 
     private void Update()
@@ -73,6 +78,11 @@ public class UIManager : MonoBehaviour
         {
             _debugPhasesInfoUI.IsActive = !_debugPhasesInfoUI.IsActive;
             _debugBlockInfoUI.IsActive = !_debugBlockInfoUI.IsActive;
+        }
+
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            _inventoryUI.IsActive = !_inventoryUI.IsActive;
         }
     }
     #endregion

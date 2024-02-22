@@ -59,8 +59,8 @@ public class ListOfExistingWorldsController : MonoBehaviour
 
     private void HandleWorldDelete(string worldName)
     {
-        string worldPath = StaticInfo.WorldsDirectory + worldName;
-        Directory.Delete(worldPath);
+        string worldPath = StaticInfo.WorldsDirectory + $"/{worldName}";
+        Directory.Delete(worldPath, true);
         GameManager.Instance.WorldNames.Remove(worldName);
         UpdateUI();
     }

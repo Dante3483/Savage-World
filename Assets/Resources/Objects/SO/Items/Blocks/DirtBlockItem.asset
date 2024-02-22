@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cfc0007050f10c438964fce730d01e1, type: 3}
+  m_Name: DirtBlockItem
+  m_EditorClassIdentifier: 
+  _id: 0
+  _itemType: 1
+  _itemRarity: {fileID: 11400000, guid: ddd32f58fffdb79469e4e8303aa87b40, type: 2}
+  _isStackable: 1
+  _maxStackSize: 9999
+  _name: Dirt block
+  _using: Can be placed
+  _description: Dirt
+  _itemImage: {fileID: 21300000, guid: 5d881f46b6b40e648846228d8b5f39f7, type: 3}
+  _blockToPlace: {fileID: 11400000, guid: 5c652c777cfdd1b4ba8ceee62bf0c0b9, type: 2}
