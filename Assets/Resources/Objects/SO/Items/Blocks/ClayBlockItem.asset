@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ClayBlockItem
   m_EditorClassIdentifier: 
   _id: 3
-  _itemType: 1
+  _itemType: 0
   _itemRarity: {fileID: 11400000, guid: 1ab80723928f4cf4f8323c6f1fff4622, type: 2}
   _isStackable: 1
   _maxStackSize: 9999

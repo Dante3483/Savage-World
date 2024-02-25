@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public class UIInventoryPage : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class UIInventoryPage : MonoBehaviour
     private List<UIStorageItemCell> _listOfStorageItems;
     private List<UIHotbarItemCell> _listOfHotbarItems;
     private List<UIAccessoryItemCell> _listOfAccessoryItems;
+    [SerializeField] private List<UIArmorItemCell> _listOfArmorItems;
     private Dictionary<ItemLocations, List<UIItemCell>> _itemsByLocation;
     #endregion
 
@@ -37,6 +39,7 @@ public class UIInventoryPage : MonoBehaviour
         InitializeStorage(storageSize);
         InitializeHotbar(hotbarSize);
         InitializeAccessories(accessoriesSize);
+        InitializeArmor();
     }
 
     private void InitializeAccessories(int accessoriesSize)
@@ -82,6 +85,16 @@ public class UIInventoryPage : MonoBehaviour
         _itemsByLocation.Add(ItemLocations.Storage, _listOfStorageItems.Cast<UIItemCell>().ToList());
     }
 
+    private void InitializeArmor()
+    {
+        _listOfArmorItems = _listOfArmorItems.OrderBy(a => a.ArmorType).ToList();
+        foreach (UIArmorItemCell uiItem in _listOfArmorItems)
+        {
+            SetHandlers(uiItem);
+        }
+        _itemsByLocation.Add(ItemLocations.Armor, _listOfArmorItems.Cast<UIItemCell>().ToList());
+    }
+
     private void SetHandlers(UIItemCell uiItem)
     {
         uiItem.OnLeftButtonClick += HandleDragItem;
@@ -102,6 +115,11 @@ public class UIInventoryPage : MonoBehaviour
     public void UpdateAccessoriesItemData(int itemIndex, Sprite itemImage)
     {
         _listOfAccessoryItems[itemIndex].SetData(itemImage);
+    }
+
+    public void UpdateArmorItemData(int itemIndex, Sprite itemImage)
+    {
+        _listOfArmorItems[itemIndex].SetData(itemImage);
     }
 
     private void HandleDragItem(UIItemCell itemUI)

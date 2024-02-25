@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1397bfbe14d7dd3499ec4f091e2773c8, type: 3}
   m_Name: Air
   m_EditorClassIdentifier: 
-  _id: 1
+  _id: 0
   _countOfVerticalChunks: 2
   _startY: 2200
   _endY: 2399

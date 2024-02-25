@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIAccessoryItemCell : UIItemCell
+public class UIAccessoryItemCell : UIWearableItemCell
 {
     #region Private fields
-    [SerializeField] private Image _silhouette;
+    
     #endregion
 
     #region Public fields
@@ -16,19 +16,6 @@ public class UIAccessoryItemCell : UIItemCell
     #endregion
 
     #region Methods
-    public override void ResetData()
-    {
-        base.ResetData();
-        _silhouette.gameObject.SetActive(true);
-    }
-
-    public override void SetData(Sprite sprite)
-    {
-        if (sprite != null)
-        {
-            _silhouette.gameObject.SetActive(false);
-        }
-        base.SetData(sprite);
-    }
+    
     #endregion
 }

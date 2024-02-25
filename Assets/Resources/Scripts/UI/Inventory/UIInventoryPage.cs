@@ -136,7 +136,7 @@ namespace Inventory
             }
             else
             {
-                _armorList[armorIndex].SetData(item.Item.ItemImage);
+                _armorList[armorIndex].SetData(item.ItemData.ItemImage);
             }
         }
 

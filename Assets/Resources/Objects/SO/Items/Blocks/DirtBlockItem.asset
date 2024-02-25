@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DirtBlockItem
   m_EditorClassIdentifier: 
   _id: 0
-  _itemType: 1
+  _itemType: 0
   _itemRarity: {fileID: 11400000, guid: ddd32f58fffdb79469e4e8303aa87b40, type: 2}
   _isStackable: 1
   _maxStackSize: 9999

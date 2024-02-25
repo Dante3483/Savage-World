@@ -1,12 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public enum TerrainLevelId : byte
 {
-    None = 0,
-    Air = 1,
-    Surface = 2,
-    PreUnderground = 3,
-    Underground = 4,
+    Air = 0,
+
+    Surface = 1,
+
+    PreUnderground = 2,
+
+    Underground = 3,
 }

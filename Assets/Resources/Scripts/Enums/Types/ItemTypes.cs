@@ -1,9 +1,12 @@
 public enum ItemTypes : byte
 {
-    None = 0,
-    Block = 1,
-    Tool = 2,
-    Weapon = 3,
-    Armor = 4,
-    Accessory = 5,
+    Block = 0,
+
+    Tool = 1,
+
+    Weapon = 2,
+
+    Armor = 3,
+
+    Accessory = 4,
 }

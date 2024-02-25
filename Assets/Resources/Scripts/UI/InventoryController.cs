@@ -56,6 +56,7 @@ public class InventoryController : MonoBehaviour
         _inventoryData.OnStorageChanged += HandleUpdateStorageUI;
         _inventoryData.OnHotbarChanged += HandleUpdateHotbarUI;
         _inventoryData.OnAccessoriesChanged += HandleUpdateAccessoriesUI;
+        _inventoryData.OnArmorChanged += HandleUpdateArmorUI;
 
         foreach(ItemSO item in _initStorageItems)
         {
@@ -75,7 +76,7 @@ public class InventoryController : MonoBehaviour
     {
         for (int i = 0; i < storageState.Length; i++)
         {
-            _inventoryUI.UpdateStorageItemData(i, storageState[i].Item?.ItemImage, storageState[i].Quantity);
+            _inventoryUI.UpdateStorageItemData(i, storageState[i].ItemData?.ItemImage, storageState[i].Quantity);
         }
     }
 
@@ -83,7 +84,7 @@ public class InventoryController : MonoBehaviour
     {
         for (int i = startIndex; i < count; i++)
         {
-            _inventoryUI.UpdateHotbarItemData(i, hotbarState[i].Item?.ItemImage, hotbarState[i].Quantity);
+            _inventoryUI.UpdateHotbarItemData(i, hotbarState[i].ItemData?.ItemImage, hotbarState[i].Quantity);
         }
     }
      
@@ -91,7 +92,15 @@ public class InventoryController : MonoBehaviour
     {
         for (int i = 0; i < accessoriesState.Length; i++)
         {
-            _inventoryUI.UpdateAccessoriesItemData(i, accessoriesState[i].Item?.ItemImage);
+            _inventoryUI.UpdateAccessoriesItemData(i, accessoriesState[i].ItemData?.ItemImage);
+        }
+    }
+
+    private void HandleUpdateArmorUI(InventoryItem[] armorState)
+    {
+        for (int i = 0; i < armorState.Length; i++)
+        {
+            _inventoryUI.UpdateArmorItemData(i, armorState[i].ItemData?.ItemImage);
         }
     }
 
@@ -123,7 +132,7 @@ public class InventoryController : MonoBehaviour
     private IEnumerator TakeItemCoroutine(int index, ItemLocations location)
     {
         _isTurboTakeItem = _currentTimeToTakeItem <= (_minTimeToTakeItem + _minTimeToTakeItem / 10);
-        _inventoryData.TakeItem(index, location, _isTurboTakeItem ? 5 : 1);
+        _inventoryData.TakeItem(index, location, _isTurboTakeItem ? 50 : 1);
         yield return new WaitForSeconds(_currentTimeToTakeItem);
         _currentTimeToTakeItem = Mathf.Lerp(_currentTimeToTakeItem, _minTimeToTakeItem, _stepToLerpTimeToTakeItem);
         _takeItemCoroutine = null;

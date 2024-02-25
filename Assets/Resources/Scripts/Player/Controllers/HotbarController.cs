@@ -112,7 +112,7 @@ namespace Hotbar
                 }
                 else
                 {
-                    HotbarUI.UpdateData(item.Key, item.Value.Item.ItemImage, item.Value.Quantity);
+                    HotbarUI.UpdateData(item.Key, item.Value.ItemData.ItemImage, item.Value.Quantity);
                 }
             }
         }
