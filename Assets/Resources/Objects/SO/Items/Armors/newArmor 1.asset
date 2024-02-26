@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: 5
   _itemType: 3
-  _itemRarity: {fileID: 0}
+  _itemRarity: {fileID: 11400000, guid: 1ab80723928f4cf4f8323c6f1fff4622, type: 2}
   _isStackable: 0
   _maxStackSize: 1
-  _name: 
+  _name: Leggings
   _using: Can be equipped
   _description: 
   _itemImage: {fileID: 21300000, guid: df7a4d806d238ea4b84972e62fffb5b5, type: 3}

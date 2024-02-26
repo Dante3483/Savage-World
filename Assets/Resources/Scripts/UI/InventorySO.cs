@@ -3,8 +3,8 @@ using Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
-using static UnityEditor.FilePathAttribute;
 
 [CreateAssetMenu(fileName = "Inventory", menuName = "Player/Inventory/Inventory")]
 public class InventorySO : ScriptableObject
@@ -34,6 +34,7 @@ public class InventorySO : ScriptableObject
     public event Action<InventoryItem[], int, int> OnHotbarChanged;
     public event Action<InventoryItem[]> OnAccessoriesChanged;
     public event Action<InventoryItem[]> OnArmorChanged;
+    public event Action<InventoryItem> OnBufferItemChanged;
     #endregion
 
     #region Properties
@@ -122,6 +123,7 @@ public class InventorySO : ScriptableObject
         OnHotbarChanged?.Invoke(_hotbarItems, _hotbarStartIndex, _hotbarSize);
         OnAccessoriesChanged?.Invoke(_accessoriesItems);
         OnArmorChanged?.Invoke(_armorItems);
+        OnBufferItemChanged?.Invoke(_bufferItem);
     }
 
     public int AddItem(ItemSO itemData, int quantity, ItemLocations location)
@@ -328,6 +330,16 @@ public class InventorySO : ScriptableObject
     private InventoryItem GetItem(int index, ItemLocations location)
     {
         return _itemsByLocation[location][index];
+    }
+
+    public StringBuilder GetItemDescription(int index, ItemLocations location)
+    {
+        if (_isItemInBuffer)
+        {
+            return null;
+        }
+        InventoryItem item = _itemsByLocation[location][index];
+        return item.ItemData?.GetFullDescription(item.Quantity);
     }
 
     public void RemoveItemAt(int index, ItemLocations location)

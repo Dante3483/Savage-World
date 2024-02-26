@@ -2,8 +2,8 @@ using Inventory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 public class UIInventoryPage : MonoBehaviour
 {
@@ -15,16 +15,19 @@ public class UIInventoryPage : MonoBehaviour
     [SerializeField] private RectTransform _storageContent;
     [SerializeField] private RectTransform _hotbarContent;
     [SerializeField] private RectTransform _accessoriesContent;
+    [SerializeField] private RectTransform _armorContent;
+    [SerializeField] private UITooltip _tooltipUI;
+    [SerializeField] private UIStorageItemCell _itemInBuffer;
 
     private List<UIStorageItemCell> _listOfStorageItems;
     private List<UIHotbarItemCell> _listOfHotbarItems;
     private List<UIAccessoryItemCell> _listOfAccessoryItems;
-    [SerializeField] private List<UIArmorItemCell> _listOfArmorItems;
+    private List<UIArmorItemCell> _listOfArmorItems;
     private Dictionary<ItemLocations, List<UIItemCell>> _itemsByLocation;
     #endregion
 
     #region Public fields
-    public event Action<int, ItemLocations> OnDraggingItem, OnStartTakeItem;
+    public event Action<int, ItemLocations> OnDraggingItem, OnStartTakeItem, OnDescriptionRequested;
     public event Action OnMouseLeave, OnStopTakeItem;
     #endregion
 
@@ -87,7 +90,7 @@ public class UIInventoryPage : MonoBehaviour
 
     private void InitializeArmor()
     {
-        _listOfArmorItems = _listOfArmorItems.OrderBy(a => a.ArmorType).ToList();
+        _listOfArmorItems = GetComponentsInChildren<UIArmorItemCell>().OrderBy(a => a.ArmorType).ToList();
         foreach (UIArmorItemCell uiItem in _listOfArmorItems)
         {
             SetHandlers(uiItem);
@@ -98,8 +101,57 @@ public class UIInventoryPage : MonoBehaviour
     private void SetHandlers(UIItemCell uiItem)
     {
         uiItem.OnLeftButtonClick += HandleDragItem;
+        uiItem.OnLeftButtonClick += HandleUpdateTooltip;
+
         uiItem.OnRightMouseDown += HandleStartTakeItem;
+        uiItem.OnRightMouseDown += HandleUpdateTooltip;
+
         uiItem.OnRightMouseUp += HandleStopTakeItem;
+        uiItem.OnMouseEnter += HandleUpdateTooltip;
+        uiItem.OnMouseLeave += HandleHideTooltip;
+    }
+
+    private void HandleDragItem(UIItemCell itemUI)
+    {
+        int index = _itemsByLocation[itemUI.ItemLocation].IndexOf(itemUI);
+
+        if (index == -1)
+        {
+            return;
+        }
+        OnDraggingItem?.Invoke(index, itemUI.ItemLocation);
+    }
+
+    private void HandleStartTakeItem(UIItemCell itemUI)
+    {
+        int index = _itemsByLocation[itemUI.ItemLocation].IndexOf(itemUI);
+
+        if (index == -1)
+        {
+            return;
+        }
+        OnStartTakeItem?.Invoke(index, itemUI.ItemLocation);
+    }
+
+    private void HandleStopTakeItem()
+    {
+        OnStopTakeItem?.Invoke();
+    }
+
+    private void HandleUpdateTooltip(UIItemCell itemUI)
+    {
+        int index = _itemsByLocation[itemUI.ItemLocation].IndexOf(itemUI);
+
+        if (index == -1)
+        {
+            return;
+        }
+        OnDescriptionRequested?.Invoke(index, itemUI.ItemLocation);
+    }
+
+    private void HandleHideTooltip()
+    {
+        HideTooltip();
     }
 
     public void UpdateStorageItemData(int itemIndex, Sprite itemImage, int itemQuantity)
@@ -122,31 +174,26 @@ public class UIInventoryPage : MonoBehaviour
         _listOfArmorItems[itemIndex].SetData(itemImage);
     }
 
-    private void HandleDragItem(UIItemCell itemUI)
+    public void UpdateItemInBufferData(Sprite itemImage, int itemQuantity)
     {
-        int index = _itemsByLocation[itemUI.ItemLocation].IndexOf(itemUI);
-        
-        if (index == -1)
-        {
-            return;
-        }
-        OnDraggingItem?.Invoke(index, itemUI.ItemLocation);
+        _itemInBuffer.SetData(itemImage, itemQuantity);
     }
 
-    private void HandleStartTakeItem(UIItemCell itemUI)
+    public void UpdateTooltip(StringBuilder text)
     {
-        int index = _itemsByLocation[itemUI.ItemLocation].IndexOf(itemUI);
-
-        if (index == -1)
+        if (text == null)
         {
-            return;
+            HideTooltip();
         }
-        OnStartTakeItem?.Invoke(index, itemUI.ItemLocation);
+        else
+        {
+            _tooltipUI.Show(text);
+        }
     }
 
-    private void HandleStopTakeItem()
+    private void HideTooltip()
     {
-        OnStopTakeItem?.Invoke();
+        _tooltipUI.Hide();
     }
     #endregion
 }

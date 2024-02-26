@@ -1,12 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Text;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Items
 {
-    [CreateAssetMenu(fileName = "newArmor", menuName = "Items/Armor")]
+    [CreateAssetMenu(fileName = "Armor", menuName = "Items/Armor")]
     public class ArmorItemSO : ItemSO
     {
         #region Private fields
@@ -55,16 +52,14 @@ namespace Items
             Using = "Can be equipped";
         }
 
-        public override string GetDescription()
+        public override StringBuilder GetFullDescription(int quantity)
         {
-            StringBuilder builder = new StringBuilder();
-
-            builder.Append("<size=30>").Append(ColoredName).Append("</size>").AppendLine();
-            builder.Append(ItemRarity.Name).AppendLine();
-            builder.Append(Using).AppendLine();
-            builder.Append(Description).AppendLine();
-
-            return builder.ToString();
+            _fullDescriptionStringBuilder.Clear();
+            _fullDescriptionStringBuilder.Append("<size=25>").Append(ColoredName).Append("</size>").AppendLine();
+            _fullDescriptionStringBuilder.Append(ItemRarity.Name).AppendLine();
+            _fullDescriptionStringBuilder.Append(Using).AppendLine();
+            _fullDescriptionStringBuilder.Append(Description).AppendLine();
+            return _fullDescriptionStringBuilder;
         }
         #endregion
     }

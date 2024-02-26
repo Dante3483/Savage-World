@@ -241,8 +241,8 @@ namespace Inventory
             IsItemChangeCell = _mouseFollower.gameObject.activeSelf;
             if (!IsItemChangeCell)
             {
-                _tooltip.Offset = _tooltipDesctiprionOffset;
-                _tooltip.Show(description);
+                //_tooltip.Offset = _tooltipDesctiprionOffset;
+                //_tooltip.Show(description);
             }
             else
             {
@@ -252,7 +252,7 @@ namespace Inventory
 
         public void ResetTooltipDescription()
         {
-            _tooltip.Hide();
+            //_tooltip.Hide();
         }
         #endregion
 

@@ -1,10 +1,9 @@
-using Inventory;
 using System.Text;
 using UnityEngine;
 
 namespace Items
 {
-    [CreateAssetMenu(fileName = "newBlock", menuName = "Items/Block")]
+    [CreateAssetMenu(fileName = "Block", menuName = "Items/Block")]
     public class BlockItemSO : ItemSO
     {
         #region Private fields
@@ -39,16 +38,14 @@ namespace Items
             Using = "Can be placed";
         }
 
-        public override string GetDescription()
+        public override StringBuilder GetFullDescription(int quantity)
         {
-            StringBuilder builder = new StringBuilder();
-
-            builder.Append("<size=30>").Append(ColoredName).Append("</size>").AppendLine();
-            builder.Append(ItemRarity.Name).AppendLine();
-            builder.Append(Using).AppendLine();
-            builder.Append(Description).AppendLine();
-
-            return builder.ToString();
+            _fullDescriptionStringBuilder.Clear();
+            _fullDescriptionStringBuilder.Append("<size=25>").Append(ColoredName).Append($" ({quantity})").Append("</size>").AppendLine();
+            _fullDescriptionStringBuilder.Append(ItemRarity.Name).AppendLine();
+            _fullDescriptionStringBuilder.Append(Using).AppendLine();
+            _fullDescriptionStringBuilder.Append(Description).AppendLine();
+            return _fullDescriptionStringBuilder;
         }
         #endregion
     }

@@ -48,6 +48,7 @@ public class InventoryController : MonoBehaviour
         _inventoryUI.OnDraggingItem += HandleDragItem;
         _inventoryUI.OnStartTakeItem += HandleStartTakeItem;
         _inventoryUI.OnStopTakeItem += HandleStopTakeItem;
+        _inventoryUI.OnDescriptionRequested += HandleDescriptionRequest;
     }
 
     public void PrepareInventoryData()
@@ -57,6 +58,7 @@ public class InventoryController : MonoBehaviour
         _inventoryData.OnHotbarChanged += HandleUpdateHotbarUI;
         _inventoryData.OnAccessoriesChanged += HandleUpdateAccessoriesUI;
         _inventoryData.OnArmorChanged += HandleUpdateArmorUI;
+        _inventoryData.OnBufferItemChanged += HandleUpdateItemInBufferUI;
 
         foreach(ItemSO item in _initStorageItems)
         {
@@ -104,10 +106,19 @@ public class InventoryController : MonoBehaviour
         }
     }
 
+    private void HandleUpdateItemInBufferUI(InventoryItem bufferState)
+    {
+        _inventoryUI.UpdateItemInBufferData(bufferState.ItemData?.ItemImage, bufferState.Quantity);
+    }
+
+    private void HandleDescriptionRequest(int itemIndex, ItemLocations itemLocation)
+    {
+        _inventoryUI.UpdateTooltip(_inventoryData.GetItemDescription(itemIndex, itemLocation));
+    }
+
     private void HandleDragItem(int itemIndex, ItemLocations itemLocation)
     {
         _inventoryData.TakeItem(itemIndex, itemLocation);
-        //InventoryUI.CreateDraggedItem(inventoryItem.Item.ItemImage, inventoryItem.Quantity);
     }
 
     private void HandleStartTakeItem(int itemIndex, ItemLocations itemLocation)

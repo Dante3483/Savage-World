@@ -1,3 +1,4 @@
+using System.Text;
 using UnityEngine;
 
 namespace Items
@@ -14,6 +15,7 @@ namespace Items
         [SerializeField] private string _using;
         [SerializeField][TextArea] private string _description;
         [SerializeField] private Sprite _itemImage;
+        protected StringBuilder _fullDescriptionStringBuilder;
         #endregion
 
         #region Public fields
@@ -77,13 +79,7 @@ namespace Items
         {
             get
             {
-                string hexColor = ColorUtility.ToHtmlStringRGB(ItemRarity.RarityColor);
-                return $"<color=#{hexColor}>{_name}</color>";
-            }
-
-            set
-            {
-                _name = value;
+                return $"<color=#{ColorUtility.ToHtmlStringRGB(ItemRarity.RarityColor)}>{_name}</color>";
             }
         }
 
@@ -154,7 +150,12 @@ namespace Items
         #endregion
 
         #region Methods
-        public abstract string GetDescription();
+        public ItemSO()
+        {
+            _fullDescriptionStringBuilder = new StringBuilder();
+        }
+
+        public abstract StringBuilder GetFullDescription(int quantity);
         #endregion
     }
 }
