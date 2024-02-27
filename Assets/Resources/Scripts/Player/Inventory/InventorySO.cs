@@ -1,636 +1,433 @@
-//using Items;
-//using System;
-//using System.Collections.Generic;
-//using System.Drawing;
-//using System.Linq;
-//using UnityEngine;
+using Inventory;
+using Items;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
 
-//namespace Inventory
-//{
-//    [CreateAssetMenu(fileName = "newInventory", menuName = "UI/Inventory/Inventory")]
-//    public class InventorySO : ScriptableObject
-//    {
-//        #region Private fields
-//        [SerializeField] private List<InventoryItem> _inventoryItems;
-//        [SerializeField] private HotbarSO _hotbar;
-//        [SerializeField] private InventoryItem _itemInChangeState;
-//        [SerializeField] private int _size = 10;
-//        [Header("Armor")]
-//        [SerializeField] private InventoryItem _helmet;
-//        [SerializeField] private InventoryItem _chestplate;
-//        [SerializeField] private InventoryItem _leggings;
-//        [Space]
-//        [SerializeField] private InventoryItem _helmetClothes;
-//        [SerializeField] private InventoryItem _chestplateClothes;
-//        [SerializeField] private InventoryItem _leggingsClothes;
-//        #endregion
+[CreateAssetMenu(fileName = "Inventory", menuName = "Player/Inventory/Inventory")]
+public class InventorySO : ScriptableObject
+{
+    #region Private fields
+    [SerializeField] private InventoryItem[] _storageItems;
+    [SerializeField] private InventoryItem[] _hotbarItems;
+    [SerializeField] private InventoryItem[] _accessoriesItems;
+    [SerializeField] private InventoryItem[] _armorItems;
 
-//        #region Public fields
-//        public event Action<Dictionary<int, InventoryItem>, List<InventoryItem>> OnInventoryChanged;
-//        #endregion
+    [SerializeField] private InventoryItem _bufferItem;
 
-//        #region Properties
-//        public int Size
-//        {
-//            get
-//            {
-//                return _size;
-//            }
+    [SerializeField] private int _storageSize = 36;
+    [SerializeField] private int _hotbarFullSize = 10;
+    [SerializeField] private int _accessoriesSize = 6;
+    [SerializeField] private int _armorSize = 3;
 
-//            set
-//            {
-//                _size = value;
-//            }
-//        }
+    private Dictionary<ItemLocations, InventoryItem[]> _itemsByLocation;
+    private bool _isFirstPartOfHotbar;
+    private bool _isItemInBuffer => !_bufferItem.IsEmpty;
+    private int _hotbarSize => _hotbarFullSize / 2;
+    private int _hotbarStartIndex => _isFirstPartOfHotbar ? 0 : _hotbarSize;
+    #endregion
 
-//        public InventoryItem ItemInChangeState
-//        {
-//            get
-//            {
-//                return _itemInChangeState;
-//            }
+    #region Public fields
+    public event Action<InventoryItem[]> OnStorageChanged;
+    public event Action<InventoryItem[], int, int> OnHotbarChanged;
+    public event Action<InventoryItem[]> OnAccessoriesChanged;
+    public event Action<InventoryItem[]> OnArmorChanged;
+    public event Action<InventoryItem> OnBufferItemChanged;
+    #endregion
 
-//            set
-//            {
-//                _itemInChangeState = value;
-//            }
-//        }
-//        #endregion
+    #region Properties
+    public int StorageSize
+    {
+        get
+        {
+            return _storageSize;
+        }
 
-//        #region Methods
+        set
+        {
+            _storageSize = value;
+        }
+    }
 
-//        #region General
-//        public void Initialize()
-//        {
-//            _inventoryItems = new List<InventoryItem>();
-//            for (int i = 0; i < Size; i++)
-//            {
-//                _inventoryItems.Add(InventoryItem.GetEmptyItem());
-//            }
-//            ItemInChangeState = InventoryItem.GetEmptyItem();
-//            _helmet = InventoryItem.GetEmptyItem();
-//            _helmetClothes = InventoryItem.GetEmptyItem();
-//            _chestplate = InventoryItem.GetEmptyItem();
-//            _chestplateClothes = InventoryItem.GetEmptyItem();
-//            _leggings = InventoryItem.GetEmptyItem();
-//            _leggingsClothes = InventoryItem.GetEmptyItem();
-//        }
+    public int HotbarSize
+    {
+        get
+        {
+            return _hotbarFullSize;
+        }
 
-//        public void InformAboutChange()
-//        {
-//            OnInventoryChanged?.Invoke(GetCurrentInventoryState(), GetArmorInventoryState());
-//            _hotbar.InformAboutChange(GetHotbarInventoryState());
-//        }
-//        #endregion
+        set
+        {
+            _hotbarFullSize = value;
+        }
+    }
 
-//        #region Get inventory state
-//        public Dictionary<int, InventoryItem> GetCurrentInventoryState()
-//        {
-//            Dictionary<int, InventoryItem> returnValue = new Dictionary<int, InventoryItem>();
-//            for (int i = 0; i < _inventoryItems.Count; i++)
-//            {
-//                returnValue[i] = _inventoryItems[i];
-//            }
-//            return returnValue;
-//        }
+    public int AccessoriesSize
+    {
+        get
+        {
+            return _accessoriesSize;
+        }
 
-//        public List<InventoryItem> GetArmorInventoryState()
-//        {
-//            return new List<InventoryItem>()
-//            {
-//                _helmet,
-//                _chestplate,
-//                _leggings,
-//                _helmetClothes,
-//                _chestplateClothes,
-//                _leggingsClothes
-//            };
-//        }
+        set
+        {
+            _accessoriesSize = value;
+        }
+    }
+    #endregion
 
-//        public Dictionary<int, InventoryItem> GetHotbarInventoryState()
-//        {
-//            Dictionary<int, InventoryItem> returnValue = new Dictionary<int, InventoryItem>();
-//            for (int i = 0; i < 10; i++)
-//            {
-//                returnValue[i] = _inventoryItems[i];
-//            }
-//            return returnValue;
-//        }
-//        #endregion
+    #region Methods
+    public void Initialize()
+    {
+        _itemsByLocation = new Dictionary<ItemLocations, InventoryItem[]>();
+        _storageItems = new InventoryItem[_storageSize];
+        _hotbarItems = new InventoryItem[_hotbarFullSize];
+        _accessoriesItems = new InventoryItem[_accessoriesSize];
+        _armorItems = new InventoryItem[_armorSize];
 
-//        #region Add item
-//        public int AddItem(ItemSO item, int quantity)
-//        {
-//            if (!item.IsStackable)
-//            {
-//                for (int i = 0; i < _inventoryItems.Count; i++)
-//                {
-//                    while (quantity > 0 && !IsInventoryFull())
-//                    {
-//                        quantity -= AddItemToFirstFreeSlot(item, 1);
-//                    }
-//                    InformAboutChange();
-//                    return quantity;
-//                }
-//            }
-//            quantity = AddStackableItem(item, quantity);
-//            InformAboutChange();
-//            return quantity;
-//        }
+        for (int i = 0; i < _storageSize; i++)
+        {
+            _storageItems[i] = InventoryItem.GetEmptyItem();
+        }
 
-//        public int AddItem(InventoryItem item)
-//        {
-//            return AddItem(item.Item, item.Quantity);
-//        }
+        for (int i = 0; i < _hotbarFullSize; i++)
+        {
+            _hotbarItems[i] = InventoryItem.GetEmptyItem();
+        }
 
-//        public void AddItemAt(InventoryItem item, int index)
-//        {
-//            //Item in changing cell
-//            InventoryItem newItem = new InventoryItem()
-//            {
-//                Item = item.Item,
-//                Quantity = item.Quantity,
-//            };
+        for (int i = 0; i < _accessoriesSize; i++)
+        {
+            _accessoriesItems[i] = InventoryItem.GetEmptyItem();
+        }
 
-//            //Item in cell to change
-//            InventoryItem itemAtIndex = GetItemAt(index);
+        for (int i = 0; i < _armorSize; i++)
+        {
+            _armorItems[i] = InventoryItem.GetEmptyItem();
+        }
 
-//            //Current quantity
-//            int quantity = item.Quantity;
+        _itemsByLocation.Add(ItemLocations.Storage, _storageItems);
+        _itemsByLocation.Add(ItemLocations.Hotbar, _hotbarItems);
+        _itemsByLocation.Add(ItemLocations.Accessories, _accessoriesItems);
+        _itemsByLocation.Add(ItemLocations.Armor, _armorItems);
 
-//            //If item in cell to change is empty cell
-//            if (itemAtIndex.IsEmpty)
-//            {
-//                _inventoryItems[index] = newItem;
-//                ItemInChangeState = InventoryItem.GetEmptyItem();
-//            }
-//            //Otherwise
-//            else
-//            {
-//                //If item same as changing item
-//                if (itemAtIndex.Item == item.Item)
-//                {
-//                    if (itemAtIndex.Quantity == itemAtIndex.Item.MaxStackSize)
-//                    {
-//                        _inventoryItems[index] = newItem;
-//                        AddItemInBuffer(itemAtIndex);
-//                    }
-//                    else
-//                    {
-//                        int amountPossibleToTake = itemAtIndex.Item.MaxStackSize - itemAtIndex.Quantity;
-//                        //If quantity greater than maximus stack size
-//                        if (quantity > amountPossibleToTake)
-//                        {
-//                            _inventoryItems[index] = itemAtIndex.SetQuantity(itemAtIndex.Item.MaxStackSize);
-//                            quantity -= amountPossibleToTake;
-//                            InventoryItem remainderItem = new InventoryItem()
-//                            {
-//                                Item = item.Item,
-//                                Quantity = quantity,
-//                            };
-//                            AddItemInBuffer(remainderItem);
-//                        }
-//                        //Otherwise
-//                        else
-//                        {
-//                            _inventoryItems[index] = itemAtIndex.SetQuantity(itemAtIndex.Quantity + quantity);
-//                            ItemInChangeState = InventoryItem.GetEmptyItem();
-//                        }
-//                    }
-//                }
-//                //Otherwise
-//                else
-//                {
-//                    AddItemInBuffer(itemAtIndex);
-//                    _inventoryItems[index] = newItem;
-//                }
-//            }
-//            InformAboutChange();
-//        }
+        _bufferItem = InventoryItem.GetEmptyItem();
 
-//        private int AddItemToFirstFreeSlot(ItemSO item, int quantity)
-//        {
-//            InventoryItem newItem = new InventoryItem()
-//            {
-//                Item = item,
-//                Quantity = quantity,
-//            };
+        _isFirstPartOfHotbar = true;
+    }
 
-//            for (int i = 0; i < _inventoryItems.Count; i++)
-//            {
-//                if (_inventoryItems[i].IsEmpty)
-//                {
-//                    _inventoryItems[i] = newItem;
-//                    return quantity;
-//                }
-//            }
-//            return 0;
-//        }
+    public void InformAboutChange()
+    {
+        OnStorageChanged?.Invoke(_storageItems);
+        OnHotbarChanged?.Invoke(_hotbarItems, _hotbarStartIndex, _hotbarSize);
+        OnAccessoriesChanged?.Invoke(_accessoriesItems);
+        OnArmorChanged?.Invoke(_armorItems);
+        OnBufferItemChanged?.Invoke(_bufferItem);
+    }
 
-//        private int AddStackableItem(ItemSO item, int quantity)
-//        {
-//            for (int i = 0; i < _inventoryItems.Count; i++)
-//            {
-//                if (_inventoryItems[i].IsEmpty)
-//                {
-//                    continue;
-//                }
-//                if (_inventoryItems[i].Item == item)
-//                {
-//                    int amountPossibleToTake = _inventoryItems[i].Item.MaxStackSize - _inventoryItems[i].Quantity;
-//                    if (quantity > amountPossibleToTake)
-//                    {
-//                        _inventoryItems[i] = _inventoryItems[i].SetQuantity(_inventoryItems[i].Item.MaxStackSize);
-//                        quantity -= amountPossibleToTake;
-//                    }
-//                    else
-//                    {
-//                        _inventoryItems[i] = _inventoryItems[i].SetQuantity(_inventoryItems[i].Quantity + quantity);
-//                        InformAboutChange();
-//                        return 0;
-//                    }
-//                }
-//            }
-//            while (quantity > 0 && !IsInventoryFull())
-//            {
-//                int newQuantity = Mathf.Clamp(quantity, 0, item.MaxStackSize);
-//                quantity -= newQuantity;
-//                AddItemToFirstFreeSlot(item, newQuantity);
-//            }
-//            return quantity;
-//        }
+    public int AddItem(ItemSO itemData, int quantity, ItemLocations location)
+    {
+        if (!itemData.IsStackable)
+        {
+            if (!IsStorageFull(location))
+            {
+                quantity -= AddItemToFirstFreeSlot(itemData, 1, location);
+            }
+        }
+        else
+        {
+            quantity = AddStackableItem(itemData, quantity, location);
+        }
+        InformAboutChange();
+        return quantity;
+    }
 
-//        public void AddItemInBuffer(InventoryItem item)
-//        {
-//            InventoryItem newItem = new InventoryItem()
-//            {
-//                Item = item.Item,
-//                Quantity = item.Quantity,
-//            };
-//            _itemInChangeState = newItem;
-//        }
+    private int AddItemToFirstFreeSlot(ItemSO itemData, int quantity, ItemLocations location)
+    {
+        for (int i = 0; i < _itemsByLocation[location].Length; i++)
+        {
+            if (_itemsByLocation[location][i].IsEmpty)
+            {
+                _itemsByLocation[location][i].UpdateData(quantity, itemData);
+                return quantity;
+            }
+        }
+        return 0;
+    }
 
-//        public void AddItemInBuffer(InventoryItem item, int quantity)
-//        {
-//            if (ItemInChangeState.IsEmpty)
-//            {
-//                InventoryItem newItem = new InventoryItem()
-//                {
-//                    Item = item.Item,
-//                    Quantity = 1,
-//                };
-//                ItemInChangeState = newItem;
-//            }
-//            else
-//            {
-//                ItemInChangeState = ItemInChangeState.SetQuantity(ItemInChangeState.Quantity + quantity);
-//            }
-//        }
+    private int AddItemToFirstFreeSlot(InventoryItem item, ItemLocations location)
+    {
+        for (int i = 0; i < _itemsByLocation[location].Length; i++)
+        {
+            if (_itemsByLocation[location][i].IsEmpty)
+            {
+                _itemsByLocation[location][i].UpdateData(item);
+                item.ClearData();
+                return item.Quantity;
+            }
+        }
+        return 0;
+    }
 
-//        public void QuickSetArmor(int index)
-//        {
-//            InventoryItem item = GetItemAt(index);
-//            ArmorItemSO armor = item.Item as ArmorItemSO;
-//            RemoveItemAt(index);
-//            switch (armor.ArmorType)
-//            {
-//                case ArmorTypes.Helmet:
-//                    {
-//                        if (!_helmet.IsEmpty)
-//                        {
-//                            AddItemAt(_helmet, index);
-//                        }
-//                        _helmet = item;
-//                    }
-//                    break;
-//                case ArmorTypes.Chestplate:
-//                    {
-//                        if (!_chestplate.IsEmpty)
-//                        {
-//                            AddItemAt(_chestplate, index);
-//                        }
-//                        _chestplate = item;
-//                    }
-//                    break;
-//                case ArmorTypes.Leggings:
-//                    {
-//                        if (!_leggings.IsEmpty)
-//                        {
-//                            AddItemAt(_leggings, index);
-//                        }
-//                        _leggings = item;
-//                    }
-//                    break;
-//                default:
-//                    break;
-//            }
-//            InformAboutChange();
-//        }
+    private void AddAccessory(InventoryItem item)
+    {
+        InventoryItem sameAccessory = FindSameAccessory(item);
+        if (sameAccessory != null)
+        {
+            sameAccessory.SwapData(item);
+            return;
+        }
+        for (int i = 0; i < _accessoriesSize; i++)
+        {
+            if (_accessoriesItems[i].IsEmpty)
+            {
+                _accessoriesItems[i].SwapData(item);
+                return;
+            }
+        }
+        _accessoriesItems[0].SwapData(item);
+    }
 
-//        public void SetArmor(ArmorTypes type)
-//        {
-//            if (ItemInChangeState.IsEmpty)
-//            {
-//                RemoveArmor(type);
-//                return;
-//            }
-//            InventoryItem item = ItemInChangeState;
-//            ArmorItemSO armor = item.Item as ArmorItemSO;
-//            if (armor != null)
-//            {
-//                switch (type)
-//                {
-//                    case ArmorTypes.Helmet:
-//                        {
-//                            if (armor.ArmorType == type)
-//                            {
-//                                ItemInChangeState = InventoryItem.GetEmptyItem();
-//                                if (!_helmet.IsEmpty)
-//                                {
-//                                    AddItemInBuffer(_helmet);
-//                                }
-//                                _helmet = item;
-//                            }
-//                        }
-//                        break;
-//                    case ArmorTypes.Chestplate:
-//                        {
-//                            if (armor.ArmorType == type)
-//                            {
-//                                ItemInChangeState = InventoryItem.GetEmptyItem();
-//                                if (!_chestplate.IsEmpty)
-//                                {
-//                                    AddItemInBuffer(_chestplate);
-//                                }
-//                                _chestplate = item;
-//                            }
-//                        }
-//                        break;
-//                    case ArmorTypes.Leggings:
-//                        {
-//                            if (armor.ArmorType == type)
-//                            {
-//                                ItemInChangeState = InventoryItem.GetEmptyItem();
-//                                if (!_leggings.IsEmpty)
-//                                {
-//                                    AddItemInBuffer(_leggings);
-//                                }
-//                                _leggings = item;
-//                            }
-//                        }
-//                        break;
-//                    case ArmorTypes.HelmetClothes:
-//                        {
-//                            if (armor.ArmorType == ArmorTypes.Helmet)
-//                            {
-//                                ItemInChangeState = InventoryItem.GetEmptyItem();
-//                                if (!_helmetClothes.IsEmpty)
-//                                {
-//                                    AddItemInBuffer(_helmetClothes);
-//                                }
-//                                _helmetClothes = item;
-//                            }
-//                        }
-//                        break;
-//                    case ArmorTypes.ChestplateClothes:
-//                        {
-//                            if (armor.ArmorType == ArmorTypes.Chestplate)
-//                            {
-//                                ItemInChangeState = InventoryItem.GetEmptyItem();
-//                                if (!_chestplateClothes.IsEmpty)
-//                                {
-//                                    AddItemInBuffer(_chestplateClothes);
-//                                }
-//                                _chestplateClothes = item;
-//                            }
-//                        }
-//                        break;
-//                    case ArmorTypes.LeggingsClothes:
-//                        {
-//                            if (armor.ArmorType == ArmorTypes.Leggings)
-//                            {
-//                                ItemInChangeState = InventoryItem.GetEmptyItem();
-//                                if (!_leggingsClothes.IsEmpty)
-//                                {
-//                                    AddItemInBuffer(_leggingsClothes);
-//                                }
-//                                _leggingsClothes = item;
-//                            }
-//                        }
-//                        break;
-//                    default:
-//                        break;
-//                }
-//                InformAboutChange();
-//            }
-//        }
+    private void AddArmor(InventoryItem item)
+    {
+        if (item.ItemData is ArmorItemSO armor)
+        {
+            _armorItems[(int)(armor.ArmorType)].SwapData(item);
+        }
+    }
 
-//        public void SetArmorAt(InventoryItem armor, int i)
-//        {
-//            switch (i)
-//            {
-//                case 0:
-//                    {
-//                        _helmet = armor;
-//                    }
-//                    break;
-//                case 1:
-//                    {
-//                        _chestplate = armor;
-//                    }
-//                    break;
-//                case 2:
-//                    {
-//                        _leggings = armor;
-//                    }
-//                    break;
-//                case 3:
-//                    {
-//                        _helmetClothes = armor;
-//                    }
-//                    break;
-//                case 4:
-//                    {
-//                        _chestplateClothes = armor;
-//                    }
-//                    break;
-//                case 5:
-//                    {
-//                        _leggingsClothes = armor;
-//                    }
-//                    break;
-//                default:
-//                    break;
-//            }
-//        }
-//        #endregion
+    private int AddStackableItem(ItemSO item, int quantity, ItemLocations location)
+    {
+        for (int i = 0; i < _itemsByLocation[location].Length; i++)
+        {
+            if (_itemsByLocation[location][i].ItemData == item)
+            {
+                int amountPossibleToTake = _itemsByLocation[location][i].ItemData.MaxStackSize - _itemsByLocation[location][i].Quantity;
+                if (quantity > amountPossibleToTake)
+                {
+                    _itemsByLocation[location][i].UpdateQuantity(_itemsByLocation[location][i].ItemData.MaxStackSize);
+                    quantity -= amountPossibleToTake;
+                }
+                else
+                {
+                    _itemsByLocation[location][i].UpdateQuantity(_itemsByLocation[location][i].Quantity + quantity);
+                    return 0;
+                }
+            }
+        }
 
-//        #region Get item
-//        public InventoryItem GetItemAt(int itemIndex)
-//        {
-//            return _inventoryItems[itemIndex];
-//        }
-//        #endregion
+        while (quantity > 0 && !IsStorageFull(location))
+        {
+            int newQuantity = Mathf.Clamp(quantity, 0, item.MaxStackSize);
+            quantity -= newQuantity;
+            AddItemToFirstFreeSlot(item, newQuantity, location);
+        }
+        return quantity;
+    }
 
-//        #region Remove item
-//        public int RemoveItemAt(int index, int quantity = 0)
-//        {
-//            if (quantity == 0)
-//            {
-//                _inventoryItems[index] = InventoryItem.GetEmptyItem();
-//                InformAboutChange();
-//                return 0;
-//            }
-//            else
-//            {
-//                int amountPossibliToRemove = _inventoryItems[index].Quantity - quantity;
-//                if (amountPossibliToRemove > 0)
-//                {
-//                    _inventoryItems[index] = _inventoryItems[index].SetQuantity(_inventoryItems[index].Quantity - quantity);
-//                    if (_inventoryItems[index].Quantity == 0)
-//                    {
-//                        _inventoryItems[index] = InventoryItem.GetEmptyItem();
-//                    }
-//                    InformAboutChange();
-//                    return quantity;
-//                }
-//                else
-//                {
-//                    _inventoryItems[index] = InventoryItem.GetEmptyItem();
-//                    InformAboutChange();
-//                    return amountPossibliToRemove + quantity;
-//                }
-//            }
-//        }
+    private void AddItemToBuffer(int index, ItemLocations location)
+    {
+        InventoryItem item = GetItem(index, location);
 
-//        public void RemoveSelectedItem(int quantity)
-//        {
-//            int index = _hotbar.SelectedIndex;
-//            _inventoryItems[index] = _inventoryItems[index].SetQuantity(_inventoryItems[index].Quantity - quantity);
-//            if (_inventoryItems[index].Quantity == 0)
-//            {
-//                _inventoryItems[index] = InventoryItem.GetEmptyItem();
-//            }
-//            InformAboutChange();
-//        }
+        if (item.IsEmpty)
+        {
+            return;
+        }
+        _bufferItem.UpdateData(item);
+        RemoveItemAt(index, location);
+    }
 
-//        public void QuickRemoveArmor(ArmorTypes type)
-//        {
-//            if (!IsInventoryFull())
-//            {
-//                switch (type)
-//                {
-//                    case ArmorTypes.Helmet:
-//                        {
-//                            AddItemToFirstFreeSlot(_helmet.Item, 1);
-//                            _helmet = InventoryItem.GetEmptyItem();
-//                        }
-//                        break;
-//                    case ArmorTypes.Chestplate:
-//                        {
-//                            AddItemToFirstFreeSlot(_chestplate.Item, 1);
-//                            _chestplate = InventoryItem.GetEmptyItem();
-//                        }
-//                        break;
-//                    case ArmorTypes.Leggings:
-//                        {
-//                            AddItemToFirstFreeSlot(_leggings.Item, 1);
-//                            _leggings = InventoryItem.GetEmptyItem();
-//                        }
-//                        break;
-//                    case ArmorTypes.HelmetClothes:
-//                        {
-//                            AddItemToFirstFreeSlot(_helmetClothes.Item, 1);
-//                            _helmetClothes = InventoryItem.GetEmptyItem();
-//                        }
-//                        break;
-//                    case ArmorTypes.ChestplateClothes:
-//                        {
-//                            AddItemToFirstFreeSlot(_chestplateClothes.Item, 1);
-//                            _chestplateClothes = InventoryItem.GetEmptyItem();
-//                        }
-//                        break;
-//                    case ArmorTypes.LeggingsClothes:
-//                        {
-//                            AddItemToFirstFreeSlot(_leggingsClothes.Item, 1);
-//                            _leggingsClothes = InventoryItem.GetEmptyItem();
-//                        }
-//                        break;
-//                    default:
-//                        break;
-//                }
-//                InformAboutChange();
-//            }
-//        }
+    private void AddItemToBuffer(int index, ItemLocations location, int quantity)
+    {
+        InventoryItem item = GetItem(index, location);
 
-//        public void RemoveArmor(ArmorTypes type)
-//        {
-//            switch (type)
-//            {
-//                case ArmorTypes.Helmet:
-//                    {
-//                        AddItemInBuffer(_helmet);
-//                        _helmet = InventoryItem.GetEmptyItem();
-//                    }
-//                    break;
-//                case ArmorTypes.Chestplate:
-//                    {
-//                        AddItemInBuffer(_chestplate);
-//                        _chestplate = InventoryItem.GetEmptyItem();
-//                    }
-//                    break;
-//                case ArmorTypes.Leggings:
-//                    {
-//                        AddItemInBuffer(_leggings);
-//                        _leggings = InventoryItem.GetEmptyItem();
-//                    }
-//                    break;
-//                case ArmorTypes.HelmetClothes:
-//                    {
-//                        AddItemInBuffer(_helmetClothes);
-//                        _helmetClothes = InventoryItem.GetEmptyItem();
-//                    }
-//                    break;
-//                case ArmorTypes.ChestplateClothes:
-//                    {
-//                        AddItemInBuffer(_chestplateClothes);
-//                        _chestplateClothes = InventoryItem.GetEmptyItem();
-//                    }
-//                    break;
-//                case ArmorTypes.LeggingsClothes:
-//                    {
-//                        AddItemInBuffer(_leggingsClothes);
-//                        _leggingsClothes = InventoryItem.GetEmptyItem();
-//                    }
-//                    break;
-//                default:
-//                    break;
-//            }
-//            InformAboutChange();
-//        }
-//        #endregion
+        if (item.Quantity - quantity < 0)
+        {
+            quantity = item.Quantity;
+        }
+        if (!_isItemInBuffer)
+        {
+            item.UpdateQuantity(item.Quantity - quantity);
+            _bufferItem.UpdateItem(item.ItemData);
+            _bufferItem.UpdateQuantity(quantity);
+        }
+        else if (_bufferItem.ItemData == item.ItemData)
+        {
+            if (_bufferItem.Quantity + quantity > _bufferItem.ItemData.MaxStackSize)
+            {
+                quantity = _bufferItem.ItemData.MaxStackSize - _bufferItem.Quantity;
+            }
+            item.UpdateQuantity(item.Quantity - quantity);
+            _bufferItem.UpdateQuantity(_bufferItem.Quantity + quantity);
+        }
+        InformAboutChange();
+    }
 
-//        #region Checks
-//        private bool IsInventoryFull()
-//        {
-//            return !_inventoryItems.Where(item => item.IsEmpty).Any();
-//        }
+    private void AddItemFromBufferAt(int index, ItemLocations location)
+    {
+        InventoryItem item = GetItem(index, location);
+        int quantity = _bufferItem.Quantity;
 
-//        public bool CanAddItemToInventory(ItemSO item)
-//        {
-//            bool isSameItemInInventory = _inventoryItems.Where(x => x.Item == item && x.Quantity != item.MaxStackSize).Any();
-//            if (isSameItemInInventory)
-//            {
-//                return true;
-//            }
-//            if (!IsInventoryFull())
-//            {
-//                return true;
-//            }
-//            return false;
-//        }
-//        #endregion
+        if (location == ItemLocations.Accessories)
+        {
+            if (!_bufferItem.IsAccessory)
+            {
+                return;
+            }
+            if (FindSameAccessory(_bufferItem) != null)
+            {
+                return;
+            }
+        }
+        if (location == ItemLocations.Armor)
+        {
+            if (!_bufferItem.IsArmor)
+            {
+                return;
+            }
+            if (!IsCorrectArmorSlot(index, _bufferItem))
+            {
+                return;
+            }
+        }
+        if (item.IsEmpty)
+        {
+            item.UpdateData(_bufferItem);
+            _bufferItem.ClearData();
+        }
+        else
+        {
+            if (item.ItemData == _bufferItem.ItemData)
+            {
+                if (item.Quantity == item.ItemData.MaxStackSize)
+                {
+                    item.SwapData(_bufferItem);
+                }
+                else
+                {
+                    int amountPossibleToTake = item.ItemData.MaxStackSize - item.Quantity;
+                    if (quantity > amountPossibleToTake)
+                    {
+                        item.UpdateQuantity(item.ItemData.MaxStackSize);
+                        quantity -= amountPossibleToTake;
+                        _bufferItem.UpdateQuantity(quantity);
+                    }
+                    else
+                    {
+                        item.UpdateQuantity(item.Quantity + quantity);
+                        _bufferItem.ClearData();
+                    }
+                }
+            }
+            else
+            {
+                item.SwapData(_bufferItem);
+            }
+        }
+    }
 
-//        #endregion
-//    }
-//}
+    private InventoryItem GetItem(int index, ItemLocations location)
+    {
+        return _itemsByLocation[location][index];
+    }
+
+    public StringBuilder GetItemDescription(int index, ItemLocations location)
+    {
+        if (_isItemInBuffer)
+        {
+            return null;
+        }
+        InventoryItem item = _itemsByLocation[location][index];
+        return item.ItemData?.GetFullDescription(item.Quantity);
+    }
+
+    public void RemoveItemAt(int index, ItemLocations location)
+    {
+        GetItem(index, location).ClearData();
+        InformAboutChange();
+    }
+
+    public void TakeItem(int index, ItemLocations location)
+    {
+        if (!_isItemInBuffer)
+        {
+            AddItemToBuffer(index, location);
+        }
+        else
+        {
+            AddItemFromBufferAt(index, location);
+        }
+        InformAboutChange();
+    }
+
+    public void TakeItem(int index, ItemLocations location, int quantity)
+    {
+        InventoryItem item = GetItem(index, location);
+        if (item.IsAccessory)
+        {
+            FastEquipAccessory(location, item);
+        }
+        else if (item.IsArmor)
+        {
+            FastEquipArmor(location, item);
+        }
+        else
+        {
+            AddItemToBuffer(index, location, quantity);
+        }
+        InformAboutChange();
+    }
+
+    private void FastEquipAccessory(ItemLocations location, InventoryItem item)
+    {
+        if (location != ItemLocations.Accessories)
+        {
+            AddAccessory(item);
+        }
+        else
+        {
+            AddItemToFirstFreeSlot(item, ItemLocations.Storage);
+        }
+    }
+
+    private void FastEquipArmor(ItemLocations location, InventoryItem item)
+    {
+        if (location != ItemLocations.Armor)
+        {
+            AddArmor(item);
+        }
+        else
+        {
+            AddItemToFirstFreeSlot(item, ItemLocations.Storage);
+        }
+    }
+
+    public bool CompareItemWithBuffer(int index, ItemLocations location)
+    {
+        return _bufferItem.ItemData == GetItem(index, location).ItemData;
+    }
+
+    private bool IsStorageFull(ItemLocations location)
+    {
+        return !_itemsByLocation[location].Where(item => item.IsEmpty).Any();
+    }
+
+    private bool IsCorrectArmorSlot(int index, InventoryItem item)
+    {
+        return (int)(item.ItemData as ArmorItemSO).ArmorType == index;
+    }
+
+    private InventoryItem FindSameAccessory(InventoryItem item)
+    {
+        for (int i = 0; i < _accessoriesSize; i++)
+        {
+            if (_accessoriesItems[i].ItemData == item.ItemData)
+            {
+                return _accessoriesItems[i];
+            }
+        }
+        return null;
+    }
+    #endregion
+}

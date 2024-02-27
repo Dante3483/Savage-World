@@ -155,7 +155,7 @@ TextureImporter:
         width: 96
         height: 96
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 2, y: 2, z: 2, w: 2}
       outline: []
       physicsShape: []
@@ -302,7 +302,7 @@ TextureImporter:
         width: 84
         height: 84
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 18, y: 18, z: 18, w: 18}
       outline: []
       physicsShape: []
@@ -310,6 +310,132 @@ TextureImporter:
       bones: []
       spriteID: e55f3d051efc194458905de90751f1a7
       internalID: 1874808982
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PaperUI_10
+      rect:
+        serializedVersion: 2
+        x: 2002
+        y: 528
+        width: 75
+        height: 46
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e33a392e4675e5749b59a58319714ac4
+      internalID: 1307218070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PaperUI_11
+      rect:
+        serializedVersion: 2
+        x: 2218
+        y: 528
+        width: 59
+        height: 38
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3692e9a5e74bb04418bbdcdf9b57d545
+      internalID: -190130963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PaperUI_12
+      rect:
+        serializedVersion: 2
+        x: 2230
+        y: 451
+        width: 35
+        height: 35
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 741d7e9428691d04d8a2b87e1ce869ab
+      internalID: 934485225
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PaperUI_13
+      rect:
+        serializedVersion: 2
+        x: 2215
+        y: 387
+        width: 64
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fb0d8a9e35bf6974ca44dd33c58902eb
+      internalID: -1936805760
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PaperUI_14
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 272
+        width: 48
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 1, y: 1, z: 1, w: 1}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 29377e1c433c5b240a15353f6c30870d
+      internalID: 473205736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PaperUI_15
+      rect:
+        serializedVersion: 2
+        x: 424
+        y: 185
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d9ed51033eee8aa49a0de9a0b52494b6
+      internalID: -1680182812
       vertices: []
       indices: 
       edges: []
@@ -327,6 +453,12 @@ TextureImporter:
     nameFileIdTable:
       PaperUI_0: 1586372631
       PaperUI_1: -1336014693
+      PaperUI_10: 1307218070
+      PaperUI_11: -190130963
+      PaperUI_12: 934485225
+      PaperUI_13: -1936805760
+      PaperUI_14: 473205736
+      PaperUI_15: -1680182812
       PaperUI_2: -1268454277
       PaperUI_3: -1405196987
       PaperUI_4: 437917871
