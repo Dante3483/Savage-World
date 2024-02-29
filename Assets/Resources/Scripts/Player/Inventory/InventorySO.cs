@@ -16,6 +16,7 @@ public class InventorySO : ScriptableObject
     [SerializeField] private InventoryItem[] _armorItems;
 
     [SerializeField] private InventoryItem _bufferItem;
+    [SerializeField] private InventoryItem _selectedItem;
 
     [SerializeField] private int _storageSize = 36;
     [SerializeField] private int _hotbarFullSize = 10;
@@ -27,6 +28,7 @@ public class InventorySO : ScriptableObject
     private bool _isItemInBuffer => !_bufferItem.IsEmpty;
     private int _hotbarSize => _hotbarFullSize / 2;
     private int _hotbarStartIndex => _isFirstPartOfHotbar ? 0 : _hotbarSize;
+    private int _indexOfSelectedItem;
     #endregion
 
     #region Public fields
@@ -44,23 +46,13 @@ public class InventorySO : ScriptableObject
         {
             return _storageSize;
         }
-
-        set
-        {
-            _storageSize = value;
-        }
     }
 
     public int HotbarSize
     {
         get
         {
-            return _hotbarFullSize;
-        }
-
-        set
-        {
-            _hotbarFullSize = value;
+            return _hotbarSize;
         }
     }
 
@@ -70,10 +62,13 @@ public class InventorySO : ScriptableObject
         {
             return _accessoriesSize;
         }
+    }
 
-        set
+    public int HotbarSelectedIndex
+    {
+        get
         {
-            _accessoriesSize = value;
+            return _indexOfSelectedItem;
         }
     }
     #endregion
@@ -139,6 +134,26 @@ public class InventorySO : ScriptableObject
         {
             quantity = AddStackableItem(itemData, quantity, location);
         }
+        InformAboutChange();
+        return quantity;
+    }
+
+    public int AddItem(InventoryItem item, ItemLocations location)
+    {
+        ItemSO itemData = item.ItemData;
+        int quantity = item.Quantity;
+        if (!itemData.IsStackable)
+        {
+            if (!IsStorageFull(location))
+            {
+                quantity -= AddItemToFirstFreeSlot(itemData, 1, location);
+            }
+        }
+        else
+        {
+            quantity = AddStackableItem(itemData, quantity, location);
+        }
+        item.UpdateQuantity(quantity);
         InformAboutChange();
         return quantity;
     }
@@ -379,6 +394,14 @@ public class InventorySO : ScriptableObject
         InformAboutChange();
     }
 
+    public void ClearBuffer()
+    {
+        if (_isItemInBuffer)
+        {
+            AddItem(_bufferItem, ItemLocations.Storage);
+        }
+    }
+
     private void FastEquipAccessory(ItemLocations location, InventoryItem item)
     {
         if (location != ItemLocations.Accessories)
@@ -401,6 +424,17 @@ public class InventorySO : ScriptableObject
         {
             AddItemToFirstFreeSlot(item, ItemLocations.Storage);
         }
+    }
+
+    public void SelectItem(int index)
+    {
+        _selectedItem = _hotbarItems[_hotbarStartIndex + index];
+        _indexOfSelectedItem = index;
+    }
+
+    public InventoryItem GetSelectedItem()
+    {
+        return _selectedItem;
     }
 
     public bool CompareItemWithBuffer(int index, ItemLocations location)

@@ -41,7 +41,7 @@ namespace Items
         public override StringBuilder GetFullDescription(int quantity)
         {
             _fullDescriptionStringBuilder.Clear();
-            _fullDescriptionStringBuilder.Append("<size=25>").Append(ColoredName).Append($" ({quantity})").Append("</size>").AppendLine();
+            _fullDescriptionStringBuilder.Append(ColoredName).Append($" ({quantity})").AppendLine();
             _fullDescriptionStringBuilder.Append(ItemRarity.Name).AppendLine();
             _fullDescriptionStringBuilder.Append(Using).AppendLine();
             _fullDescriptionStringBuilder.Append(Description).AppendLine();

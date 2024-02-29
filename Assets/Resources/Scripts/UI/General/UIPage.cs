@@ -24,7 +24,7 @@ public class UIPage : MonoBehaviour
 
         set
         {
-            _onActiveUpdate += SetActive;
+            _onActiveUpdate += SetActiveNextUpdate;
             _isActive = value;
         }
     }
@@ -37,6 +37,7 @@ public class UIPage : MonoBehaviour
         {
             _content = (RectTransform)transform.Find("Content");
         }
+        IsActive = false;
     }
 
     private void Update()
@@ -44,10 +45,16 @@ public class UIPage : MonoBehaviour
         _onActiveUpdate?.Invoke();
     }
 
-    private void SetActive()
+    private void SetActiveNextUpdate()
     {
         _content.gameObject.SetActive(_isActive);
-        _onActiveUpdate -= SetActive;
+        _onActiveUpdate -= SetActiveNextUpdate;
+    }
+
+    public void ReverseActivity()
+    {
+        _isActive = !_isActive;
+        _content.gameObject.SetActive(_isActive);
     }
     #endregion
 }

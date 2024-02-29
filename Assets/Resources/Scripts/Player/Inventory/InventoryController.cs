@@ -41,26 +41,9 @@ public class InventoryController : MonoBehaviour
         _currentTimeToTakeItem = _maxTimeToTakeItem;
     }
 
-    private void PrepareUI()
+    private void Start()
     {
-        _inventoryUI.InitializePage(_inventoryData.StorageSize, _inventoryData.HotbarSize / 2, _inventoryData.AccessoriesSize);
-
-        _inventoryUI.OnDraggingItem += HandleDragItem;
-        _inventoryUI.OnStartTakeItem += HandleStartTakeItem;
-        _inventoryUI.OnStopTakeItem += HandleStopTakeItem;
-        _inventoryUI.OnDescriptionRequested += HandleDescriptionRequest;
-    }
-
-    public void PrepareInventoryData()
-    {
-        _inventoryData.Initialize();
-        _inventoryData.OnStorageChanged += HandleUpdateStorageUI;
-        _inventoryData.OnHotbarChanged += HandleUpdateHotbarUI;
-        _inventoryData.OnAccessoriesChanged += HandleUpdateAccessoriesUI;
-        _inventoryData.OnArmorChanged += HandleUpdateArmorUI;
-        _inventoryData.OnBufferItemChanged += HandleUpdateItemInBufferUI;
-
-        foreach(ItemSO item in _initStorageItems)
+        foreach (ItemSO item in _initStorageItems)
         {
             _inventoryData.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Storage);
         }
@@ -71,6 +54,44 @@ public class InventoryController : MonoBehaviour
         foreach (ItemSO item in _initAccessoriesItems)
         {
             _inventoryData.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Accessories);
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            ResetUI();
+        }
+    }
+
+    private void PrepareUI()
+    {
+        _inventoryUI.InitializePage(_inventoryData.StorageSize, _inventoryData.HotbarSize, _inventoryData.AccessoriesSize);
+
+        _inventoryUI.OnDraggingItem += HandleDragItem;
+        _inventoryUI.OnStartTakeItem += HandleStartTakeItem;
+        _inventoryUI.OnStopTakeItem += HandleStopTakeItem;
+        _inventoryUI.OnDescriptionRequested += HandleDescriptionRequest;
+    }
+
+    private void PrepareInventoryData()
+    {
+        _inventoryData.Initialize();
+        _inventoryData.OnStorageChanged += HandleUpdateStorageUI;
+        _inventoryData.OnHotbarChanged += HandleUpdateHotbarUI;
+        _inventoryData.OnAccessoriesChanged += HandleUpdateAccessoriesUI;
+        _inventoryData.OnArmorChanged += HandleUpdateArmorUI;
+        _inventoryData.OnBufferItemChanged += HandleUpdateItemInBufferUI;
+    }
+
+    private void ResetUI()
+    {
+        UIManager.Instance.InventoryUI.ReverseActivity();
+        if (!UIManager.Instance.InventoryUI.IsActive)
+        {
+            _inventoryUI.ResetPage();
+            _inventoryData.ClearBuffer();
         }
     }
 

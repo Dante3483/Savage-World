@@ -15,6 +15,7 @@ public class UIManager : MonoBehaviour
 
     [Header("InGame")]
     [SerializeField] private UIPage _inventoryUI;
+    [SerializeField] private UIPage _hotbarUI;
 
     #endregion
 
@@ -54,35 +55,46 @@ public class UIManager : MonoBehaviour
             return _mainMenuWorldsUI;
         }
     }
+
+    public UIPage InventoryUI
+    {
+        get
+        {
+            return _inventoryUI;
+        }
+
+        set
+        {
+            _inventoryUI = value;
+        }
+    }
+
+    public UIPage HotbarUI
+    {
+        get
+        {
+            return _hotbarUI;
+        }
+
+        set
+        {
+            _hotbarUI = value;
+        }
+    }
     #endregion
 
     #region Methods
     private void Awake()
     {
         Instance = this;
-
-        _mainMenuUI.IsActive = false;
-        _mainMenuProgressBarUI.IsActive = false;
-        _mainMenuPlayersUI.IsActive = false;
-        _mainMenuWorldsUI.IsActive = false;
-
-        _debugPhasesInfoUI.IsActive = false;
-        _debugBlockInfoUI.IsActive = false;
-
-        _inventoryUI.IsActive = false;
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.O))
         {
-            _debugPhasesInfoUI.IsActive = !_debugPhasesInfoUI.IsActive;
-            _debugBlockInfoUI.IsActive = !_debugBlockInfoUI.IsActive;
-        }
-
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            _inventoryUI.IsActive = !_inventoryUI.IsActive;
+            _debugPhasesInfoUI.ReverseActivity();
+            _debugBlockInfoUI.ReverseActivity();
         }
     }
     #endregion

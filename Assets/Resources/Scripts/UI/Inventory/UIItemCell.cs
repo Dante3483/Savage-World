@@ -44,6 +44,11 @@ public class UIItemCell : MonoBehaviour, IPointerClickHandler, IPointerEnterHand
         }
     }
 
+    private void OnDisable()
+    {
+        _isMouseAbove = false;
+    }
+
     public virtual void ResetData()
     {
         _itemImage.gameObject.SetActive(false);
@@ -60,7 +65,7 @@ public class UIItemCell : MonoBehaviour, IPointerClickHandler, IPointerEnterHand
         _itemImage.sprite = sprite;
     }
 
-    public virtual void OnPointerClick(PointerEventData pointerData)
+    public void OnPointerClick(PointerEventData pointerData)
     {
         if (pointerData.button == PointerEventData.InputButton.Left)
         {

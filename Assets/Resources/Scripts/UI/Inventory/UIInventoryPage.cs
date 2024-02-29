@@ -1,4 +1,3 @@
-using Inventory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +8,9 @@ public class UIInventoryPage : MonoBehaviour
 {
     #region Private fields
     [Header("Main")]
-    [SerializeField] private UIStorageItemCell _itemStoragePrefab;
-    [SerializeField] private UIHotbarItemCell _itemHotbarPrefab;
-    [SerializeField] private UIAccessoryItemCell _itemAccessoryPrefab;
+    [SerializeField] private UIStorageItemCell _storageItemPrefab;
+    [SerializeField] private UIStorageHotbarItemCell _hotbarItemPrefab;
+    [SerializeField] private UIAccessoryItemCell _accessoryItemPrefab;
     [SerializeField] private RectTransform _storageContent;
     [SerializeField] private RectTransform _hotbarContent;
     [SerializeField] private RectTransform _accessoriesContent;
@@ -20,7 +19,7 @@ public class UIInventoryPage : MonoBehaviour
     [SerializeField] private UIStorageItemCell _itemInBuffer;
 
     private List<UIStorageItemCell> _listOfStorageItems;
-    private List<UIHotbarItemCell> _listOfHotbarItems;
+    private List<UIStorageHotbarItemCell> _listOfHotbarItems;
     private List<UIAccessoryItemCell> _listOfAccessoryItems;
     private List<UIArmorItemCell> _listOfArmorItems;
     private Dictionary<ItemLocations, List<UIItemCell>> _itemsByLocation;
@@ -50,7 +49,7 @@ public class UIInventoryPage : MonoBehaviour
         _listOfAccessoryItems = new List<UIAccessoryItemCell>();
         for (int i = 0; i < accessoriesSize; i++)
         {
-            UIAccessoryItemCell uiItem = Instantiate(_itemAccessoryPrefab, Vector3.zero, Quaternion.identity);
+            UIAccessoryItemCell uiItem = Instantiate(_accessoryItemPrefab, Vector3.zero, Quaternion.identity);
             uiItem.transform.SetParent(_accessoriesContent, false);
             uiItem.name = "AccessoryItemCell";
             SetHandlers(uiItem);
@@ -61,10 +60,10 @@ public class UIInventoryPage : MonoBehaviour
 
     private void InitializeHotbar(int hotbarSize)
     {
-        _listOfHotbarItems = new List<UIHotbarItemCell>();
+        _listOfHotbarItems = new List<UIStorageHotbarItemCell>();
         for (int i = 0; i < hotbarSize; i++)
         {
-            UIHotbarItemCell uiItem = Instantiate(_itemHotbarPrefab, Vector3.zero, Quaternion.identity);
+            UIStorageHotbarItemCell uiItem = Instantiate(_hotbarItemPrefab, Vector3.zero, Quaternion.identity);
             uiItem.transform.SetParent(_hotbarContent, false);
             uiItem.name = "HotbarItemCell";
             uiItem.HotbarNumberTxt.text = $"{i + 1}";
@@ -79,7 +78,7 @@ public class UIInventoryPage : MonoBehaviour
         _listOfStorageItems = new List<UIStorageItemCell>();
         for (int i = 0; i < inventorySize; i++)
         {
-            UIStorageItemCell uiItem = Instantiate(_itemStoragePrefab, Vector3.zero, Quaternion.identity);
+            UIStorageItemCell uiItem = Instantiate(_storageItemPrefab, Vector3.zero, Quaternion.identity);
             uiItem.transform.SetParent(_storageContent, false);
             uiItem.name = "ItemCell";
             SetHandlers(uiItem);
@@ -154,6 +153,11 @@ public class UIInventoryPage : MonoBehaviour
         HideTooltip();
     }
 
+    private void HideTooltip()
+    {
+        _tooltipUI.Hide();
+    }
+
     public void UpdateStorageItemData(int itemIndex, Sprite itemImage, int itemQuantity)
     {
         _listOfStorageItems[itemIndex].SetData(itemImage, itemQuantity);
@@ -191,9 +195,9 @@ public class UIInventoryPage : MonoBehaviour
         }
     }
 
-    private void HideTooltip()
+    public void ResetPage()
     {
-        _tooltipUI.Hide();
+        HideTooltip();
     }
     #endregion
 }

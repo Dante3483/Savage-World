@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Security;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -9,7 +10,6 @@ public class UIStorageItemCell : UIItemCell
     #region Private fields
     [SerializeField] private TMP_Text _quantityTxt;
 
-    private StringBuilder _stringBuilder = new StringBuilder();
     private char[] _quantityCharArray4Digit = new char[4];
     private char[] _quantityCharArray3Digit = new char[3];
     private char[] _quantityCharArray2Digit = new char[2];
