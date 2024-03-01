@@ -56,6 +56,7 @@ public class GameManager : MonoBehaviour
 
     #region Public fields
     public static GameManager Instance;
+    public Drop DropPrefab;
     #endregion
 
     #region Properties
@@ -318,6 +319,11 @@ public class GameManager : MonoBehaviour
             CreateWater();
             CreateTorch();
         }
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            Drop drop = Instantiate(DropPrefab, _player.transform.position, Quaternion.identity);
+            drop.AddForce();
+        }
     }
 
     public void UpdateGameState(GameState gameState)
@@ -493,14 +499,18 @@ public class GameManager : MonoBehaviour
             Vector3 clickPosition = Input.mousePosition;
 
             Vector3Int intPos = Vector3Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
+            if (!WorldDataManager.Instance.WorldData[intPos.x, intPos.y].IsEmpty())
+            {
+                Terrain.CreateBlock(intPos.x, intPos.y, _blocksAtlas.Air);
 
-            Terrain.CreateBlock((ushort)intPos.x, (ushort)intPos.y, _blocksAtlas.Air);
+                Instantiate(DropPrefab, new Vector3(intPos.x + 0.5f, intPos.y + 0.5f), Quaternion.identity);
 
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y));
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y + 1));
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y - 1));
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x - 1, intPos.y));
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x + 1, intPos.y));
+                Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y));
+                Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y + 1));
+                Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y - 1));
+                Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x - 1, intPos.y));
+                Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x + 1, intPos.y));
+            }
         }
     }
 

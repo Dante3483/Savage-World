@@ -308,8 +308,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _renderWidth: 40
   _renderHeight: 20
-  _camera: {fileID: 0}
-  _solidTileBase: {fileID: 11400000, guid: fb8bcc821835c7d4fa213d4957cd69bf, type: 2}
+  _solidRuleTIle: {fileID: 11400000, guid: c2484c8ff49d1ae4daf852dddd3448b9, type: 2}
+  _cornerRuleTile: {fileID: 11400000, guid: 3db0a5d792f4b4e46b05e3e9f3f064c5, type: 2}
   _solidTilemap: {fileID: 0}
   _blocksTilemap: {fileID: 0}
   _trees: {fileID: 0}
@@ -2121,7 +2121,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 0.2
 --- !u!222 &344326478
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4555,6 +4555,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _spriteRenderer: {fileID: 0}
   _spriteMask: {fileID: 0}
+  _isAnimated: 0
 --- !u!331 &699589509
 SpriteMask:
   m_ObjectHideFlags: 0
@@ -4973,6 +4974,7 @@ MonoBehaviour:
   _isStaticSeed: 0
   _isMenuActive: 0
   _isLoadingProgressActive: 0
+  DropPrefab: {fileID: 9080023921913248994, guid: 3cafab4b63471bf4b81789ed4f374071, type: 3}
 --- !u!28 &758104367
 Texture2D:
   m_ObjectHideFlags: 0
@@ -6722,81 +6724,61 @@ Tilemap:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 961106241}
   m_Enabled: 1
-  m_Tiles: {}
+  m_Tiles:
+  - first: {x: 3650, y: 2151, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 4294967295
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741826
+  - first: {x: 3654, y: 2151, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 4294967295
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741826
   m_AnimatedTiles: {}
   m_TileAssetArray:
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  m_TileSpriteArray:
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
+  - m_RefCount: 2
+    m_Data: {fileID: 11400000, guid: 3db0a5d792f4b4e46b05e3e9f3f064c5, type: 2}
+  m_TileSpriteArray: []
   m_TileMatrixArray:
-  - m_RefCount: 0
+  - m_RefCount: 2
     m_Data:
-      e00: -5.1688804e+14
-      e01: 0
-      e02: -1.8295932e-19
-      e03: -1.8295932e-19
-      e10: 5.97e-43
-      e11: 0
-      e12: 5.97e-43
-      e13: 5.97e-43
-      e20: 27510016
-      e21: 1e-45
-      e22: 1.3689417e-18
-      e23: 3018308
-      e30: 4.5904e-41
-      e31: 0
-      e32: 5.98e-43
-      e33: 5.98e-43
-  - m_RefCount: 0
-    m_Data:
-      e00: 0
+      e00: 1
       e01: 0
       e02: 0
-      e03: 1.1420356e+24
+      e03: 0
       e10: 0
-      e11: 0
+      e11: 1
       e12: 0
-      e13: 1.63e-43
+      e13: 0
       e20: 0
       e21: 0
-      e22: -2.8040468e+26
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 6e-43
-      e33: 0
-  - m_RefCount: 0
-    m_Data:
-      e00: 0
-      e01: 0
-      e02: 0
-      e03: 1.141292e+24
-      e10: 0
-      e11: 0
-      e12: 0
-      e13: 1.63e-43
-      e20: 0
-      e21: 0
-      e22: 0
+      e22: 1
       e23: 0
       e30: 0
       e31: 0
       e32: 0
-      e33: 0
+      e33: 1
   m_TileColorArray:
-  - m_RefCount: 0
-    m_Data: {r: NaN, g: NaN, b: NaN, a: NaN}
+  - m_RefCount: 2
+    m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: -11, y: -10, z: 0}
-  m_Size: {x: 20, y: 10, z: 1}
+  m_Size: {x: 3674, y: 2164, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:

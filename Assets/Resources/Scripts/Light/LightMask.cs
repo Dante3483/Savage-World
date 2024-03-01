@@ -7,7 +7,7 @@ public class LightMask : MonoBehaviour
     #region Private fields
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private SpriteMask _spriteMask;
-
+    [SerializeField] private bool _isAnimated;
     private bool _isActive;
     #endregion
 
@@ -35,11 +35,15 @@ public class LightMask : MonoBehaviour
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _spriteMask = GetComponent<SpriteMask>();
+        _spriteMask.sprite = _spriteRenderer.sprite;
     }
 
     private void LateUpdate()
     {
-        _spriteMask.sprite = _spriteRenderer.sprite;
+        if (_isAnimated)
+        {
+            _spriteMask.sprite = _spriteRenderer.sprite;
+        }
     }
     #endregion
 }

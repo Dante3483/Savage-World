@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: e1884f2008d1bae47b50a897137c1870
+guid: 6be7d29a7293df945b86664f5ff05299
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -20,7 +20,7 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
-  isReadable: 0
+  isReadable: 1
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -105,11 +105,11 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: BlockTemplate_0
+      name: BlockTemplate2_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
+        y: 64
         width: 16
         height: 16
       alignment: 0
@@ -117,24 +117,101 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape:
-      - - {x: -8, y: -8}
-        - {x: -8, y: 8}
-        - {x: 8, y: 8}
+      - - {x: 2, y: -8}
         - {x: 8, y: -8}
+        - {x: 8, y: -2}
       tessellationDetail: 0
       bones: []
-      spriteID: da7ed4f52fe0e1e4b9c2e52669d51b30
-      internalID: -1756721022
+      spriteID: e13dd8886bcfb344a849dc9a530129de
+      internalID: -1879412089
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: BlockTemplate_1
+      name: BlockTemplate2_1
       rect:
         serializedVersion: 2
         x: 16
-        y: 0
+        y: 64
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: -8, y: -2}
+        - {x: -8, y: -8}
+        - {x: 8, y: -8}
+        - {x: 8, y: -2}
+        - {x: 0, y: 6}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 370280b188fca7546a55146be81af8d5
+      internalID: -1997753857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlockTemplate2_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 48
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 6}
+        - {x: 0, y: 6}
+        - {x: 2, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 552263d6b1923524bb263fdf081a4028
+      internalID: -1087408987
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlockTemplate2_4
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 48
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: -8, y: 8}
+        - {x: -8, y: -8}
+        - {x: 8, y: -8}
+        - {x: 8, y: 8}
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff74e03ed5f79b64ab586fb1fe2dece4
+      internalID: 1618636819
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlockTemplate2_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 32
         width: 16
         height: 16
       alignment: 0
@@ -144,17 +221,44 @@ TextureImporter:
       physicsShape:
       - - {x: -8, y: -8}
         - {x: 8, y: -8}
-        - {x: 8, y: 8}
+        - {x: 8, y: 6}
+        - {x: -8, y: 6}
       tessellationDetail: 0
       bones: []
-      spriteID: 759a7f5e88555a04b888137e8f5af853
-      internalID: -886192028
+      spriteID: f7db47d877be5eb4db7a19137960ef69
+      internalID: 929878114
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: BlockTemplate_2
+      name: BlockTemplate2_10
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: 2, y: 8}
+        - {x: -8, y: -2}
+        - {x: -8, y: -8}
+        - {x: 8, y: -8}
+        - {x: 8, y: 8}
+      tessellationDetail: 0
+      bones: []
+      spriteID: e92500ea19cd6604a94eee33f7349cf5
+      internalID: -1611038718
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlockTemplate2_12
       rect:
         serializedVersion: 2
         x: 32
@@ -166,13 +270,15 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape:
-      - - {x: -8, y: -8}
+      - - {x: -8, y: 6}
+        - {x: -8, y: -8}
         - {x: 8, y: -8}
+        - {x: 8, y: -2}
         - {x: 0, y: 6}
       tessellationDetail: 0
       bones: []
-      spriteID: 888922c4bdb264440a190aa39cde6322
-      internalID: 268028162
+      spriteID: 7189aaa98e16fed40b9d4b0d27e7cba0
+      internalID: 459995289
       vertices: []
       indices: 
       edges: []
@@ -188,9 +294,19 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      BlockTemplate_0: -1756721022
-      BlockTemplate_1: -886192028
-      BlockTemplate_2: 268028162
+      BlockTemplate2_0: -1879412089
+      BlockTemplate2_1: -1997753857
+      BlockTemplate2_10: -1611038718
+      BlockTemplate2_11: -1021100414
+      BlockTemplate2_12: 459995289
+      BlockTemplate2_2: 1885659883
+      BlockTemplate2_3: -1087408987
+      BlockTemplate2_4: 1618636819
+      BlockTemplate2_5: -2041940573
+      BlockTemplate2_6: 929878114
+      BlockTemplate2_7: 1374708509
+      BlockTemplate2_8: 2004883848
+      BlockTemplate2_9: 152832816
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

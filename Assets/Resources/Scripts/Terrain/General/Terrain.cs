@@ -10,10 +10,10 @@ public class Terrain : MonoBehaviour
     [Header("Main")]
     [SerializeField] private int _renderWidth;
     [SerializeField] private int _renderHeight;
-    [SerializeField] private Camera _camera;
 
     [Header("Tilemaps")]
-    [SerializeField] private TileBase _solidTileBase;
+    [SerializeField] private SolidRuleTile _solidRuleTIle;
+    [SerializeField] private CornerRuleTile _cornerRuleTile;
     [SerializeField] private Tilemap _solidTilemap;
     [SerializeField] private CustomTilemap.Tilemap _blocksTilemap;
 
@@ -126,7 +126,6 @@ public class Terrain : MonoBehaviour
 
         #region Initialization
         NeedToUpdate = new HashSet<Vector2Ushort>();
-        _camera = Camera.main;
         _currentCameraRect = new RectInt();
         _prevCameraRect = new RectInt();
         _tilesCoords = new Vector3Int[_renderWidth * _renderHeight];
@@ -701,7 +700,16 @@ public class Terrain : MonoBehaviour
                 _solidTiles[i] = null;
                 if (_worldData[position.x, position.y].IsSolid())
                 {
-                    _solidTiles[i] = _solidTileBase;
+                    _solidTiles[i] = _solidRuleTIle;
+                }
+                else if (_worldData[position.x, position.y - 1].IsSolid())
+                {
+                    bool isLeftSolid = _worldData[position.x - 1, position.y].IsSolid();
+                    bool isRightSolid = _worldData[position.x + 1, position.y].IsSolid();
+                    if ((isLeftSolid && !isRightSolid) || (!isLeftSolid && isRightSolid))
+                    {
+                        _solidTiles[i] = _cornerRuleTile;
+                    }
                 }
                 i++;
             }
