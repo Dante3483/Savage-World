@@ -22,8 +22,6 @@ public class PickUpItemsActivityUtil : MonoBehaviour
         if (collision.transform.tag == "PickUpItem")
         {
             collision.GetComponent<SpriteRenderer>().enabled = true;
-            collision.GetComponent<SpriteMask>().enabled = true;
-            collision.GetComponent<LightMask>().enabled = true;
             for (int i = 0; i < collision.transform.childCount; i++)
             {
                 collision.transform.GetChild(i).gameObject.SetActive(true);
@@ -36,8 +34,6 @@ public class PickUpItemsActivityUtil : MonoBehaviour
         if (collision.transform.tag == "PickUpItem")
         {
             collision.GetComponent<SpriteRenderer>().enabled = false;
-            collision.GetComponent<SpriteMask>().enabled = false;
-            collision.GetComponent<LightMask>().enabled = false;
             for (int i = 0; i < collision.transform.childCount; i++)
             {
                 collision.transform.GetChild(i).gameObject.SetActive(false);

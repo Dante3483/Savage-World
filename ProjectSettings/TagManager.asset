@@ -18,7 +18,7 @@ TagManager:
   - PickUpItem
   - Player
   - Drop
-  - DropPlatform
+  - Block
   - 
   - 
   - 

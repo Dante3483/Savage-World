@@ -105,7 +105,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: BlockTemplate2_0
+      name: SolidBlock_0
       rect:
         serializedVersion: 2
         x: 0
@@ -129,7 +129,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: BlockTemplate2_1
+      name: SolidBlock_1
       rect:
         serializedVersion: 2
         x: 16
@@ -155,7 +155,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: BlockTemplate2_3
+      name: SolidBlock_2
       rect:
         serializedVersion: 2
         x: 0
@@ -182,7 +182,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: BlockTemplate2_4
+      name: SolidBlock_3
       rect:
         serializedVersion: 2
         x: 16
@@ -207,7 +207,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: BlockTemplate2_6
+      name: SolidBlock_4
       rect:
         serializedVersion: 2
         x: 0
@@ -232,7 +232,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: BlockTemplate2_10
+      name: SolidBlock_5
       rect:
         serializedVersion: 2
         x: 16
@@ -258,7 +258,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: BlockTemplate2_12
+      name: SolidBlock_7
       rect:
         serializedVersion: 2
         x: 32
@@ -294,19 +294,21 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      BlockTemplate2_0: -1879412089
-      BlockTemplate2_1: -1997753857
-      BlockTemplate2_10: -1611038718
       BlockTemplate2_11: -1021100414
-      BlockTemplate2_12: 459995289
-      BlockTemplate2_2: 1885659883
-      BlockTemplate2_3: -1087408987
-      BlockTemplate2_4: 1618636819
       BlockTemplate2_5: -2041940573
-      BlockTemplate2_6: 929878114
       BlockTemplate2_7: 1374708509
       BlockTemplate2_8: 2004883848
       BlockTemplate2_9: 152832816
+      SolidBlock_0: -1879412089
+      SolidBlock_1: -1997753857
+      SolidBlock_2: -1087408987
+      SolidBlock_3: 1618636819
+      SolidBlock_4: 929878114
+      SolidBlock_5: -1611038718
+      SolidBlock_6: 1885659883
+      SolidBlock_7: 459995289
+      SolidBlock_8: 2107909608
+      SolidBlock_9: 1935923902
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

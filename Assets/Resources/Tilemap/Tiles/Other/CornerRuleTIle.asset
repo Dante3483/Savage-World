@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46dd1e3094fd3b54ebbaa9f984a853b2, type: 3}
   m_Name: CornerRuleTIle
   m_EditorClassIdentifier: 
-  m_DefaultSprite: {fileID: -1291330879, guid: 6be7d29a7293df945b86664f5ff05299, type: 3}
+  m_DefaultSprite: {fileID: 0}
   m_DefaultGameObject: {fileID: 0}
   m_DefaultColliderType: 1
   m_TilingRules:
@@ -35,4 +35,4 @@ MonoBehaviour:
     - {x: 1, y: 1, z: 0}
     m_RuleTransform: 2
   customField: 0
-  SolidTile: {fileID: 11400000, guid: c2484c8ff49d1ae4daf852dddd3448b9, type: 2}
+  SolidRuleTile: {fileID: 11400000, guid: c2484c8ff49d1ae4daf852dddd3448b9, type: 2}

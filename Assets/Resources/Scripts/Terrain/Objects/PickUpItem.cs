@@ -1,8 +1,6 @@
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
-[RequireComponent(typeof(SpriteMask))]
-[RequireComponent(typeof(LightMask))]
 public class PickUpItem : MonoBehaviour
 {
     #region Private fields
@@ -65,8 +63,6 @@ public class PickUpItem : MonoBehaviour
     private void Awake()
     {
         GetComponent<SpriteRenderer>().enabled = false;
-        GetComponent<SpriteMask>().enabled = false;
-        GetComponent<LightMask>().enabled = false;
     }
 
     private void Update()
