@@ -1,3 +1,4 @@
+using Items;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,7 @@ public abstract class BlockSO : ScriptableObject
 {
     #region Private fields
     [SerializeField] private List<Sprite> _sprites;
+    [SerializeField] private ItemSO _drop;
     [SerializeField] private BlockTypes _type;
     [SerializeField] private Color _colorOnMap = Color.white;
     [SerializeField] private float _lightValue;
@@ -108,6 +110,19 @@ public abstract class BlockSO : ScriptableObject
         set
         {
             _waterproof = value;
+        }
+    }
+
+    public ItemSO Drop
+    {
+        get
+        {
+            return _drop;
+        }
+
+        set
+        {
+            _drop = value;
         }
     }
     #endregion

@@ -722,6 +722,10 @@ public class Terrain : MonoBehaviour
     #region Helpful
     public void CreateBlock(int x, int y, BlockSO block)
     {
+        if (block == null)
+        {
+            return;
+        }
         _worldData[x, y].SetBlockData(block);
         if (GameManager.Instance.IsGameSession && !GameManager.Instance.IsWorldLoading)
         {

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7722285507099397664}
   - component: {fileID: 7722285507099397671}
-  - component: {fileID: 1470507237951081775}
+  - component: {fileID: 6344339858261412346}
   - component: {fileID: 4090920047552967875}
   - component: {fileID: 9080023921913248994}
   m_Layer: 10
@@ -18,7 +18,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!4 &7722285507099397664
 Transform:
@@ -87,7 +87,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &1470507237951081775
+--- !u!61 &6344339858261412346
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -97,7 +97,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -146,11 +146,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03b5f0efb91d18b4aa1ac62541ccc862, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rigidbody: {fileID: 0}
+  _spriteRenderer: {fileID: 7722285507099397671}
+  _rigidbody: {fileID: 4090920047552967875}
+  _boxCollider: {fileID: 0}
   _intPosition: {x: 0, y: 0, z: 0}
-  _direction: {x: 0, y: 0}
+  _item: {fileID: 0}
+  _quantity: 0
   _colliderSize: {x: 0, y: 0}
   _speed: 15
   _gravity: 30
   _xVelocity: 0
   _yVelocity: 0
+  _mergeCheckBoxCast:
+    _needVisualize: 1
+    _checkYourself: 1
+    _result: 0
+    _originOffset: {x: 0, y: 0, z: 0}
+    _size: {x: 1, y: 1}
+    _angle: 0
+    _direction: {x: 0, y: 0}
+    _distance: 0
+    _layerMask:
+      serializedVersion: 2
+      m_Bits: 1024
+    _hitColor: {r: 0.054572344, g: 1, b: 0, a: 1}
+    _notHitColor: {r: 1, g: 0, b: 0, a: 1}
+  _canBeAttracted: 0
+  _attractionCooldown: 2
+  _attractionTarget: {fileID: 0}
+  _attractionSpeed: 15

@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: 0
   _itemType: 0
-  _itemRarity: {fileID: 11400000, guid: ddd32f58fffdb79469e4e8303aa87b40, type: 2}
+  _itemRarity: {fileID: 11400000, guid: 1ab80723928f4cf4f8323c6f1fff4622, type: 2}
   _isStackable: 1
   _maxStackSize: 9999
   _name: Dirt block
   _using: Can be placed
   _description: Dirt
-  _itemImage: {fileID: 21300000, guid: 5d881f46b6b40e648846228d8b5f39f7, type: 3}
+  _itemImage: {fileID: 21300000, guid: e0c865bc441ac7f4e9f41af4a98d68e9, type: 3}
   _blockToPlace: {fileID: 11400000, guid: 5c652c777cfdd1b4ba8ceee62bf0c0b9, type: 2}
