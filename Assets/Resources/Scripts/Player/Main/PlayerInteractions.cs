@@ -1,8 +1,6 @@
 using Items;
-using System;
 using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class PlayerInteractions : MonoBehaviour
 {
@@ -53,6 +51,7 @@ public class PlayerInteractions : MonoBehaviour
         }
     }
 
+    //Change
     public void PlaceBlock(BlockItemSO blockItem)
     {
         Vector3 clickPosition = Input.mousePosition;
@@ -71,6 +70,7 @@ public class PlayerInteractions : MonoBehaviour
         }
     }
 
+    //Change
     public void BreakBlock()
     {
         if (Input.GetMouseButton((int)MouseButton.Right))
@@ -95,6 +95,7 @@ public class PlayerInteractions : MonoBehaviour
         }
     }
 
+    //Delete
     public void CreateWater()
     {
         if (Input.GetKeyDown(KeyCode.U))
@@ -109,6 +110,7 @@ public class PlayerInteractions : MonoBehaviour
         }
     }
 
+    //Delete
     public void CreateTorch()
     {
         if (Input.GetKeyDown(KeyCode.L))
@@ -129,8 +131,19 @@ public class PlayerInteractions : MonoBehaviour
 
     public void TakeDrop(Drop drop)
     {
-        int remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Storage);
+        int remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Hotbar);
         drop.Quantity = remainder;
+
+        if (remainder != 0)
+        {
+            remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Storage);
+        }
+        drop.Quantity = remainder;
+    }
+
+    public bool IsEnoughSpaceToTakeDrop()
+    {
+        return !_inventory.IsStorageFull(ItemLocations.Hotbar) || !_inventory.IsStorageFull(ItemLocations.Storage);
     }
 
     public void ThrowItem()
@@ -138,7 +151,8 @@ public class PlayerInteractions : MonoBehaviour
         Drop drop = CreateDrop(transform.position, _inventory.GetSelectedItem().ItemData);
         if (drop != null)
         {
-            drop.AddForce();
+            DropPhysics dropPhysics = drop.GetComponent<DropPhysics>();
+            dropPhysics.AddForce();
             drop.Quantity = _inventory.GetSelectedItem().Quantity;
             _inventory.RemoveSelectedItem();
         }

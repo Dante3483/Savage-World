@@ -13,6 +13,9 @@ GameObject:
   - component: {fileID: 6344339858261412346}
   - component: {fileID: 4090920047552967875}
   - component: {fileID: 9080023921913248994}
+  - component: {fileID: 7019620428535080678}
+  - component: {fileID: -283986864824333139}
+  - component: {fileID: -429422141648292246}
   m_Layer: 10
   m_Name: Drop
   m_TagString: Untagged
@@ -149,14 +152,39 @@ MonoBehaviour:
   _spriteRenderer: {fileID: 7722285507099397671}
   _rigidbody: {fileID: 4090920047552967875}
   _boxCollider: {fileID: 0}
-  _intPosition: {x: 0, y: 0, z: 0}
   _item: {fileID: 0}
   _quantity: 0
-  _colliderSize: {x: 0, y: 0}
+--- !u!114 &7019620428535080678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7722285507099397670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3816d1ad3f2e224a919f56f21ad84d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _drop: {fileID: 9080023921913248994}
+  _colliderHalfSize: {x: 0, y: 0}
   _speed: 15
   _gravity: 30
   _xVelocity: 0
   _yVelocity: 0
+--- !u!114 &-283986864824333139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7722285507099397670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19ec63c6abdc6034ab8e8c498801f64f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _drop: {fileID: 9080023921913248994}
   _mergeCheckBoxCast:
     _needVisualize: 1
     _checkYourself: 1
@@ -171,7 +199,19 @@ MonoBehaviour:
       m_Bits: 1024
     _hitColor: {r: 0.054572344, g: 1, b: 0, a: 1}
     _notHitColor: {r: 1, g: 0, b: 0, a: 1}
-  _canBeAttracted: 0
-  _attractionCooldown: 2
-  _attractionTarget: {fileID: 0}
-  _attractionSpeed: 15
+--- !u!114 &-429422141648292246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7722285507099397670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87d266b434e14e04e910b893934177e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _drop: {fileID: 9080023921913248994}
+  _cooldown: 2
+  _target: {fileID: 0}
+  _speed: 20
