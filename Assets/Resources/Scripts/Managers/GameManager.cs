@@ -311,13 +311,6 @@ public class GameManager : MonoBehaviour
         {
             _player.SetActive(true);
         }
-
-        if (IsGameSession)
-        {
-            BreakBlock();
-            CreateWater();
-            CreateTorch();
-        }
     }
 
     public void UpdateGameState(GameState gameState)
@@ -484,60 +477,5 @@ public class GameManager : MonoBehaviour
     {
         return _player.transform;
     }
-
-    //Delete
-    public void BreakBlock()
-    {
-        if (Input.GetMouseButton(0))
-        {
-            Vector3 clickPosition = Input.mousePosition;
-
-            Vector3Int intPos = Vector3Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
-
-            Terrain.CreateBlock((ushort)intPos.x, (ushort)intPos.y, _blocksAtlas.Air);
-
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y));
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y + 1));
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y - 1));
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x - 1, intPos.y));
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x + 1, intPos.y));
-        }
-    }
-
-
-    //Delete
-    public void CreateWater()
-    {
-        if (Input.GetMouseButtonDown(2))
-        {
-            Vector3 clickPosition = Input.mousePosition;
-
-            Vector3Int intPos = Vector3Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
-
-            Terrain.CreateLiquidBlock((ushort)intPos.x, (ushort)intPos.y, (byte)_blocksAtlas.Water.GetId());
-
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y));
-        }
-    }
-
-    //Delete
-    public void CreateTorch()
-    {
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            Vector3 clickPosition = Input.mousePosition;
-
-            Vector3Int intPos = Vector3Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
-
-            Terrain.CreateBlock((ushort)intPos.x, (ushort)intPos.y, _blocksAtlas.GetBlockById(FurnitureBlocksID.Torch));
-
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y));
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y + 1));
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y - 1));
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x - 1, intPos.y));
-            Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x + 1, intPos.y));
-        }
-    }
-
     #endregion
 }

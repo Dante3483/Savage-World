@@ -64,8 +64,8 @@ public class MobAttackController : MonoBehaviour
     private void Start()
     {
         Npc = transform.parent.GetComponent<NPC>();
-        _checkTarget.HitColor = new Color(238f / 255f, 0f / 255f, 255f / 255f);
-        _checkTarget.NotHitColor = new Color(221f / 255f, 255f / 255f, 0f / 255f);
+        //_checkTarget._hitColor = new Color(238f / 255f, 0f / 255f, 255f / 255f);
+        //_checkTarget._notHitColor = new Color(221f / 255f, 255f / 255f, 0f / 255f);
     }
     private void FixedUpdate()
     {
@@ -73,8 +73,8 @@ public class MobAttackController : MonoBehaviour
         {
             Vector3 startPosition = transform.parent.position;
             Vector3 endPosition = _npc.Target.position;
-            var lineResult = GroundCheck.CheckLinecast(startPosition, endPosition, out bool result, true);
-            var areaResult = _checkTarget.BoxCast(transform.position, transform.parent.gameObject);
+            var lineResult = GroundCheck.CheckLinecast(startPosition, endPosition, out bool result);
+            var areaResult = _checkTarget.BoxCast(transform.position);
          
             if (!lineResult && areaResult)
             {

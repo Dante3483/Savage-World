@@ -56,7 +56,6 @@ public class PlayerMovementNew : MonoBehaviour
     [SerializeField] private PlayerStats _playerStats;
     [SerializeField] private PlayerFlags _playerFlags;
     [SerializeField] private PlayerAnimationsController _playerAnimationsController;
-    [SerializeField] private PlayerDebugger _playerDebugger;
     [SerializeField] private Rigidbody2D _rigidbody;
     [SerializeField] private BoxCollider2D _boxCollider;
 
@@ -110,7 +109,6 @@ public class PlayerMovementNew : MonoBehaviour
         _playerStats = GetComponent<PlayerStats>();
         _playerFlags = GetComponent<PlayerFlags>();
         _playerAnimationsController = GetComponent<PlayerAnimationsController>();
-        _playerDebugger = GetComponent<PlayerDebugger>();
         _rigidbody = GetComponent<Rigidbody2D>();
         _boxCollider = GetComponent<BoxCollider2D>();
 
@@ -344,8 +342,8 @@ public class PlayerMovementNew : MonoBehaviour
         Vector3 origin = _boxCollider.bounds.center;
         origin.y -= _boxCollider.bounds.extents.y;
 
-        _groundCheckBoxCast.BoxCast(origin, out bool result, _playerDebugger.EnableGroundCheckVizualization);
-        _playerFlags.IsGrounded = result;
+        _groundCheckBoxCast.BoxCast(origin);
+        _playerFlags.IsGrounded = _groundCheckBoxCast.Result;
     }
 
     private void RiseCheck()
@@ -382,8 +380,7 @@ public class PlayerMovementNew : MonoBehaviour
             _slopeCheckDistanceRight,
             _groundLayer,
             Color.cyan,
-            Color.red,
-            _playerDebugger.EnableSlopeCheckVizualization);
+            Color.red);
 
         RaycastHit2D slopeHitBack = _slopeCheckRaycast.Raycast(
             checkPosistion,
@@ -391,30 +388,29 @@ public class PlayerMovementNew : MonoBehaviour
             _slopeCheckDistanceLeft,
             _groundLayer,
             Color.cyan,
-            Color.red,
-            _playerDebugger.EnableSlopeCheckVizualization);
+            Color.red);
 
         if (slopeHitFront)
         {
             _slopeAngle = Vector2.Angle(slopeHitFront.normal, Vector2.up);
             _slopeNormalPerpendicular = Vector2.Perpendicular(slopeHitFront.normal).normalized;
 
-            if (_playerDebugger.EnableSlopeCheckVizualization)
-            {
-                Debug.DrawRay(slopeHitFront.point, _slopeNormalPerpendicular, Color.blue);
-                Debug.DrawRay(slopeHitFront.point, slopeHitFront.normal, Color.red);
-            }
+            //if (_playerDebugger.EnableSlopeCheckVizualization)
+            //{
+            //    Debug.DrawRay(slopeHitFront.point, _slopeNormalPerpendicular, Color.blue);
+            //    Debug.DrawRay(slopeHitFront.point, slopeHitFront.normal, Color.red);
+            //}
         }
         else if (slopeHitBack)
         {
             _slopeAngle = Vector2.Angle(slopeHitBack.normal, Vector2.up);
             _slopeNormalPerpendicular = Vector2.Perpendicular(slopeHitBack.normal).normalized;
 
-            if (_playerDebugger.EnableSlopeCheckVizualization)
-            {
-                Debug.DrawRay(slopeHitBack.point, _slopeNormalPerpendicular, Color.blue);
-                Debug.DrawRay(slopeHitBack.point, slopeHitBack.normal, Color.red);
-            }
+            //if (_playerDebugger.EnableSlopeCheckVizualization)
+            //{
+            //    Debug.DrawRay(slopeHitBack.point, _slopeNormalPerpendicular, Color.blue);
+            //    Debug.DrawRay(slopeHitBack.point, slopeHitBack.normal, Color.red);
+            //}
         }
         else
         {
@@ -436,8 +432,8 @@ public class PlayerMovementNew : MonoBehaviour
         origin.x += _boxCollider.bounds.extents.x * transform.right.x;
         _wallCheckBoxCast.Distance = _currentState.WallInFrontCheckDistance;
 
-        _wallCheckBoxCast.BoxCast(origin, out bool result);
-        _playerFlags.IsWallInFront = result;
+        _wallCheckBoxCast.BoxCast(origin);
+        _playerFlags.IsWallInFront = _wallCheckBoxCast.Result;
     }
 
     private void CeilingCheck()
@@ -445,8 +441,8 @@ public class PlayerMovementNew : MonoBehaviour
         Vector3 origin = _boxCollider.bounds.center;
         origin.y += _boxCollider.bounds.extents.y;
 
-        _ceilingCheckBoxCast.BoxCast(origin, out bool result);
-        _playerFlags.IsTouchCeiling = result;
+        _ceilingCheckBoxCast.BoxCast(origin);
+        _playerFlags.IsTouchCeiling = _ceilingCheckBoxCast.Result;
     }
 
     private void SlideCheck()

@@ -167,8 +167,8 @@ public class NPC : MonoBehaviour
     {
         Vector3 origin = _boxCollider.bounds.center;
         origin.y -= _boxCollider.bounds.extents.y;
-        _groundCheckBoxCast.BoxCast(origin, out bool result, true);
-        _npcFlags.IsGrounded = result;
+        _groundCheckBoxCast.BoxCast(origin);
+        _npcFlags.IsGrounded = _groundCheckBoxCast.Result;
     }
 
     protected void RiseCheck()

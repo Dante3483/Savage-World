@@ -6,8 +6,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
-[RequireComponent(typeof(SpriteMask))]
-[RequireComponent(typeof(LightMask))]
 public class Tree : MonoBehaviour
 {
     #region Private fields
@@ -197,8 +195,6 @@ public class Tree : MonoBehaviour
     private void Awake()
     {
         GetComponent<SpriteRenderer>().enabled = false;
-        GetComponent<SpriteMask>().enabled = false;
-        GetComponent<LightMask>().enabled = false;
     }
 
     private void OnValidate()

@@ -437,6 +437,18 @@ public class InventorySO : ScriptableObject
         return _selectedItem;
     }
 
+    public void RemoveSelectedItem()
+    {
+        _selectedItem.ClearData();
+        InformAboutChange();
+    }
+
+    public void DecreaseSelectedItemQuantity(int value)
+    {
+        _selectedItem.UpdateQuantity(_selectedItem.Quantity - value);
+        InformAboutChange();
+    }
+
     public bool CompareItemWithBuffer(int index, ItemLocations location)
     {
         return _bufferItem.ItemData == GetItem(index, location).ItemData;
