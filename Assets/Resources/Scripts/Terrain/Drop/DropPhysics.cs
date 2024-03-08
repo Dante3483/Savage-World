@@ -1,24 +1,16 @@
 using System.Collections;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class DropPhysics : MonoBehaviour
 {
     #region Private fields
     [SerializeField] private Drop _drop;
-    [SerializeField] private LayerMask _groundLayer;
-    [SerializeField] private Vector2 _colliderHalfSize;
+    [SerializeField] private BoxCollider2D[] _platforms;
     [SerializeField] private float _speed;
-    [SerializeField] private float _gravity = 30;
-    [SerializeField] private float _xVelocity;
-    [SerializeField] private float _yVelocity;
     private Vector3Int _intPosition;
-    private Vector3 _newPosition;
-    bool _isBottomBlockSolid;
-    bool _isTopBlockSolid;
-    bool _isRightBlockSolid;
-    bool _isLeftBlockSolid;
-    bool _isCurrentBlockSolid;
+    private bool _isExtendedPlatforms;
     #endregion
 
     #region Public fields
@@ -33,118 +25,57 @@ public class DropPhysics : MonoBehaviour
     private void Awake()
     {
         _drop = GetComponent<Drop>();
-        _drop.OnColliderSizeChanged += () =>
-        {
-            _colliderHalfSize = _drop.BoxCollider.size / 2;
-        };
+        _isExtendedPlatforms = true;
     }
 
     private void FixedUpdate()
     {
         if (_drop.IsPhysicsEnabled)
         {
-            Move();
-        }
-    }
-
-    private void Move()
-    {
-        _intPosition = Vector3Int.FloorToInt(transform.position);
-        _isBottomBlockSolid = WorldDataManager.Instance.GetAdjacentWorldCellData(_intPosition.x, _intPosition.y, Vector2Int.down).IsSolid();
-        if (transform.position.y == _intPosition.y + _colliderHalfSize.y && _isBottomBlockSolid)
-        {
-            _xVelocity = 0;
-            _yVelocity = 0;
-            return;
-        }
-
-        _isTopBlockSolid = WorldDataManager.Instance.GetAdjacentWorldCellData(_intPosition.x, _intPosition.y, Vector2Int.up).IsSolid();
-        _isRightBlockSolid = WorldDataManager.Instance.GetAdjacentWorldCellData(_intPosition.x, _intPosition.y, Vector2Int.right).IsSolid();
-        _isLeftBlockSolid = WorldDataManager.Instance.GetAdjacentWorldCellData(_intPosition.x, _intPosition.y, Vector2Int.left).IsSolid();
-        _isCurrentBlockSolid = WorldDataManager.Instance.GetWorldCellData(_intPosition.x, _intPosition.y).IsSolid();
-
-        _xVelocity = Mathf.Lerp(_xVelocity, 0, Time.fixedDeltaTime);
-        _yVelocity = Mathf.Lerp(_yVelocity, -_gravity, Time.fixedDeltaTime);
-        _newPosition = transform.position + new Vector3(_xVelocity, _yVelocity) * Time.fixedDeltaTime;
-
-        MoveRight();
-        MoveLeft();
-        MoveTop();
-        MoveBottom();
-        PushOut();
-
-        _drop.Rigidbody.MovePosition(_newPosition);
-    }
-
-    private void PushOut()
-    {
-        if (_isCurrentBlockSolid)
-        {
-            if (!_isTopBlockSolid)
+            _intPosition = Vector3Int.FloorToInt(transform.position);
+            if (_isExtendedPlatforms)
             {
-                _newPosition.y = _intPosition.y + 1 + _colliderHalfSize.y;
+                CreatePlatforms();
             }
             else
             {
-                _newPosition.y = _intPosition.y - _colliderHalfSize.y;
-            }
-            if (!_isRightBlockSolid)
-            {
-                _newPosition.x = _intPosition.x + 1 + _colliderHalfSize.x;
-            }
-            else
-            {
-                _newPosition.x = _intPosition.x - _colliderHalfSize.x;
-            }
-            _xVelocity = 0;
-        }
-    }
-
-    private void MoveBottom()
-    {
-        if (_isBottomBlockSolid)
-        {
-            if (_newPosition.y < _intPosition.y + _colliderHalfSize.y)
-            {
-                _newPosition.y = _intPosition.y + _colliderHalfSize.y;
-                _yVelocity = 0;
+                CreatePlatform(0, 0, -1);
             }
         }
     }
 
-    private void MoveTop()
+    private void CreatePlatforms()
     {
-        if (_isTopBlockSolid)
+        for (int x = -1, i = 0; x <= 1; x++)
         {
-            if (_newPosition.y > (_intPosition.y + 1) - _colliderHalfSize.y)
+            for (int y = -1; y <= 1; y++)
             {
-                _newPosition.y = (_intPosition.y + 1) - _colliderHalfSize.y;
-                _yVelocity = 0;
+                if (x == 0 && y == 0)
+                {
+                    continue;
+                }
+                CreatePlatform(i, x, y);
+                i++;
+            }
+        }
+        if (_drop.Rigidbody.velocity.x == 0)
+        {
+            _isExtendedPlatforms = false;
+            foreach(Collider2D collider in  _platforms)
+            {
+                collider.gameObject.SetActive(false);
             }
         }
     }
 
-    private void MoveLeft()
+    private void CreatePlatform(int platformIndex, int x, int y)
     {
-        if (_xVelocity < 0 && _isLeftBlockSolid)
+        bool result = WorldDataManager.Instance.GetAdjacentWorldCellData(_intPosition.x, _intPosition.y, new Vector2Int(x, y)).IsSolid();
+        _platforms[platformIndex].gameObject.SetActive(result);
+        if (result)
         {
-            if (_newPosition.x < _intPosition.x + _colliderHalfSize.x)
-            {
-                _newPosition.x = _intPosition.x + _colliderHalfSize.x;
-                _xVelocity = 0;
-            }
-        }
-    }
-
-    private void MoveRight()
-    {
-        if (_xVelocity > 0 && _isRightBlockSolid)
-        {
-            if (_newPosition.x > (_intPosition.x + 1) - _colliderHalfSize.x)
-            {
-                _newPosition.x = (_intPosition.x + 1) - _colliderHalfSize.x;
-                _xVelocity = 0;
-            }
+            Vector3 position = new Vector3((_intPosition.x + x) - transform.position.x + 0.5f, (_intPosition.y + y) - transform.position.y + 0.5f);
+            _platforms[platformIndex].transform.localPosition = position;
         }
     }
 
@@ -154,8 +85,10 @@ public class DropPhysics : MonoBehaviour
         Vector3 direction = Input.mousePosition - screenPoint;
         direction.Normalize();
 
-        _xVelocity = direction.x * _speed;
-        _yVelocity = direction.y * _speed;
+        float xVelocity = direction.x * _speed;
+        float yVelocity = direction.y * _speed;
+
+        _drop.Rigidbody.AddForce(new Vector2(xVelocity, yVelocity), ForceMode2D.Impulse);
 
         _drop.IsAttractionEnabled = false;
     }
