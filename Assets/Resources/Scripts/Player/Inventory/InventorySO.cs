@@ -461,7 +461,7 @@ public class InventorySO : ScriptableObject
         return _bufferItem.ItemData == GetItem(index, location).ItemData;
     }
 
-    public bool IsStorageFull(ItemLocations location)
+    private bool IsStorageFull(ItemLocations location)
     {
         if (location == ItemLocations.Hotbar)
         {
@@ -470,6 +470,23 @@ public class InventorySO : ScriptableObject
         else
         {
             return !_itemsByLocation[location].Where(item => item.IsEmpty).Any();
+        }
+    }
+
+    public bool IsEnoughSpaceForItem(ItemSO itemData, ItemLocations location)
+    {
+        if (location == ItemLocations.Hotbar)
+        {
+            return !_itemsByLocation[location]
+                .Where((_, index) => index >= _hotbarStartIndex && index <= _hotbarEndIndex)
+                .Where((item) => item.IsEmpty || (item.ItemData == itemData && item.Quantity != item.ItemData.MaxStackSize))
+                .Any();
+        }
+        else
+        {
+            return !_itemsByLocation[location]
+                .Where((item) => item.IsEmpty || (item.ItemData == itemData && item.Quantity != item.ItemData.MaxStackSize))
+                .Any();
         }
     }
 

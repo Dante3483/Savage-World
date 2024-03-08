@@ -131,19 +131,23 @@ public class PlayerInteractions : MonoBehaviour
 
     public void TakeDrop(Drop drop)
     {
+        if (drop.Quantity == 0)
+        {
+            return;
+        }
         int remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Hotbar);
         drop.Quantity = remainder;
 
         if (remainder != 0)
         {
             remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Storage);
+            drop.Quantity = remainder;
         }
-        drop.Quantity = remainder;
     }
 
-    public bool IsEnoughSpaceToTakeDrop()
+    public bool IsEnoughSpaceToTakeDrop(Drop drop)
     {
-        return !_inventory.IsStorageFull(ItemLocations.Hotbar) || !_inventory.IsStorageFull(ItemLocations.Storage);
+        return !_inventory.IsEnoughSpaceForItem(drop.Item, ItemLocations.Hotbar) || !_inventory.IsEnoughSpaceForItem(drop.Item, ItemLocations.Storage);
     }
 
     public void ThrowItem()

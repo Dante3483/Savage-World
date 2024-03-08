@@ -2,6 +2,7 @@ using Items;
 using System;
 using System.Collections;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 public class Drop : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class Drop : MonoBehaviour
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private Rigidbody2D _rigidbody;
     [SerializeField] private BoxCollider2D _boxCollider;
+    [SerializeField] private Vector2 _maxColliderSize;
     [SerializeField] private ItemSO _item;
     [SerializeField] private int _quantity;
 
@@ -19,7 +21,7 @@ public class Drop : MonoBehaviour
     #endregion
 
     #region Public fields
-
+    public Action OnColliderSizeChanged;
     #endregion
 
     #region Properties
@@ -48,7 +50,7 @@ public class Drop : MonoBehaviour
 
         set
         {
-            _spriteRenderer.sprite = value.ItemImage;
+            SetSprite(value.ItemImage);
             _item = value;
         }
     }
@@ -113,13 +115,25 @@ public class Drop : MonoBehaviour
     #region Methods
     private void Awake()
     {
-        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         _rigidbody = GetComponent<Rigidbody2D>();
         _boxCollider= GetComponent<BoxCollider2D>();
 
         _isPhysicsEnabled = true;
         _isAttractionEnabled = true;
         _isMergingEnabled = true;
+    }
+
+    private void SetSprite(Sprite sprite)
+    {
+        _spriteRenderer.sprite = sprite;
+        float sizeX = Mathf.Min(sprite.bounds.size.x, _maxColliderSize.x);
+        float sizeY = Mathf.Min(sprite.bounds.size.y, _maxColliderSize.y);
+        float scaleX = sizeX / sprite.bounds.size.x;
+        float scaleY = sizeY / sprite.bounds.size.y;
+        _boxCollider.size = new Vector2(sizeX, sizeY);
+        _spriteRenderer.transform.localScale = new Vector3(scaleX, scaleY, 1);
+        OnColliderSizeChanged?.Invoke();
     }
     #endregion
 }

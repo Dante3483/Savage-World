@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &7722285507099397670
+--- !u!1 &995442748941064461
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,43 +8,37 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7722285507099397664}
-  - component: {fileID: 7722285507099397671}
-  - component: {fileID: 6344339858261412346}
-  - component: {fileID: 4090920047552967875}
-  - component: {fileID: 9080023921913248994}
-  - component: {fileID: 7019620428535080678}
-  - component: {fileID: -283986864824333139}
-  - component: {fileID: -429422141648292246}
+  - component: {fileID: 2561020295700773507}
+  - component: {fileID: 4418371314342451250}
   m_Layer: 10
-  m_Name: Drop
+  m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7722285507099397664
+--- !u!4 &2561020295700773507
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7722285507099397670}
+  m_GameObject: {fileID: 995442748941064461}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 7722285507099397664}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &7722285507099397671
+--- !u!212 &4418371314342451250
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7722285507099397670}
+  m_GameObject: {fileID: 995442748941064461}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -78,7 +72,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 100
+  m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: e0c865bc441ac7f4e9f41af4a98d68e9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -90,6 +84,44 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &7722285507099397670
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7722285507099397664}
+  - component: {fileID: 6344339858261412346}
+  - component: {fileID: 4090920047552967875}
+  - component: {fileID: 9080023921913248994}
+  - component: {fileID: 7019620428535080678}
+  - component: {fileID: -283986864824333139}
+  - component: {fileID: -429422141648292246}
+  m_Layer: 10
+  m_Name: Drop
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7722285507099397664
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7722285507099397670}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2561020295700773507}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &6344339858261412346
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -100,7 +132,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -149,9 +181,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03b5f0efb91d18b4aa1ac62541ccc862, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spriteRenderer: {fileID: 7722285507099397671}
+  _spriteRenderer: {fileID: 4418371314342451250}
   _rigidbody: {fileID: 4090920047552967875}
-  _boxCollider: {fileID: 0}
+  _boxCollider: {fileID: 6344339858261412346}
+  _maxColliderSize: {x: 1.5, y: 1.5}
   _item: {fileID: 0}
   _quantity: 0
 --- !u!114 &7019620428535080678
@@ -167,6 +200,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _drop: {fileID: 9080023921913248994}
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
   _colliderHalfSize: {x: 0, y: 0}
   _speed: 15
   _gravity: 30

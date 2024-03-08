@@ -30,6 +30,11 @@ public class DropMerging : MonoBehaviour
 
     private void Merge()
     {
+        if (!_drop.Item.IsStackable)
+        {
+            return;
+        }
+
         RaycastHit2D dropHit = _mergeCheckBoxCast.BoxCast(transform.position);
         if (_mergeCheckBoxCast.Result)
         {

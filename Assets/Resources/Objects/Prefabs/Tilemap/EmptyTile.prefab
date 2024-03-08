@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1146189006914090158}
   - component: {fileID: 1146189006914090157}
+  - component: {fileID: 5484390362324527993}
   m_Layer: 0
   m_Name: EmptyTile
   m_TagString: Untagged
@@ -54,6 +55,32 @@ MonoBehaviour:
   _blockLayerSpriteRenderer: {fileID: 1789146104956387954}
   _backgroundLayerSpriteRenderer: {fileID: 4531116644211462149}
   _liquidLayerSpriteRenderer: {fileID: 318821307189890087}
+--- !u!61 &5484390362324527993
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1146189006914090156}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
 --- !u!1 &2813177848922735273
 GameObject:
   m_ObjectHideFlags: 0

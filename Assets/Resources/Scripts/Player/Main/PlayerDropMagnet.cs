@@ -25,13 +25,15 @@ public class PlayerDropMagnet : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (_playerInteractions.IsEnoughSpaceToTakeDrop())
+        RaycastHit2D[] dropHits = _dropNearBoxCast.BoxCastAll(transform.position);
+        foreach (RaycastHit2D dropHit in dropHits)
         {
-            RaycastHit2D[] dropHits = _dropNearBoxCast.BoxCastAll(transform.position);
-            foreach (RaycastHit2D dropHit in dropHits)
+            Drop drop = dropHit.collider.GetComponent<Drop>();
+            if (drop.IsAttractionEnabled && _playerInteractions.IsEnoughSpaceToTakeDrop(drop))
             {
                 DropAttraction dropAttratction = dropHit.collider.GetComponent<DropAttraction>();
                 dropAttratction.Target = transform;
+
                 dropAttratction.OnEndOfAttraction += (drop) =>
                 {
                     _playerInteractions.TakeDrop(drop);
