@@ -1,8 +1,6 @@
 using Items;
 using System;
-using System.Collections;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 
 public class Drop : MonoBehaviour
 {
@@ -22,6 +20,7 @@ public class Drop : MonoBehaviour
 
     #region Public fields
     public Action OnColliderSizeChanged;
+    public Action OnDropReset;
     #endregion
 
     #region Properties
@@ -127,12 +126,26 @@ public class Drop : MonoBehaviour
     private void SetSprite(Sprite sprite)
     {
         _spriteRenderer.sprite = sprite;
-        float sizeX = Mathf.Min(sprite.bounds.size.x, _maxColliderSize.x);
-        float sizeY = Mathf.Min(sprite.bounds.size.y, _maxColliderSize.y);
-        float scaleX = sizeX / sprite.bounds.size.x;
-        float scaleY = sizeY / sprite.bounds.size.y;
-        _boxCollider.size = new Vector2(sizeX, sizeY);
-        _spriteRenderer.transform.localScale = new Vector3(scaleX, scaleY, 1);
+        Vector2 size = sprite.bounds.size;
+        float aspectRatio = size.x / size.y;
+        float currentSizeX = Mathf.Min(sprite.bounds.size.x, _maxColliderSize.x);
+        float currentSizeY = Mathf.Min(sprite.bounds.size.y, _maxColliderSize.y);
+        float newScaleX;
+        float newScaleY;
+        if (aspectRatio > 1)
+        {
+            newScaleX = currentSizeX;
+            newScaleY = currentSizeY / aspectRatio;
+        }
+        else
+        {
+            newScaleX = currentSizeX * aspectRatio;
+            newScaleY = currentSizeY;
+        }
+        _boxCollider.size = new Vector2(newScaleX, newScaleY);
+        newScaleX /= size.x;
+        newScaleY /= size.y;
+        _spriteRenderer.transform.localScale = new Vector3(newScaleX, newScaleY, 1);
         OnColliderSizeChanged?.Invoke();
     }
     #endregion
