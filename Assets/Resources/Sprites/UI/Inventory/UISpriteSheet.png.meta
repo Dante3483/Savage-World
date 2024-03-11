@@ -545,6 +545,90 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Bookmark_1
+      rect:
+        serializedVersion: 2
+        x: 800
+        y: 1126
+        width: 48
+        height: 21
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5c632b9cfd8a513469cf0ef1aaa09a90
+      internalID: 1813808826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bookmark_2
+      rect:
+        serializedVersion: 2
+        x: 806
+        y: 1072
+        width: 21
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b690a72377b5647419b37275e8663506
+      internalID: -1452376037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bookmark_3
+      rect:
+        serializedVersion: 2
+        x: 803
+        y: 1029
+        width: 26
+        height: 21
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2815a5440f1e226448ed50656d846c57
+      internalID: -432219784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bookmark_4
+      rect:
+        serializedVersion: 2
+        x: 854
+        y: 1027
+        width: 21
+        height: 26
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c4f17bcf2c0f776459e6c412bc5dfd05
+      internalID: -1160777540
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -557,6 +641,10 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       Accessory_Silhouette_1: 480572714
+      Bookmark_1: 1813808826
+      Bookmark_2: -1452376037
+      Bookmark_3: -432219784
+      Bookmark_4: -1160777540
       Chestplate_Silhouette_1: 1802058320
       Cover_1: 1014699151
       Desk_1: -1544545748
