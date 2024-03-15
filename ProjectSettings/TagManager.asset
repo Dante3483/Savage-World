@@ -17,9 +17,9 @@ TagManager:
   - Tree
   - PickUpItem
   - Player
-  - 
-  - 
-  - 
+  - Drop
+  - Block
+  - DropPlatform
   - 
   - 
   - 

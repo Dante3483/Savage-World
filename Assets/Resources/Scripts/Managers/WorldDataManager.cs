@@ -81,6 +81,11 @@ public class WorldDataManager : MonoBehaviour
         return ref _worldData[x, y];
     }
 
+    public ref WorldCellData GetAdjacentWorldCellData(int x, int y, Vector2Int direction)
+    {
+        return ref _worldData[x + direction.x, y + direction.y];
+    }
+
     public void SetBlockInfoByCoords(Vector2Int blockCoords)
     {
         _blockInfo = _worldData[blockCoords.x, blockCoords.y].ToString();

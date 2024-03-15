@@ -5,6 +5,7 @@ using UnityEngine;
 public struct LinecastUtil
 {
     #region Private fields
+    [SerializeField] private bool _needVisualize;
     [SerializeField] private Color _hitColor;
     [SerializeField] private Color _notHitColor;
     [SerializeField] private Vector3 _vFrom;
@@ -81,10 +82,23 @@ public struct LinecastUtil
             _layerMask = value;
         }
     }
+
+    public bool NeedVisualize
+    {
+        get
+        {
+            return _needVisualize;
+        }
+
+        set
+        {
+            _needVisualize = value;
+        }
+    }
     #endregion
 
     #region Methods
-    public RaycastHit2D CheckLinecast(Vector3 vFrom, Vector3 vTo,  out bool result, bool needVizualize = true)
+    public RaycastHit2D CheckLinecast(Vector3 vFrom, Vector3 vTo,  out bool result)
     {
         Color rayColor;
 
@@ -100,12 +114,18 @@ public struct LinecastUtil
             rayColor = NotHitColor;
         }
 
-        if (needVizualize)
-        {
-            Debug.DrawLine(vFrom, vTo, rayColor);
-        }
+        DrawLine(vFrom, vTo, rayColor);
 
         return hit;
+    }
+
+    private void DrawLine(Vector3 vFrom, Vector3 vTo, Color rayColor)
+    {
+        if (!_needVisualize)
+        {
+            return;
+        }
+        Debug.DrawLine(vFrom, vTo, rayColor);
     }
     #endregion
 }

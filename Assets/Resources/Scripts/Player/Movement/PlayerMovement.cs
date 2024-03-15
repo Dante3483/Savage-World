@@ -7,7 +7,6 @@ public class PlayerMovement : MonoBehaviour
     #region Private fields
     [Header("Main")]
     [SerializeField] private PlayerStats _playerStats;
-    [SerializeField] private PlayerDebugger _playerDebugger;
     [SerializeField] private Rigidbody2D _rigidbody;
     [SerializeField] private BoxCollider2D _boxCollider;
 
@@ -417,7 +416,6 @@ public class PlayerMovement : MonoBehaviour
         _playerStats = GetComponent<PlayerStats>();
         _rigidbody = GetComponent<Rigidbody2D>();
         _boxCollider = GetComponent<BoxCollider2D>();
-        _playerDebugger = GetComponent<PlayerDebugger>();
         _playerAnimator = GetComponent<Animator>();
         _playerAnimations = GetComponent<PlayerAnimationsController>();
 
@@ -654,8 +652,8 @@ public class PlayerMovement : MonoBehaviour
         // Center bottom point
         Vector3 origin = _boxCollider.bounds.center;
         origin.y -= _boxCollider.bounds.extents.y;
-        _groundCheckBoxCast.BoxCast(origin, out bool result, _playerDebugger.EnableGroundCheckVizualization);
-        IsGrounded = result;
+        _groundCheckBoxCast.BoxCast(origin);
+        IsGrounded = _groundCheckBoxCast.Result;
     }
 
     private void SlopeCheck()
@@ -674,8 +672,7 @@ public class PlayerMovement : MonoBehaviour
             _slopeCheckDistance, 
             _groundLayer,
             Color.cyan,
-            Color.red,
-            _playerDebugger.EnableSlopeCheckVizualization);
+            Color.red);
 
         RaycastHit2D slopeHitBack = _slopeCheckRaycast.Raycast(
             checkPosistion, 
@@ -683,30 +680,29 @@ public class PlayerMovement : MonoBehaviour
             _slopeCheckDistance,
             _groundLayer,
             Color.cyan,
-            Color.red,
-            _playerDebugger.EnableSlopeCheckVizualization);
+            Color.red);
 
         if (slopeHitFront)
         {
             _slopeAngle = Vector2.Angle(slopeHitFront.normal, Vector2.up);
             _slopeNormalPerpendicular = Vector2.Perpendicular(slopeHitFront.normal).normalized;
 
-            if (_playerDebugger.EnableSlopeCheckVizualization)
-            {
-                Debug.DrawRay(slopeHitFront.point, _slopeNormalPerpendicular, Color.blue);
-                Debug.DrawRay(slopeHitFront.point, slopeHitFront.normal, Color.red);
-            }
+            //if (_playerDebugger.EnableSlopeCheckVizualization)
+            //{
+            //    Debug.DrawRay(slopeHitFront.point, _slopeNormalPerpendicular, Color.blue);
+            //    Debug.DrawRay(slopeHitFront.point, slopeHitFront.normal, Color.red);
+            //}
         }
         else if (slopeHitBack)
         {
             _slopeAngle = Vector2.Angle(slopeHitBack.normal, Vector2.up);
             _slopeNormalPerpendicular = Vector2.Perpendicular(slopeHitBack.normal).normalized;
 
-            if (_playerDebugger.EnableSlopeCheckVizualization)
-            {
-                Debug.DrawRay(slopeHitBack.point, _slopeNormalPerpendicular, Color.blue);
-                Debug.DrawRay(slopeHitBack.point, slopeHitBack.normal, Color.red);
-            }
+            //if (_playerDebugger.EnableSlopeCheckVizualization)
+            //{
+            //    Debug.DrawRay(slopeHitBack.point, _slopeNormalPerpendicular, Color.blue);
+            //    Debug.DrawRay(slopeHitBack.point, slopeHitBack.normal, Color.red);
+            //}
         }
         else
         {
@@ -724,7 +720,7 @@ public class PlayerMovement : MonoBehaviour
     private void WallCheck()
     {
         _wallCheckRaycast.Direction = transform.right;
-        _wallCheckRaycast.Raycast(_boxCollider.bounds.center, out bool result, _playerDebugger.EnableWallCheckVizualization);
+        _wallCheckRaycast.Raycast(_boxCollider.bounds.center, out bool result);
         IsWallInFront = result;
     }
 

@@ -28,6 +28,7 @@ public class InventorySO : ScriptableObject
     private bool _isItemInBuffer => !_bufferItem.IsEmpty;
     private int _hotbarSize => _hotbarFullSize / 2;
     private int _hotbarStartIndex => _isFirstPartOfHotbar ? 0 : _hotbarSize;
+    private int _hotbarEndIndex => (_isFirstPartOfHotbar ? _hotbarSize : _hotbarFullSize) - 1;
     private int _indexOfSelectedItem;
     #endregion
 
@@ -160,7 +161,9 @@ public class InventorySO : ScriptableObject
 
     private int AddItemToFirstFreeSlot(ItemSO itemData, int quantity, ItemLocations location)
     {
-        for (int i = 0; i < _itemsByLocation[location].Length; i++)
+        GetIndexesByLocation(location, out int startIndex, out int endIndex);
+
+        for (int i = startIndex; i <= endIndex; i++)
         {
             if (_itemsByLocation[location][i].IsEmpty)
             {
@@ -173,7 +176,9 @@ public class InventorySO : ScriptableObject
 
     private int AddItemToFirstFreeSlot(InventoryItem item, ItemLocations location)
     {
-        for (int i = 0; i < _itemsByLocation[location].Length; i++)
+        GetIndexesByLocation(location, out int startIndex, out int endIndex);
+
+        for (int i = startIndex; i <= endIndex; i++)
         {
             if (_itemsByLocation[location][i].IsEmpty)
             {
@@ -214,7 +219,9 @@ public class InventorySO : ScriptableObject
 
     private int AddStackableItem(ItemSO item, int quantity, ItemLocations location)
     {
-        for (int i = 0; i < _itemsByLocation[location].Length; i++)
+        GetIndexesByLocation(location, out int startIndex, out int endIndex);
+
+        for (int i = startIndex; i <= endIndex; i++)
         {
             if (_itemsByLocation[location][i].ItemData == item)
             {
@@ -437,6 +444,18 @@ public class InventorySO : ScriptableObject
         return _selectedItem;
     }
 
+    public void RemoveSelectedItem()
+    {
+        _selectedItem.ClearData();
+        InformAboutChange();
+    }
+
+    public void DecreaseSelectedItemQuantity(int value)
+    {
+        _selectedItem.UpdateQuantity(_selectedItem.Quantity - value);
+        InformAboutChange();
+    }
+
     public bool CompareItemWithBuffer(int index, ItemLocations location)
     {
         return _bufferItem.ItemData == GetItem(index, location).ItemData;
@@ -444,7 +463,31 @@ public class InventorySO : ScriptableObject
 
     private bool IsStorageFull(ItemLocations location)
     {
-        return !_itemsByLocation[location].Where(item => item.IsEmpty).Any();
+        if (location == ItemLocations.Hotbar)
+        {
+            return !_itemsByLocation[location].Where((item, index) => item.IsEmpty && (index >= _hotbarStartIndex && index <= _hotbarEndIndex)).Any();
+        }
+        else
+        {
+            return !_itemsByLocation[location].Where(item => item.IsEmpty).Any();
+        }
+    }
+
+    public bool IsEnoughSpaceForItem(ItemSO itemData, ItemLocations location)
+    {
+        if (location == ItemLocations.Hotbar)
+        {
+            return !_itemsByLocation[location]
+                .Where((_, index) => index >= _hotbarStartIndex && index <= _hotbarEndIndex)
+                .Where((item) => item.IsEmpty || (item.ItemData == itemData && item.Quantity != item.ItemData.MaxStackSize))
+                .Any();
+        }
+        else
+        {
+            return !_itemsByLocation[location]
+                .Where((item) => item.IsEmpty || (item.ItemData == itemData && item.Quantity != item.ItemData.MaxStackSize))
+                .Any();
+        }
     }
 
     private bool IsCorrectArmorSlot(int index, InventoryItem item)
@@ -462,6 +505,20 @@ public class InventorySO : ScriptableObject
             }
         }
         return null;
+    }
+
+    private void GetIndexesByLocation(ItemLocations location, out int startIndex, out int endIndex)
+    {
+        if (location == ItemLocations.Hotbar)
+        {
+            startIndex = _hotbarStartIndex;
+            endIndex = _hotbarEndIndex;
+        }
+        else
+        {
+            startIndex = 0;
+            endIndex = _itemsByLocation[location].Length - 1;
+        }
     }
     #endregion
 }
