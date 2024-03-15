@@ -7,20 +7,21 @@ using UnityEngine;
 public class RecipeSO : ScriptableObject
 {
     #region Private fields
-    [SerializeField] private RecipeItem[] _meterials;
+    [SerializeField] private RecipeItem[] _materials;
     [SerializeField] private RecipeItem _result;
+    [SerializeField] private bool _isEnoughMaterials;
     #endregion
 
     #region Public fields
-
+    public static RecipeSO SelectedRecipe;
     #endregion
 
     #region Properties
-    public RecipeItem[] Meterials
+    public RecipeItem[] Materials
     {
         get
         {
-            return _meterials;
+            return _materials;
         }
     }
 
@@ -32,7 +33,18 @@ public class RecipeSO : ScriptableObject
         }
     }
 
-    public static RecipeSO SelectedRecipe;
+    public bool IsEnoughMaterials
+    {
+        get
+        {
+            return _isEnoughMaterials;
+        }
+
+        set
+        {
+            _isEnoughMaterials = value;
+        }
+    }
     #endregion
 
     #region Methods

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using static UnityEditor.FilePathAttribute;
 
 [CreateAssetMenu(fileName = "Inventory", menuName = "Player/Inventory/Inventory")]
 public class InventorySO : ScriptableObject
@@ -23,6 +24,9 @@ public class InventorySO : ScriptableObject
     [SerializeField] private int _accessoriesSize = 6;
     [SerializeField] private int _armorSize = 3;
 
+    private bool _isInvntoryOpened;
+    private bool _isCraftStationOpened;
+
     private Dictionary<ItemLocations, InventoryItem[]> _itemsByLocation;
     private bool _isFirstPartOfHotbar;
     private bool _isItemInBuffer => !_bufferItem.IsEmpty;
@@ -38,6 +42,8 @@ public class InventorySO : ScriptableObject
     public event Action<InventoryItem[]> OnAccessoriesChanged;
     public event Action<InventoryItem[]> OnArmorChanged;
     public event Action<InventoryItem> OnBufferItemChanged;
+    public event Action<ItemSO, int> OnInventoryFull;
+    public event Action OnItemsUpdate;
     #endregion
 
     #region Properties
@@ -113,13 +119,39 @@ public class InventorySO : ScriptableObject
         _isFirstPartOfHotbar = true;
     }
 
-    public void InformAboutChange()
+    public void UpdateUI()
     {
         OnStorageChanged?.Invoke(_storageItems);
         OnHotbarChanged?.Invoke(_hotbarItems, _hotbarStartIndex, _hotbarSize);
         OnAccessoriesChanged?.Invoke(_accessoriesItems);
         OnArmorChanged?.Invoke(_armorItems);
         OnBufferItemChanged?.Invoke(_bufferItem);
+        OnItemsUpdate?.Invoke();
+    }
+
+    public void AddItem(ItemSO itemData, int quantity)
+    {
+        if (!itemData.IsStackable)
+        {
+            quantity -= AddItemToFirstFreeSlot(itemData, 1, ItemLocations.Hotbar);
+            if (quantity != 0)
+            {
+                quantity -= AddItemToFirstFreeSlot(itemData, 1, ItemLocations.Storage);
+            }
+        }
+        else
+        {
+            quantity = AddStackableItem(itemData, quantity, ItemLocations.Hotbar);
+            if (quantity != 0)
+            {
+                quantity = AddStackableItem(itemData, quantity, ItemLocations.Storage);
+            }
+        }
+        if (quantity != 0)
+        {
+            OnInventoryFull?.Invoke(itemData, quantity);
+        }
+        UpdateUI();
     }
 
     public int AddItem(ItemSO itemData, int quantity, ItemLocations location)
@@ -135,7 +167,7 @@ public class InventorySO : ScriptableObject
         {
             quantity = AddStackableItem(itemData, quantity, location);
         }
-        InformAboutChange();
+        UpdateUI();
         return quantity;
     }
 
@@ -155,7 +187,7 @@ public class InventorySO : ScriptableObject
             quantity = AddStackableItem(itemData, quantity, location);
         }
         item.UpdateQuantity(quantity);
-        InformAboutChange();
+        UpdateUI();
         return quantity;
     }
 
@@ -283,7 +315,7 @@ public class InventorySO : ScriptableObject
             item.UpdateQuantity(item.Quantity - quantity);
             _bufferItem.UpdateQuantity(_bufferItem.Quantity + quantity);
         }
-        InformAboutChange();
+        UpdateUI();
     }
 
     private void AddItemFromBufferAt(int index, ItemLocations location)
@@ -363,11 +395,52 @@ public class InventorySO : ScriptableObject
         InventoryItem item = _itemsByLocation[location][index];
         return item.ItemData?.GetFullDescription(item.Quantity);
     }
+
+    public int GetItemQuantity(ItemSO itemData)
+    {
+        return _hotbarItems.Union(_storageItems).Where(i => i.ItemData == itemData).Sum(i => i.Quantity);
+    }
     
     public void RemoveItemAt(int index, ItemLocations location)
     {
         GetItem(index, location).ClearData();
-        InformAboutChange();
+        UpdateUI();
+    }
+
+    public void RemoveItemFromFirstSlot(ItemSO itemData, int quantity)
+    {
+        quantity = RemoveItemFromFirstSlot(itemData, quantity, ItemLocations.Hotbar);
+        if (quantity != 0)
+        {
+            RemoveItemFromFirstSlot(itemData, quantity, ItemLocations.Storage);
+        }
+        UpdateUI();
+    }
+
+    private int RemoveItemFromFirstSlot(ItemSO itemData, int quantity, ItemLocations location)
+    {
+        for (int i = 0; i <= _itemsByLocation[location].Length; i++)
+        {
+            if (quantity == 0)
+            {
+                return 0;
+            }
+            if (_itemsByLocation[location][i].ItemData == itemData)
+            {
+                int amountPossibleToRemove = _itemsByLocation[location][i].Quantity;
+                if (quantity > amountPossibleToRemove)
+                {
+                    _itemsByLocation[location][i].ClearData();
+                    quantity -= amountPossibleToRemove;
+                }
+                else
+                {
+                    _itemsByLocation[location][i].UpdateQuantity(_itemsByLocation[location][i].Quantity - quantity);
+                    return 0;
+                }
+            }
+        }
+        return quantity;
     }
 
     public void TakeItem(int index, ItemLocations location)
@@ -380,7 +453,7 @@ public class InventorySO : ScriptableObject
         {
             AddItemFromBufferAt(index, location);
         }
-        InformAboutChange();
+        UpdateUI();
     }
 
     public void TakeItem(int index, ItemLocations location, int quantity)
@@ -398,7 +471,7 @@ public class InventorySO : ScriptableObject
         {
             AddItemToBuffer(index, location, quantity);
         }
-        InformAboutChange();
+        UpdateUI();
     }
 
     public void ClearBuffer()
@@ -447,13 +520,13 @@ public class InventorySO : ScriptableObject
     public void RemoveSelectedItem()
     {
         _selectedItem.ClearData();
-        InformAboutChange();
+        UpdateUI();
     }
 
     public void DecreaseSelectedItemQuantity(int value)
     {
         _selectedItem.UpdateQuantity(_selectedItem.Quantity - value);
-        InformAboutChange();
+        UpdateUI();
     }
 
     public bool CompareItemWithBuffer(int index, ItemLocations location)

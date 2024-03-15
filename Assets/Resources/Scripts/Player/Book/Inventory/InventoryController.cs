@@ -12,6 +12,8 @@ public class InventoryController : MonoBehaviour, IBookPageController
     [SerializeField] private UIInventoryPage _inventoryUI;
     [SerializeField] private InventorySO _inventoryData;
 
+    [Header("Test data")]
+    [SerializeField] private bool _isTestDataEnabled;
     [SerializeField] private List<ItemSO> _initStorageItems;
     [SerializeField] private List<ItemSO> _initHotbarItems;
     [SerializeField] private List<ItemSO> _initAccessoriesItems;
@@ -43,17 +45,20 @@ public class InventoryController : MonoBehaviour, IBookPageController
 
     private void Start()
     {
-        foreach (ItemSO item in _initStorageItems)
+        if (_isTestDataEnabled)
         {
-            _inventoryData.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Storage);
-        }
-        foreach (ItemSO item in _initHotbarItems)
-        {
-            _inventoryData.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Hotbar);
-        }
-        foreach (ItemSO item in _initAccessoriesItems)
-        {
-            _inventoryData.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Accessories);
+            foreach (ItemSO item in _initStorageItems)
+            {
+                _inventoryData.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Storage);
+            }
+            foreach (ItemSO item in _initHotbarItems)
+            {
+                _inventoryData.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Hotbar);
+            }
+            foreach (ItemSO item in _initAccessoriesItems)
+            {
+                _inventoryData.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Accessories);
+            }
         }
     }
 

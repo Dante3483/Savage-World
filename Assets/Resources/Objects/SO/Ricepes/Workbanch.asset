@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee41b269f37009e4598e6f2a771f5cb4, type: 3}
   m_Name: Workbanch
   m_EditorClassIdentifier: 
-  _recipes: []
+  _recipes:
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}

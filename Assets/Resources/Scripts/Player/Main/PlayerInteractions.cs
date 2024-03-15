@@ -1,3 +1,4 @@
+using Inventory;
 using Items;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -7,7 +8,7 @@ public class PlayerInteractions : MonoBehaviour
     #region Private fields
     [SerializeField] private Drop _dropPrefab;
     [SerializeField] private ItemSO _item;
-    [SerializeField] private InventorySO _inventory;
+    [SerializeField] private InventorySO _inventoryData;
     #endregion
 
     #region Public fields
@@ -19,6 +20,11 @@ public class PlayerInteractions : MonoBehaviour
     #endregion
 
     #region Methods
+    private void Awake()
+    {
+        _inventoryData.OnInventoryFull += HandleThrowItem;
+    }
+
     private void Update()
     {
         if (GameManager.Instance.IsGameSession)
@@ -29,7 +35,7 @@ public class PlayerInteractions : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.T))
             {
-                ThrowItem();
+                ThrowSelectedItem();
             }
             BreakBlock();
             CreateWater();
@@ -39,7 +45,7 @@ public class PlayerInteractions : MonoBehaviour
 
     private void InteractWithItemInHotbar()
     {
-        switch (_inventory.GetSelectedItem().ItemData)
+        switch (_inventoryData.GetSelectedItem().ItemData)
         {
             case BlockItemSO blockItem:
                 {
@@ -60,7 +66,7 @@ public class PlayerInteractions : MonoBehaviour
         if (WorldDataManager.Instance.WorldData[intPos.x, intPos.y].IsEmpty())
         {
             GameManager.Instance.Terrain.CreateBlock(intPos.x, intPos.y, blockItem.BlockToPlace);
-            _inventory.DecreaseSelectedItemQuantity(1);
+            _inventoryData.DecreaseSelectedItemQuantity(1);
 
             GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y));
             GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y + 1));
@@ -82,7 +88,7 @@ public class PlayerInteractions : MonoBehaviour
             {
                 ref WorldCellData block = ref WorldDataManager.Instance.GetWorldCellData(intPos.x, intPos.y);
 
-                CreateDrop(new Vector3(intPos.x + 0.5f, intPos.y + 0.5f), block.BlockData.Drop);
+                CreateDrop(new Vector3(intPos.x + 0.5f, intPos.y + 0.5f), block.BlockData.Drop, 1);
 
                 GameManager.Instance.Terrain.CreateBlock(intPos.x, intPos.y, GameManager.Instance.BlocksAtlas.Air);
 
@@ -135,43 +141,47 @@ public class PlayerInteractions : MonoBehaviour
         {
             return;
         }
-        int remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Hotbar);
+        int remainder = _inventoryData.AddItem(drop.Item, drop.Quantity, ItemLocations.Hotbar);
         drop.Quantity = remainder;
 
         if (remainder != 0)
         {
-            remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Storage);
+            remainder = _inventoryData.AddItem(drop.Item, drop.Quantity, ItemLocations.Storage);
             drop.Quantity = remainder;
         }
     }
 
     public bool IsEnoughSpaceToTakeDrop(Drop drop)
     {
-        return !_inventory.IsEnoughSpaceForItem(drop.Item, ItemLocations.Hotbar) || !_inventory.IsEnoughSpaceForItem(drop.Item, ItemLocations.Storage);
+        return !_inventoryData.IsEnoughSpaceForItem(drop.Item, ItemLocations.Hotbar) || !_inventoryData.IsEnoughSpaceForItem(drop.Item, ItemLocations.Storage);
     }
 
-    public void ThrowItem()
+    public void ThrowSelectedItem()
     {
-        Drop drop = CreateDrop(transform.position, _inventory.GetSelectedItem().ItemData);
+        Drop drop = CreateDrop(transform.position, _inventoryData.GetSelectedItem().ItemData, _inventoryData.GetSelectedItem().Quantity);
         if (drop != null)
         {
             DropPhysics dropPhysics = drop.GetComponent<DropPhysics>();
             dropPhysics.AddForce();
-            drop.Quantity = _inventory.GetSelectedItem().Quantity;
-            _inventory.RemoveSelectedItem();
+            _inventoryData.RemoveSelectedItem();
         }
     }
 
-    private Drop CreateDrop(Vector3 position, ItemSO item)
+    private Drop CreateDrop(Vector3 position, ItemSO item, int quantity)
     {
         if (item == null)
         {
             return null;
         }
         Drop drop = Instantiate(_dropPrefab, position, Quaternion.identity);
-        drop.Quantity = 1;
+        drop.Quantity = quantity;
         drop.Item = item;
         return drop;
+    }
+
+    public void HandleThrowItem(ItemSO itemData, int quantity)
+    {
+        CreateDrop(transform.position, itemData, quantity);
     }
     #endregion
 }

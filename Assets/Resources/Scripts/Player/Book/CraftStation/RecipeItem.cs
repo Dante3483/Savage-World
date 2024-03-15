@@ -7,7 +7,7 @@ public struct RecipeItem
 {
     #region Private fields
     [SerializeField] private ItemSO _item;
-    [Min(1)][SerializeField] private int _quantity;
+    [Range(1, 9999)][SerializeField] private int _quantity;
     #endregion
 
     #region Public fields

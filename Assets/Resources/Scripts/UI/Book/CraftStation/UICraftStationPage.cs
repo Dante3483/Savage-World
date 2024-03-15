@@ -74,9 +74,9 @@ public class UICraftStationPage : MonoBehaviour
         }
     }
 
-    public void UpdateItemForCraft(int index, Sprite sprite, string name, string quantity)
+    public void UpdateItemForCraft(int index, Sprite sprite, string name, int possibleQuantity, int requieredQuantity)
     {
-        _listOfItemsForCraft[index].SetData(sprite, name, quantity);
+        _listOfItemsForCraft[index].SetData(sprite, name, possibleQuantity, requieredQuantity);
     }
 
     public void SelectCell(int index)

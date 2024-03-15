@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fff3cb7898beefc45b526d243d5b7d0a, type: 3}
   m_Name: Planks
   m_EditorClassIdentifier: 
-  _meterials:
+  _materials:
   - _item: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
     _quantity: 5
   _result:
     _item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
     _quantity: 5
+  _isEnoughMaterials: 0
