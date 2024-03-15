@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class UIManager : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class UIManager : MonoBehaviour
 
     [Header("InGame")]
     [SerializeField] private UIPage _inventoryUI;
+    [SerializeField] private UIPage _craftStationUI;
     [SerializeField] private UIPage _hotbarUI;
 
     #endregion
@@ -81,21 +83,29 @@ public class UIManager : MonoBehaviour
             _hotbarUI = value;
         }
     }
+
+    public UIPage CraftStationUI
+    {
+        get
+        {
+            return _craftStationUI;
+        }
+    }
     #endregion
 
     #region Methods
     private void Awake()
     {
         Instance = this;
+        PlayerInputActions inputActions = new PlayerInputActions();
+        inputActions.UI.Enable();
+        inputActions.UI.OpenCloseDebug.performed += ResetDebugUI;
     }
 
-    private void Update()
+    private void ResetDebugUI(InputAction.CallbackContext context)
     {
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            _debugPhasesInfoUI.ReverseActivity();
-            _debugBlockInfoUI.ReverseActivity();
-        }
+        _debugPhasesInfoUI.ReverseActivity();
+        _debugBlockInfoUI.ReverseActivity();
     }
     #endregion
 }

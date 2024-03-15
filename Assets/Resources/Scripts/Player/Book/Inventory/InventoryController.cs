@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class InventoryController : MonoBehaviour
+public class InventoryController : MonoBehaviour, IBookPageController
 {
     #region Private fields
     [Header("Main")]
@@ -37,7 +37,7 @@ public class InventoryController : MonoBehaviour
     private void Awake()
     {
         PrepareUI();
-        PrepareInventoryData();
+        PrepareData();
         _currentTimeToTakeItem = _maxTimeToTakeItem;
     }
 
@@ -57,15 +57,7 @@ public class InventoryController : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            ResetUI();
-        }
-    }
-
-    private void PrepareUI()
+    public void PrepareUI()
     {
         _inventoryUI.InitializePage(_inventoryData.StorageSize, _inventoryData.HotbarSize, _inventoryData.AccessoriesSize);
 
@@ -75,7 +67,7 @@ public class InventoryController : MonoBehaviour
         _inventoryUI.OnDescriptionRequested += HandleDescriptionRequest;
     }
 
-    private void PrepareInventoryData()
+    public void PrepareData()
     {
         _inventoryData.Initialize();
         _inventoryData.OnStorageChanged += HandleUpdateStorageUI;
@@ -85,7 +77,7 @@ public class InventoryController : MonoBehaviour
         _inventoryData.OnBufferItemChanged += HandleUpdateItemInBufferUI;
     }
 
-    private void ResetUI()
+    public void ResetData()
     {
         UIManager.Instance.InventoryUI.ReverseActivity();
         if (!UIManager.Instance.InventoryUI.IsActive)

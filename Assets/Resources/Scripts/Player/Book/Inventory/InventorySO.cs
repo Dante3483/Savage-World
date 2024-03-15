@@ -356,7 +356,7 @@ public class InventorySO : ScriptableObject
         InventoryItem item = _itemsByLocation[location][index];
         return item.ItemData?.GetFullDescription(item.Quantity);
     }
-
+    
     public void RemoveItemAt(int index, ItemLocations location)
     {
         GetItem(index, location).ClearData();
