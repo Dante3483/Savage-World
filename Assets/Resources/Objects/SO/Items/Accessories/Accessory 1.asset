@@ -17,9 +17,10 @@ MonoBehaviour:
   _itemRarity: {fileID: 11400000, guid: ddd32f58fffdb79469e4e8303aa87b40, type: 2}
   _isStackable: 0
   _maxStackSize: 1
-  _name: Book
+  _name: Iron
   _using: Can be equipped
   _description: 
-  _itemImage: {fileID: 1709470125, guid: 25a8a488940f2ea44a8195048e6024fa, type: 3}
+  _smallItemImage: {fileID: -619127051, guid: cb4e0e5650217bf4b9adfca7943a01ea, type: 3}
+  _bigItemImage: {fileID: -619127051, guid: cb4e0e5650217bf4b9adfca7943a01ea, type: 3}
   _armorType: 0
   _playerView: {fileID: 0}

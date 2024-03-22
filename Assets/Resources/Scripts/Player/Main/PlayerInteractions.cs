@@ -29,11 +29,11 @@ public class PlayerInteractions : MonoBehaviour
     {
         if (GameManager.Instance.IsGameSession)
         {
-            if (Input.GetMouseButton((int)MouseButton.Left))
+            if (!GameManager.Instance.IsInputTextInFocus && Input.GetMouseButton((int)MouseButton.Left))
             {
                 InteractWithItemInHotbar();
             }
-            if (Input.GetKeyDown(KeyCode.T))
+            if (!GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(KeyCode.T))
             {
                 ThrowSelectedItem();
             }
@@ -79,7 +79,7 @@ public class PlayerInteractions : MonoBehaviour
     //Change
     public void BreakBlock()
     {
-        if (Input.GetMouseButton((int)MouseButton.Right))
+        if (!GameManager.Instance.IsInputTextInFocus && Input.GetMouseButton((int)MouseButton.Right))
         {
             Vector3 clickPosition = Input.mousePosition;
 
@@ -104,7 +104,7 @@ public class PlayerInteractions : MonoBehaviour
     //Delete
     public void CreateWater()
     {
-        if (Input.GetKeyDown(KeyCode.U))
+        if (!GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(KeyCode.U))
         {
             Vector3 clickPosition = Input.mousePosition;
 
@@ -119,7 +119,7 @@ public class PlayerInteractions : MonoBehaviour
     //Delete
     public void CreateTorch()
     {
-        if (Input.GetKeyDown(KeyCode.L))
+        if (!GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(KeyCode.L))
         {
             Vector3 clickPosition = Input.mousePosition;
 

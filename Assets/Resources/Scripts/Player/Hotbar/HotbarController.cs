@@ -53,7 +53,7 @@ public class HotbarController : MonoBehaviour
     {
         for (int i = 0; i < _hotbarKeys.Length; i++)
         {
-            if (Input.GetKeyDown(_hotbarKeys[i]))
+            if (!GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(_hotbarKeys[i]))
             {
                 SelectCell(i);
                 return;
@@ -86,7 +86,7 @@ public class HotbarController : MonoBehaviour
     {
         for (int i = startIndex; i < count; i++)
         {
-            _hotbarUI.UpdateHotbarItemData(i, hotbarState[i].ItemData?.ItemImage, hotbarState[i].Quantity);
+            _hotbarUI.UpdateHotbarItemData(i, hotbarState[i].ItemData?.SmallItemImage, hotbarState[i].Quantity);
         }
     }
     #endregion

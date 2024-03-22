@@ -132,21 +132,24 @@ namespace LightSystem
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.H))
+            if (!GameManager.Instance.IsInputTextInFocus)
             {
-                _currentLightMapMaterial = _lightMapMaterialLow;
-            }
-            if (Input.GetKeyDown(KeyCode.J))
-            {
-                _currentLightMapMaterial = _lightMapMaterialMedium;
-            }
-            if (Input.GetKeyDown(KeyCode.K))
-            {
-                _currentLightMapMaterial = _lightMapMaterialHigh;
-            }
-            if (Input.GetKeyDown(KeyCode.G))
-            {
-                _isColoredMode = !_isColoredMode;
+                if (Input.GetKeyDown(KeyCode.H))
+                {
+                    _currentLightMapMaterial = _lightMapMaterialLow;
+                }
+                if (Input.GetKeyDown(KeyCode.J))
+                {
+                    _currentLightMapMaterial = _lightMapMaterialMedium;
+                }
+                if (Input.GetKeyDown(KeyCode.K))
+                {
+                    _currentLightMapMaterial = _lightMapMaterialHigh;
+                }
+                if (Input.GetKeyDown(KeyCode.G))
+                {
+                    _isColoredMode = !_isColoredMode;
+                }
             }
 
             if (GameManager.Instance.IsGameSession)

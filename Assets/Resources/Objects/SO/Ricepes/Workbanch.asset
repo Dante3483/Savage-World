@@ -12,5 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee41b269f37009e4598e6f2a771f5cb4, type: 3}
   m_Name: Workbanch
   m_EditorClassIdentifier: 
-  _recipes:
-  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  _name: Workbanch
+  _recipesSets:
+  - _setName: Equipment
+    _setSprite: {fileID: 2003883804, guid: cb4e0e5650217bf4b9adfca7943a01ea, type: 3}
+    _recipes:
+    - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  _indexOfCurrentSet: 0

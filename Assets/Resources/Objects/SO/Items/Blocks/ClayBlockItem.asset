@@ -20,5 +20,6 @@ MonoBehaviour:
   _name: Clay block
   _using: Can be placed
   _description: Clay
-  _itemImage: {fileID: 21300000, guid: 615cef0125df2324295f7025cb39ae75, type: 3}
+  _smallItemImage: {fileID: 21300000, guid: 615cef0125df2324295f7025cb39ae75, type: 3}
+  _bigItemImage: {fileID: 21300000, guid: e4c399b32a521ca449bf333037951af8, type: 3}
   _blockToPlace: {fileID: 11400000, guid: 73ff087286672b04b9204ebbc38cef50, type: 2}

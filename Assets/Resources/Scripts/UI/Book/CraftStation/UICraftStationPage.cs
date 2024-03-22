@@ -1,23 +1,37 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UICraftStationPage : MonoBehaviour
 {
     #region Private fields
-    [Header("Main")]
-    [SerializeField] private UIItemToCraftCell _itemToCraftPrefab;
-    [SerializeField] private UIItemForCraftCell _itemForCraftPrefab;
-    [SerializeField] private RectTransform _itemsToCraftContent;
-    [SerializeField] private RectTransform _itemsForCraftContent;
+    [Header("Left page")]
+    [SerializeField] private UIRecipe _recipePrefab;
+    [SerializeField] private UICraftStationBookmark _bookmarkPrefab;
+    [SerializeField] private UISearchRecipes _searchRecipesInput;
+    [SerializeField] private TMP_Text _craftStationNameTxt;
+    [SerializeField] private RectTransform _recipesContent;
+    [SerializeField] private RectTransform _bookmarksContent;
 
-    private List<UIItemToCraftCell> _listOfItemsToCraft;
-    private List<UIItemForCraftCell> _listOfItemsForCraft;
+    [Header("Right page")]
+    [SerializeField] private UIRecipeMaterial _recipeMaterialPrefab;
+    [SerializeField] private UIQuantityInput _quantityInput;
+    [SerializeField] private Image _bigImage;
+    [SerializeField] private TMP_Text _rarityTxt;
+    [SerializeField] private TMP_Text _descriptionTxt;
+    [SerializeField] private Button _createItemButton;
+    [SerializeField] private RectTransform _recipeMaterialsContent;
+
+    private List<UICraftStationBookmark> _listOfBookmarks;
+    private List<UIRecipe> _listOfRecipes;
+    private List<UIRecipeMaterial> _listOfRecipeMaterials;
     #endregion
 
     #region Public fields
-    public Action<int> OnItemSelected;
-    public Action OnItemCreate;
+    public Action<int> OnRecipeSelected, OnBookmarkSelected, OnItemCreate;
+    public Action<string> OnSearchRecipes;
     #endregion
 
     #region Properties
@@ -27,82 +41,172 @@ public class UICraftStationPage : MonoBehaviour
     #region Methods
     private void Awake()
     {
-        _listOfItemsToCraft = new List<UIItemToCraftCell>();
+        _listOfRecipes = new List<UIRecipe>();
     }
 
-    public void InitializePage(int itemsForCraftCount)
+    public void InitializePage(int bookmarksCount, int recipeMaterialsCount)
     {
-        InitializeItemsForCraft(itemsForCraftCount);
+        InitializeBookmarks(bookmarksCount);
+        InitializeRecipeMaterials(recipeMaterialsCount);
+        _searchRecipesInput.OnNeedSearch += HandleSearchRecipes;
     }
 
-    private void InitializeItemsForCraft(int itemsForCraftCount)
+    private void InitializeBookmarks(int bookmarksCount)
     {
-        _listOfItemsForCraft = new List<UIItemForCraftCell>();
-        for (int i = 0; i < itemsForCraftCount; i++)
+        _listOfBookmarks = new List<UICraftStationBookmark>();
+        for (int i = 0; i < bookmarksCount; i++)
         {
-            UIItemForCraftCell uiItem = Instantiate(_itemForCraftPrefab, Vector3.zero, Quaternion.identity);
-            uiItem.transform.SetParent(_itemsForCraftContent, false);
-            uiItem.name = "ItemForCraft";
-            _listOfItemsForCraft.Add(uiItem);
+            UICraftStationBookmark uiItem = Instantiate(_bookmarkPrefab, Vector3.zero, Quaternion.identity);
+            uiItem.transform.SetParent(_bookmarksContent, false);
+            uiItem.name = "Bookmark";
+            uiItem.OnLeftButtonClick += HandleSelectBookmark;
+            _listOfBookmarks.Add(uiItem);
         }
     }
 
-    public void ResetPage()
+    private void InitializeRecipeMaterials(int recipeMaterialsCount)
     {
-        foreach (UIItemToCraftCell itemToCraft in _listOfItemsToCraft)
+        _listOfRecipeMaterials = new List<UIRecipeMaterial>();
+        for (int i = 0; i < recipeMaterialsCount; i++)
         {
-            Destroy(itemToCraft.gameObject);
+            UIRecipeMaterial uiItem = Instantiate(_recipeMaterialPrefab, Vector3.zero, Quaternion.identity);
+            uiItem.transform.SetParent(_recipeMaterialsContent, false);
+            uiItem.name = "RecipeMaterial";
+            _listOfRecipeMaterials.Add(uiItem);
         }
-        _listOfItemsToCraft.Clear();
     }
 
-    public void UpdateItemToCraft(Sprite sprite, string name)
+    public void UpdateRecipe(Sprite sprite, string name)
     {
-        UIItemToCraftCell uiItem = Instantiate(_itemToCraftPrefab, Vector3.zero, Quaternion.identity);
-        uiItem.transform.SetParent(_itemsToCraftContent, false);
-        uiItem.name = "ItemToCraft";
-        uiItem.OnLeftButtonClick += HandleSelectItemToCraftCell;
+        UIRecipe uiItem = Instantiate(_recipePrefab, Vector3.zero, Quaternion.identity);
+        uiItem.transform.SetParent(_recipesContent, false);
+        uiItem.name = "Recipe";
+        uiItem.OnLeftButtonClick += HandleSelectRecipe;
         uiItem.SetData(sprite, name);
-        _listOfItemsToCraft.Add(uiItem);
+        _listOfRecipes.Add(uiItem);
     }
 
-    public void ResetItemsToCraft()
+    public void UpdateRecipeMaterial(int index, Sprite sprite, string name, int quantity)
     {
-        foreach (UIItemForCraftCell item in _listOfItemsForCraft)
+        _listOfRecipeMaterials[index].SetData(sprite, name, quantity);
+    }
+
+    public void UpdateBigImage(Sprite sprite)
+    {
+        _bigImage.sprite = sprite;
+    }
+
+    public void UpdateQuantityInput(int quantity)
+    {
+        _createItemButton.interactable = quantity > 0;
+        _quantityInput.UpdateMaxQuantity(quantity);
+    }
+
+    public void UpdateRarityText(string name, Color color)
+    {
+        _rarityTxt.text = name;
+        _rarityTxt.color = color;
+    }
+
+    public void UpdateDescriptionText(string description)
+    {
+        _descriptionTxt.text = description;
+    }
+
+    public void UpdateCraftStationName(string name)
+    {
+        _craftStationNameTxt.text = name;
+    }
+
+    public void UpdateBookmark(int index, Sprite sprite)
+    {
+        _listOfBookmarks[index].SetData(sprite);
+    }
+
+    public void ResetAllRecipes()
+    {
+        foreach (UIRecipe uiItem in _listOfRecipes)
         {
-            item.ResetData();
+            Destroy(uiItem.gameObject);
+        }
+        _listOfRecipes.Clear();
+    }
+
+    public void ResetAllMaterials()
+    {
+        foreach (UIRecipeMaterial uiItem in _listOfRecipeMaterials)
+        {
+            uiItem.ResetData();
         }
     }
 
-    public void UpdateItemForCraft(int index, Sprite sprite, string name, int possibleQuantity, int requieredQuantity)
+    public void ResetAllBookmarks()
     {
-        _listOfItemsForCraft[index].SetData(sprite, name, possibleQuantity, requieredQuantity);
+        foreach (UICraftStationBookmark uiItem in _listOfBookmarks)
+        {
+            uiItem.ResetData();
+        }
     }
 
-    public void SelectCell(int index)
+    public void ResetSearchInput()
     {
-        DeselectAllCells();
-        _listOfItemsToCraft[index].Select();
-        OnItemSelected?.Invoke(index);
+        _searchRecipesInput.ResetData();
     }
 
-    private void DeselectAllCells()
+    public void SelectRecipe(int index)
     {
-        foreach (UIItemToCraftCell uiItem in _listOfItemsToCraft)
+        if (_listOfRecipes.Count == 0)
+        {
+            return;
+        }
+        DeselectAllRecipes();
+        _listOfRecipes[index].Select();
+        OnRecipeSelected?.Invoke(index);
+    }
+
+    public void SelectBookmark(int index)
+    {
+        DeselectAllBookmarks();
+        _listOfBookmarks[index].Select();
+        OnBookmarkSelected?.Invoke(index);
+    }
+
+    private void DeselectAllRecipes()
+    {
+        foreach (UIRecipe uiItem in _listOfRecipes)
         {
             uiItem.Deselect();
         }
     }
 
-    private void HandleSelectItemToCraftCell(UIItemToCraftCell cell)
+    private void DeselectAllBookmarks()
     {
-        int index = _listOfItemsToCraft.IndexOf(cell);
-        SelectCell(index);
+        foreach (UICraftStationBookmark uiItem in _listOfBookmarks)
+        {
+            uiItem.Deselect();
+        }
+    }
+
+    private void HandleSelectRecipe(UIRecipe recipe)
+    {
+        int index = _listOfRecipes.IndexOf(recipe);
+        SelectRecipe(index);
+    }
+
+    private void HandleSelectBookmark(UICraftStationBookmark bookmark)
+    {
+        int index = _listOfBookmarks.IndexOf(bookmark);
+        SelectBookmark(index);
+    }
+
+    public void HandleSearchRecipes(string name)
+    {
+        OnSearchRecipes?.Invoke(name);
     }
 
     public void HandleCreateItem()
     {
-        OnItemCreate?.Invoke();
+        OnItemCreate?.Invoke(_quantityInput.Quantity);
     }
     #endregion
 }

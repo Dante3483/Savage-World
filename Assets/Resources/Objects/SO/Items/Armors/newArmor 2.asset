@@ -20,6 +20,7 @@ MonoBehaviour:
   _name: Chestplate
   _using: Can be equipped
   _description: 
-  _itemImage: {fileID: 21300000, guid: e1c66419c616edf4e8b8728d0843e9c7, type: 3}
+  _smallItemImage: {fileID: 1802058320, guid: cb4e0e5650217bf4b9adfca7943a01ea, type: 3}
+  _bigItemImage: {fileID: 1802058320, guid: cb4e0e5650217bf4b9adfca7943a01ea, type: 3}
   _armorType: 1
   _playerView: {fileID: 0}

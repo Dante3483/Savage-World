@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Random = System.Random;
 using Stopwatch = System.Diagnostics.Stopwatch;
@@ -45,6 +46,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private bool _isStaticSeed;
     [SerializeField] private bool _isMenuActive;
     [SerializeField] private bool _isLoadingProgressActive;
+    [SerializeField] private bool _isInputTextInFocus;
 
     private List<string> _playerNames;
     private List<string> _worldNames;
@@ -282,6 +284,27 @@ public class GameManager : MonoBehaviour
             _worldNames = value;
         }
     }
+
+    public bool IsInputTextInFocus
+    {
+        get
+        {
+            return _isInputTextInFocus;
+        }
+
+        set
+        {
+            if (value)
+            {
+                InputSystem.DisableDevice(Keyboard.current);
+            }
+            else
+            {
+                InputSystem.EnableDevice(Keyboard.current);
+            }
+            _isInputTextInFocus = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -296,7 +319,7 @@ public class GameManager : MonoBehaviour
 
         _terrain = _terrainGameObject.GetComponent<Terrain>();
         _terrainGameObject.SetActive(false);
-
+        InputSystem.EnableDevice(Keyboard.current);
         StaticInfo.Initialize();
     }
 
@@ -307,7 +330,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P))
+        if (!IsInputTextInFocus && Input.GetKeyDown(KeyCode.P))
         {
             _player.SetActive(true);
         }

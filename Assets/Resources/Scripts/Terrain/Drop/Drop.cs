@@ -49,7 +49,7 @@ public class Drop : MonoBehaviour
 
         set
         {
-            SetSprite(value.ItemImage);
+            SetSprite(value.SmallItemImage);
             _item = value;
         }
     }

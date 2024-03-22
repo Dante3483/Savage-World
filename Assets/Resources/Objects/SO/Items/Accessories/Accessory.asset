@@ -20,6 +20,7 @@ MonoBehaviour:
   _name: Ring
   _using: Can be equipped
   _description: 
-  _itemImage: {fileID: -2052766746, guid: 25a8a488940f2ea44a8195048e6024fa, type: 3}
+  _smallItemImage: {fileID: 2003883804, guid: cb4e0e5650217bf4b9adfca7943a01ea, type: 3}
+  _bigItemImage: {fileID: 2003883804, guid: cb4e0e5650217bf4b9adfca7943a01ea, type: 3}
   _armorType: 0
   _playerView: {fileID: 0}

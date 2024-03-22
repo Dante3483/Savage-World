@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UIItemToCraftCell : MonoBehaviour, IPointerClickHandler
+public class UIRecipe : MonoBehaviour, IPointerClickHandler
 {
     #region Private fields
     [Header("Main")]
@@ -14,7 +14,7 @@ public class UIItemToCraftCell : MonoBehaviour, IPointerClickHandler
     #endregion
 
     #region Public fields
-    public Action<UIItemToCraftCell> OnLeftButtonClick;
+    public Action<UIRecipe> OnLeftButtonClick;
     #endregion
 
     #region Properties

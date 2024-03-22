@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public interface IBookPageController
 {
     #region Private fields
@@ -13,7 +9,7 @@ public interface IBookPageController
     #endregion
 
     #region Properties
-
+    public bool IsActive { get;}
     #endregion
 
     #region Methods

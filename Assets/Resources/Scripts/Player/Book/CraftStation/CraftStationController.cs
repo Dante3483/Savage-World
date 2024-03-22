@@ -1,3 +1,5 @@
+using Items;
+using System;
 using UnityEngine;
 
 public class CraftStationController : MonoBehaviour, IBookPageController
@@ -5,9 +7,12 @@ public class CraftStationController : MonoBehaviour, IBookPageController
     #region Private fields
     [Header("Main")]
     [SerializeField] private UICraftStationPage _craftStationUI;
-    [SerializeField] private CraftStationSO _craftStationData;
+    [SerializeField] private CraftStationSO _currentCraftStation;
+    [SerializeField] private RecipeSO _currentRecipe;
     [SerializeField] private InventorySO _inventoryData;
-    [SerializeField] private int _itemsForCraftCount;
+    [SerializeField] private int _bookmarksCount;
+    [SerializeField] private int _recipeMaterialsCount;
+    [SerializeField] private bool _isQuantityForRecipeRepeating;
     #endregion
 
     #region Public fields
@@ -15,7 +20,7 @@ public class CraftStationController : MonoBehaviour, IBookPageController
     #endregion
 
     #region Properties
-
+    public bool IsActive => UIManager.Instance.CraftStationUI.IsActive;
     #endregion
 
     #region Methods
@@ -27,24 +32,20 @@ public class CraftStationController : MonoBehaviour, IBookPageController
 
     public void PrepareUI()
     {
-        _craftStationUI.InitializePage(_itemsForCraftCount);
-        _craftStationUI.OnItemSelected += HandleUpdateItemsForCraft;
+        _craftStationUI.InitializePage(_bookmarksCount, _recipeMaterialsCount);
+        _craftStationUI.OnBookmarkSelected += HandleUpdateSet;
+        _craftStationUI.OnRecipeSelected += HandleUpdateRecipeInfo;
         _craftStationUI.OnItemCreate += HandleCreateItem;
+        _craftStationUI.OnSearchRecipes += UpdateRecipes;
     }
 
     public void PrepareData()
     {
-        _inventoryData.OnItemsUpdate += HandleUpdateItemsForCraft;
+        _inventoryData.OnItemsUpdate += HandleUpdateMaxRecipeQuantity;
     }
 
     public void ResetData()
     {
-        if (UIManager.Instance.CraftStationUI.IsActive && _craftStationData != CraftStationSO.CurrentCraftStation)
-        {
-            UpdateCraftStation();
-            return;
-        }
-
         UIManager.Instance.CraftStationUI.ReverseActivity();
         if (UIManager.Instance.CraftStationUI.IsActive)
         {
@@ -52,58 +53,114 @@ public class CraftStationController : MonoBehaviour, IBookPageController
         }
     }
 
-    private void UpdateCraftStation()
+    public void UpdateCraftStation()
     {
-        _craftStationData = CraftStationSO.CurrentCraftStation;
-        _craftStationUI.ResetPage();
-        foreach (RecipeSO recipe in _craftStationData.Recipes)
+        _currentCraftStation = CraftStationSO.CurrentCraftStation;
+        UpdateLeftPage();
+    }
+
+    private void UpdateRecipes()
+    {
+        _craftStationUI.ResetSearchInput();
+        _craftStationUI.ResetAllRecipes();
+        foreach (RecipeSO recipe in _currentCraftStation.GetRecipes())
         {
-            _craftStationUI.UpdateItemToCraft(recipe.Result.Item.ItemImage, recipe.Result.Item.Name);
+            _craftStationUI.UpdateRecipe(recipe.Result.Item.SmallItemImage, recipe.Result.Item.Name);
         }
-        _craftStationUI.SelectCell(0);
+        _craftStationUI.SelectRecipe(0);
     }
 
-    private void HandleUpdateItemsForCraft(int index)
+    private void UpdateRecipes(string name)
     {
-        RecipeSO recipe = _craftStationData.Recipes[index];
-        recipe.SelectRecipe();
-        _craftStationUI.ResetItemsToCraft();
-        UpdateItemsForCraft(recipe);
+        _craftStationUI.ResetAllRecipes();
+        foreach (RecipeSO recipe in _currentCraftStation.GetRecipes(name))
+        {
+            _craftStationUI.UpdateRecipe(recipe.Result.Item.SmallItemImage, recipe.Result.Item.Name);
+        }
+        _craftStationUI.SelectRecipe(0);
     }
 
-    private void HandleUpdateItemsForCraft()
+    private void UpdateRecipeMaterials()
+    {
+        int i = 0;
+        _craftStationUI.UpdateBigImage(_currentRecipe.Result.Item.BigItemImage);
+        foreach (RecipeItem material in _currentRecipe.Materials)
+        {
+            _craftStationUI.UpdateRecipeMaterial(i++, material.Item.SmallItemImage, material.Item.Name, material.Quantity);
+        }
+    }
+
+    private void UpdateBookmarks()
+    {
+        _craftStationUI.ResetAllBookmarks();
+        int i = 0;
+        foreach (RecipesSet recipesSet in _currentCraftStation.RecipesSets)
+        {
+            _craftStationUI.UpdateBookmark(i++, recipesSet.SetSprite);
+        }
+        _craftStationUI.SelectBookmark(0);
+    }
+
+    private void UpdateMaxRecipeQuantity()
+    {
+        int itemQuantity;
+        int currentRecipeQuantity;
+        int minRecipeQuantity = int.MaxValue;
+        foreach (RecipeItem material in _currentRecipe.Materials)
+        {
+            itemQuantity = _inventoryData.GetItemQuantity(material.Item);
+            currentRecipeQuantity = Mathf.FloorToInt(itemQuantity / material.Quantity);
+            minRecipeQuantity = Mathf.Min(currentRecipeQuantity, minRecipeQuantity);
+        }
+        _craftStationUI.UpdateQuantityInput(minRecipeQuantity);
+    }
+
+    private void UpdateLeftPage()
+    {
+        _craftStationUI.UpdateCraftStationName(_currentCraftStation.Name);
+        UpdateBookmarks();
+    }
+
+    private void UpdateRightPage()
+    {
+        ItemSO resultItem = _currentRecipe.Result.Item;
+        ItemRaritySO resultRarity = resultItem.ItemRarity;
+        _craftStationUI.ResetAllMaterials();
+        _craftStationUI.UpdateRarityText(resultRarity.Name, resultRarity.RarityColor);
+        _craftStationUI.UpdateDescriptionText(resultItem.Description);
+        UpdateRecipeMaterials();
+        UpdateMaxRecipeQuantity();
+    }
+
+    private void HandleUpdateSet(int index)
+    {
+        _currentCraftStation.ChangeSet(index);
+        UpdateRecipes();
+    }
+
+    private void HandleUpdateRecipeInfo(int index)
+    {
+        _currentRecipe = _currentCraftStation.GetRecipe(index);
+        _currentRecipe.SelectRecipe();
+        UpdateRightPage();
+    }
+
+    private void HandleUpdateMaxRecipeQuantity()
     {
         if (UIManager.Instance.CraftStationUI.IsActive)
         {
-            RecipeSO recipe = RecipeSO.SelectedRecipe;
-            UpdateItemsForCraft(recipe);
+            UpdateMaxRecipeQuantity();
         }
     }
 
-    private void UpdateItemsForCraft(RecipeSO recipe)
+    private void HandleCreateItem(int quantity)
     {
-        int i = 0;
-        bool isEnoughMaterials = true;
-        foreach (RecipeItem material in recipe.Materials)
+        foreach (RecipeItem material in _currentRecipe.Materials)
         {
-            int possibleQuantity = Mathf.Min(_inventoryData.GetItemQuantity(material.Item), material.Item.MaxStackSize);
-            isEnoughMaterials &= possibleQuantity >= material.Quantity;
-            _craftStationUI.UpdateItemForCraft(i++, material.Item.ItemImage, material.Item.Name, possibleQuantity, material.Quantity);
+            _inventoryData.RemoveItemFromFirstSlot(material.Item, material.Quantity * quantity);
         }
-        recipe.IsEnoughMaterials = isEnoughMaterials;
-    }
-
-    private void HandleCreateItem()
-    {
-        RecipeSO recipe = RecipeSO.SelectedRecipe;
-        if (recipe.IsEnoughMaterials)
-        {
-            foreach (RecipeItem material in recipe.Materials)
-            {
-                _inventoryData.RemoveItemFromFirstSlot(material.Item, material.Quantity);
-            }
-            _inventoryData.AddItem(recipe.Result.Item, recipe.Result.Quantity);
-        }
+        _inventoryData.AddItem(_currentRecipe.Result.Item, _currentRecipe.Result.Quantity * quantity);
+        UpdateMaxRecipeQuantity();
     }
     #endregion
 }

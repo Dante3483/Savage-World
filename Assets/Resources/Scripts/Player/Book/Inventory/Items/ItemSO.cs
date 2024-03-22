@@ -14,7 +14,8 @@ namespace Items
         [SerializeField] private string _name;
         [SerializeField] private string _using;
         [SerializeField][TextArea] private string _description;
-        [SerializeField] private Sprite _itemImage;
+        [SerializeField] private Sprite _smallItemImage;
+        [SerializeField] private Sprite _bigItemImage;
         protected StringBuilder _fullDescriptionStringBuilder;
         #endregion
 
@@ -96,16 +97,16 @@ namespace Items
             }
         }
 
-        public Sprite ItemImage
+        public Sprite SmallItemImage
         {
             get
             {
-                return _itemImage;
+                return _smallItemImage;
             }
 
             set
             {
-                _itemImage = value;
+                _smallItemImage = value;
             }
         }
 
@@ -145,6 +146,14 @@ namespace Items
             set
             {
                 _id = value;
+            }
+        }
+
+        public Sprite BigItemImage
+        {
+            get
+            {
+                return _bigItemImage;
             }
         }
         #endregion

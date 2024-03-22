@@ -20,6 +20,7 @@ MonoBehaviour:
   _name: Leggings
   _using: Can be equipped
   _description: 
-  _itemImage: {fileID: 21300000, guid: df7a4d806d238ea4b84972e62fffb5b5, type: 3}
+  _smallItemImage: {fileID: -1790093723, guid: cb4e0e5650217bf4b9adfca7943a01ea, type: 3}
+  _bigItemImage: {fileID: -1790093723, guid: cb4e0e5650217bf4b9adfca7943a01ea, type: 3}
   _armorType: 2
   _playerView: {fileID: 0}

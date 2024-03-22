@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using static UnityEditor.FilePathAttribute;
 
 [CreateAssetMenu(fileName = "Inventory", menuName = "Player/Inventory/Inventory")]
 public class InventorySO : ScriptableObject
@@ -23,9 +22,6 @@ public class InventorySO : ScriptableObject
     [SerializeField] private int _hotbarFullSize = 10;
     [SerializeField] private int _accessoriesSize = 6;
     [SerializeField] private int _armorSize = 3;
-
-    private bool _isInvntoryOpened;
-    private bool _isCraftStationOpened;
 
     private Dictionary<ItemLocations, InventoryItem[]> _itemsByLocation;
     private bool _isFirstPartOfHotbar;
@@ -419,7 +415,7 @@ public class InventorySO : ScriptableObject
 
     private int RemoveItemFromFirstSlot(ItemSO itemData, int quantity, ItemLocations location)
     {
-        for (int i = 0; i <= _itemsByLocation[location].Length; i++)
+        for (int i = 0; i < _itemsByLocation[location].Length; i++)
         {
             if (quantity == 0)
             {

@@ -33,35 +33,47 @@ public class BookController : MonoBehaviour
         inputActions.UI.OpenCloseFurnace.performed += OpenCloseFurnace;
     }
 
-    private void SetNewController(IBookPageController controller)
+    private void SetController(IBookPageController controller)
     {
         _currentController?.ResetData();
-        Debug.Log(controller);
         if (controller != _currentController)
         {
-            controller.ResetData();
             _currentController = controller;
+            _currentController.ResetData();
         }
         else
         {
             _currentController = null;
         }
     }
+
+    private void SetCraftStation(CraftStationSO craftStationData)
+    {
+        if (_craftStationController.IsActive && craftStationData != CraftStationSO.CurrentCraftStation)
+        {
+            craftStationData.SelectCraftStation();
+            _craftStationController.UpdateCraftStation();
+        }
+        else
+        {
+            craftStationData.SelectCraftStation();
+            SetController(_craftStationController);
+        }
+    }
+
     private void OpenCloseFurnace(InputAction.CallbackContext context)
     {
-        _furnaceCraftStation.SelectCraftStation();
-        SetNewController(_craftStationController);
+        SetCraftStation(_furnaceCraftStation);
     }
 
     private void OpenCloseCraftStation(InputAction.CallbackContext context)
     {
-        _handCraftStation.SelectCraftStation();
-        SetNewController(_craftStationController);
+        SetCraftStation(_handCraftStation);
     }
 
     private void OpenCloseInventory(InputAction.CallbackContext context)
     {
-        SetNewController(_inventoryController);
+        SetController(_inventoryController);
     }
     #endregion
 }

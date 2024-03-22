@@ -153,8 +153,8 @@ public class PlayerMovementNew : MonoBehaviour
     #region Read movement
     private void ReadMove()
     {
-        bool keyA = Input.GetKey(KeyCode.A);
-        bool keyD = Input.GetKey(KeyCode.D);
+        bool keyA = !GameManager.Instance.IsInputTextInFocus && Input.GetKey(KeyCode.A);
+        bool keyD = !GameManager.Instance.IsInputTextInFocus && Input.GetKey(KeyCode.D);
 
         if (keyA)
         {
@@ -188,13 +188,13 @@ public class PlayerMovementNew : MonoBehaviour
             return;
         }
 
-        if (_playerFlags.IsGrounded && Input.GetKeyDown(KeyCode.Space))
+        if (_playerFlags.IsGrounded && !GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(KeyCode.Space))
         {
             _playerFlags.IsRise = true;
             _rigidbody.velocity = Vector2.up * _playerStats.JumpForce;
         }
 
-        if (Input.GetKeyUp(KeyCode.Space) && _rigidbody.velocity.y > 0)
+        if (!GameManager.Instance.IsInputTextInFocus && Input.GetKeyUp(KeyCode.Space) && _rigidbody.velocity.y > 0)
         {
             _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.y * 0.5f);
         }
@@ -202,7 +202,7 @@ public class PlayerMovementNew : MonoBehaviour
 
     private void ReadRun()
     {
-        if (_playerFlags.IsWalk && !_playerFlags.IsWallInFront && !_playerFlags.IsCrouch && Input.GetKey(KeyCode.LeftShift))
+        if (_playerFlags.IsWalk && !_playerFlags.IsWallInFront && !_playerFlags.IsCrouch && !GameManager.Instance.IsInputTextInFocus && Input.GetKey(KeyCode.LeftShift))
         {
             _playerFlags.IsWalk = false;
             _playerFlags.IsRun = true;
@@ -215,7 +215,7 @@ public class PlayerMovementNew : MonoBehaviour
 
     private void ReadCrouch()
     {
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (!GameManager.Instance.IsInputTextInFocus && Input.GetKey(KeyCode.LeftControl))
         {
             _playerFlags.IsCrouch = true;
         }
@@ -234,7 +234,7 @@ public class PlayerMovementNew : MonoBehaviour
 
     private void ReadSlide()
     {
-        if (_playerFlags.IsRun && !_playerFlags.IsRise && !_playerFlags.IsFall && !_playerFlags.IsSlide && Input.GetKeyDown(KeyCode.C))
+        if (_playerFlags.IsRun && !_playerFlags.IsRise && !_playerFlags.IsFall && !_playerFlags.IsSlide && !GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(KeyCode.C))
         {
             _playerFlags.IsStartSlide = true;
             _playerFlags.IsCancelSlideBlocked = true;
@@ -243,7 +243,7 @@ public class PlayerMovementNew : MonoBehaviour
             _slideDirection = _movementDirection;
         }
 
-        if (_playerFlags.IsSlide && !Input.GetKey(KeyCode.C) && !_playerFlags.IsCancelSlideBlocked)
+        if (_playerFlags.IsSlide && !GameManager.Instance.IsInputTextInFocus && !Input.GetKey(KeyCode.C) && !_playerFlags.IsCancelSlideBlocked)
         {
             _playerFlags.IsEndSlide = true;
             StopCoroutine(_waitForMaxSlidingTime);

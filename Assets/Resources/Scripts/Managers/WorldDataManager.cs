@@ -48,7 +48,7 @@ public class WorldDataManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(1))
+        if (!GameManager.Instance.IsInputTextInFocus && Input.GetMouseButtonDown(1))
         {
             Vector3 clickPosition = Input.mousePosition;
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);

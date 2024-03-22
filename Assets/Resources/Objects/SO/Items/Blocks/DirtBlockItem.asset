@@ -19,6 +19,9 @@ MonoBehaviour:
   _maxStackSize: 9999
   _name: Dirt block
   _using: Can be placed
-  _description: Dirt
-  _itemImage: {fileID: 21300000, guid: e0c865bc441ac7f4e9f41af4a98d68e9, type: 3}
+  _description: 'Dirt asdkasjndasdkasjdkansdjasndjasnk
+
+    jnksjdnasdkajsdajsdj'
+  _smallItemImage: {fileID: 21300000, guid: e0c865bc441ac7f4e9f41af4a98d68e9, type: 3}
+  _bigItemImage: {fileID: 21300000, guid: 5d881f46b6b40e648846228d8b5f39f7, type: 3}
   _blockToPlace: {fileID: 11400000, guid: 5c652c777cfdd1b4ba8ceee62bf0c0b9, type: 2}

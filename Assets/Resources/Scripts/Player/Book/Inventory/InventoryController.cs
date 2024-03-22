@@ -32,7 +32,7 @@ public class InventoryController : MonoBehaviour, IBookPageController
     #endregion
 
     #region Properties
-
+    public bool IsActive => UIManager.Instance.InventoryUI.IsActive;
     #endregion
 
     #region Methods
@@ -96,7 +96,7 @@ public class InventoryController : MonoBehaviour, IBookPageController
     {
         for (int i = 0; i < storageState.Length; i++)
         {
-            _inventoryUI.UpdateStorageItemData(i, storageState[i].ItemData?.ItemImage, storageState[i].Quantity);
+            _inventoryUI.UpdateStorageItemData(i, storageState[i].ItemData?.SmallItemImage, storageState[i].Quantity);
         }
     }
 
@@ -104,7 +104,7 @@ public class InventoryController : MonoBehaviour, IBookPageController
     {
         for (int i = startIndex; i < count; i++)
         {
-            _inventoryUI.UpdateHotbarItemData(i, hotbarState[i].ItemData?.ItemImage, hotbarState[i].Quantity);
+            _inventoryUI.UpdateHotbarItemData(i, hotbarState[i].ItemData?.SmallItemImage, hotbarState[i].Quantity);
         }
     }
      
@@ -112,7 +112,7 @@ public class InventoryController : MonoBehaviour, IBookPageController
     {
         for (int i = 0; i < accessoriesState.Length; i++)
         {
-            _inventoryUI.UpdateAccessoriesItemData(i, accessoriesState[i].ItemData?.ItemImage);
+            _inventoryUI.UpdateAccessoriesItemData(i, accessoriesState[i].ItemData?.SmallItemImage);
         }
     }
 
@@ -120,13 +120,13 @@ public class InventoryController : MonoBehaviour, IBookPageController
     {
         for (int i = 0; i < armorState.Length; i++)
         {
-            _inventoryUI.UpdateArmorItemData(i, armorState[i].ItemData?.ItemImage);
+            _inventoryUI.UpdateArmorItemData(i, armorState[i].ItemData?.SmallItemImage);
         }
     }
 
     private void HandleUpdateItemInBufferUI(InventoryItem bufferState)
     {
-        _inventoryUI.UpdateItemInBufferData(bufferState.ItemData?.ItemImage, bufferState.Quantity);
+        _inventoryUI.UpdateItemInBufferData(bufferState.ItemData?.SmallItemImage, bufferState.Quantity);
     }
 
     private void HandleDescriptionRequest(int itemIndex, ItemLocations itemLocation)

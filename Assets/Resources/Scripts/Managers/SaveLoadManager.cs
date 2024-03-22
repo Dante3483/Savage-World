@@ -28,7 +28,7 @@ public class SaveLoadManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.V))
+        if (!GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(KeyCode.V))
         {
             ExecutionTimeCalculator.Instance.Execute(() => Save());
         }

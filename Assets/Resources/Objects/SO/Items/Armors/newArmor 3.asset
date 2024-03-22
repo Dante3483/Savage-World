@@ -20,6 +20,7 @@ MonoBehaviour:
   _name: Helmet 1
   _using: Can be equipped
   _description: Helmet 1
-  _itemImage: {fileID: 21300000, guid: 004e35366a96a424881f43c701cf1caa, type: 3}
+  _smallItemImage: {fileID: 1154766705, guid: cb4e0e5650217bf4b9adfca7943a01ea, type: 3}
+  _bigItemImage: {fileID: 1154766705, guid: cb4e0e5650217bf4b9adfca7943a01ea, type: 3}
   _armorType: 0
   _playerView: {fileID: 0}
