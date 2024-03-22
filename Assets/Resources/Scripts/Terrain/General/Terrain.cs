@@ -7,16 +7,6 @@ using UnityEngine.Tilemaps;
 public class Terrain : MonoBehaviour
 {
     #region Private fields
-    [Header("Main")]
-    [SerializeField] private int _renderWidth;
-    [SerializeField] private int _renderHeight;
-
-    [Header("Tilemaps")]
-    [SerializeField] private SolidRuleTile _solidRuleTIle;
-    [SerializeField] private CornerRuleTile _cornerRuleTile;
-    [SerializeField] private Tilemap _solidTilemap;
-    [SerializeField] private CustomTilemap.Tilemap _blocksTilemap;
-
     [Header("Sections")]
     [SerializeField] private GameObject _trees;
     [SerializeField] private GameObject _pickUpItems;
@@ -28,20 +18,8 @@ public class Terrain : MonoBehaviour
     private List<Vector2Ushort> vectors = new List<Vector2Ushort>();
     #endregion
 
-    #region World data render
-    private bool _firstRender;
-    private RectInt _currentCameraRect;
-    private RectInt _prevCameraRect;
-    private Vector3Int[] _tilesCoords;
-    private TileBase[] _solidTiles;
-    private PoolForDynamicEmptyArraysGeneric<TileBase> _solidTilesPool;
-    private PoolForDynamicEmptyArraysGeneric<Vector3Int> _tilesCoordsPool;
-    private List<List<TileBase>> _allLiquidTiles;
-    #endregion
-
     #region Threads
     private Thread _randomBlockProcessingThread;
-    private object _lockObject = new object();
     #endregion
 
     #endregion
@@ -96,44 +74,7 @@ public class Terrain : MonoBehaviour
     #region General
     private void Awake()
     {
-        #region Setup tilemaps
-        _solidTilemap = transform.Find("SolidTilemap").GetComponent<Tilemap>();
-        if (_solidTilemap == null)
-        {
-            throw new NullReferenceException("SolidTilemap is null");
-        }
-
-        _blocksTilemap = transform.Find("BlocksTilemap").GetComponent<CustomTilemap.Tilemap>();
-        if (_blocksTilemap == null)
-        {
-            throw new NullReferenceException("BlocksTilemap is null");
-        }
-        #endregion
-
-        #region Setup sections
-        Trees = transform.Find("Trees").gameObject;
-        if (Trees == null)
-        {
-            throw new NullReferenceException("Trees is null");
-        }
-
-        PickUpItems = transform.Find("PickUpItems").gameObject;
-        if (PickUpItems == null)
-        {
-            throw new NullReferenceException("PickUpItems is null");
-        }
-        #endregion
-
-        #region Initialization
         NeedToUpdate = new HashSet<Vector2Ushort>();
-        _currentCameraRect = new RectInt();
-        _prevCameraRect = new RectInt();
-        _tilesCoords = new Vector3Int[_renderWidth * _renderHeight];
-        _solidTiles = new TileBase[_renderWidth * _renderHeight];
-        _solidTilesPool = new PoolForDynamicEmptyArraysGeneric<TileBase>();
-        _tilesCoordsPool = new PoolForDynamicEmptyArraysGeneric<Vector3Int>();
-        _firstRender = true;
-        #endregion
     }
 
     private void FixedUpdate()
@@ -141,14 +82,6 @@ public class Terrain : MonoBehaviour
         if (GameManager.Instance.IsGameSession)
         {
             UpdateWorldData();
-        }
-    }
-
-    private void Update()
-    {
-        if (GameManager.Instance.IsGameSession)
-        {
-            RenderWorldData();
         }
     }
 
@@ -613,110 +546,6 @@ public class Terrain : MonoBehaviour
             }
         }
     }
-
-    public void RenderWorldData()
-    {
-        int difX;
-        int difY;
-
-        if (_firstRender)
-        {
-            _prevCameraRect = GetCameraRectInt();
-            _firstRender = false;
-        }
-
-        _currentCameraRect = GetCameraRectInt();
-
-        //Calculate prev and current camera rect differences
-        difX = Mathf.Abs(_prevCameraRect.x - _currentCameraRect.x);
-        difY = Mathf.Abs(_prevCameraRect.y - _currentCameraRect.y);
-
-        //ExecutionTimeCalculator.Instance.Execute(() => FillSolidTilemap(difX, difY));
-        FillTilemaps(difX, difY); //Execution time 4.5 ms
-
-        _prevCameraRect = _currentCameraRect;
-    }
-
-    public void FillTilemaps(int difX, int difY)
-    {
-        CustomTilemap.TileSprites tileSprites = new CustomTilemap.TileSprites();
-        int i = 0;
-        int size;
-
-        //Calculate array size
-        if (difX >= _prevCameraRect.width || difY >= _prevCameraRect.height)
-        {
-            size = _prevCameraRect.width * _prevCameraRect.height * 2;
-        }
-        else
-        {
-            size = _prevCameraRect.width * _prevCameraRect.height + _currentCameraRect.height * difX + _currentCameraRect.width * difY - difX * difY;
-        }
-
-        _solidTiles = _solidTilesPool.GetArray(size);
-        _tilesCoords = _tilesCoordsPool.GetArray(size);
-
-        //Fill Tiles array with blocks to destroy
-        Vector3Int vector = new Vector3Int();
-        if (difX >= 1 || difY >= 1)
-        {
-            foreach (Vector2Int position in _prevCameraRect.allPositionsWithin)
-            {
-                if (!_currentCameraRect.Contains(position))
-                {
-                    vector.x = position.x;
-                    vector.y = position.y;
-                    _tilesCoords[i] = vector;
-                    _solidTiles[i] = null;
-                    i++;
-                }
-            }
-        }
-
-        foreach (Vector2Int position in _currentCameraRect.allPositionsWithin)
-        {
-            if (IsInMapRange(position.x, position.y))
-            {
-                //Coords
-                vector.x = position.x;
-                vector.y = position.y;
-                _tilesCoords[i] = vector;
-
-                //Block
-                tileSprites.BlockSprite = _worldData[position.x, position.y].GetBlockSprite();
-
-                //Background
-                tileSprites.BackgroundSprite = _worldData[position.x, position.y].GetBackgroundSprite();
-
-                //Liquid
-                tileSprites.LiquidSprite = null;
-                if (_worldData[position.x, position.y].IsEmptyForLiquid() && _worldData[position.x, position.y].IsLiquid())
-                {
-                    tileSprites.LiquidSprite = _worldData[position.x, position.y].GetLiquidSprite();
-                }
-                _blocksTilemap.SetTile(vector, tileSprites);
-
-                //Solid
-                _solidTiles[i] = null;
-                if (_worldData[position.x, position.y].IsSolid())
-                {
-                    _solidTiles[i] = _solidRuleTIle;
-                }
-                else if (_worldData[position.x, position.y - 1].IsSolid())
-                {
-                    bool isLeftSolid = _worldData[position.x - 1, position.y].IsSolid();
-                    bool isRightSolid = _worldData[position.x + 1, position.y].IsSolid();
-                    if ((isLeftSolid && !isRightSolid) || (!isLeftSolid && isRightSolid))
-                    {
-                        _solidTiles[i] = _cornerRuleTile;
-                    }
-                }
-                i++;
-            }
-        }
-        //Change Tilemap using Vector's array and Tile's array
-        _solidTilemap.SetTiles(_tilesCoords, _solidTiles);
-    }
     #endregion
 
     #region Helpful
@@ -755,19 +584,6 @@ public class Terrain : MonoBehaviour
     public void SetTileId(int x, int y, byte tileId)
     {
         _worldData[x, y].TileId = tileId;
-    }
-
-    private RectInt GetCameraRectInt()
-    {
-        Vector3 cameraPosition = Camera.main.transform.position;
-        float cameraHeight = Camera.main.orthographicSize * 2 + 5;
-        float cameraWidth = cameraHeight * Camera.main.aspect + 5;
-        Vector3 cameraSize = new Vector3(cameraWidth, cameraHeight, 0);
-        RectInt cameraBounds = new RectInt(
-            Vector2Int.FloorToInt(cameraPosition) - Vector2Int.FloorToInt(cameraSize / 2),
-            Vector2Int.FloorToInt(cameraSize)
-        );
-        return cameraBounds;
     }
     #endregion
 

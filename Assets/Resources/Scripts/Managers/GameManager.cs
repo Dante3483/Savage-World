@@ -489,10 +489,9 @@ public class GameManager : MonoBehaviour
         LoadingValue = 0;
     }
 
-    //Delete
-    public Vector3 GetPlayerPosition()
+    public bool IsInMapRange(int x, int y)
     {
-        return _player.transform.position;
+        return x >= 0 && x < _currentTerrainWidth && y >= 0 && y < _currentTerrainHeight;
     }
 
     //Delete

@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace CustomTilemap
 {
@@ -9,17 +9,31 @@ namespace CustomTilemap
         [Header("Main")]
         [SerializeField] private int _width;
         [SerializeField] private int _height;
-        [SerializeField] private Vector2 _tilesOffset = new Vector2(0.5f, 0.5f);
 
-        [Header("Tiles")]
+        [Header("Solid tilemap")]
+        [SerializeField] private UnityEngine.Tilemaps.Tilemap _solidTilemap;
+        [SerializeField] private SolidRuleTile _solidRuleTIle;
+        [SerializeField] private CornerRuleTile _cornerRuleTile;
+
+        [Header("Blocks tilemap")]
         [SerializeField] private Tile _tilePrefab;
+        [SerializeField] private Transform _blocksTilemap;
+        [SerializeField] private Vector2 _tilesOffset = new Vector2(0.5f, 0.5f);
         [SerializeField] private int _orderInBlockLayer;
         [SerializeField] private int _orderInBackgroundLayer;
         [SerializeField] private int _orderInLiquidLayer;
-        private Tile[,] _tiles;
 
         [Header("Block materials")]
         [SerializeField] private Material _liquidMaterial;
+
+        private Vector3Int _currentPosition;
+        private Vector3Int _prevPosition;
+        private RectInt _currentAreaRect;
+        private RectInt _prevAreaRect;
+        private TileSprites _tileSprites;
+        private Vector3Int[] _solidTilesCoords;
+        private TileBase[] _solidTiles;
+        private Tile[,] _tiles;
         #endregion
 
         #region Public fields
@@ -83,12 +97,30 @@ namespace CustomTilemap
         #region Methods
         private void Awake()
         {
+            InitializeTiles();
+            _solidTilesCoords = new Vector3Int[_width * _height * 2];
+            _solidTiles = new TileBase[_width * _height * 2];
+            _prevAreaRect = new RectInt(new Vector2Int(0, 0), new Vector2Int(_width, _height));
+            _currentAreaRect = new RectInt(new Vector2Int(0, 0), new Vector2Int(_width, _height));
+            _prevPosition = Vector3Int.FloorToInt(Camera.main.transform.position) - new Vector3Int(_width / 2, _height / 2, -30);
+        }
+
+        private void FixedUpdate()
+        {
+            _currentPosition = Vector3Int.FloorToInt(Camera.main.transform.position) - new Vector3Int(_width / 2, _height / 2, -30);
+            _blocksTilemap.position = _currentPosition;
+            UpdateTilemap();
+            _prevPosition = _currentPosition;
+        }
+
+        private void InitializeTiles()
+        {
             _tiles = new Tile[_width, _height];
             for (int x = 0; x < _width; x++)
             {
                 for (int y = 0; y < _height; y++)
                 {
-                    Tile tile = Instantiate(_tilePrefab, new Vector2(x, y) + _tilesOffset, Quaternion.identity, transform);
+                    Tile tile = Instantiate(_tilePrefab, new Vector2(x, y) + _tilesOffset, Quaternion.identity, _blocksTilemap);
                     tile.name = "Tile";
                     tile.Tilemap = this;
                     _tiles[x, y] = tile;
@@ -96,26 +128,82 @@ namespace CustomTilemap
             }
         }
 
-        private void FixedUpdate()
+        private void UpdateTilemap()
         {
-            transform.position = Vector3Int.FloorToInt(Camera.main.transform.position) - new Vector3Int(_width / 2, _height / 2, -30);
+            Vector3Int blockPosition = new Vector3Int();
+            int length = _width * _height;
+            int differenceX = _currentPosition.x - _prevPosition.x;
+            int differenceY = _currentPosition.y - _prevPosition.y;
+
+            if (differenceX != 0 || differenceY != 0)
+            {
+                _prevAreaRect.position = new Vector2Int(_prevPosition.x, _prevPosition.y);
+                _currentAreaRect.position = new Vector2Int(_currentPosition.x, _currentPosition.y);
+                int i = 0;
+                foreach (Vector2Int position in _prevAreaRect.allPositionsWithin)
+                {
+                    if (!_currentAreaRect.Contains(position))
+                    {
+                        _solidTilesCoords[length + i].x = position.x;
+                        _solidTilesCoords[length + i].y = position.y;
+                    }
+                    else
+                    {
+                        _solidTilesCoords[length + i].x = -1;
+                        _solidTilesCoords[length + i].y = -1;
+                    }
+                    i++;
+                }
+            }
+
+            for (int x = 0; x < _width; x++)
+            {
+                for (int y = 0; y < _height; y++)
+                {
+                    blockPosition.x = _currentPosition.x + x;
+                    blockPosition.y = _currentPosition.y + y;
+                    ref WorldCellData blockData = ref WorldDataManager.Instance.GetWorldCellData(blockPosition.x, blockPosition.y);
+
+                    _tileSprites.BlockSprite = blockData.GetBlockSprite();
+
+                    _tileSprites.BackgroundSprite = blockData.GetBackgroundSprite();
+
+                    _tileSprites.LiquidSprite = null;
+                    if (blockData.IsEmptyForLiquid() && blockData.IsLiquid())
+                    {
+                        _tileSprites.LiquidSprite = blockData.GetLiquidSprite();
+                    }
+
+                    SetTile(x, y);
+
+                    _solidTilesCoords[x * _height + y].x = blockPosition.x;
+                    _solidTilesCoords[x * _height + y].y = blockPosition.y;
+                    _solidTiles[x * _height + y] = null;
+                    if (blockData.IsSolid())
+                    {
+                        _solidTiles[x * _height + y] = _solidRuleTIle;
+                    }
+                    else if (WorldDataManager.Instance.IsSolid(blockPosition.x, blockPosition.y - 1))
+                    {
+                        bool isLeftSolid = WorldDataManager.Instance.IsSolid(blockPosition.x - 1, blockPosition.y);
+                        bool isRightSolid = WorldDataManager.Instance.IsSolid(blockPosition.x + 1, blockPosition.y);
+                        if ((isLeftSolid && !isRightSolid) || (!isLeftSolid && isRightSolid))
+                        {
+                            _solidTiles[x * _height + y] = _cornerRuleTile;
+                        }
+                    }
+                }
+            }
+            _solidTilemap.SetTiles(_solidTilesCoords, _solidTiles);
         }
 
-        public void SetTile(Vector3 position, TileSprites tileSprites)
+        private void SetTile(int x, int y)
         {
-            WorldToLocal(position, out int x, out int y);
             if (x < 0 || y < 0 || x >= _width || y >= _height)
             {
                 return;
             }
-            _tiles[x, y].UpdateSprite(tileSprites);
-        }
-
-        private void WorldToLocal(Vector3 position, out int x, out int y)
-        {
-            Vector3 result = transform.InverseTransformPoint(position);
-            x = (int)result.x;
-            y = (int)result.y;
+            _tiles[x, y].UpdateSprite(_tileSprites);
         }
         #endregion
     }

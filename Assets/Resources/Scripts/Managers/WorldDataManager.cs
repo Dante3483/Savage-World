@@ -90,5 +90,10 @@ public class WorldDataManager : MonoBehaviour
     {
         _blockInfo = _worldData[blockCoords.x, blockCoords.y].ToString();
     }
+
+    public bool IsSolid(int x, int y)
+    {
+        return _worldData[x, y].IsSolid();
+    }
     #endregion
 }

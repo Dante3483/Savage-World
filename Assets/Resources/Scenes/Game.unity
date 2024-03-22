@@ -438,7 +438,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1928249623}
-  - {fileID: 961106242}
   - {fileID: 884038812}
   - {fileID: 1278595434}
   - {fileID: 1804569938}
@@ -457,14 +456,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4299550030938a84eb1f3019b1e616d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _renderWidth: 40
-  _renderHeight: 20
-  _solidRuleTIle: {fileID: 11400000, guid: c2484c8ff49d1ae4daf852dddd3448b9, type: 2}
-  _cornerRuleTile: {fileID: 11400000, guid: 3db0a5d792f4b4e46b05e3e9f3f064c5, type: 2}
-  _solidTilemap: {fileID: 0}
-  _blocksTilemap: {fileID: 0}
-  _trees: {fileID: 0}
-  _pickUpItems: {fileID: 0}
+  _trees: {fileID: 884038811}
+  _pickUpItems: {fileID: 1278595433}
 --- !u!1 &49787564
 GameObject:
   m_ObjectHideFlags: 0
@@ -8565,7 +8558,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 30800703}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &899271948
 GameObject:
@@ -9641,7 +9634,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 30800703}
+  m_Father: {fileID: 1928249623}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &961106243
@@ -13202,7 +13195,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 30800703}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1285613884
 GameObject:
@@ -16285,6 +16278,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1501065881}
   m_CullTransparentMesh: 1
+--- !u!1 &1518297461
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1518297462}
+  m_Layer: 0
+  m_Name: BlocksTilemap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1518297462
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1518297461}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1928249623}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1528506847
 GameObject:
   m_ObjectHideFlags: 0
@@ -17499,7 +17523,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 30800703}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1804569940
 SpriteRenderer:
@@ -17893,7 +17917,7 @@ GameObject:
   - component: {fileID: 1928249623}
   - component: {fileID: 1928249622}
   m_Layer: 0
-  m_Name: BlocksTilemap
+  m_Name: Tilemap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17913,8 +17937,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _width: 40
   _height: 20
-  _tilesOffset: {x: 0.5, y: 0.5}
+  _solidTilemap: {fileID: 961106247}
+  _solidRuleTIle: {fileID: 11400000, guid: c2484c8ff49d1ae4daf852dddd3448b9, type: 2}
+  _cornerRuleTile: {fileID: 11400000, guid: 3db0a5d792f4b4e46b05e3e9f3f064c5, type: 2}
   _tilePrefab: {fileID: 1146189006914090157, guid: 6806fba7b561f634f9a5f417bab26333, type: 3}
+  _blocksTilemap: {fileID: 1518297462}
+  _tilesOffset: {x: 0.5, y: 0.5}
   _orderInBlockLayer: 10
   _orderInBackgroundLayer: -10
   _orderInLiquidLayer: 11
@@ -17930,7 +17958,9 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1518297462}
+  - {fileID: 961106242}
   m_Father: {fileID: 30800703}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
