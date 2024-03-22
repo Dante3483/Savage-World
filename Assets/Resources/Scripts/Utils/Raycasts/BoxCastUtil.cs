@@ -71,7 +71,10 @@ public struct BoxCastUtil
         }
         rayColor = _result ? _hitColor : _notHitColor;
 
-        DrawBox(origin, rayColor);
+        if (_needVisualize)
+        {
+            DebugUtil.DrawBox(origin, _size, _direction, _distance, rayColor);
+        }
         return hit;
     }
 
@@ -91,47 +94,11 @@ public struct BoxCastUtil
         }
         rayColor = _result ? _hitColor : _notHitColor;
 
-        DrawBox(origin, rayColor);
+        if (_needVisualize)
+        {
+            DebugUtil.DrawBox(origin, _size, _direction, _distance, rayColor);
+        }
         return hits;
-    }
-
-    private void DrawBox(Vector3 origin, Color rayColor)
-    {
-        if (!_needVisualize)
-        {
-            return;
-        }
-        Vector2 halfSize = _size / 2f;
-        Vector2 leftBottom = origin - new Vector3(halfSize.x, halfSize.y);
-        Vector2 leftTop = origin - new Vector3(halfSize.x, -halfSize.y);
-        Vector2 rightBottom = origin + new Vector3(halfSize.x, -halfSize.y);
-        Vector2 rightTop = origin + new Vector3(halfSize.x, halfSize.y);
-
-        if (_direction.x < 0)
-        {
-            leftBottom.x -= _distance;
-            leftTop.x -= _distance;
-        }
-        if (_direction.x > 0)
-        {
-            rightBottom.x += _distance;
-            rightTop.x += _distance;
-        }
-        if (_direction.y < 0)
-        {
-            leftBottom.y -= _distance;
-            rightBottom.y -= _distance;
-        }
-        if (_direction.y > 0)
-        {
-            leftTop.y += _distance;
-            rightTop.y += _distance;
-        }
-
-        Debug.DrawLine(leftBottom, leftTop, rayColor);
-        Debug.DrawLine(leftTop, rightTop, rayColor);
-        Debug.DrawLine(rightTop, rightBottom, rayColor);
-        Debug.DrawLine(rightBottom, leftBottom, rayColor);
     }
     #endregion
 }

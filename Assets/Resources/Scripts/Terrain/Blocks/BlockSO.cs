@@ -12,6 +12,7 @@ public abstract class BlockSO : ScriptableObject
     [SerializeField] private BlockTypes _type;
     [SerializeField] private Color _colorOnMap = Color.white;
     [SerializeField] private float _lightValue;
+    [SerializeField] private float _breakingTime;
     [SerializeField] private Color32 _lightColor = Color.black;
     [SerializeField] private bool _isSurfaceLight;
     [SerializeField] private bool _waterproof = true;
@@ -123,6 +124,14 @@ public abstract class BlockSO : ScriptableObject
         set
         {
             _drop = value;
+        }
+    }
+
+    public float BreakingTime
+    {
+        get
+        {
+            return _breakingTime;
         }
     }
     #endregion
