@@ -1,10 +1,10 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "newBackground", menuName = "Blocks/Background")]
-public class BackgroundSO : BlockSO
+[CreateAssetMenu(fileName = "newWall", menuName = "Blocks/Wall")]
+public class WallSO : BlockSO
 {
     #region Private fields
-    [SerializeField] private BackgroundsID _id;
+    [SerializeField] private WallsID _id;
     #endregion
 
     #region Public fields
@@ -16,10 +16,11 @@ public class BackgroundSO : BlockSO
     #endregion
 
     #region Methods
-    public BackgroundSO()
+    public WallSO()
     {
-        Type = BlockTypes.Background;
+        _type = BlockTypes.Wall;
     }
+
     public override ushort GetId()
     {
         return (ushort)_id;

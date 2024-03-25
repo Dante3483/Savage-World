@@ -179,7 +179,7 @@ GameObject:
   - component: {fileID: 3922947138104117127}
   - component: {fileID: 7295462549766119487}
   m_Layer: 0
-  m_Name: BackgroundPalette
+  m_Name: WallPalette
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

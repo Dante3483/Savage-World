@@ -1,4 +1,4 @@
-public enum BackgroundsID : ushort
+public enum WallsID : ushort
 {
     Empty = 0,
 

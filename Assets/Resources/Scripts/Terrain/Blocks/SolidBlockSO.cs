@@ -18,7 +18,7 @@ public class SolidBlockSO : BlockSO
     #region Methods
     public SolidBlockSO()
     {
-        Type = BlockTypes.Solid;
+        _type = BlockTypes.Solid;
     }
 
     public override ushort GetId()

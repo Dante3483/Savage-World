@@ -7,13 +7,13 @@ using UnityEngine.Serialization;
 public class BlocksAtlas : ScriptableObject
 {
     #region Private fields
-    [FormerlySerializedAs("Abstract blocks")][SerializeField] private BlockSO[] _abstractBlocks;
-    [FormerlySerializedAs("Solid blocks")][SerializeField] private BlockSO[] _solidBlocks;
-    [FormerlySerializedAs("Dust blocks")][SerializeField] private BlockSO[] _dustBlocks;
-    [FormerlySerializedAs("Liquid blocks")][SerializeField] private BlockSO[] _liquidBlocks;
-    [FormerlySerializedAs("Plant blocks")][SerializeField] private BlockSO[] _plantBlocks;
-    [FormerlySerializedAs("Background blocks")][SerializeField] private BlockSO[] _backgroundBlocks;
-    [FormerlySerializedAs("Furniture blocks")][SerializeField] private BlockSO[] _furnitureBlocks;
+    [FormerlySerializedAs("Abstract blocks")][SerializeField] private AbstractBlockSO[] _abstractBlocks;
+    [FormerlySerializedAs("Solid blocks")][SerializeField] private SolidBlockSO[] _solidBlocks;
+    [FormerlySerializedAs("Dust blocks")][SerializeField] private DustBlockSO[] _dustBlocks;
+    [FormerlySerializedAs("Liquid blocks")][SerializeField] private LiquidBlockSO[] _liquidBlocks;
+    [FormerlySerializedAs("Plant blocks")][SerializeField] private PlantSO[] _plantBlocks;
+    [FormerlySerializedAs("Walls")][SerializeField] private WallSO[] _walls;
+    [FormerlySerializedAs("Furniture")][SerializeField] private FurnitureSO[] _furniture;
 
     private Dictionary<BlockTypes, Dictionary<ushort, BlockSO>> _blockByTypeAndId;
     private Dictionary<BiomesID, BlockSO> _grassByBiome;
@@ -33,11 +33,11 @@ public class BlocksAtlas : ScriptableObject
         }
     }
 
-    public BlockSO AirBG
+    public BlockSO AirWall
     {
         get
         {
-            return GetBlockById(BackgroundsID.Air);
+            return GetBlockById(WallsID.Air);
         }
     }
 
@@ -49,11 +49,11 @@ public class BlocksAtlas : ScriptableObject
         }
     }
 
-    public BlockSO DirtBG
+    public BlockSO DirtWall
     {
         get
         {
-            return GetBlockById(BackgroundsID.Dirt);
+            return GetBlockById(WallsID.Dirt);
         }
     }
 
@@ -106,8 +106,8 @@ public class BlocksAtlas : ScriptableObject
         AddBlocksToSetFromArray(_dustBlocks);
         AddBlocksToSetFromArray(_liquidBlocks);
         AddBlocksToSetFromArray(_plantBlocks);
-        AddBlocksToSetFromArray(_backgroundBlocks);
-        AddBlocksToSetFromArray(_furnitureBlocks);
+        AddBlocksToSetFromArray(_walls);
+        AddBlocksToSetFromArray(_furniture);
 
         void AddBlocksToSetFromArray(BlockSO[] _blockArray)
         {
@@ -188,12 +188,12 @@ public class BlocksAtlas : ScriptableObject
 
     public BlockSO GetBlockById(byte id)
     {
-        return _blockByTypeAndId[BlockTypes.Liquid][(ushort)id];
+        return _blockByTypeAndId[BlockTypes.Liquid][id];
     }
 
     public BlockSO GetBlockById(LiquidBlocksID id)
     {
-        return _blockByTypeAndId[BlockTypes.Liquid][(ushort)id];
+        return _liquidBlocks[(ushort)id];
     }
 
     public BlockSO GetBlockById(PlantsID id)
@@ -201,9 +201,9 @@ public class BlocksAtlas : ScriptableObject
         return _blockByTypeAndId[BlockTypes.Plant][(ushort)id];
     }
 
-    public BlockSO GetBlockById(BackgroundsID id)
+    public BlockSO GetBlockById(WallsID id)
     {
-        return _blockByTypeAndId[BlockTypes.Background][(ushort)id];
+        return _blockByTypeAndId[BlockTypes.Wall][(ushort)id];
     }
 
     public BlockSO GetBlockById(FurnitureBlocksID id)

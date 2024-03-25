@@ -6,10 +6,10 @@ namespace CustomTilemap
     {
         #region Private fields
         private Sprite _blockSprite;
-        private Sprite _backgroundSprite;
+        private Sprite _wallSprite;
         private Sprite _liquidSprite;
         private Sprite _blockDamageSprite;
-        private Sprite _backgroundDamageSprite;
+        private Sprite _wallDamageSprite;
         #endregion
 
         #region Public fields
@@ -43,16 +43,16 @@ namespace CustomTilemap
             }
         }
 
-        public Sprite BackgroundSprite
+        public Sprite WallSprite
         {
             get
             {
-                return _backgroundSprite;
+                return _wallSprite;
             }
 
             set
             {
-                _backgroundSprite = value;
+                _wallSprite = value;
             }
         }
 
@@ -69,16 +69,16 @@ namespace CustomTilemap
             }
         }
 
-        public Sprite BackgroundDamageSprite
+        public Sprite WallDamageSprite
         {
             get
             {
-                return _backgroundDamageSprite;
+                return _wallDamageSprite;
             }
 
             set
             {
-                _backgroundDamageSprite = value;
+                _wallDamageSprite = value;
             }
         }
         #endregion

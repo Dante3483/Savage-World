@@ -22,7 +22,7 @@ namespace CustomTilemap
 
         [Header("Tile damage")]
         [SerializeField] private Sprite[] _blockDamageSprites;
-        [SerializeField] private Sprite[] _backgroundDamageSprites;
+        [SerializeField] private Sprite[] _wallDamageSprites;
 
         private Vector3Int _currentPosition;
         private Vector3Int _prevPosition;
@@ -123,7 +123,7 @@ namespace CustomTilemap
         {
             Vector3Int blockPosition = new Vector3Int();
             byte blockDamage;
-            byte backgroundDamage;
+            byte wallDamage;
 
             blockPosition.x = _currentPosition.x + x;
             blockPosition.y = _currentPosition.y + y;
@@ -131,7 +131,7 @@ namespace CustomTilemap
 
             _tileSprites.BlockSprite = blockData.GetBlockSprite();
 
-            _tileSprites.BackgroundSprite = blockData.GetBackgroundSprite();
+            _tileSprites.WallSprite = blockData.GetWallSprite();
 
             _tileSprites.LiquidSprite = null;
             if (blockData.IsEmptyForLiquid() && blockData.IsLiquid())
@@ -147,12 +147,12 @@ namespace CustomTilemap
                 _tileSprites.BlockDamageSprite = _blockDamageSprites[index];
             }
 
-            _tileSprites.BackgroundDamageSprite = null;
-            backgroundDamage = blockData.BackgroundDamagePercent;
-            if (backgroundDamage != 0)
+            _tileSprites.WallDamageSprite = null;
+            wallDamage = blockData.WallDamagePercent;
+            if (wallDamage != 0)
             {
-                int index = Mathf.CeilToInt(backgroundDamage / (100f / _backgroundDamageSprites.Length)) - 1;
-                _tileSprites.BackgroundDamageSprite = _backgroundDamageSprites[index];
+                int index = Mathf.CeilToInt(wallDamage / (100f / _wallDamageSprites.Length)) - 1;
+                _tileSprites.WallDamageSprite = _wallDamageSprites[index];
             }
 
             _tiles[x, y].UpdateSprites(_tileSprites);

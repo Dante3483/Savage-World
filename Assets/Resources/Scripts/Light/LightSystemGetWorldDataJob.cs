@@ -49,12 +49,12 @@ namespace LightSystem
             if (_isColoredMode)
             {
                 data.BlockLightColor = globalWorldData[dx, dy].BlockData.LightColor;
-                data.BgLightColor = globalWorldData[dx, dy].BackgroundData.LightColor;
+                data.WallLightColor = globalWorldData[dx, dy].WallData.LightColor;
             }
             else
             {
                 data.BlockLightValue = globalWorldData[dx, dy].BlockData.LightValue;
-                data.BgLightValue = globalWorldData[dx, dy].BackgroundData.LightValue;
+                data.WallLightValue = globalWorldData[dx, dy].WallData.LightValue;
             }
 
             data.Flags = 0;

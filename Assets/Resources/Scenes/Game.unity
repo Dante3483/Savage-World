@@ -17999,7 +17999,7 @@ MonoBehaviour:
   - {fileID: -1168243026, guid: 7dce64eb51bca45489451ba950577d98, type: 3}
   - {fileID: -1911996818, guid: 7dce64eb51bca45489451ba950577d98, type: 3}
   - {fileID: -1207819948, guid: 7dce64eb51bca45489451ba950577d98, type: 3}
-  _backgroundDamageSprites:
+  _wallDamageSprites:
   - {fileID: 190626949, guid: 7dce64eb51bca45489451ba950577d98, type: 3}
   - {fileID: -1804239147, guid: 7dce64eb51bca45489451ba950577d98, type: 3}
   - {fileID: -1168243026, guid: 7dce64eb51bca45489451ba950577d98, type: 3}

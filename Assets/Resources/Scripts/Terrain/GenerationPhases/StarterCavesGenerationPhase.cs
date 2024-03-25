@@ -11,7 +11,7 @@ public class StarterCavesGenerationPhase : IGenerationPhase
     private Random _randomVar = GameManager.Instance.RandomVar;
     private BlockSO _stoneBlock = GameManager.Instance.BlocksAtlas.Stone;
     private BlockSO _airBlock = GameManager.Instance.BlocksAtlas.Air;
-    private BlockSO _dirtBG = GameManager.Instance.BlocksAtlas.DirtBG;
+    private BlockSO _dirtWall = GameManager.Instance.BlocksAtlas.DirtWall;
     #endregion
 
     #region Public fields
@@ -69,7 +69,7 @@ public class StarterCavesGenerationPhase : IGenerationPhase
         //Define list of coords and air block
         List<Vector2Int> coords = new List<Vector2Int>();
         List<Vector2Int> stoneCoords = new List<Vector2Int>();
-        List<Vector2Int> backgroundCoords = new List<Vector2Int>();
+        List<Vector2Int> wallCoords = new List<Vector2Int>();
         Vector2Int vector = new Vector2Int();
 
         //Create rectangle
@@ -171,11 +171,11 @@ public class StarterCavesGenerationPhase : IGenerationPhase
         //Create tunnel
         if (tunnelDirection == -1)
         {
-            CreateTunnel(tunnelDirection, startX, startY, ref coords, ref stoneCoords, ref backgroundCoords);
+            CreateTunnel(tunnelDirection, startX, startY, ref coords, ref stoneCoords, ref wallCoords);
         }
         else
         {
-            CreateTunnel(tunnelDirection, startX + length, startY, ref coords, ref stoneCoords, ref backgroundCoords);
+            CreateTunnel(tunnelDirection, startX + length, startY, ref coords, ref stoneCoords, ref wallCoords);
         }
 
 
@@ -191,10 +191,10 @@ public class StarterCavesGenerationPhase : IGenerationPhase
             _terrain.CreateBlock(coord.x, coord.y, _stoneBlock);
         }
 
-        //Fill terrain with dirt background
-        foreach (Vector2Int coord in backgroundCoords)
+        //Fill terrain with dirt wall
+        foreach (Vector2Int coord in wallCoords)
         {
-            _terrain.CreateBackground(coord.x, coord.y, _dirtBG);
+            _terrain.CreateWall(coord.x, coord.y, _dirtWall);
         }
 
         coords = null;
@@ -204,12 +204,12 @@ public class StarterCavesGenerationPhase : IGenerationPhase
     }
 
     private void CreateTunnel(int direction, int startX, int startY,
-        ref List<Vector2Int> coords, ref List<Vector2Int> stoneCoords, ref List<Vector2Int> backgroundCoords)
+        ref List<Vector2Int> coords, ref List<Vector2Int> stoneCoords, ref List<Vector2Int> wallCoords)
     {
         int x = startX;
         int y = startY;
         int stepUp = 5;
-        int stepUpBackground = 5;
+        int stepUpWall = 5;
         int i;
         bool decreaseStep = false;
         Vector2Int vector = new Vector2Int();
@@ -223,11 +223,11 @@ public class StarterCavesGenerationPhase : IGenerationPhase
                 coords.Add(vector);
             }
 
-            for (i = 0; i <= stepUpBackground; i++)
+            for (i = 0; i <= stepUpWall; i++)
             {
                 vector.x = x;
                 vector.y = y + i;
-                backgroundCoords.Add(vector);
+                wallCoords.Add(vector);
                 if (_worldData[x, y + i + 2].CompareBlock(_airBlock))
                 {
                     decreaseStep = true;
@@ -247,7 +247,7 @@ public class StarterCavesGenerationPhase : IGenerationPhase
                 y++;
                 if (decreaseStep)
                 {
-                    stepUpBackground -= 2;
+                    stepUpWall -= 2;
                 }
             }
             if (_worldData[x, y].CompareBlock(_airBlock))

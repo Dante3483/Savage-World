@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "newFurnitureBlock", menuName = "Blocks/Furniture")]
-public class FurnitureBlockSO : BlockSO
+[CreateAssetMenu(fileName = "newFurniture", menuName = "Blocks/Furniture")]
+public class FurnitureSO : BlockSO
 {
     #region Private fields
     [SerializeField] private FurnitureBlocksID _id;
+    [SerializeField] private bool _canBePlacedOnSide;
     [SerializeField] private bool _canBePlacedOnWall;
-    [SerializeField] private bool _canBePlacedOnBackground;
     [SerializeField] private bool _canBePlacedOnFloor;
     [SerializeField] private bool _canBePlacedOnCeiling;
     #endregion
@@ -18,6 +18,19 @@ public class FurnitureBlockSO : BlockSO
     #endregion
 
     #region Properties
+    public bool CanBePlacedOnSide
+    {
+        get
+        {
+            return _canBePlacedOnSide;
+        }
+
+        set
+        {
+            _canBePlacedOnSide = value;
+        }
+    }
+
     public bool CanBePlacedOnWall
     {
         get
@@ -28,19 +41,6 @@ public class FurnitureBlockSO : BlockSO
         set
         {
             _canBePlacedOnWall = value;
-        }
-    }
-
-    public bool CanBePlacedOnBackground
-    {
-        get
-        {
-            return _canBePlacedOnBackground;
-        }
-
-        set
-        {
-            _canBePlacedOnBackground = value;
         }
     }
 
@@ -72,9 +72,9 @@ public class FurnitureBlockSO : BlockSO
     #endregion
 
     #region Methods
-    public FurnitureBlockSO()
+    public FurnitureSO()
     {
-        Type = BlockTypes.Furniture;
+        _type = BlockTypes.Furniture;
     }
 
     public override ushort GetId()

@@ -31,7 +31,7 @@ public class LiquidBlockSO : BlockSO
     #region Methods
     public LiquidBlockSO()
     {
-        Type = BlockTypes.Liquid;
+        _type = BlockTypes.Liquid;
     }
 
     public override ushort GetId()

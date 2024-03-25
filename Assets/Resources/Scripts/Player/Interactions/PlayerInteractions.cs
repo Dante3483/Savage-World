@@ -156,11 +156,11 @@ public class PlayerInteractions : MonoBehaviour
             {
                 ref WorldCellData block = ref WorldDataManager.Instance.GetWorldCellData(wallPosition.x, wallPosition.y);
                 _miningDamageController.AddDamageToWall(wallPosition, _wallDamageMultiplier);
-                if (_miningDamageController.IsWallDamageReachedMaximum(wallPosition, block.BackgroundData.MaximumDamage))
+                if (_miningDamageController.IsWallDamageReachedMaximum(wallPosition, block.WallData.MaximumDamage))
                 {
                     _miningDamageController.RemoveDamageFromWalls(wallPosition);
-                    CreateDrop(new Vector3(wallPosition.x + 0.5f, wallPosition.y + 0.5f), block.BackgroundData.Drop, 1);
-                    GameManager.Instance.Terrain.CreateBackground(wallPosition.x, wallPosition.y, GameManager.Instance.BlocksAtlas.AirBG);
+                    CreateDrop(new Vector3(wallPosition.x + 0.5f, wallPosition.y + 0.5f), block.WallData.Drop, 1);
+                    GameManager.Instance.Terrain.CreateWall(wallPosition.x, wallPosition.y, GameManager.Instance.BlocksAtlas.AirWall);
                 }
             }
         }

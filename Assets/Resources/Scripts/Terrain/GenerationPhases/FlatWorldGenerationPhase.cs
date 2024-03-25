@@ -38,18 +38,18 @@ public class FlatWorldGenerationPhase : IGenerationPhase
         {
             int x = index;
 
-            GenerateLevel(x, undergroundLevel.StartY, undergroundLevel.EndY, dirtBlock, undergroundLevel.DefaultBackground);
-            GenerateLevel(x, preUndergroundLevel.StartY, preUndergroundLevel.EndY, dirtBlock, preUndergroundLevel.DefaultBackground);
-            GenerateLevel(x, surfaceLevel.StartY, terrainEquator, dirtBlock, surfaceLevel.DefaultBackground);
-            GenerateLevel(x, terrainEquator + 1, airLevel.EndY, airBlock, airLevel.DefaultBackground);
+            GenerateLevel(x, undergroundLevel.StartY, undergroundLevel.EndY, dirtBlock, undergroundLevel.DefaultWall);
+            GenerateLevel(x, preUndergroundLevel.StartY, preUndergroundLevel.EndY, dirtBlock, preUndergroundLevel.DefaultWall);
+            GenerateLevel(x, surfaceLevel.StartY, terrainEquator, dirtBlock, surfaceLevel.DefaultWall);
+            GenerateLevel(x, terrainEquator + 1, airLevel.EndY, airBlock, airLevel.DefaultWall);
         });
 
-        void GenerateLevel(int x, int startY, int endY, BlockSO block, BlockSO background)
+        void GenerateLevel(int x, int startY, int endY, BlockSO block, BlockSO wall)
         {
             for (int y = startY; y <= endY; y++)
             {
                 terrain.CreateBlock(x, y, block);
-                terrain.CreateBackground(x, y, background);
+                terrain.CreateWall(x, y, wall);
             }
         }
     }

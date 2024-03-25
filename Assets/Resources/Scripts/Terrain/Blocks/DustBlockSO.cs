@@ -13,8 +13,6 @@ public class DustBlockSO : BlockSO
     #endregion
 
     #region Properties
-
-    #endregion
     public byte FallingTime
     {
         get
@@ -27,10 +25,12 @@ public class DustBlockSO : BlockSO
             _fallingTime = value;
         }
     }
+    #endregion
+
     #region Methods
     public DustBlockSO()
     {
-        Type = BlockTypes.Dust;
+        _type = BlockTypes.Dust;
     }
 
     public override ushort GetId()

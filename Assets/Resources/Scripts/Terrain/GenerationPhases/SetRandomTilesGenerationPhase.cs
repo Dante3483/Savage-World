@@ -24,7 +24,7 @@ public class SetRandomTilesGenerationPhase : IGenerationPhase
             for (int y = 0; y < GameManager.Instance.CurrentTerrainHeight; y++)
             {
                 _worldData[x, y].SetRandomBlockTile(_randomVar);
-                _worldData[x, y].SetRandomBackgroundTile(_randomVar);
+                _worldData[x, y].SetRandomWallTile(_randomVar);
             }
         }
     }

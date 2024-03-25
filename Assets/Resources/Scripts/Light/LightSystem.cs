@@ -160,27 +160,21 @@ namespace LightSystem
 
         private void UpdateLight()
         {
-            //Set camera color
             _mainCamera.backgroundColor = GameTimeUtil.Instance.CurrentColor;
 
-            //Set current light map material
             _renderer.material = _currentLightMapMaterial;
 
-            //Calculate current map position (CAN BE FIXED)
             _intVector = Vector3Int.FloorToInt(_mainCamera.transform.position);
             _intVector.z = 10;
             transform.position = _intVector;
 
-            //Calculate start X and Y position
             _startX = _intVector.x - _width / 2;
             _startY = _intVector.y - _height / 2;
 
-            //Get world data for GPU
             LightSystemGetWorldDataJob getWorldDataJob = new LightSystemGetWorldDataJob(_startX, _startY, _width, _height, _isColoredMode, _worldDataNativeArray);
             _jobHandle = getWorldDataJob.Schedule(_width * _height, 64);
             _jobHandle.Complete();
 
-            //Set data to compute arrays
             _worldDataComputeArray.SetData(_worldDataNativeArray);
             if (_isColoredMode)
             {
@@ -191,13 +185,10 @@ namespace LightSystem
                 _brightnessComputeArray.SetData(_brightnessNativeArray);
             }
 
-            //Fill brightness or color array with specified values
             FillLight();
 
-            //Spread brightness or color
             SpreadLight();
 
-            //Apply brightness or color array to texture
             ApplyLight();
         }
 

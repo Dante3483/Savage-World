@@ -8,7 +8,7 @@ namespace CustomTilemap
     {
         #region Private fields
         [SerializeField] private BreakableTileLayer _blockLayer;
-        [SerializeField] private BreakableTileLayer _backgroundLayer;
+        [SerializeField] private BreakableTileLayer _wallLayer;
         [SerializeField] private TileLayer _liquidLayer;
         #endregion
 
@@ -24,7 +24,7 @@ namespace CustomTilemap
         public void UpdateSprites(TileSprites tileSprites)
         {
             _blockLayer.UpdateSprite(tileSprites.BlockSprite, tileSprites.BlockDamageSprite);
-            _backgroundLayer.UpdateSprite(tileSprites.BackgroundSprite, tileSprites.BackgroundDamageSprite);
+            _wallLayer.UpdateSprite(tileSprites.WallSprite, tileSprites.WallDamageSprite);
             _liquidLayer.UpdateSprite(tileSprites.LiquidSprite);
         }
         #endregion

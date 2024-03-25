@@ -52,9 +52,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a83cf3bac342cec44b34f52c113a4171, type: 2}
   - {fileID: 11400000, guid: 3ecf4ea8f4228864e9c506d1eaa67f45, type: 2}
   - {fileID: 11400000, guid: 53620b510aa0e8c4a9b320c89e060813, type: 2}
-  _backgroundBlocks:
+  _walls:
   - {fileID: 11400000, guid: 4f7bf36ef6dc2b44991b536faedf8fe0, type: 2}
   - {fileID: 11400000, guid: 02deafd90ef1e1f499a9492b1d065e8d, type: 2}
   - {fileID: 11400000, guid: b317175c439b7fa4aaa9d7559ded8863, type: 2}
-  _furnitureBlocks:
+  _furniture:
   - {fileID: 11400000, guid: 11134d2c28b734847aaae92c4c666407, type: 2}

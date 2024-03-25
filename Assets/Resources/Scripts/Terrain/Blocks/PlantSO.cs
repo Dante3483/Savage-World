@@ -143,7 +143,7 @@ public class PlantSO : BlockSO
     #region Methods
     public PlantSO()
     {
-        Type = BlockTypes.Plant;
+        _type = BlockTypes.Plant;
     }
 
     public override ushort GetId()

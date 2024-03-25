@@ -64,14 +64,14 @@ public class WorldDataManager : MonoBehaviour
 
         _worldData = new WorldCellData[terrainWidth, terrainHeight];
         BlockSO airBlock = GameManager.Instance.BlocksAtlas.Air;
-        BlockSO airBGBlock = GameManager.Instance.BlocksAtlas.AirBG;
+        BlockSO airWall = GameManager.Instance.BlocksAtlas.AirWall;
 
         Parallel.For(0, terrainWidth, (index) =>
         {
             ushort x = (ushort)index;
             for (ushort y = 0; y < terrainHeight; y++)
             {
-                _worldData[x, y] = new WorldCellData(x, y, airBlock, airBGBlock);
+                _worldData[x, y] = new WorldCellData(x, y, airBlock, airWall);
             }
         });
     }

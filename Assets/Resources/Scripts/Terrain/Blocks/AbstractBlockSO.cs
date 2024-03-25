@@ -18,7 +18,7 @@ public class AbstractBlockSO : BlockSO
     #region Methods
     public AbstractBlockSO()
     {
-        Type = BlockTypes.Abstract;
+        _type = BlockTypes.Abstract;
     }
 
     public override ushort GetId()

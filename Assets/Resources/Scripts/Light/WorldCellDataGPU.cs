@@ -7,9 +7,9 @@ namespace LightSystem
     public struct WorldCellDataGPU
     {
         #region Private fields
-        private float _bgLightValue;
+        private float _wallLightValue;
         private float _blockLightValue;
-        private Color32 _bgLightColor;
+        private Color32 _wallLightColor;
         private Color32 _blockLightColor;
         private int _flags;
         #endregion
@@ -19,16 +19,16 @@ namespace LightSystem
         #endregion
 
         #region Properties
-        public float BgLightValue
+        public float WallLightValue
         {
             get
             {
-                return _bgLightValue;
+                return _wallLightValue;
             }
 
             set
             {
-                _bgLightValue = value;
+                _wallLightValue = value;
             }
         }
 
@@ -58,16 +58,16 @@ namespace LightSystem
             }
         }
 
-        public Color32 BgLightColor
+        public Color32 WallLightColor
         {
             get
             {
-                return _bgLightColor;
+                return _wallLightColor;
             }
 
             set
             {
-                _bgLightColor = value;
+                _wallLightColor = value;
             }
         }
 

@@ -30,7 +30,7 @@ public class SaveLoadTestGenerationPhase : IGenerationPhase
 
         BlockSO dirtBlock = GameManager.Instance.BlocksAtlas.Dirt;
         BlockSO stoneBlock = GameManager.Instance.BlocksAtlas.Stone;
-        BlockSO dirtBG = GameManager.Instance.BlocksAtlas.DirtBG;
+        BlockSO dirtWall = GameManager.Instance.BlocksAtlas.DirtWall;
         BlockSO waterBlock = GameManager.Instance.BlocksAtlas.Water;
 
         Parallel.For(0, terrainWidth, (index) =>
@@ -41,13 +41,13 @@ public class SaveLoadTestGenerationPhase : IGenerationPhase
                 if (y % 2 == 0)
                 {
                     terrain.CreateBlock(x, y, dirtBlock);
-                    terrain.CreateBackground(x, y, dirtBG);
+                    terrain.CreateWall(x, y, dirtWall);
                     terrain.CreateLiquidBlock(x, y, (byte)waterBlock.GetId());
                 }
                 else
                 {
                     terrain.CreateBlock(x, y, stoneBlock);
-                    terrain.CreateBackground(x, y, dirtBG);
+                    terrain.CreateWall(x, y, dirtWall);
                     terrain.CreateLiquidBlock(x, y, (byte)waterBlock.GetId());
                 }
             }

@@ -10,7 +10,7 @@ public class TerrainLevelSO : ScriptableObject
     [SerializeField] private byte _countOfVerticalChunks;
     [SerializeField] private ushort _startY;
     [SerializeField] private ushort _endY;
-    [SerializeField] private BlockSO _defaultBackground;
+    [SerializeField] private BlockSO _defaultWall;
 
     [Header("Stone")]
     [SerializeField] private float _stoneAmplitude;
@@ -102,16 +102,16 @@ public class TerrainLevelSO : ScriptableObject
         }
     }
 
-    public BlockSO DefaultBackground
+    public BlockSO DefaultWall
     {
         get
         {
-            return _defaultBackground;
+            return _defaultWall;
         }
 
         set
         {
-            _defaultBackground = value;
+            _defaultWall = value;
         }
     }
 

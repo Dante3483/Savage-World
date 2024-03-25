@@ -4,30 +4,30 @@ using UnityEngine.Tilemaps;
 using System.Linq;
 
 //Firt 4 bit of _tileId = blockTileId
-//Last 4 bit of _tileId = backgroundTileId
+//Last 4 bit of _tileId = wallTileId
 public struct WorldCellData
 {
     #region Private fields
 
     #region Main
-    private ushort _blockId; //Save
-    private ushort _backgroundId; //Save
-    private byte _tileId; //Save
-    private BlockTypes _blockType; //Save
+    private ushort _blockId;
+    private ushort _wallId;
+    private byte _tileId;
+    private BlockTypes _blockType;
 
     private BlockSO _blockData;
-    private BlockSO _backgroundData;
+    private BlockSO _wallData;
 
     private Vector2Ushort _coords;
     private byte _currentActionTime;
     private byte _blockDamagePercent;
-    private byte _backgroundDamagePercent;
+    private byte _wallDamagePercent;
     #endregion
 
     #region Liquid
-    private byte _liquidId; //Save
+    private byte _liquidId;
     private bool _isFlowsDown;
-    private float _flowValue; //Save
+    private float _flowValue;
     private byte _countToStop;
     #endregion
 
@@ -51,16 +51,16 @@ public struct WorldCellData
         }
     }
 
-    public ushort BackgroundId
+    public ushort WallId
     {
         get
         {
-            return _backgroundId;
+            return _wallId;
         }
 
         set
         {
-            _backgroundId = value;
+            _wallId = value;
         }
     }
 
@@ -116,7 +116,7 @@ public struct WorldCellData
         }
     }
 
-    public byte BackgroundTileId
+    public byte WallTileId
     {
         get
         {
@@ -194,16 +194,16 @@ public struct WorldCellData
         }
     }
 
-    public BlockSO BackgroundData
+    public BlockSO WallData
     {
         get
         {
-            return _backgroundData;
+            return _wallData;
         }
 
         set
         {
-            _backgroundData = value;
+            _wallData = value;
         }
     }
 
@@ -228,28 +228,28 @@ public struct WorldCellData
         }
     }
 
-    public byte BackgroundDamagePercent
+    public byte WallDamagePercent
     {
         get
         {
-            return _backgroundDamagePercent;
+            return _wallDamagePercent;
         }
     }
     #endregion
 
     #region Methods
-    public WorldCellData(ushort xPosition, ushort yPosition, BlockSO block, BlockSO background)
+    public WorldCellData(ushort xPosition, ushort yPosition, BlockSO block, BlockSO wall)
     {
         _blockId = 0;
-        _backgroundId = 0;
+        _wallId = 0;
         _tileId = 0;
         _blockType = BlockTypes.Abstract;
         _blockData = block;
-        _backgroundData = background;
+        _wallData = wall;
         _coords = new Vector2Ushort { x = xPosition, y = yPosition };
         _currentActionTime = 0;
         _blockDamagePercent = 0;
-        _backgroundDamagePercent = 0;
+        _wallDamagePercent = 0;
 
         _liquidId = 255;
         _isFlowsDown = false;
@@ -265,33 +265,33 @@ public struct WorldCellData
             $"Tile ID: {BlockTileId}\n" +
             $"Block type: {_blockType}\n" +
             $"Name: {_blockData.name}\n" +
-            $"Background ID: {_backgroundData.GetId()}\n" +
-            $"Background type: {_backgroundData.Type}\n" +
-            $"Background name: {_backgroundData.name}\n" +
+            $"Wall ID: {_wallData.GetId()}\n" +
+            $"Wall type: {_wallData.Type}\n" +
+            $"Wall name: {_wallData.name}\n" +
             $"Is liquid: {_liquidId != 255}\n" +
             $"Is flow down: {_isFlowsDown}\n" +
             $"Liquid ID: {_liquidId}\n" +
             $"Flow value: {_flowValue}\n" +
             $"Block damage: {_blockDamagePercent}\n" +
-            $"Background damage: {_backgroundDamagePercent}";
+            $"Wall damage: {_wallDamagePercent}";
     }
 
     public Sprite GetBlockSprite()
     {
-        if (BlockData.Sprites.Count == 0)
+        if (_blockData.Sprites.Count == 0)
         {
             return null;
         }
-        return BlockData.Sprites[BlockTileId];
+        return _blockData.Sprites[BlockTileId];
     }
 
-    public Sprite GetBackgroundSprite()
+    public Sprite GetWallSprite()
     {
-        if (BackgroundData.Sprites.Count == 0)
+        if (_wallData.Sprites.Count == 0)
         {
             return null;
         }
-        return BackgroundData.Sprites[BackgroundTileId];
+        return _wallData.Sprites[WallTileId];
     }
 
     public Sprite GetLiquidSprite()
@@ -329,29 +329,29 @@ public struct WorldCellData
 
     public void SetBlockData(BlockSO block)
     {
-        BlockId = block.GetId();
-        BlockType = block.Type;
-        BlockData = block;
+        _blockId = block.GetId();
+        _blockType = block.Type;
+        _blockData = block;
         _blockDamagePercent = 0;
     }
 
     public void SetLiquidBlockData(byte id)
     {
-        LiquidId = id;
-        FlowValue = 100f;
+        _liquidId = id;
+        _flowValue = 100f;
     }
 
     public void SetLiquidBlockData(byte id, float flowValue)
     {
-        LiquidId = id;
-        FlowValue = flowValue;
+        _liquidId = id;
+        _flowValue = flowValue;
     }
 
-    public void SetBackgroundData(BlockSO background)
+    public void SetWallData(BlockSO wall)
     {
-        BackgroundId = background.GetId();
-        BackgroundData = background;
-        _backgroundDamagePercent = 0;
+        _wallId = wall.GetId();
+        _wallData = wall;
+        _wallDamagePercent = 0;
     }
 
     public void SetRandomBlockTile(Random randomVar)
@@ -359,19 +359,19 @@ public struct WorldCellData
         BlockTileId = (byte)randomVar.Next(0, BlockData.Sprites.Count);
     }
 
-    public void SetRandomBackgroundTile(Random randomVar)
+    public void SetRandomWallTile(Random randomVar)
     {
-        BackgroundTileId = (byte)randomVar.Next(0, BackgroundData.Sprites.Count);
+        WallTileId = (byte)randomVar.Next(0, WallData.Sprites.Count);
     }
 
-    public void SetBlockDamagePercent(float breakingTime)
+    public void SetBlockDamagePercent(float damage)
     {
-        _blockDamagePercent = (byte)(Mathf.Min(breakingTime / _blockData.MaximumDamage, 1) * 100);
+        _blockDamagePercent = (byte)(Mathf.Min(damage / _blockData.MaximumDamage, 1) * 100);
     }
 
-    public void SetWallDamagePercent(float breakingTime)
+    public void SetWallDamagePercent(float damage)
     {
-        _backgroundDamagePercent = (byte)(Mathf.Min(breakingTime / BackgroundData.MaximumDamage, 1) * 100);
+        _wallDamagePercent = (byte)(Mathf.Min(damage / WallData.MaximumDamage, 1) * 100);
     }
 
     public bool CompareBlock(BlockSO block)
@@ -401,12 +401,12 @@ public struct WorldCellData
 
     public bool IsLiquid()
     {
-        return LiquidId != 255;
+        return _liquidId != 255;
     }
 
     public bool IsFurniture()
     {
-        return BlockType == BlockTypes.Furniture;
+        return _blockType == BlockTypes.Furniture;
     }
 
     public bool IsEmptyForTree()
@@ -416,33 +416,33 @@ public struct WorldCellData
 
     public bool IsEmptyForLiquid()
     {
-        return BlockType == BlockTypes.Abstract || BlockType == BlockTypes.Plant || BlockType == BlockTypes.Furniture;
+        return _blockType == BlockTypes.Abstract || _blockType == BlockTypes.Plant || _blockType == BlockTypes.Furniture;
     }
 
     public bool IsEmptyForPlant()
     {
-        return BlockType == BlockTypes.Abstract || BlockType == BlockTypes.Furniture;
+        return _blockType == BlockTypes.Abstract || _blockType == BlockTypes.Furniture;
     }
 
     public bool IsWall()
     {
-        return BackgroundData != GameManager.Instance.BlocksAtlas.AirBG;
+        return _wallData != GameManager.Instance.BlocksAtlas.AirWall;
     }
 
     public bool IsDayLightBlock()
     {
-        return BackgroundData.GetId() == (ushort)BackgroundsID.Air;
+        return _wallData.GetId() == (ushort)WallsID.Air;
     }
 
     public bool IsFullLiquidBlock()
     {
-        return IsLiquid() && FlowValue == 100;
+        return IsLiquid() && _flowValue == 100;
     }
 
     public void Drain()
     {
-        FlowValue = 0f;
-        LiquidId = 255;
+        _liquidId = 255;
+        _flowValue = 0f;
     }
     #endregion
 }

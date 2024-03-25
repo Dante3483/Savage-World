@@ -1,21 +1,19 @@
 using Items;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 public abstract class BlockSO : ScriptableObject
 {
     #region Private fields
     [SerializeField] private List<Sprite> _sprites;
     [SerializeField] private ItemSO _drop;
-    [SerializeField] private BlockTypes _type;
     [SerializeField] private Color _colorOnMap = Color.white;
     [SerializeField] private float _lightValue;
     [SerializeField] private float _maximumDamage;
     [SerializeField] private Color32 _lightColor = Color.black;
     [SerializeField] private bool _isSurfaceLight;
     [SerializeField] private bool _waterproof = true;
+    protected BlockTypes _type;
     #endregion
 
     #region Public fields
@@ -28,11 +26,6 @@ public abstract class BlockSO : ScriptableObject
         get
         {
             return _type;
-        }
-
-        set
-        {
-            _type = value;
         }
     }
 

@@ -44,7 +44,7 @@ public class SaveMapToPNG : MonoBehaviour
                 cellColor = WorldDataManager.Instance.WorldData[x, y].BlockData.ColorOnMap;
                 if (WorldDataManager.Instance.WorldData[x, y].IsEmpty())
                 {
-                    cellColor = WorldDataManager.Instance.WorldData[x, y].BackgroundData.ColorOnMap;
+                    cellColor = WorldDataManager.Instance.WorldData[x, y].WallData.ColorOnMap;
                 }
                 if (WorldDataManager.Instance.WorldData[x, y].IsLiquid())
                 {

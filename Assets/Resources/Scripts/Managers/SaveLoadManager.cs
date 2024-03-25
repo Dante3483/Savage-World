@@ -67,7 +67,7 @@ public class SaveLoadManager : MonoBehaviour
 
                 //Flag bits:
                 //1 - BlockID
-                //2 - BackgroundID
+                //2 - WallID
                 //3 - LiquidID
                 //4 - RLE
                 //5 - 
@@ -83,8 +83,8 @@ public class SaveLoadManager : MonoBehaviour
                 }
                 #endregion
 
-                #region Background ID
-                if (data.BackgroundId > 255)
+                #region Wall ID
+                if (data.WallId > 255)
                 {
                     flags = (byte)(flags | 2);
                 }
@@ -107,7 +107,7 @@ public class SaveLoadManager : MonoBehaviour
                     {
                         break;
                     }
-                    if (data.BackgroundId != nextData.BackgroundId)
+                    if (data.WallId != nextData.WallId)
                     {
                         break;
                     }
@@ -151,11 +151,11 @@ public class SaveLoadManager : MonoBehaviour
                 }
 
                 startColumn += 1;
-                binaryWriter.Write((byte)(data.BackgroundId));
+                binaryWriter.Write((byte)(data.WallId));
                 if ((flags & 0b0000_0010) != 0)
                 {
                     startColumn += 1;
-                    binaryWriter.Write((byte)(data.BackgroundId >> 8));
+                    binaryWriter.Write((byte)(data.WallId >> 8));
                 }
 
                 if ((flags & 0b0000_0100) != 0)
@@ -245,13 +245,13 @@ public class SaveLoadManager : MonoBehaviour
                 byte tileId;
                 byte liquidId;
                 ushort blockId;
-                ushort backgroundId;
+                ushort wallId;
                 int count;
                 float flowValue;
                 BlockTypes blockType;
                 bool isLiquid;
                 BlockSO block;
-                BlockSO background;
+                BlockSO wall;
 
                 for (int y = 0; y < GameManager.Instance.CurrentTerrainHeight;)
                 {
@@ -272,12 +272,12 @@ public class SaveLoadManager : MonoBehaviour
 
                     if ((flags & 0b0000_0010) != 0)
                     {
-                        backgroundId = worldData[start + byteIndex++];
-                        backgroundId = (ushort)(worldData[start + byteIndex++] << 8);
+                        wallId = worldData[start + byteIndex++];
+                        wallId = (ushort)(worldData[start + byteIndex++] << 8);
                     }
                     else
                     {
-                        backgroundId = worldData[start + byteIndex++];
+                        wallId = worldData[start + byteIndex++];
                     }
 
                     if ((flags & 0b0000_0100) != 0)
@@ -303,12 +303,12 @@ public class SaveLoadManager : MonoBehaviour
                     }
 
                     block = blockAtlas.GetBlockByTypeAndId(blockType, blockId);
-                    background = blockAtlas.GetBlockByTypeAndId(BlockTypes.Background, backgroundId);
+                    wall = blockAtlas.GetBlockByTypeAndId(BlockTypes.Wall, wallId);
 
                     for (int i = 0; i < count; i++)
                     {
                         terrain.CreateBlock(x, y + i, block);
-                        terrain.CreateBackground(x, y + i, background);
+                        terrain.CreateWall(x, y + i, wall);
                         terrain.SetTileId(x, y + i, tileId);
                         terrain.CreateLiquidBlock(x, y + i, liquidId, flowValue);
                     }

@@ -10,7 +10,7 @@ public enum BlockTypes: byte
 
     Plant = 4,
 
-    Background = 5,
+    Wall = 5,
 
     Furniture = 6,
 }
