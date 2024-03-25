@@ -21,14 +21,8 @@ public class PlayerInteractions : MonoBehaviour
 
     [Header("Mining")]
     [Min(0.001f)][SerializeField] private float _blockDamageMultiplier;
-    [Min(0.001f)][SerializeField] private float _blockHealingMultiplier;    
-    [Min(0.001f)][SerializeField] private float _backgroundDamageMultiplier;
-    [Min(0.001f)][SerializeField] private float _backgroundHealingMultiplier;
-    private Vector2Int _miningPosition;
-    private Dictionary<Vector2Int, float> _damageByBlockPosition;
-    private Dictionary<Vector2Int, float> _damageByBackgroundPosition;
-    private SetDamageDelegate _setBlockDamage;
-    private SetDamageDelegate _setBackgroundDamage;
+    [Min(0.001f)][SerializeField] private float _wallDamageMultiplier;
+    [SerializeField] private MiningDamageController _miningDamageController;
     #endregion
 
     #region Public fields
@@ -42,17 +36,12 @@ public class PlayerInteractions : MonoBehaviour
     #region Methods
     private void Awake()
     {
-        _damageByBlockPosition = new Dictionary<Vector2Int, float>();
-        _damageByBackgroundPosition = new Dictionary<Vector2Int, float>();
-        _setBlockDamage = (ref WorldCellData block, float damage) => block.SetBlockDamagePercent(damage);
-        _setBackgroundDamage = (ref WorldCellData block, float damage) => block.SetBackgroundDamagePercent(damage);
         _inventoryData.OnInventoryFull += HandleThrowItem;
     }
 
     private void FixedUpdate()
     {
         IsMouseInsideArea();
-        UpdateAllDamage();
         if (GameManager.Instance.IsGameSession)
         {
             if (!GameManager.Instance.IsInputTextInFocus && Input.GetMouseButton((int)MouseButton.Left))
@@ -64,7 +53,7 @@ public class PlayerInteractions : MonoBehaviour
                 ThrowSelectedItem();
             }
             BreakBlock();
-            BreakBackground();
+            BreakWall();
             CreateWater();
             CreateTorch();
         }
@@ -79,31 +68,6 @@ public class PlayerInteractions : MonoBehaviour
         if (_isAreaDrawing)
         {
             DebugUtil.DrawBox(transform.position, _areaSize, _isMouseInsideArea ? Color.green : Color.red);
-        }
-    }
-
-    private void UpdateAllDamage()
-    {
-        UpdateDamage(_damageByBlockPosition, _setBlockDamage, _blockHealingMultiplier);
-        UpdateDamage(_damageByBackgroundPosition, _setBackgroundDamage, _backgroundHealingMultiplier);
-        _miningPosition.x = -1;
-        _miningPosition.y = -1;
-    }
-
-    private void UpdateDamage(Dictionary<Vector2Int, float> damageCollection, SetDamageDelegate setDamageAction, float healingMultiplier)
-    {
-        foreach (Vector2Int key in damageCollection.Keys.ToList())
-        {
-            setDamageAction?.Invoke(ref WorldDataManager.Instance.GetWorldCellData(key.x, key.y), damageCollection[key]);
-            if (key == _miningPosition)
-            {
-                continue;
-            }
-            damageCollection[key] -= Time.fixedDeltaTime / healingMultiplier;
-            if (damageCollection[key] <= 0)
-            {
-                damageCollection.Remove(key);
-            }
         }
     }
 
@@ -164,15 +128,10 @@ public class PlayerInteractions : MonoBehaviour
             if (!WorldDataManager.Instance.WorldData[blockPosition.x, blockPosition.y].IsEmpty())
             {
                 ref WorldCellData block = ref WorldDataManager.Instance.GetWorldCellData(blockPosition.x, blockPosition.y);
-
-                _miningPosition.x = blockPosition.x;
-                _miningPosition.y = blockPosition.y;
-                _damageByBlockPosition.TryAdd(blockPosition, 0f);
-                _damageByBlockPosition[blockPosition] += Time.fixedDeltaTime * _blockDamageMultiplier;
-                    
-                if (_damageByBlockPosition[blockPosition] >= block.BlockData.BreakingTime)
+                _miningDamageController.AddDamageToBlock(blockPosition, _blockDamageMultiplier);
+                if (_miningDamageController.IsBlockDamageReachedMaximum(blockPosition, block.BlockData.MaximumDamage))
                 {
-                    _damageByBlockPosition.Remove(blockPosition);
+                    _miningDamageController.RemoveDamageFromBlocks(blockPosition);
                     CreateDrop(new Vector3(blockPosition.x + 0.5f, blockPosition.y + 0.5f), block.BlockData.Drop, 1);
                     GameManager.Instance.Terrain.CreateBlock(blockPosition.x, blockPosition.y, GameManager.Instance.BlocksAtlas.Air);
                     UpdateNeighboringBlocks(blockPosition);
@@ -182,7 +141,7 @@ public class PlayerInteractions : MonoBehaviour
     }
 
     //Change
-    public void BreakBackground()
+    public void BreakWall()
     {
         if (!_isMouseInsideArea)
         {
@@ -192,21 +151,16 @@ public class PlayerInteractions : MonoBehaviour
         {
             Vector3 clickPosition = Input.mousePosition;
 
-            Vector2Int backgroundPosition = Vector2Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
-            if (WorldDataManager.Instance.WorldData[backgroundPosition.x, backgroundPosition.y].IsBackground())
+            Vector2Int wallPosition = Vector2Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
+            if (WorldDataManager.Instance.WorldData[wallPosition.x, wallPosition.y].IsWall())
             {
-                ref WorldCellData block = ref WorldDataManager.Instance.GetWorldCellData(backgroundPosition.x, backgroundPosition.y);
-
-                _miningPosition.x = backgroundPosition.x;
-                _miningPosition.y = backgroundPosition.y;
-                _damageByBackgroundPosition.TryAdd(backgroundPosition, 0f);
-                _damageByBackgroundPosition[backgroundPosition] += Time.fixedDeltaTime * _backgroundDamageMultiplier;
-
-                if (_damageByBackgroundPosition[backgroundPosition] >= block.BackgroundData.BreakingTime)
+                ref WorldCellData block = ref WorldDataManager.Instance.GetWorldCellData(wallPosition.x, wallPosition.y);
+                _miningDamageController.AddDamageToWall(wallPosition, _wallDamageMultiplier);
+                if (_miningDamageController.IsWallDamageReachedMaximum(wallPosition, block.BackgroundData.MaximumDamage))
                 {
-                    _damageByBackgroundPosition.Remove(backgroundPosition);
-                    CreateDrop(new Vector3(backgroundPosition.x + 0.5f, backgroundPosition.y + 0.5f), block.BackgroundData.Drop, 1);
-                    GameManager.Instance.Terrain.CreateBackground(backgroundPosition.x, backgroundPosition.y, GameManager.Instance.BlocksAtlas.AirBG);
+                    _miningDamageController.RemoveDamageFromWalls(wallPosition);
+                    CreateDrop(new Vector3(wallPosition.x + 0.5f, wallPosition.y + 0.5f), block.BackgroundData.Drop, 1);
+                    GameManager.Instance.Terrain.CreateBackground(wallPosition.x, wallPosition.y, GameManager.Instance.BlocksAtlas.AirBG);
                 }
             }
         }

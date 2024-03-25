@@ -18,7 +18,7 @@ MonoBehaviour:
   _type: 1
   _colorOnMap: {r: 0.45490196, g: 0.45490196, b: 0.45490196, a: 1}
   _lightValue: 0
-  _breakingTime: 5
+  _maximumDamage: 5
   _lightColor:
     serializedVersion: 2
     rgba: 4278190080

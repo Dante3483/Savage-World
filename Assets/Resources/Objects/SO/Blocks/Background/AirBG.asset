@@ -13,10 +13,14 @@ MonoBehaviour:
   m_Name: AirBG
   m_EditorClassIdentifier: 
   _sprites: []
+  _drop: {fileID: 0}
   _type: 5
   _colorOnMap: {r: 1, g: 1, b: 1, a: 0}
   _lightValue: 1
-  _lightColor: {r: 1, g: 1, b: 1, a: 1}
+  _maximumDamage: 0
+  _lightColor:
+    serializedVersion: 2
+    rgba: 4278190080
   _isSurfaceLight: 1
   _waterproof: 1
   _id: 1

@@ -366,12 +366,12 @@ public struct WorldCellData
 
     public void SetBlockDamagePercent(float breakingTime)
     {
-        _blockDamagePercent = (byte)(Mathf.Min(breakingTime / _blockData.BreakingTime, 1) * 100);
+        _blockDamagePercent = (byte)(Mathf.Min(breakingTime / _blockData.MaximumDamage, 1) * 100);
     }
 
-    public void SetBackgroundDamagePercent(float breakingTime)
+    public void SetWallDamagePercent(float breakingTime)
     {
-        _backgroundDamagePercent = (byte)(Mathf.Min(breakingTime / BackgroundData.BreakingTime, 1) * 100);
+        _backgroundDamagePercent = (byte)(Mathf.Min(breakingTime / BackgroundData.MaximumDamage, 1) * 100);
     }
 
     public bool CompareBlock(BlockSO block)
@@ -424,7 +424,7 @@ public struct WorldCellData
         return BlockType == BlockTypes.Abstract || BlockType == BlockTypes.Furniture;
     }
 
-    public bool IsBackground()
+    public bool IsWall()
     {
         return BackgroundData != GameManager.Instance.BlocksAtlas.AirBG;
     }
