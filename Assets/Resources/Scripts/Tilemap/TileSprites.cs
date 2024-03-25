@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace CustomTilemap
@@ -10,6 +8,8 @@ namespace CustomTilemap
         private Sprite _blockSprite;
         private Sprite _backgroundSprite;
         private Sprite _liquidSprite;
+        private Sprite _blockDamageSprite;
+        private Sprite _backgroundDamageSprite;
         #endregion
 
         #region Public fields
@@ -30,6 +30,19 @@ namespace CustomTilemap
             }
         }
 
+        public Sprite LiquidSprite
+        {
+            get
+            {
+                return _liquidSprite;
+            }
+
+            set
+            {
+                _liquidSprite = value;
+            }
+        }
+
         public Sprite BackgroundSprite
         {
             get
@@ -43,16 +56,29 @@ namespace CustomTilemap
             }
         }
 
-        public Sprite LiquidSprite
+        public Sprite BlockDamageSprite
         {
             get
             {
-                return _liquidSprite;
+                return _blockDamageSprite;
             }
 
             set
             {
-                _liquidSprite = value;
+                _blockDamageSprite = value;
+            }
+        }
+
+        public Sprite BackgroundDamageSprite
+        {
+            get
+            {
+                return _backgroundDamageSprite;
+            }
+
+            set
+            {
+                _backgroundDamageSprite = value;
             }
         }
         #endregion

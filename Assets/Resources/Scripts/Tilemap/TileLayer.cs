@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace CustomTilemap
@@ -7,7 +5,7 @@ namespace CustomTilemap
     public class TileLayer : MonoBehaviour
     {
         #region Private fields
-        [SerializeField] private SpriteRenderer _spriteRenderer;
+        [SerializeField] private SpriteRenderer _mainSpriteRenderer;
         private LayerMask _defaultLayerMask;
         private LayerMask _blockLayerMask;
         #endregion
@@ -26,16 +24,10 @@ namespace CustomTilemap
             _defaultLayerMask = LayerMask.NameToLayer("Default");
             _blockLayerMask = LayerMask.NameToLayer("Block");
         }
-
-        public void UpdateSprite(Sprite sprite)
+        public void UpdateSprite(Sprite mainSprite)
         {
-            gameObject.layer = sprite == null ? _defaultLayerMask : _blockLayerMask;
-            _spriteRenderer.sprite = sprite;
-        }
-
-        public void UpdateOrderInLayer(int orderInLayer)
-        {
-            _spriteRenderer.sortingOrder = orderInLayer;
+            gameObject.layer = mainSprite == null ? _defaultLayerMask : _blockLayerMask;
+            _mainSpriteRenderer.sprite = mainSprite;
         }
         #endregion
     }

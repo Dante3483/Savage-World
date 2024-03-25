@@ -7002,8 +7002,10 @@ MonoBehaviour:
   _isAreaDrawing: 1
   _areaSize: {x: 5, y: 5}
   _isMouseInsideArea: 0
-  _breakingTimeMultiplier: 1
-  _breakingTimeReducer: 10
+  _blockDamageMultiplier: 5
+  _blockHealingMultiplier: 10
+  _backgroundDamageMultiplier: 5
+  _backgroundHealingMultiplier: 10
 --- !u!1 &705028195
 GameObject:
   m_ObjectHideFlags: 0
@@ -17943,10 +17945,18 @@ MonoBehaviour:
   _tilePrefab: {fileID: 1146189006914090157, guid: 6806fba7b561f634f9a5f417bab26333, type: 3}
   _blocksTilemap: {fileID: 1518297462}
   _tilesOffset: {x: 0.5, y: 0.5}
-  _orderInBlockLayer: 10
-  _orderInBackgroundLayer: -10
-  _orderInLiquidLayer: 11
-  _liquidMaterial: {fileID: 2100000, guid: 1f195482888639a4d9d7818d532199ce, type: 2}
+  _blockDamageSprites:
+  - {fileID: 190626949, guid: 7dce64eb51bca45489451ba950577d98, type: 3}
+  - {fileID: -1804239147, guid: 7dce64eb51bca45489451ba950577d98, type: 3}
+  - {fileID: -1168243026, guid: 7dce64eb51bca45489451ba950577d98, type: 3}
+  - {fileID: -1911996818, guid: 7dce64eb51bca45489451ba950577d98, type: 3}
+  - {fileID: -1207819948, guid: 7dce64eb51bca45489451ba950577d98, type: 3}
+  _backgroundDamageSprites:
+  - {fileID: 190626949, guid: 7dce64eb51bca45489451ba950577d98, type: 3}
+  - {fileID: -1804239147, guid: 7dce64eb51bca45489451ba950577d98, type: 3}
+  - {fileID: -1168243026, guid: 7dce64eb51bca45489451ba950577d98, type: 3}
+  - {fileID: -1911996818, guid: 7dce64eb51bca45489451ba950577d98, type: 3}
+  - {fileID: -1207819948, guid: 7dce64eb51bca45489451ba950577d98, type: 3}
 --- !u!4 &1928249623
 Transform:
   m_ObjectHideFlags: 0

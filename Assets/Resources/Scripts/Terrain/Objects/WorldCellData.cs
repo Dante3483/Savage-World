@@ -20,6 +20,8 @@ public struct WorldCellData
 
     private Vector2Ushort _coords;
     private byte _currentActionTime;
+    private byte _blockDamagePercent;
+    private byte _backgroundDamagePercent;
     #endregion
 
     #region Liquid
@@ -217,12 +219,27 @@ public struct WorldCellData
             _countToStop = value;
         }
     }
+
+    public byte BlockDamagePercent
+    {
+        get
+        {
+            return _blockDamagePercent;
+        }
+    }
+
+    public byte BackgroundDamagePercent
+    {
+        get
+        {
+            return _backgroundDamagePercent;
+        }
+    }
     #endregion
 
     #region Methods
     public WorldCellData(ushort xPosition, ushort yPosition, BlockSO block, BlockSO background)
     {
-        //Set Ait block by default
         _blockId = 0;
         _backgroundId = 0;
         _tileId = 0;
@@ -231,6 +248,8 @@ public struct WorldCellData
         _backgroundData = background;
         _coords = new Vector2Ushort { x = xPosition, y = yPosition };
         _currentActionTime = 0;
+        _blockDamagePercent = 0;
+        _backgroundDamagePercent = 0;
 
         _liquidId = 255;
         _isFlowsDown = false;
@@ -252,7 +271,9 @@ public struct WorldCellData
             $"Is liquid: {_liquidId != 255}\n" +
             $"Is flow down: {_isFlowsDown}\n" +
             $"Liquid ID: {_liquidId}\n" +
-            $"Flow value: {_flowValue}\n";
+            $"Flow value: {_flowValue}\n" +
+            $"Block damage: {_blockDamagePercent}\n" +
+            $"Background damage: {_backgroundDamagePercent}";
     }
 
     public Sprite GetBlockSprite()
@@ -311,6 +332,7 @@ public struct WorldCellData
         BlockId = block.GetId();
         BlockType = block.Type;
         BlockData = block;
+        _blockDamagePercent = 0;
     }
 
     public void SetLiquidBlockData(byte id)
@@ -329,6 +351,7 @@ public struct WorldCellData
     {
         BackgroundId = background.GetId();
         BackgroundData = background;
+        _backgroundDamagePercent = 0;
     }
 
     public void SetRandomBlockTile(Random randomVar)
@@ -339,6 +362,16 @@ public struct WorldCellData
     public void SetRandomBackgroundTile(Random randomVar)
     {
         BackgroundTileId = (byte)randomVar.Next(0, BackgroundData.Sprites.Count);
+    }
+
+    public void SetBlockDamagePercent(float breakingTime)
+    {
+        _blockDamagePercent = (byte)(Mathf.Min(breakingTime / _blockData.BreakingTime, 1) * 100);
+    }
+
+    public void SetBackgroundDamagePercent(float breakingTime)
+    {
+        _backgroundDamagePercent = (byte)(Mathf.Min(breakingTime / BackgroundData.BreakingTime, 1) * 100);
     }
 
     public bool CompareBlock(BlockSO block)

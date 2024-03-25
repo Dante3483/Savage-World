@@ -19,12 +19,10 @@ namespace CustomTilemap
         [SerializeField] private Tile _tilePrefab;
         [SerializeField] private Transform _blocksTilemap;
         [SerializeField] private Vector2 _tilesOffset = new Vector2(0.5f, 0.5f);
-        [SerializeField] private int _orderInBlockLayer;
-        [SerializeField] private int _orderInBackgroundLayer;
-        [SerializeField] private int _orderInLiquidLayer;
 
-        [Header("Block materials")]
-        [SerializeField] private Material _liquidMaterial;
+        [Header("Tile damage")]
+        [SerializeField] private Sprite[] _blockDamageSprites;
+        [SerializeField] private Sprite[] _backgroundDamageSprites;
 
         private Vector3Int _currentPosition;
         private Vector3Int _prevPosition;
@@ -41,57 +39,7 @@ namespace CustomTilemap
         #endregion
 
         #region Properties
-        public int OrderInBlockLayer
-        {
-            get
-            {
-                return _orderInBlockLayer;
-            }
 
-            set
-            {
-                _orderInBlockLayer = value;
-            }
-        }
-
-        public int OrderInBackgroundLayer
-        {
-            get
-            {
-                return _orderInBackgroundLayer;
-            }
-
-            set
-            {
-                _orderInBackgroundLayer = value;
-            }
-        }
-
-        public int OrderInLiquidLayer
-        {
-            get
-            {
-                return _orderInLiquidLayer;
-            }
-
-            set
-            {
-                _orderInLiquidLayer = value;
-            }
-        }
-
-        public Material LiquidMaterial
-        {
-            get
-            {
-                return _liquidMaterial;
-            }
-
-            set
-            {
-                _liquidMaterial = value;
-            }
-        }
         #endregion
 
         #region Methods
@@ -122,7 +70,6 @@ namespace CustomTilemap
                 {
                     Tile tile = Instantiate(_tilePrefab, new Vector2(x, y) + _tilesOffset, Quaternion.identity, _blocksTilemap);
                     tile.name = "Tile";
-                    tile.Tilemap = this;
                     _tiles[x, y] = tile;
                 }
             }
@@ -130,80 +77,102 @@ namespace CustomTilemap
 
         private void UpdateTilemap()
         {
-            Vector3Int blockPosition = new Vector3Int();
-            int length = _width * _height;
             int differenceX = _currentPosition.x - _prevPosition.x;
             int differenceY = _currentPosition.y - _prevPosition.y;
 
             if (differenceX != 0 || differenceY != 0)
             {
-                _prevAreaRect.position = new Vector2Int(_prevPosition.x, _prevPosition.y);
-                _currentAreaRect.position = new Vector2Int(_currentPosition.x, _currentPosition.y);
-                int i = 0;
-                foreach (Vector2Int position in _prevAreaRect.allPositionsWithin)
-                {
-                    if (!_currentAreaRect.Contains(position))
-                    {
-                        _solidTilesCoords[length + i].x = position.x;
-                        _solidTilesCoords[length + i].y = position.y;
-                    }
-                    else
-                    {
-                        _solidTilesCoords[length + i].x = -1;
-                        _solidTilesCoords[length + i].y = -1;
-                    }
-                    i++;
-                }
+                ClearUnnecessarySolidTiles();
             }
 
             for (int x = 0; x < _width; x++)
             {
                 for (int y = 0; y < _height; y++)
                 {
-                    blockPosition.x = _currentPosition.x + x;
-                    blockPosition.y = _currentPosition.y + y;
-                    ref WorldCellData blockData = ref WorldDataManager.Instance.GetWorldCellData(blockPosition.x, blockPosition.y);
-
-                    _tileSprites.BlockSprite = blockData.GetBlockSprite();
-
-                    _tileSprites.BackgroundSprite = blockData.GetBackgroundSprite();
-
-                    _tileSprites.LiquidSprite = null;
-                    if (blockData.IsEmptyForLiquid() && blockData.IsLiquid())
-                    {
-                        _tileSprites.LiquidSprite = blockData.GetLiquidSprite();
-                    }
-
-                    SetTile(x, y);
-
-                    _solidTilesCoords[x * _height + y].x = blockPosition.x;
-                    _solidTilesCoords[x * _height + y].y = blockPosition.y;
-                    _solidTiles[x * _height + y] = null;
-                    if (blockData.IsSolid())
-                    {
-                        _solidTiles[x * _height + y] = _solidRuleTIle;
-                    }
-                    else if (WorldDataManager.Instance.IsSolid(blockPosition.x, blockPosition.y - 1))
-                    {
-                        bool isLeftSolid = WorldDataManager.Instance.IsSolid(blockPosition.x - 1, blockPosition.y);
-                        bool isRightSolid = WorldDataManager.Instance.IsSolid(blockPosition.x + 1, blockPosition.y);
-                        if ((isLeftSolid && !isRightSolid) || (!isLeftSolid && isRightSolid))
-                        {
-                            _solidTiles[x * _height + y] = _cornerRuleTile;
-                        }
-                    }
+                    UpdateTileData(x, y);
                 }
             }
+
             _solidTilemap.SetTiles(_solidTilesCoords, _solidTiles);
         }
 
-        private void SetTile(int x, int y)
+        private void ClearUnnecessarySolidTiles()
         {
-            if (x < 0 || y < 0 || x >= _width || y >= _height)
+            int length = _width * _height;
+            int i = 0;
+            _prevAreaRect.position = new Vector2Int(_prevPosition.x, _prevPosition.y);
+            _currentAreaRect.position = new Vector2Int(_currentPosition.x, _currentPosition.y);
+
+            foreach (Vector2Int position in _prevAreaRect.allPositionsWithin)
             {
-                return;
+                if (!_currentAreaRect.Contains(position))
+                {
+                    _solidTilesCoords[length + i].x = position.x;
+                    _solidTilesCoords[length + i].y = position.y;
+                }
+                else
+                {
+                    _solidTilesCoords[length + i].x = -1;
+                    _solidTilesCoords[length + i].y = -1;
+                }
+                i++;
             }
-            _tiles[x, y].UpdateSprite(_tileSprites);
+        }
+
+        private void UpdateTileData(int x, int y)
+        {
+            Vector3Int blockPosition = new Vector3Int();
+            byte blockDamage;
+            byte backgroundDamage;
+
+            blockPosition.x = _currentPosition.x + x;
+            blockPosition.y = _currentPosition.y + y;
+            ref WorldCellData blockData = ref WorldDataManager.Instance.GetWorldCellData(blockPosition.x, blockPosition.y);
+
+            _tileSprites.BlockSprite = blockData.GetBlockSprite();
+
+            _tileSprites.BackgroundSprite = blockData.GetBackgroundSprite();
+
+            _tileSprites.LiquidSprite = null;
+            if (blockData.IsEmptyForLiquid() && blockData.IsLiquid())
+            {
+                _tileSprites.LiquidSprite = blockData.GetLiquidSprite();
+            }
+
+            _tileSprites.BlockDamageSprite = null;
+            blockDamage = blockData.BlockDamagePercent;
+            if (blockDamage != 0)
+            {
+                int index = Mathf.CeilToInt(blockDamage / (100f / _blockDamageSprites.Length)) - 1;
+                _tileSprites.BlockDamageSprite = _blockDamageSprites[index];
+            }
+
+            _tileSprites.BackgroundDamageSprite = null;
+            backgroundDamage = blockData.BackgroundDamagePercent;
+            if (backgroundDamage != 0)
+            {
+                int index = Mathf.CeilToInt(backgroundDamage / (100f / _backgroundDamageSprites.Length)) - 1;
+                _tileSprites.BackgroundDamageSprite = _backgroundDamageSprites[index];
+            }
+
+            _tiles[x, y].UpdateSprites(_tileSprites);
+
+            _solidTilesCoords[x * _height + y].x = blockPosition.x;
+            _solidTilesCoords[x * _height + y].y = blockPosition.y;
+            _solidTiles[x * _height + y] = null;
+            if (blockData.IsSolid())
+            {
+                _solidTiles[x * _height + y] = _solidRuleTIle;
+            }
+            else if (WorldDataManager.Instance.IsSolid(blockPosition.x, blockPosition.y - 1))
+            {
+                bool isLeftSolid = WorldDataManager.Instance.IsSolid(blockPosition.x - 1, blockPosition.y);
+                bool isRightSolid = WorldDataManager.Instance.IsSolid(blockPosition.x + 1, blockPosition.y);
+                if ((isLeftSolid && !isRightSolid) || (!isLeftSolid && isRightSolid))
+                {
+                    _solidTiles[x * _height + y] = _cornerRuleTile;
+                }
+            }
         }
         #endregion
     }

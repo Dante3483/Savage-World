@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sprites:
   - {fileID: 21300000, guid: 615cef0125df2324295f7025cb39ae75, type: 3}
-  _drop: {fileID: 0}
+  _drop: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
   _type: 1
   _colorOnMap: {r: 0.70980394, g: 0.7294118, b: 0.81960785, a: 1}
   _lightValue: 0
