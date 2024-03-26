@@ -5412,7 +5412,7 @@ MonoBehaviour:
     _needVisualize: 0
     _checkYourself: 0
     _result: 0
-    _originOffset: {x: 0, y: 0, z: 0}
+    _originOffset: {x: 0, y: 0}
     _size: {x: 1, y: 1}
     _angle: 0
     _direction: {x: 0, y: 0}
@@ -6719,7 +6719,7 @@ MonoBehaviour:
     _needVisualize: 0
     _checkYourself: 0
     _result: 0
-    _originOffset: {x: 0, y: 0, z: 0}
+    _originOffset: {x: 0, y: 0}
     _size: {x: 1.1, y: 1}
     _angle: 0
     _direction: {x: 0, y: -1}
@@ -6733,7 +6733,7 @@ MonoBehaviour:
     _needVisualize: 0
     _checkYourself: 0
     _result: 0
-    _originOffset: {x: 0, y: -0.5, z: 0}
+    _originOffset: {x: 0, y: -0.5}
     _size: {x: 0.4, y: 0.001}
     _angle: 0
     _direction: {x: 0, y: -1}
@@ -6747,7 +6747,7 @@ MonoBehaviour:
     _needVisualize: 0
     _checkYourself: 0
     _result: 0
-    _originOffset: {x: 0, y: 0, z: 0}
+    _originOffset: {x: 0, y: 0}
     _size: {x: 1, y: 0.001}
     _angle: 0
     _direction: {x: 0, y: 1}
@@ -6974,7 +6974,7 @@ MonoBehaviour:
     _needVisualize: 1
     _checkYourself: 0
     _result: 1
-    _originOffset: {x: 0, y: 0, z: 0}
+    _originOffset: {x: 0, y: 0}
     _size: {x: 3, y: 5}
     _angle: 0
     _direction: {x: 0, y: 0}
@@ -7006,6 +7006,11 @@ MonoBehaviour:
   _blockDamageMultiplier: 5
   _wallDamageMultiplier: 5
   _miningDamageController: {fileID: 1373237005}
+  _placingCooldown: 0.2
+  _isPlacingAllowed: 0
+  _playerLayerMask:
+    serializedVersion: 2
+    m_Bits: 512
 --- !u!1 &705028195
 GameObject:
   m_ObjectHideFlags: 0
@@ -14894,7 +14899,7 @@ MonoBehaviour:
     _needVisualize: 0
     _checkYourself: 0
     _result: 0
-    _originOffset: {x: 0, y: 0, z: 0}
+    _originOffset: {x: 0, y: 0}
     _size: {x: 9, y: 5}
     _angle: 0
     _direction: {x: 0, y: 0}

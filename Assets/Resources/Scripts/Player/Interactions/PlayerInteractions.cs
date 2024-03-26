@@ -1,4 +1,6 @@
 using Items;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
@@ -23,6 +25,12 @@ public class PlayerInteractions : MonoBehaviour
     [Min(0.001f)][SerializeField] private float _blockDamageMultiplier;
     [Min(0.001f)][SerializeField] private float _wallDamageMultiplier;
     [SerializeField] private MiningDamageController _miningDamageController;
+
+    [Header("Placing")]
+    [SerializeField] private float _placingCooldown;
+    [SerializeField] private bool _isPlacingAllowed;
+    [SerializeField] private LayerMask _playerLayerMask;
+    private BoxCastUtil _checkPlayerBoxCast;
     #endregion
 
     #region Public fields
@@ -37,6 +45,10 @@ public class PlayerInteractions : MonoBehaviour
     private void Awake()
     {
         _inventoryData.OnInventoryFull += HandleThrowItem;
+        _checkPlayerBoxCast.OriginOffset = new Vector2(0.5f, 0.5f);
+        _checkPlayerBoxCast.Size = new Vector2(1f, 1f);
+        _checkPlayerBoxCast.LayerMask = _playerLayerMask;
+        _isPlacingAllowed = true;
     }
 
     private void FixedUpdate()
@@ -52,10 +64,13 @@ public class PlayerInteractions : MonoBehaviour
             {
                 ThrowSelectedItem();
             }
-            BreakBlock();
-            BreakWall();
-            CreateWater();
-            CreateTorch();
+            if (_isMouseInsideArea && !GameManager.Instance.IsInputTextInFocus)
+            {
+                BreakBlock();
+                BreakWall();
+                CreateWater();
+                CreateTorch();
+            }
         }
     }
 
@@ -97,35 +112,51 @@ public class PlayerInteractions : MonoBehaviour
     //Change
     public void PlaceBlock(BlockItemSO blockItem)
     {
-        if (!_isMouseInsideArea)
+        if (!_isMouseInsideArea || !_isPlacingAllowed)
         {
             return;
         }
+
         Vector3 clickPosition = Input.mousePosition;
         Vector2Int intPos = Vector2Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
-
-        if (WorldDataManager.Instance.WorldData[intPos.x, intPos.y].IsEmpty())
+        _checkPlayerBoxCast.BoxCast(intPos);
+        if (_checkPlayerBoxCast.Result)
+        {
+            return;
+        }
+        if (!WorldDataManager.Instance.IsFree(intPos.x, intPos.y))
+        {
+            return;
+        }
+        if (WorldDataManager.Instance.IsEmpty(intPos.x, intPos.y) && 
+            (WorldDataManager.Instance.IsWall(intPos.x, intPos.y) || WorldDataManager.Instance.IsSolidAnyNeighbor(intPos.x, intPos.y)))
         {
             GameManager.Instance.Terrain.CreateBlock(intPos.x, intPos.y, blockItem.BlockToPlace);
             _inventoryData.DecreaseSelectedItemQuantity(1);
-
             UpdateNeighboringBlocks(intPos);
+            StartCoroutine(WaitForPlacingCooldown());
         }
+    }
+
+    private IEnumerator WaitForPlacingCooldown()
+    {
+        _isPlacingAllowed = false;
+        yield return new WaitForSeconds(_placingCooldown);
+        _isPlacingAllowed = true;
     }
 
     //Change
     public void BreakBlock()
     {
-        if (!_isMouseInsideArea)
-        {
-            return;
-        }
-        if (!GameManager.Instance.IsInputTextInFocus && Input.GetMouseButton((int)MouseButton.Right))
+        if (Input.GetMouseButton((int)MouseButton.Right))
         {
             Vector3 clickPosition = Input.mousePosition;
-
             Vector2Int blockPosition = Vector2Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
-            if (!WorldDataManager.Instance.WorldData[blockPosition.x, blockPosition.y].IsEmpty())
+            if (!WorldDataManager.Instance.IsBreakable(blockPosition.x, blockPosition.y))
+            {
+                return;
+            }
+            if (!WorldDataManager.Instance.IsEmpty(blockPosition.x, blockPosition.y))
             {
                 ref WorldCellData block = ref WorldDataManager.Instance.GetWorldCellData(blockPosition.x, blockPosition.y);
                 _miningDamageController.AddDamageToBlock(blockPosition, _blockDamageMultiplier);
@@ -143,16 +174,15 @@ public class PlayerInteractions : MonoBehaviour
     //Change
     public void BreakWall()
     {
-        if (!_isMouseInsideArea)
-        {
-            return;
-        }
-        if (!GameManager.Instance.IsInputTextInFocus && Input.GetMouseButton((int)MouseButton.Middle))
+        if (Input.GetMouseButton((int)MouseButton.Middle))
         {
             Vector3 clickPosition = Input.mousePosition;
-
             Vector2Int wallPosition = Vector2Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
-            if (WorldDataManager.Instance.WorldData[wallPosition.x, wallPosition.y].IsWall())
+            if (!WorldDataManager.Instance.IsBreakable(wallPosition.x, wallPosition.y))
+            {
+                return;
+            }
+            if (WorldDataManager.Instance.IsWall(wallPosition.x, wallPosition.y))
             {
                 ref WorldCellData block = ref WorldDataManager.Instance.GetWorldCellData(wallPosition.x, wallPosition.y);
                 _miningDamageController.AddDamageToWall(wallPosition, _wallDamageMultiplier);
@@ -169,11 +199,7 @@ public class PlayerInteractions : MonoBehaviour
     //Delete
     public void CreateWater()
     {
-        if (!_isMouseInsideArea)
-        {
-            return;
-        }
-        if (!GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(KeyCode.U))
+        if (Input.GetKeyDown(KeyCode.U))
         {
             Vector3 clickPosition = Input.mousePosition;
 
@@ -188,11 +214,7 @@ public class PlayerInteractions : MonoBehaviour
     //Delete
     public void CreateTorch()
     {
-        if (!_isMouseInsideArea)
-        {
-            return;
-        }
-        if (!GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(KeyCode.L))
+        if (Input.GetKeyDown(KeyCode.L))
         {
             Vector3 clickPosition = Input.mousePosition;
 

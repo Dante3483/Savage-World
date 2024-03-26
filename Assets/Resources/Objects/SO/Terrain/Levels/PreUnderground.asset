@@ -16,7 +16,7 @@ MonoBehaviour:
   _countOfVerticalChunks: 3
   _startY: 1700
   _endY: 1999
-  _defaultBackground: {fileID: 11400000, guid: b317175c439b7fa4aaa9d7559ded8863, type: 2}
+  _defaultWall: {fileID: 11400000, guid: b317175c439b7fa4aaa9d7559ded8863, type: 2}
   _stoneAmplitude: 1
   _stoneScale: 10
   _stoneIntensity: 0.4

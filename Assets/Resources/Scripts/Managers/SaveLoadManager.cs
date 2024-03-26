@@ -354,7 +354,7 @@ public class SaveLoadManager : MonoBehaviour
         }
 
         int pickUpItemsCount = binaryReader.ReadInt32();
-        Vector3 position = new Vector3();
+        Vector3Int position = new Vector3Int();
 
         for (int i = 0; i < pickUpItemsCount; i++)
         {
@@ -366,6 +366,7 @@ public class SaveLoadManager : MonoBehaviour
 
             GameObject pickUpItemGameObject = GameObject.Instantiate(pickUpItem.gameObject, position, Quaternion.identity, GameManager.Instance.Terrain.PickUpItems.transform);
             pickUpItemGameObject.name = pickUpItem.gameObject.name;
+            WorldDataManager.Instance.MakeOccupied(position.x, position.y);
         }
     }
 

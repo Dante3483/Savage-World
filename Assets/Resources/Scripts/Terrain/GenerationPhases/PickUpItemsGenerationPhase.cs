@@ -82,6 +82,7 @@ public class PickUpItemsGenerationPhase : IGenerationPhase
                             vector.x = x;
                             vector.y = y + 1;
                             coords.Add(vector);
+                            _worldData[x, y].MakeOccupied();
                         }
                     }
                 }

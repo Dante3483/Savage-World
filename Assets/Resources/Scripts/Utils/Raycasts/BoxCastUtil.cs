@@ -9,16 +9,14 @@ public struct BoxCastUtil
     [SerializeField] private bool _needVisualize;
     [SerializeField] private bool _checkYourself;
     [SerializeField] private bool _result;
-    [SerializeField] private Vector3 _originOffset;
-    [Min(0.001f)]
-    [SerializeField] private Vector2 _size;
+    [SerializeField] private Vector2 _originOffset;
+    [Min(0.001f)][SerializeField] private Vector2 _size;
     [SerializeField] private float _angle;
     [SerializeField] private Vector2 _direction;
     [SerializeField] private float _distance;
     [SerializeField] private LayerMask _layerMask;
     [SerializeField] private Color _hitColor;
     [SerializeField] private Color _notHitColor;
-
     private GameObject _self;
     #endregion
 
@@ -27,6 +25,22 @@ public struct BoxCastUtil
     #endregion
 
     #region Properties
+    public bool NeedVisualize
+    {
+        set
+        {
+            _needVisualize = value;
+        }
+    }
+
+    public bool CheckYourself
+    {
+        set
+        {
+            _checkYourself = value;
+        }
+    }
+
     public bool Result
     {
         get
@@ -35,16 +49,67 @@ public struct BoxCastUtil
         }
     }
 
+    public Vector2 OriginOffset
+    {
+        set
+        {
+            _originOffset = value;
+        }
+    }
+
+    public Vector2 Size
+    {
+        set
+        {
+            _size = value;
+        }
+    }
+
+    public float Angle
+    {
+        set
+        {
+            _angle = value;
+        }
+    }
+
+    public Vector2 Direction
+    {
+        set
+        {
+            _direction = value;
+        }
+    }
+
     public float Distance
     {
-        get
-        {
-            return _distance;
-        }
-
         set
         {
             _distance = value;
+        }
+    }
+
+    public LayerMask LayerMask
+    {
+        set
+        {
+            _layerMask = value;
+        }
+    }
+
+    public Color HitColor
+    {
+        set
+        {
+            _hitColor = value;
+        }
+    }
+
+    public Color NotHitColor
+    {
+        set
+        {
+            _notHitColor = value;
         }
     }
 
@@ -58,7 +123,7 @@ public struct BoxCastUtil
     #endregion
 
     #region Methods
-    public RaycastHit2D BoxCast(Vector3 origin)
+    public RaycastHit2D BoxCast(Vector2 origin)
     {
         Color rayColor;
         origin += _originOffset;
@@ -78,7 +143,7 @@ public struct BoxCastUtil
         return hit;
     }
 
-    public RaycastHit2D[] BoxCastAll(Vector3 origin)
+    public RaycastHit2D[] BoxCastAll(Vector2 origin)
     {
         Color rayColor;
         origin += _originOffset;

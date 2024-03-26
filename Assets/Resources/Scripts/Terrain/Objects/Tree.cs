@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(SpriteRenderer))]
 public class Tree : MonoBehaviour
@@ -18,14 +20,16 @@ public class Tree : MonoBehaviour
     [SerializeField] private int _height;
     [SerializeField] private int _distanceEachOthers;
     [SerializeField] private Vector2 _offset;
-    [SerializeField] private Vector2 _start;
+    [SerializeField] private Vector2Int _start;
 
-    [Header("Spawn Properties")]
+    [Header("Spawn")]
+    [SerializeField] private GameObject _tree;
+    [SerializeField] private GameObject _treeTrunk;
     [SerializeField] private BiomesID[] _biomesToSpawn;
     [SerializeField] private float _chanceToSpawn;
     [SerializeField] private int _widthToSpawn;
-    [SerializeField] private List<Vector3> _treeBlocks;
-    [SerializeField] private List<Vector3> _trunkBlocks;
+    [SerializeField] private List<Vector2Int> _treeBlocks;
+    [SerializeField] private List<Vector2Int> _trunkBlocks;
     [SerializeField] private List<BlockSO> _allowedToSpawnOn;
     #endregion
 
@@ -99,7 +103,7 @@ public class Tree : MonoBehaviour
         }
     }
 
-    public List<Vector3> TrunkBlocks
+    public List<Vector2Int> TrunkBlocks
     {
         get
         {
@@ -125,7 +129,7 @@ public class Tree : MonoBehaviour
         }
     }
 
-    public List<Vector3> TreeBlocks
+    public List<Vector2Int> TreeBlocks
     {
         get
         {
@@ -151,7 +155,7 @@ public class Tree : MonoBehaviour
         }
     }
 
-    public Vector2 Start
+    public Vector2Int Start
     {
         get
         {
@@ -195,6 +199,7 @@ public class Tree : MonoBehaviour
     private void Awake()
     {
         GetComponent<SpriteRenderer>().enabled = false;
+        OccupieArea();
     }
 
     private void OnValidate()
@@ -215,44 +220,27 @@ public class Tree : MonoBehaviour
     {
         PolygonCollider2D polygonCollider = transform.AddComponent<PolygonCollider2D>();
 
-        TrunkBlocks.Clear();
-        TreeBlocks.Clear();
+        _trunkBlocks.Clear();
+        _treeBlocks.Clear();
 
-        GameObject treeTrunk;
-        GameObject tree;
-
-        if (!transform.Find("Tree"))
+        bool initializeTreeResult = InitializeTree();
+        bool initializeTreeTrunkResult = InitializeTreeTrunk();
+        if (initializeTreeResult && initializeTreeTrunkResult)
         {
-            tree = new GameObject("Tree");
-            tree.AddComponent<BoxCollider2D>();
-            tree.GetComponent<BoxCollider2D>().isTrigger = true;
-            tree.transform.parent = transform;
-            tree.transform.position = transform.position;
-        }
-        else
-        {
-            tree = transform.Find("Tree").gameObject;
-            Width = (int)System.Math.Ceiling(tree.GetComponent<BoxCollider2D>().size.x);
-            Height = (int)System.Math.Ceiling(tree.GetComponent<BoxCollider2D>().size.y);
+            SetBlocks();
         }
 
-        if (!transform.Find("TreeTrunk"))
-        {
-            treeTrunk = new GameObject("TreeTrunk");
-            treeTrunk.AddComponent<BoxCollider2D>();
-            treeTrunk.GetComponent<BoxCollider2D>().isTrigger = true;
-            treeTrunk.transform.parent = transform;
-            treeTrunk.transform.position = transform.position;
-        }
-        else
-        {
-            treeTrunk = transform.Find("TreeTrunk").gameObject;
-            WidthToSpawn = (int)System.Math.Ceiling(treeTrunk.GetComponent<BoxCollider2D>().size.x);
-        }
+        _tree.SetActive(false);
+        _treeTrunk.SetActive(false);
+        transform.AddComponent<BoxCollider2D>();
+        _start = new Vector2Int(_trunkBlocks.Min(a => a.x), 0);
+    }
 
-        for (float x = 0; x <= Width; x++)
+    private void SetBlocks()
+    {
+        for (int x = 0; x <= _width; x++)
         {
-            for (float y = 0; y <= Height; y++)
+            for (int y = 0; y <= _height; y++)
             {
                 Vector2 point = new Vector2(x, y);
                 Vector2 pointEnd = new Vector2(x + 1, y + 1);
@@ -260,21 +248,59 @@ public class Tree : MonoBehaviour
                 Vector2 newPointEnd = transform.TransformPoint(pointEnd);
                 Collider2D[] hits = Physics2D.OverlapAreaAll(newPoint, newPointEnd);
                 Collider2D treePolygonCollider = hits.ToList().Find(c => c.gameObject.GetComponent<PolygonCollider2D>());
-                Collider2D treeBoxCollder = hits.ToList().Find(c => c.gameObject == tree);
-                Collider2D treeTrunkCollider = hits.ToList().Find(c => c.gameObject == treeTrunk);
+                Collider2D treeBoxCollder = hits.ToList().Find(c => c.gameObject == _tree);
+                Collider2D treeTrunkCollider = hits.ToList().Find(c => c.gameObject == _treeTrunk);
                 if (treePolygonCollider != null && treeBoxCollder != null && treeTrunkCollider == null)
                 {
-                    TreeBlocks.Add(new Vector3(x, y));
+                    _treeBlocks.Add(new Vector2Int(x, y));
                 }
                 if (treePolygonCollider != null && treeTrunkCollider != null)
                 {
-                    TrunkBlocks.Add(new Vector3(x, y));
+                    _trunkBlocks.Add(new Vector2Int(x, y));
                 }
             }
         }
+    }
 
-        float minX = TrunkBlocks.Min(a => a.x);
-        Start = new Vector2(minX, 0);
+    private bool InitializeTree()
+    {
+        if (_tree == null)
+        {
+            _tree = new GameObject("Tree");
+            _tree.AddComponent<BoxCollider2D>();
+            _tree.GetComponent<BoxCollider2D>().isTrigger = true;
+            _tree.transform.parent = transform;
+            _tree.transform.position = transform.position;
+            return false;
+        }
+        else
+        {
+            _tree = transform.Find("Tree").gameObject;
+            _tree.SetActive(true);
+            _width = Mathf.CeilToInt(_tree.GetComponent<BoxCollider2D>().size.x);
+            _height = Mathf.CeilToInt(_tree.GetComponent<BoxCollider2D>().size.y);
+            return true;
+        }
+    }
+
+    private bool InitializeTreeTrunk()
+    {
+        if (_treeTrunk == null)
+        {
+            _treeTrunk = new GameObject("TreeTrunk");
+            _treeTrunk.AddComponent<BoxCollider2D>();
+            _treeTrunk.GetComponent<BoxCollider2D>().isTrigger = true;
+            _treeTrunk.transform.parent = transform;
+            _treeTrunk.transform.position = transform.position;
+            return false;
+        }
+        else
+        {
+            _treeTrunk = transform.Find("TreeTrunk").gameObject;
+            _treeTrunk.SetActive(true);
+            _widthToSpawn = Mathf.CeilToInt(_treeTrunk.GetComponent<BoxCollider2D>().size.x);
+            return true;
+        }
     }
 
     private void VisualizeTree()
@@ -287,7 +313,7 @@ public class Tree : MonoBehaviour
         {
             GameObject treeFoliageGameObject = new GameObject("Tree block", typeof(SpriteRenderer));
             treeFoliageGameObject.transform.parent = visualizer.transform;
-            treeFoliageGameObject.transform.position = visualizer.transform.TransformPoint(new Vector3(block.x + 0.5f, block.y + 0.5f, block.z));
+            treeFoliageGameObject.transform.position = visualizer.transform.TransformPoint(new Vector3(block.x + 0.5f, block.y + 0.5f));
             treeFoliageGameObject.GetComponent<SpriteRenderer>().color = Color.white;
             treeFoliageGameObject.GetComponent<SpriteRenderer>().sprite = _square;
         }
@@ -296,9 +322,26 @@ public class Tree : MonoBehaviour
         {
             GameObject treeTrunkGameObject = new GameObject("Tree trunk", typeof(SpriteRenderer));
             treeTrunkGameObject.transform.parent = visualizer.transform;
-            treeTrunkGameObject.transform.position = visualizer.transform.TransformPoint(new Vector3(block.x + 0.5f, block.y + 0.5f, block.z));
+            treeTrunkGameObject.transform.position = visualizer.transform.TransformPoint(new Vector3(block.x + 0.5f, block.y + 0.5f));
             treeTrunkGameObject.GetComponent<SpriteRenderer>().color = Color.green;
             treeTrunkGameObject.GetComponent<SpriteRenderer>().sprite = _square;
+        }
+    }
+
+    private void OccupieArea()
+    {
+        Vector2Int treePosition = Vector2Int.FloorToInt(transform.position);
+        foreach(Vector2Int position in _treeBlocks)
+        {
+            WorldDataManager.Instance.MakeTree(treePosition.x + position.x, treePosition.y + position.y);
+        }
+        foreach (Vector2Int position in _trunkBlocks)
+        {
+            WorldDataManager.Instance.MakeTreeTrunk(treePosition.x + position.x, treePosition.y + position.y);
+        }
+        for (int i = 0; i < _widthToSpawn; i++)
+        {
+            WorldDataManager.Instance.MakeUnbreakable(treePosition.x + _start.x + i, treePosition.y + _start.y - 1);
         }
     }
     #endregion

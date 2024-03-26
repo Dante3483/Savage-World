@@ -106,7 +106,7 @@ public class TreesGenerationPhase : IGenerationPhase
                 {
                     foreach (Vector3 coord in coords)
                     {
-                        GameObject treeGameObject = GameObject.Instantiate(tree.gameObject, coord, Quaternion.identity, treesSection.transform);
+                        Tree treeGameObject = GameObject.Instantiate(tree, coord, Quaternion.identity, treesSection.transform);
                         treeGameObject.name = tree.gameObject.name;
                     }
                 });
@@ -122,7 +122,7 @@ public class TreesGenerationPhase : IGenerationPhase
     {
         int blockX;
         int blockY;
-        foreach (Vector3 vector in tree.TrunkBlocks)
+        foreach (Vector2Int vector in tree.TrunkBlocks)
         {
             blockX = x + (int)(vector.x - tree.Start.x);
             blockY = y;
@@ -135,7 +135,7 @@ public class TreesGenerationPhase : IGenerationPhase
                 return false;
             }
         }
-        foreach (Vector3 vector in tree.TreeBlocks)
+        foreach (Vector2Int vector in tree.TreeBlocks)
         {
             blockX = x + (int)(vector.x - tree.Start.x);
             blockY = y;

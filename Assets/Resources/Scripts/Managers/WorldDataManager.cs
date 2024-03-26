@@ -91,9 +91,75 @@ public class WorldDataManager : MonoBehaviour
         _blockInfo = _worldData[blockCoords.x, blockCoords.y].ToString();
     }
 
+    public void MakeOccupied(int x, int y)
+    {
+        _worldData[x, y].MakeOccupied();
+    }
+
+    public void MakeFree(int x, int y)
+    {
+        _worldData[x, y].MakeFree();
+    }
+
+    public void MakeUnbreakable(int x, int y)
+    {
+        _worldData[x, y].MakeUnbreakable();
+    }
+
+    public void MakeBreakable(int x, int y)
+    {
+        _worldData[x, y].MakeBreakable();
+    }
+
+    public void MakeTree(int x, int y)
+    {
+        _worldData[x, y].MakeTree();
+    }
+
+    public void RemoveTree(int x, int y)
+    {
+        _worldData[x, y].RemoveTree();
+    }
+
+    public void MakeTreeTrunk(int x, int y)
+    {
+        _worldData[x, y].MakeTreeTrunk();
+    }
+
+    public void RemoveTreeTrunk(int x, int y)
+    {
+        _worldData[x, y].RemoveTreeTrunk();
+    }
+
+    public bool IsEmpty(int x, int y)
+    {
+        return _worldData[x, y].IsEmpty();
+    }
+
     public bool IsSolid(int x, int y)
     {
         return _worldData[x, y].IsSolid();
+    }
+
+    public bool IsWall(int x, int y)
+    {
+        return _worldData[x, y].IsWall();
+    }
+
+    public bool IsSolidAnyNeighbor(int x, int y)
+    {
+        return _worldData[x - 1, y].IsSolid() || _worldData[x + 1, y].IsSolid() ||
+            _worldData[x, y + 1].IsSolid() || _worldData[x, y - 1].IsSolid();
+    }
+
+    public bool IsFree(int x, int y)
+    {
+        return _worldData[x, y].IsFree();
+    }
+
+    public bool IsBreakable(int x, int y)
+    {
+        return _worldData[x, y].IsBreakable();
     }
     #endregion
 }

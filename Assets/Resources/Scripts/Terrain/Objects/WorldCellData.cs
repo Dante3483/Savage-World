@@ -5,6 +5,10 @@ using System.Linq;
 
 //Firt 4 bit of _tileId = blockTileId
 //Last 4 bit of _tileId = wallTileId
+//1 bit of _flags = is it possible to break
+//2 bit of _flags = is it possible to place inside
+//3 bit of _flags = is tree
+//4 bit of _flags = is tree trunk
 public struct WorldCellData
 {
     #region Private fields
@@ -22,6 +26,7 @@ public struct WorldCellData
     private byte _currentActionTime;
     private byte _blockDamagePercent;
     private byte _wallDamagePercent;
+    private byte _flags;
     #endregion
 
     #region Liquid
@@ -250,6 +255,7 @@ public struct WorldCellData
         _currentActionTime = 0;
         _blockDamagePercent = 0;
         _wallDamagePercent = 0;
+        _flags = 0;
 
         _liquidId = 255;
         _isFlowsDown = false;
@@ -273,7 +279,12 @@ public struct WorldCellData
             $"Liquid ID: {_liquidId}\n" +
             $"Flow value: {_flowValue}\n" +
             $"Block damage: {_blockDamagePercent}\n" +
-            $"Wall damage: {_wallDamagePercent}";
+            $"Wall damage: {_wallDamagePercent}\n" +
+            $"Flags: {_flags}\n" +
+            $"Is breakable: {IsBreakable()}\n" +
+            $"Is tree: {IsTree()}\n" +
+            $"Is tree trunk: {IsTreeTrunk()}\n" +
+            $"Is free: {IsFree()}\n";
     }
 
     public Sprite GetBlockSprite()
@@ -374,6 +385,46 @@ public struct WorldCellData
         _wallDamagePercent = (byte)(Mathf.Min(damage / WallData.MaximumDamage, 1) * 100);
     }
 
+    public void MakeUnbreakable()
+    {
+        _flags |= 0x01;
+    }
+
+    public void MakeBreakable()
+    {
+        _flags &= 0xFE;
+    }
+
+    public void MakeOccupied()
+    {
+        _flags |= 0x02;
+    }
+
+    public void MakeFree()
+    {
+        _flags &= 0xFD;
+    }
+
+    public void MakeTree()
+    {
+        _flags |= 0x04;
+    }
+
+    public void RemoveTree()
+    {
+        _flags &= 0xFB;
+    }
+
+    public void MakeTreeTrunk()
+    {
+        _flags |= 0x08;
+    }
+
+    public void RemoveTreeTrunk()
+    {
+        _flags &= 0xF7;
+    }
+
     public bool CompareBlock(BlockSO block)
     {
         return _blockData.GetId() == block.GetId() && _blockData.Type == block.Type;
@@ -437,6 +488,26 @@ public struct WorldCellData
     public bool IsFullLiquidBlock()
     {
         return IsLiquid() && _flowValue == 100;
+    }
+
+    public bool IsBreakable()
+    {
+        return (_flags & 0x01) == 0;
+    }
+
+    public bool IsFree()
+    {
+        return (_flags & 0x02) == 0 && !IsTree() && !IsTreeTrunk();
+    }
+
+    public bool IsTree()
+    {
+        return (_flags & 0x04) == 0x04;
+    }
+
+    public bool IsTreeTrunk()
+    {
+        return (_flags & 0x08) == 0x08;
     }
 
     public void Drain()
