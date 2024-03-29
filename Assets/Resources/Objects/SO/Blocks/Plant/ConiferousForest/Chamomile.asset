@@ -12,13 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b0572a9e2a280b4396150628efcef6e, type: 3}
   m_Name: Chamomile
   m_EditorClassIdentifier: 
+  _blockName: Chamomile
   _sprites:
   - {fileID: 21300000, guid: 1cfdc34881d871549b22f7ddeca09877, type: 3}
   - {fileID: 21300000, guid: 2f7e8bef796251b419bc630bd4b4ceb9, type: 3}
-  _type: 4
+  _drop: {fileID: 0}
   _colorOnMap: {r: 1, g: 1, b: 1, a: 1}
   _lightValue: 0
-  _lightColor: {r: 0, g: 0, b: 0, a: 1}
+  _maximumDamage: 0
+  _lightColor:
+    serializedVersion: 2
+    rgba: 4278190080
   _isSurfaceLight: 0
   _waterproof: 0
   _id: 11

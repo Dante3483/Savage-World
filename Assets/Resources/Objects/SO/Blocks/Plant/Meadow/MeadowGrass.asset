@@ -12,15 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b0572a9e2a280b4396150628efcef6e, type: 3}
   m_Name: MeadowGrass
   m_EditorClassIdentifier: 
+  _blockName: Meadow grass
   _sprites:
   - {fileID: 21300000, guid: b81a9e7366b36834d8a6c6f930b55613, type: 3}
   - {fileID: 21300000, guid: 8f6eecd481a6a4d438d1fad274c7fc2f, type: 3}
   - {fileID: 21300000, guid: 13ffa4b78f3d4af4aa71d69fae372388, type: 3}
   - {fileID: 21300000, guid: a26c9f75b79baff438b58763194666d7, type: 3}
-  _type: 4
+  _drop: {fileID: 0}
   _colorOnMap: {r: 0.6, g: 0.67058825, b: 0.29411766, a: 1}
   _lightValue: 0
-  _lightColor: {r: 0, g: 0, b: 0, a: 1}
+  _maximumDamage: 0
+  _lightColor:
+    serializedVersion: 2
+    rgba: 4278190080
   _isSurfaceLight: 0
   _waterproof: 0
   _id: 4

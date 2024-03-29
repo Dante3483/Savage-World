@@ -12,11 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60360722c145bd6468bc6f9b768d1df6, type: 3}
   m_Name: Air
   m_EditorClassIdentifier: 
-  _tiles: []
-  _type: 0
+  _sprites: []
+  _drop: {fileID: 0}
   _colorOnMap: {r: 0.6270203, g: 0.8686457, b: 0.9716981, a: 1}
   _lightValue: 0
-  _lightColor: {r: 0, g: 0, b: 0, a: 1}
+  _maximumDamage: 0
+  _lightColor:
+    serializedVersion: 2
+    rgba: 4278190080
   _isSurfaceLight: 0
   _waterproof: 1
   _id: 0

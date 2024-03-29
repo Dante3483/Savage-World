@@ -1,0 +1,11 @@
+Foldout > Toggle > VisualElement {
+    height: 30px;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+Foldout > Toggle > VisualElement > VisualElement {
+    align-self: center;
+}

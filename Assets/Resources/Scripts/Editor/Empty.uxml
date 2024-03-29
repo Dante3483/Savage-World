@@ -1,0 +1,3 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Resources/Scripts/Editor/StyleSheets/AtlasEditorWindowStyleSheet.uss?fileID=7433441132597879392&amp;guid=093eeeeecd465d54ea2c0ff17cdbfcfc&amp;type=3#AtlasEditorWindowStyleSheet" />
+</ui:UXML>

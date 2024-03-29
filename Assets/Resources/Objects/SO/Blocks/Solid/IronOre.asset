@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22cfa30691df0b545b8eb5dc58571591, type: 3}
   m_Name: IronOre
   m_EditorClassIdentifier: 
+  _blockName: Iron ore
   _sprites:
   - {fileID: 21300000, guid: a67f6244323b4a34e9d4444e7946ab2b, type: 3}
   _drop: {fileID: 0}
-  _type: 1
   _colorOnMap: {r: 1, g: 0.5886792, b: 0.74406093, a: 1}
   _lightValue: 0
   _maximumDamage: 1

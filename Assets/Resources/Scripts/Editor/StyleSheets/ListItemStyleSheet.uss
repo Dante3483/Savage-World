@@ -1,0 +1,19 @@
+.list_item {
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.list_item_icon {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    margin-right: 5px;
+}
+
+.list_item_name {
+    flex-shrink: 1;
+}

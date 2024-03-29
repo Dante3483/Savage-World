@@ -12,13 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b0572a9e2a280b4396150628efcef6e, type: 3}
   m_Name: Dandelion
   m_EditorClassIdentifier: 
+  _blockName: Dandelion
   _sprites:
   - {fileID: 21300000, guid: 2f287155b0143fd428d0b32d3f6703de, type: 3}
   - {fileID: 21300000, guid: d4a43f6cace9b4c46b9c3392ec999ec2, type: 3}
-  _type: 4
+  _drop: {fileID: 0}
   _colorOnMap: {r: 0.98039216, g: 0.8666667, b: 0.29803923, a: 1}
   _lightValue: 0
-  _lightColor: {r: 0, g: 0, b: 0, a: 1}
+  _maximumDamage: 0
+  _lightColor:
+    serializedVersion: 2
+    rgba: 4278190080
   _isSurfaceLight: 0
   _waterproof: 0
   _id: 5

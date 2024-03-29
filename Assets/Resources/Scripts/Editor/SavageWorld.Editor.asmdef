@@ -1,0 +1,16 @@
+{
+    "name": "SavageWorld.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:e3227ce0409a0fe4e867bb6d2bdfbb63"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -15,7 +15,6 @@ MonoBehaviour:
   _sprites:
   - {fileID: 21300000, guid: 28d5af517cabb084fa083dad371947c1, type: 3}
   _drop: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
-  _type: 5
   _colorOnMap: {r: 0.17969622, g: 0.16817723, b: 0.18200001, a: 1}
   _lightValue: 0
   _maximumDamage: 5

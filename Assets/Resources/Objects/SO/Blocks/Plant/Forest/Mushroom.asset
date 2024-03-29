@@ -12,14 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b0572a9e2a280b4396150628efcef6e, type: 3}
   m_Name: Mushroom
   m_EditorClassIdentifier: 
+  _blockName: Mushroom
   _sprites:
   - {fileID: 21300000, guid: 8fdc97558c3e14b4291e01af38cbb9cb, type: 3}
   - {fileID: 21300000, guid: 6ce15f29107c19d43bf26592a9afb121, type: 3}
   - {fileID: 21300000, guid: a113bba06ce270e409dbef2ee8b487d5, type: 3}
-  _type: 4
+  _drop: {fileID: 0}
   _colorOnMap: {r: 0.9607843, g: 0.83137256, b: 0.7764706, a: 1}
   _lightValue: 0
-  _lightColor: {r: 0, g: 0, b: 0, a: 1}
+  _maximumDamage: 0
+  _lightColor:
+    serializedVersion: 2
+    rgba: 4278190080
   _isSurfaceLight: 0
   _waterproof: 0
   _id: 6

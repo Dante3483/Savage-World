@@ -1,0 +1,17 @@
+.content-button {
+    height: 30px;
+}
+
+.toolbar-button {
+}
+
+.search {
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.search-placeholder > #unity-text-input {
+    color: rgb(102, 102, 102);
+}

@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sprites: []
   _drop: {fileID: 0}
-  _type: 5
   _colorOnMap: {r: 1, g: 1, b: 1, a: 0}
   _lightValue: 1
   _maximumDamage: 0
