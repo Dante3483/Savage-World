@@ -6,7 +6,6 @@ public class AtlasSO : ScriptableObject
 {
     #region Private fields
     [SerializeField] private string _name;
-    [SerializeField] private Sprite _sprite;
     #endregion
 
     #region Public fields
