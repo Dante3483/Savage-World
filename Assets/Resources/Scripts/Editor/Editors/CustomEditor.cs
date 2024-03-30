@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public abstract class NewEditor : Editor
+public abstract class CustomEditor : Editor
 {
     #region Private fields
     protected VisualElement _root;
@@ -17,18 +17,12 @@ public abstract class NewEditor : Editor
     #endregion
 
     #region Methods
-    public override void OnInspectorGUI()
-    {
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("asdamsldkasmkasdmad");
-        EditorGUILayout.EndHorizontal();
-        base.OnInspectorGUI();
-    }
-
     public override VisualElement CreateInspectorGUI()
     {
+
+        _root = new VisualElement();
         FindSerializedProperties();
-        InitializeEditor();
+        InitializeEditorElements();
         Compose();
         return _root;
     }
@@ -37,6 +31,6 @@ public abstract class NewEditor : Editor
 
     public abstract void FindSerializedProperties();
 
-    public abstract void InitializeEditor();
+    public abstract void InitializeEditorElements();
     #endregion
 }

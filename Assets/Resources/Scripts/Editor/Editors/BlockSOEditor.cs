@@ -1,10 +1,9 @@
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEngine.UIElements;
 
-[CustomEditor(typeof(BlockSO), true)]
+//[CustomEditor(typeof(BlockSO), true)]
 [CanEditMultipleObjects]
-public class BlockSOEditor : NewEditor
+public class BlockSOEditor : CustomEditor
 {
     #region Private fields
     private SerializedProperty _sprites;
@@ -32,14 +31,12 @@ public class BlockSOEditor : NewEditor
 
     public override void FindSerializedProperties()
     {
-        _sprites = serializedObject.FindProperty("_sprites");
+        _sprites = serializedObject.FindProperty("_path");
         _colorOnMap = serializedObject.FindProperty("_colorOnMap");
     }
 
-    public override void InitializeEditor()
+    public override void InitializeEditorElements()
     {
-        _root = new VisualElement();
-
         _spritesPropertyField = new PropertyField(_sprites);
         _colorOnMapPropertyField = new PropertyField(_colorOnMap);
     }

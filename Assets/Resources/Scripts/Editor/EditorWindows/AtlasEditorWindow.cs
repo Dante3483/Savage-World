@@ -158,7 +158,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         _selectedIndex = 0;
         foreach (AtlasSO atlas in _atlases)
         {
-            Button atlasButton = CreateContentButton(atlas.Name);
+            Button atlasButton = CreateContentButton(GetCorrectNameByObject(atlas));
             atlasButton.RegisterCallback<ClickEvent>(evt =>
             {
                 Button toolbarButton = CreateToolbarButton("Back to atlases");
@@ -187,7 +187,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
                 Button collectionButton = CreateContentButton(collection.displayName);
                 collectionButton.RegisterCallback<ClickEvent>(evt =>
                 {
-                    Button toolbarButton = CreateToolbarButton($"Back to {atlas.Name.ToLower()}");
+                    Button toolbarButton = CreateToolbarButton($"Back to {GetCorrectNameByObject(atlas).ToLower()}");
                     toolbarButton.RegisterCallback<ClickEvent>(evt =>
                     {
                         DisplayAtlas(atlas);
@@ -215,8 +215,8 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         listView.makeItem = () => new ListItem();
         listView.bindItem = OnObjectBinding;
         listView.itemsSource = _currentObjectsCollection;
-        listView.onSelectionChange += OnObjectSelectionChange;
-        listView.onSelectionChange += (items) => { _selectedIndex = listView.selectedIndex; };
+        listView.selectionChanged += OnObjectSelectionChange;
+        listView.selectionChanged += (items) => { _selectedIndex = listView.selectedIndex; };
         listView.selectedIndex = _selectedIndex;
         listView.horizontalScrollingEnabled = false;
 

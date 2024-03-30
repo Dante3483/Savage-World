@@ -14,7 +14,15 @@ public class ListItem : VisualElement
 
     #region Public fields
     [UnityEngine.Scripting.Preserve]
-    public new class UxmlFactory : UxmlFactory<ListItem> { }
+    public new class UxmlFactory : UxmlFactory<ListItem, UxmlTraits>
+    {
+
+    }
+
+    public new class UxmlTraits : VisualElement.UxmlTraits
+    {
+
+    }
     #endregion
 
     #region Properties

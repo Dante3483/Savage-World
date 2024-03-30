@@ -1,19 +1,24 @@
-using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class FoldoutList : ListView
 {
     #region Private fields
-    private readonly string _styleResource = StaticInfo.StyleSheetsDirectory + "FoldoutListStyleSheet";
+    private static readonly string _styleResource = StaticInfo.StyleSheetsDirectory + "FoldoutListStyleSheet";
+    private static readonly string ussClassName = "unity-object-field";
     private readonly string _ussFoldoutList = "foldout_list";
     #endregion
 
     #region Public fields
-    [UnityEngine.Scripting.Preserve]
-    public new class UxmlFactory : UxmlFactory<FoldoutList> { }
+    public new class UxmlFactory : UxmlFactory<FoldoutList, UxmlTraits>
+    {
+
+    }
+
+    public new class UxmlTraits : ListView.UxmlTraits
+    {
+
+    }
     #endregion
 
     #region Properties

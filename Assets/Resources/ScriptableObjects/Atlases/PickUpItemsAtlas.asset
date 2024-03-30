@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0649d2e6293bd2e42a06ebedf0f12f9e, type: 3}
   m_Name: PickUpItemsAtlas
   m_EditorClassIdentifier: 
-  _name: Pick up items atlas
+  _path: 
   _pickUpItems:
   - {fileID: 1706276536482230136, guid: 0f5908a1d0556814ca887042132de5a9, type: 3}
   - {fileID: 7710981443612422998, guid: 8a4a5db4239c32b4c92025dbd54eb8da, type: 3}

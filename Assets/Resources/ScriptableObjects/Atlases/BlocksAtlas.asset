@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 140c0d5c5ffc9224faf86c24ab192ce8, type: 3}
   m_Name: BlocksAtlas
   m_EditorClassIdentifier: 
-  _name: Blocks atlas
-  _sprite: {fileID: 21300000, guid: a26c9f75b79baff438b58763194666d7, type: 3}
+  _path: 
   _abstractBlocks:
   - {fileID: 11400000, guid: 19d9968675a8f204f9d2c9db05716948, type: 2}
   _solidBlocks:
@@ -28,7 +27,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9b5ee4b9e005d044a8737850c9abde8f, type: 2}
   - {fileID: 11400000, guid: cc0f266b813d0834191616498d3d0460, type: 2}
   - {fileID: 11400000, guid: b70ce9478c7d4a143a11de9f32b42a81, type: 2}
-  - {fileID: 11400000, guid: 5c0e1fc1ac899384595a8d2a3187d403, type: 2}
   _dustBlocks:
   - {fileID: 11400000, guid: 2d2b1b1721726894eb3cd59597f6dce2, type: 2}
   _liquidBlocks:

@@ -1,11 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class AtlasSO : ScriptableObject
+public class FolderPathAttribute : PropertyAttribute
 {
     #region Private fields
-    [FolderPath][SerializeField] private string _path;
+
     #endregion
 
     #region Public fields
@@ -13,9 +11,13 @@ public class AtlasSO : ScriptableObject
     #endregion
 
     #region Properties
+
     #endregion
 
     #region Methods
+    public FolderPathAttribute()
+    {
 
+    }
     #endregion
 }

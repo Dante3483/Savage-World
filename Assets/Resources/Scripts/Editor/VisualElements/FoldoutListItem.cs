@@ -9,8 +9,15 @@ public class FoldoutListItem : ListItem
     #endregion
 
     #region Public fields
-    [UnityEngine.Scripting.Preserve]
-    public new class UxmlFactory : UxmlFactory<FoldoutListItem> { }
+    public new class UxmlFactory : UxmlFactory<FoldoutListItem, UxmlTraits>
+    {
+
+    }
+
+    public new class UxmlTraits : ListItem.UxmlTraits
+    {
+
+    }
     #endregion
 
     #region Properties
