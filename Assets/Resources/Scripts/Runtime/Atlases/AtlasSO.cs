@@ -1,11 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AtlasSO : ScriptableObject
 {
     #region Private fields
-    [FolderPath][SerializeField] private string _path;
+    [FolderPath]
+    [SerializeField] private string _path;
     #endregion
 
     #region Public fields

@@ -3,7 +3,7 @@ using UnityEditor.UIElements;
 
 //[CustomEditor(typeof(BlockSO), true)]
 [CanEditMultipleObjects]
-public class BlockSOEditor : CustomEditor
+public class BlockSOEditor : ObjectsCustomEditor
 {
     #region Private fields
     private SerializedProperty _sprites;

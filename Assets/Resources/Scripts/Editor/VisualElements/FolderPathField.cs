@@ -36,7 +36,6 @@ public class FolderPathField : ObjectPathField
     {
     }
 
-
     public FolderPathField(SerializedProperty property, string label) : base(property, label)
     {
         Texture icon = EditorGUIUtility.IconContent("d_Folder Icon").image;

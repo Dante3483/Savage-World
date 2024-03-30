@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 
+[System.AttributeUsage(AttributeTargets.Field)]
 public class FolderPathAttribute : PropertyAttribute
 {
     #region Private fields

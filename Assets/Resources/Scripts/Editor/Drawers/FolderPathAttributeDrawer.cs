@@ -1,4 +1,5 @@
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 [CustomPropertyDrawer(typeof(FolderPathAttribute))]
@@ -19,12 +20,7 @@ public class FolderPathAttributeDrawer : PropertyDrawer
     #region Methods
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
-        VisualElement _root = new VisualElement();
-
-        FolderPathField folderPathField = new FolderPathField(property);
-
-        _root.Add(folderPathField);
-        return _root;
+        return new FolderPathField(property);
     }
     #endregion
 }

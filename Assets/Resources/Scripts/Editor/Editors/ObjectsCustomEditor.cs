@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public abstract class CustomEditor : Editor
+public abstract class ObjectsCustomEditor : Editor
 {
     #region Private fields
     protected VisualElement _root;

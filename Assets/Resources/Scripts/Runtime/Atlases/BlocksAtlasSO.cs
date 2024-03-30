@@ -20,7 +20,7 @@ public class BlocksAtlasSO : AtlasSO
     #endregion
 
     #region Public fields
-    public static Dictionary<Sprite, Color32[]> BlocksColorArrayBySprite;
+
     #endregion
 
     #region Properties
@@ -87,7 +87,6 @@ public class BlocksAtlasSO : AtlasSO
         InitializeSetBlockByTypeAndId();
         InitializeSetGrassByBiome();
         InitializeSetPlantsByBiome();
-        InitalizeSetBlocksColorArrayBySprite();
     }
 
     private void InitializeSetBlockByTypeAndId()
@@ -144,25 +143,6 @@ public class BlocksAtlasSO : AtlasSO
         {
             _plantsByBiome[plant.BiomeId].Add(plant);
         }
-    }
-
-    private void InitalizeSetBlocksColorArrayBySprite()
-    {
-        BlocksColorArrayBySprite = new Dictionary<Sprite, Color32[]>();
-
-        ActionInMainThreadUtil.Instance.Invoke(() =>
-        {
-            foreach (var blocks in _blockByTypeAndId.Values)
-            {
-                foreach (BlockSO block in blocks.Values)
-                {
-                    foreach (Sprite sprite in block.Sprites)
-                    {
-                        BlocksColorArrayBySprite.Add(sprite, sprite.texture.GetPixels32());
-                    }
-                }
-            }
-        });
     }
 
     public BlockSO GetBlockByTypeAndId(BlockTypes blockType, object id)
