@@ -15,7 +15,8 @@ public class FolderPathField : ObjectPathField
     }
 
     #region Private fields
-
+    private string _title;
+    private string _startFolder;
     #endregion
 
     #region Public fields
@@ -23,7 +24,31 @@ public class FolderPathField : ObjectPathField
     #endregion
 
     #region Properties
+    public string Title
+    {
+        get
+        {
+            return _title;
+        }
 
+        set
+        {
+            _title = value;
+        }
+    }
+
+    public string StartFolder
+    {
+        get
+        {
+            return _startFolder;
+        }
+
+        set
+        {
+            _startFolder = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -34,6 +59,7 @@ public class FolderPathField : ObjectPathField
 
     public FolderPathField(SerializedProperty property) : this(property, null)
     {
+
     }
 
     public FolderPathField(SerializedProperty property, string label) : base(property, label)
@@ -42,8 +68,13 @@ public class FolderPathField : ObjectPathField
         _openPanelButton.style.backgroundImage = (StyleBackground)icon;
         _openPanelButton.clicked += () =>
         {
-            string path = EditorUtility.OpenFolderPanel("", "", "");
-            _pathTextField.value = path;
+            string startFolder = string.IsNullOrEmpty(_pathTextField.value) ? _startFolder : _pathTextField.value;
+            string absolutePath = EditorUtility.OpenFolderPanel(_title, startFolder, "");
+            if (absolutePath.Contains(Application.dataPath))
+            {
+                string relativePath = "Assets" + absolutePath.Substring(Application.dataPath.Length) + '/';
+                _pathTextField.value = relativePath;
+            }
         };
     }
     #endregion

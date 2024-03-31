@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 140c0d5c5ffc9224faf86c24ab192ce8, type: 3}
   m_Name: BlocksAtlas
   m_EditorClassIdentifier: 
-  _path: 
+  _atlasDataPath: Assets/Resources/ScriptableObjects/Blocks/
   _abstractBlocks:
   - {fileID: 11400000, guid: 19d9968675a8f204f9d2c9db05716948, type: 2}
   _solidBlocks:

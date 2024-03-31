@@ -132,6 +132,11 @@ public abstract class BlockSO : ScriptableObject
     #endregion
 
     #region Methods
+    public BlockSO()
+    {
+        _sprites = new List<Sprite>();
+    }
+
     public abstract ushort GetId();
     #endregion
 }

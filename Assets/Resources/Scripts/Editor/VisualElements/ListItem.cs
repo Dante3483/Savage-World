@@ -3,17 +3,6 @@ using UnityEngine.UIElements;
 
 public class ListItem : VisualElement
 {
-    #region Private fields
-    private readonly string _styleResource = StaticInfo.StyleSheetsDirectory + "ListItemStyleSheet";
-    private readonly string _ussListItem = "list_item";
-    private readonly string _ussListItemIcon = "list_item_icon";
-    private readonly string _ussListItemName = "list_item_name";
-    protected Image _icon;
-    protected Label _name;
-    #endregion
-
-    #region Public fields
-    [UnityEngine.Scripting.Preserve]
     public new class UxmlFactory : UxmlFactory<ListItem, UxmlTraits>
     {
 
@@ -23,10 +12,36 @@ public class ListItem : VisualElement
     {
 
     }
+
+    #region Private fields
+    private static readonly string _styleResource = StaticInfo.StyleSheetsDirectory + "ListItemStyleSheet";
+    private static readonly string _ussListItem = "list_item";
+    private static readonly string _ussIcon = _ussListItem + "__icon";
+    private static readonly string _ussName = _ussListItem + "__name";
+    protected Image _icon;
+    protected Label _name;
+    #endregion
+
+    #region Public fields
+
     #endregion
 
     #region Properties
+    public Image Icon
+    {
+        get
+        {
+            return _icon;
+        }
+    }
 
+    public Label Name
+    {
+        get
+        {
+            return _name;
+        }
+    }
     #endregion
 
     #region Methods
@@ -36,7 +51,6 @@ public class ListItem : VisualElement
 
         _icon = new Image();
         _name = new Label();
-        AddToClassList(_ussListItem);
 
         hierarchy.Add(_icon);
         hierarchy.Add(_name);
@@ -44,26 +58,27 @@ public class ListItem : VisualElement
 
     public void SetIcon(Sprite icon)
     {
+        AddToClassList(_ussListItem);
         if (icon == null)
         {
-            _icon.RemoveFromClassList(_ussListItemIcon);
+            _icon.RemoveFromClassList(_ussIcon);
         }
         else
         {
-            _icon.AddToClassList(_ussListItemIcon);
+            _icon.AddToClassList(_ussIcon);
         }
         _icon.sprite = icon;
     }
 
     public void SetName(string name)
     {
-        if (name == string.Empty)
+        if (string.IsNullOrEmpty(name))
         {
-            _name.RemoveFromClassList(_ussListItemName);
+            _name.RemoveFromClassList(_ussName);
         }
         else
         {
-            _name.AddToClassList(_ussListItemName);
+            _name.AddToClassList(_ussName);
         }
         _name.text = name;
     }

@@ -1,4 +1,8 @@
 .object-path-field {
+    margin-top: 5;
+    margin-bottom: 5;
+    margin-right: 0;
+    margin-left: 0;
 }
 
 .object-path-field__input {
@@ -6,21 +10,30 @@
 }
 
 .object-path-field__path {
+    margin-left: 0;
+    margin-right: 5;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
     flex-grow: 1;
-    flex-shrink: 0;
 }
 
 .object-path-field__open-panel {
-    width: 25px;
-    height: 25px;
+    width: 20px;
+    height: 20px;
     border-left-width: 0;
     border-right-width: 0;
     border-top-width: 0;
     border-bottom-width: 0;
     background-color: rgba(0, 0, 0, 0);
     -unity-background-image-tint-color: rgba(255, 255, 255, 0.5);
+    align-self: center;
 }
 
 .object-path-field__open-panel:hover {
     -unity-background-image-tint-color: rgb(255, 255, 255);
+}
+
+.object-path-field .unity-base-field__label {
+    -unity-text-align: middle-left;
+    text-overflow: ellipsis;
 }

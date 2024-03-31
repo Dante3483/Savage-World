@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7015ce9cae062bd4a8b1802f901a59d8, type: 3}
   m_Name: TreesAtlas
   m_EditorClassIdentifier: 
-  _name: Trees atlas
+  _atlasDataPath: Assets/Resources/Prefabs/Trees/
   _trees:
   - {fileID: 1647730251975947721, guid: 40f63a090e2903c40984a91305c99f80, type: 3}
   - {fileID: 6575782605102750958, guid: bcc829edaefc1f444bfeec893ca33e6b, type: 3}

@@ -23,12 +23,7 @@ public class ButtonAttribute : Attribute
     #endregion
 
     #region Methods
-    public ButtonAttribute() : this("Button")
-    {
-
-    }
-
-    public ButtonAttribute(string buttonName)
+    public ButtonAttribute(string buttonName = "Button")
     {
         _buttonName = buttonName;
     }
