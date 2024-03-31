@@ -45,10 +45,12 @@
 .atlas-window__left-pane {
     padding-top: 5px;
     background-color: rgb(60, 60, 60);
+    min-width: 200px;
 }
 
 .atlas-window__right-pane {
     background-color: rgb(51, 50, 50);
+    min-width: 400px;
 }
 
 .atlas-window__list-view {

@@ -30,11 +30,13 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     private SerializedProperty _currentCollectionProperty;
     private List<Object> _currentCollectionObjects;
     private List<Object> _collectionObjectsAfterSearch;
+    private Object _currentObject;
     private int _selectedIndex;
 
-    private ScriptableObject _newScriptableObject;
+    private Object _newObject;
     private string _newObjectName;
     private Type _newObjectType;
+    private bool _isTypeScriptableObject;
     private string _pathToSaveNewObject;
     private SearchMode _currentSearchMode;
     private bool _isSearching;
@@ -42,6 +44,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     private ToolbarSearchField _searchField;
     private ListView _listView;
     private Button _deleteObjectButton;
+    private Button _createObjectButton;
     private VisualElement _searchToolbar;
     private VisualElement _backToolbar;
     private VisualElement _deleteObjectToolbar;
@@ -71,9 +74,9 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     #region Methods
     private void OnDestroy()
     {
-        if (_newScriptableObject != null)
+        if (_newObject != null)
         {
-            DestroyImmediate(_newScriptableObject);
+            DestroyImmediate(_newObject);
         }
     }
 
@@ -117,7 +120,10 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         _collectionObjectsByCollectionName = new Dictionary<string, List<Object>>();
         _collectionElementTypeByCollectionName = new Dictionary<string, Type>();
         _collectionObjectsAfterSearch = new List<Object>();
+    }
 
+    public override void ComposeToolbar()
+    {
         AddSearchObjectsField();
         _toolbar.Add(_backToolbar);
         AddDeleteObjectButton();
@@ -125,42 +131,6 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
 
     public override void ComposeLeftPane()
     {
-        Button button = new Button(() =>
-        {
-            _rightPane.Clear();
-            string path = AssetDatabase.GetAssetPath(_currentCollectionObjects[0]);
-            path = Path.GetDirectoryName(path) + '\\';
-            Debug.Log(path);
-            _newScriptableObject = CreateInstance<SolidBlockSO>();
-            _newScriptableObject.name = "NewBlock";
-            InspectorElement inspectorElement = new InspectorElement(_newScriptableObject);
-            _rightPane.Add(inspectorElement);
-            Button create = new Button(() =>
-            {
-                string[] existingAssets = AssetDatabase.FindAssets(_newScriptableObject.name, new[] { path });
-                if (existingAssets.Length > 0)
-                {
-                    _newScriptableObject.name += existingAssets.Length;
-                }
-                AssetDatabase.CreateAsset(_newScriptableObject, path + _newScriptableObject.name + ".asset");
-                AssetDatabase.SaveAssets();
-                //_leftPane.Q<ListView>()?.Rebuild();
-
-                SerializedObject serializedObject = new SerializedObject(_atlases[0]);
-                SerializedProperty collection = serializedObject.FindProperty("_solidBlocks");
-                collection.InsertArrayElementAtIndex(collection.arraySize);
-                collection.GetArrayElementAtIndex(collection.arraySize - 1).objectReferenceValue = _newScriptableObject;
-                serializedObject.ApplyModifiedProperties();
-                _currentCollectionObjects.Add(_newScriptableObject);
-                //_leftPane.Q<ListView>()?.Rebuild();
-                _newScriptableObject = CreateInstance<SolidBlockSO>();
-                _newScriptableObject.name = "NewBlock";
-            });
-            create.text = "Create";
-            _rightPane.Add(create);
-        });
-        button.text = "Create";
-        //_root.Add(button);
         GetAllData();
         DisplayAllAtlases();
     }
@@ -169,7 +139,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     {
         _leftPane.Clear();
         _rightPane.Clear();
-        _newScriptableObject = null;
+        DestroyImmediate(_newObject);
     }
 
     private void ResetSearch()
@@ -227,6 +197,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     private void DisplayAllAtlases()
     {
         ClearContent();
+        _deleteObjectButton.SetEnabled(false);
         _currentSearchMode = SearchMode.Global;
         foreach (AtlasSO atlas in _atlases)
         {
@@ -237,6 +208,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     private void DisplayAtlas(AtlasSO atlas)
     {
         ClearContent();
+        _deleteObjectButton.SetEnabled(false);
         _currentSearchMode = SearchMode.Collections;
         List<SerializedProperty> collectionsProperties = _collectionsPropertiesByAtlas[atlas];
         foreach (SerializedProperty collectionProperty in collectionsProperties)
@@ -387,56 +359,12 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         _searchToolbar.Add(_searchField);
     }
 
-    private void SearchGloabal(string searchString)
-    {
-        _collectionObjectsAfterSearch.Clear();
-        foreach (List<Object> collectionObjects in _collectionObjectsByCollectionName.Values)
-        {
-            foreach (Object collectionObject in collectionObjects)
-            {
-                if (GetCorrectNameByObject(collectionObject).ToLower().Contains(searchString))
-                {
-                    _collectionObjectsAfterSearch.Add(collectionObject);
-                }
-            }
-        }
-        _listView.RefreshItems();
-    }
-
-    private void SearchCollections(string searchString)
-    {
-        _collectionObjectsAfterSearch.Clear();
-        foreach (SerializedProperty collectionProperty in _collectionsPropertiesByAtlas[_currentAtlas])
-        {
-            foreach (Object collectionObject in _collectionObjectsByCollectionName[collectionProperty.name])
-            {
-                if (GetCorrectNameByObject(collectionObject).ToLower().Contains(searchString))
-                {
-                    _collectionObjectsAfterSearch.Add(collectionObject);
-                }
-            }
-        }
-        _listView.RefreshItems();
-    }
-
-    private void SearchCollection(string searchString)
-    {
-        _collectionObjectsAfterSearch.Clear();
-        foreach (Object collectionObject in _currentCollectionObjects)
-        {
-            if (GetCorrectNameByObject(collectionObject).ToLower().Contains(searchString))
-            {
-                _collectionObjectsAfterSearch.Add(collectionObject);
-            }
-        }
-        _listView.RefreshItems();
-    }
-
     private void AddDeleteObjectButton()
     {
         _deleteObjectButton = CreateButton("Delete object", _ussToolbarButton);
-        _deleteObjectButton.SetEnabled(false);
+        _deleteObjectButton.clicked += OnDeleteObject;
         _toolbar.Add(_deleteObjectToolbar);
+        _deleteObjectToolbar.Add(_deleteObjectButton);
     }
 
     private void AddListViewForCollection(List<Object> itemSource)
@@ -445,7 +373,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         _listView.fixedItemHeight = 30;
         _listView.makeItem += OnMakeObject;
         _listView.bindItem += OnBindObject;
-        _listView.selectionChanged += OnObjectChanged;
+        _listView.selectionChanged += OnObjectSelected;
         _listView.selectedIndex = _selectedIndex;
         _listView.selectionChanged += (items) => { _selectedIndex = _listView.selectedIndex; };
         _listView.ClearSelection();
@@ -457,22 +385,17 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     {
         _pathToSaveNewObject = _currentAtlas.AtlasDataPath;
         _newObjectType = _collectionElementTypeByCollectionName[_currentCollectionProperty.name];
-        Button createObjectButton = CreateButton("Create new object", _ussContentButton);
-        createObjectButton.clicked += OnStartCreateNewObject;
-        _leftPane.Add(createObjectButton);
-        DisableCreateObjectButton(createObjectButton);
+        _createObjectButton = CreateButton("Create new object", _ussContentButton);
+        _createObjectButton.clicked += OnStartCreateObject;
+        _leftPane.Add(_createObjectButton);
+        DisableCreateObjectButton();
     }
 
-    private void DisableCreateObjectButton(Button createObjectButton)
+    private void DisableCreateObjectButton()
     {
         if (string.IsNullOrEmpty(_pathToSaveNewObject))
         {
-            createObjectButton.SetEnabled(false);
-        }
-
-        if (!_newObjectType.IsSubclassOf(typeof(ScriptableObject)))
-        {
-            createObjectButton.SetEnabled(false);
+            _createObjectButton.SetEnabled(false);
         }
     }
 
@@ -533,15 +456,25 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         cell.SetIcon(GetIconByObject(obj));
     }
 
-    private void OnObjectChanged(IEnumerable<object> selectedItems)
+    private void OnObjectSelected(IEnumerable<object> selectedItems)
     {
-        Object obj = selectedItems.FirstOrDefault() as Object;
-        if (obj == null)
+        _currentObject = selectedItems.FirstOrDefault() as Object;
+        if (_currentObject == null)
         {
+            _rightPane.Clear();
+            _deleteObjectButton.SetEnabled(false);
             return;
         }
+
         _rightPane.Clear();
-        InspectorElement inspectorElement = new InspectorElement(obj);
+        if (_createObjectButton != null)
+        {
+            _createObjectButton.SetEnabled(true);
+        }
+        _deleteObjectButton.SetEnabled(true);
+        DestroyImmediate(_newObject);
+
+        InspectorElement inspectorElement = new InspectorElement(_currentObject);
         inspectorElement.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
         {
             _listView.RefreshItem(_selectedIndex);
@@ -549,15 +482,53 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         _rightPane.Add(inspectorElement);
     }
 
-    private void OnStartCreateNewObject()
+    private void OnStartCreateObject()
+    {
+        ResetSearch();
+        _createObjectButton.SetEnabled(false);
+        _deleteObjectButton.SetEnabled(false);
+        _isTypeScriptableObject = _newObjectType.IsSubclassOf(typeof(ScriptableObject));
+        StartCreateObject();
+    }
+
+    private void OnCreateObject()
+    {
+        if (string.IsNullOrEmpty(_newObjectName))
+        {
+            return;
+        }
+
+        if (SaveObject())
+        {
+            AddObjectToCurrentCollection(_newObject);
+            _newObject = null;
+            StartCreateObject();
+        }
+    }
+
+    private void OnDeleteObject()
+    {
+        int index = _currentCollectionObjects.IndexOf(_currentObject);
+        string objectType = _isTypeScriptableObject ? ".asset" : ".prefab";
+        string assetGUID = AssetDatabase.AssetPathToGUID(_currentAtlas.AtlasDataPath + _currentObject.name + objectType);
+        if (!string.IsNullOrEmpty(assetGUID))
+        {
+            AssetDatabase.DeleteAsset(_currentAtlas.AtlasDataPath + _currentObject.name + objectType);
+            _currentCollectionProperty.DeleteArrayElementAtIndex(index);
+            _currentCollectionProperty.serializedObject.ApplyModifiedProperties();
+            _currentCollectionObjects.Remove(_currentObject);
+            _listView.ClearSelection();
+            _listView.AddToSelection(index - 1);
+            _listView.RefreshItems();
+        }
+    }
+
+    private void StartCreateObject()
     {
         _rightPane.Clear();
-        ResetSearch();
+        _listView.ClearSelection();
 
-        if (_newScriptableObject == null)
-        {
-            _newScriptableObject = CreateInstance(_newObjectType);
-        }
+        _newObject = _isTypeScriptableObject ? CreateInstance(_newObjectType) : new GameObject("newPrefab", _newObjectType);
 
         TextField objectNameTextField = new TextField();
         objectNameTextField.RegisterValueChangedCallback(evt =>
@@ -568,36 +539,90 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
 
         Button createObject = new Button();
         createObject.text = "Create";
-        createObject.clicked += OnCreateNewObject;
+        createObject.clicked += OnCreateObject;
         _rightPane.Add(createObject);
 
-        InspectorElement inspectorElement = new InspectorElement(_newScriptableObject);
+        InspectorElement inspectorElement = new InspectorElement(_isTypeScriptableObject ? _newObject : (_newObject as GameObject).GetComponent(_newObjectType));
         _rightPane.Add(inspectorElement);
     }
 
-    private void OnCreateNewObject()
+    private bool SaveObject()
     {
-        if (!string.IsNullOrEmpty(_newObjectName))
+        string assetName = _newObjectName.Replace(" ", "");
+        string path = _pathToSaveNewObject + assetName;
+        if (_currentCollectionObjects.Find(obj => obj.name == assetName))
         {
-            SaveItem();
-            AddItemToCurrentCollection(_newScriptableObject);
-            _newScriptableObject = null;
+            return false;
+        }
+        if (_isTypeScriptableObject)
+        {
+            path += ".asset";
+            AssetDatabase.CreateAsset(_newObject, path);
+            AssetDatabase.SaveAssets();
+            return true;
+        }
+        else
+        {
+            path += ".prefab";
+            GameObject oldObject = _newObject as GameObject;
+            _newObject = PrefabUtility.SaveAsPrefabAssetAndConnect(_newObject as GameObject, path, InteractionMode.UserAction).GetComponent(_newObjectType);
+            DestroyImmediate(oldObject);
+            return true;
         }
     }
 
-    private void SaveItem()
-    {
-        AssetDatabase.CreateAsset(_newScriptableObject, _pathToSaveNewObject + _newObjectName + ".asset");
-        AssetDatabase.SaveAssets();
-    }
-
-    private void AddItemToCurrentCollection(Object item)
+    private void AddObjectToCurrentCollection(Object item)
     {
         int arraySize = _currentCollectionProperty.arraySize;
         _currentCollectionProperty.InsertArrayElementAtIndex(arraySize);
         _currentCollectionProperty.GetArrayElementAtIndex(arraySize).objectReferenceValue = item;
         _currentCollectionProperty.serializedObject.ApplyModifiedProperties();
         _currentCollectionObjects.Add(item);
+        _listView.RefreshItems();
+    }
+
+    private void SearchGloabal(string searchString)
+    {
+        _collectionObjectsAfterSearch.Clear();
+        foreach (List<Object> collectionObjects in _collectionObjectsByCollectionName.Values)
+        {
+            foreach (Object collectionObject in collectionObjects)
+            {
+                if (GetCorrectNameByObject(collectionObject).ToLower().Contains(searchString))
+                {
+                    _collectionObjectsAfterSearch.Add(collectionObject);
+                }
+            }
+        }
+        _listView.RefreshItems();
+    }
+
+    private void SearchCollections(string searchString)
+    {
+        _collectionObjectsAfterSearch.Clear();
+        foreach (SerializedProperty collectionProperty in _collectionsPropertiesByAtlas[_currentAtlas])
+        {
+            foreach (Object collectionObject in _collectionObjectsByCollectionName[collectionProperty.name])
+            {
+                if (GetCorrectNameByObject(collectionObject).ToLower().Contains(searchString))
+                {
+                    _collectionObjectsAfterSearch.Add(collectionObject);
+                }
+            }
+        }
+        _listView.RefreshItems();
+    }
+
+    private void SearchCollection(string searchString)
+    {
+        _collectionObjectsAfterSearch.Clear();
+        foreach (Object collectionObject in _currentCollectionObjects)
+        {
+            if (GetCorrectNameByObject(collectionObject).ToLower().Contains(searchString))
+            {
+                _collectionObjectsAfterSearch.Add(collectionObject);
+            }
+        }
         _listView.RefreshItems();
     }
     #endregion

@@ -129,7 +129,7 @@ GameObject:
   - component: {fileID: 1647730251975947721}
   - component: {fileID: 7469727220072102190}
   m_Layer: 7
-  m_Name: Cactus12
+  m_Name: Cactus1
   m_TagString: Tree
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
