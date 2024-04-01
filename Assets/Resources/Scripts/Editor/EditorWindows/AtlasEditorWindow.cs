@@ -150,8 +150,9 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
                     _property.serializedObject.ApplyModifiedProperties();
                     continue;
                 }
-                _objects.Add(new ObjectInfo(collectionObject));
+                _objects.Add(new ObjectInfo(collectionObject, i));
             }
+            SortObjectsByName();
         }
 
         private void SetElementType()
@@ -162,13 +163,19 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
             _elementType = field.FieldType.GetElementType();
         }
 
+        private void SortObjectsByName()
+        {
+            _objects.Sort((obj1, obj2) => obj1.Data.name.CompareTo(obj2.Data.name));
+        }
+
         public void AddObject(Object value)
         {
-            int arraySize = _property.arraySize;
-            _property.InsertArrayElementAtIndex(arraySize);
-            _property.GetArrayElementAtIndex(arraySize).objectReferenceValue = value;
+            int index = _property.arraySize;
+            _property.InsertArrayElementAtIndex(index);
+            _property.GetArrayElementAtIndex(index).objectReferenceValue = value;
             _property.serializedObject.ApplyModifiedProperties();
-            _objects.Add(new ObjectInfo(value));
+            _objects.Add(new ObjectInfo(value, index));
+            SortObjectsByName();
         }
 
         public ObjectInfo FindByName(string name)
@@ -207,6 +214,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     {
         #region Private fields
         private Object _data;
+        private int _index;
         #endregion
 
         #region Public fields
@@ -224,9 +232,10 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         #endregion
 
         #region Methods
-        public ObjectInfo(Object data)
+        public ObjectInfo(Object data, int index)
         {
             _data = data;
+            _index = index;
         }
         #endregion
     }
@@ -667,6 +676,8 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
                     break;
             }
         }
+        SortResultByName();
+        _listView.RefreshItems();
     }
 
     private void HandleSearchFieldChanged(ChangeEvent<string> evt)
@@ -693,8 +704,10 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
             default:
                 break;
         }
+        SortResultByName();
         _listView.ClearSelection();
         _listView.AddToSelection(0);
+        _listView.RefreshItems();
     }
 
     private void StartCreateObject()
@@ -779,6 +792,11 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
             }
         }
         _listView.RefreshItems();
+    }
+
+    private void SortResultByName()
+    {
+        _objectsAfterSearch.Sort((obj1, obj2) => obj1.Data.name.CompareTo(obj2.Data.name));
     }
     #endregion
 }
