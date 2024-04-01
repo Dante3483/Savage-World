@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -20,24 +18,234 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         Collection = 2,
     }
 
-    #region Private fields
-    private List<AtlasSO> _atlases;
-    private Dictionary<AtlasSO, List<SerializedProperty>> _collectionsPropertiesByAtlas;
-    private Dictionary<string, Type> _collectionElementTypeByCollectionName;
-    private Dictionary<string, List<Object>> _collectionObjectsByCollectionName;
+    private class AtlasInfo
+    {
+        #region Private fields
+        private AtlasSO _atlas;
+        private List<CollectionInfo> _collections;
+        #endregion
 
-    private AtlasSO _currentAtlas;
-    private SerializedProperty _currentCollectionProperty;
-    private List<Object> _currentCollectionObjects;
-    private List<Object> _collectionObjectsAfterSearch;
-    private Object _currentObject;
-    private int _selectedIndex;
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+        public AtlasSO Atlas
+        {
+            get
+            {
+                return _atlas;
+            }
+        }
+
+        public List<CollectionInfo> Collections
+        {
+            get
+            {
+                return _collections;
+            }
+        }
+        #endregion
+
+        #region Methods
+        public AtlasInfo(AtlasSO atlas)
+        {
+            _atlas = atlas;
+            SetCollections();
+        }
+
+        private void SetCollections()
+        {
+            _collections = new List<CollectionInfo>();
+            SerializedProperty iterator = new SerializedObject(_atlas).GetIterator();
+            iterator.NextVisible(true);
+            while (iterator.NextVisible(false))
+            {
+                if (iterator.isArray && iterator.propertyType == SerializedPropertyType.Generic)
+                {
+                    _collections.Add(new CollectionInfo(iterator.Copy()));
+                }
+            }
+        }
+
+        public bool Delete(ObjectInfo value)
+        {
+            foreach (CollectionInfo collection in _collections)
+            {
+                if (collection.Delete(_atlas, value))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        #endregion
+    }
+
+    private class CollectionInfo
+    {
+        #region Private fields
+        private SerializedProperty _property;
+        private List<ObjectInfo> _objects;
+        private Type _elementType;
+        private bool _isScriptableObject;
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+        public SerializedProperty Property
+        {
+            get
+            {
+                return _property;
+            }
+        }
+
+        public Type ElementType
+        {
+            get
+            {
+                return _elementType;
+            }
+        }
+
+        public bool IsScriptableObject
+        {
+            get
+            {
+                return _isScriptableObject;
+            }
+        }
+
+        public List<ObjectInfo> Objects
+        {
+            get
+            {
+                return _objects;
+            }
+        }
+        #endregion
+
+        #region Methods
+        public CollectionInfo(SerializedProperty property)
+        {
+            _property = property;
+            SetObjects();
+            SetElementType();
+            _isScriptableObject = _elementType.IsSubclassOf(typeof(ScriptableObject));
+        }
+
+        private void SetObjects()
+        {
+            _objects = new List<ObjectInfo>();
+            for (int i = 0; i < _property.arraySize; i++)
+            {
+                Object collectionObject = _property.GetArrayElementAtIndex(i).objectReferenceValue;
+                if (collectionObject == null)
+                {
+                    _property.DeleteArrayElementAtIndex(i--);
+                    _property.serializedObject.ApplyModifiedProperties();
+                    continue;
+                }
+                _objects.Add(new ObjectInfo(collectionObject));
+            }
+        }
+
+        private void SetElementType()
+        {
+            Type parentType = _property.serializedObject.targetObject.GetType();
+            BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
+            FieldInfo field = parentType.GetField(_property.propertyPath, fieldFlags);
+            _elementType = field.FieldType.GetElementType();
+        }
+
+        public void AddObject(Object value)
+        {
+            int arraySize = _property.arraySize;
+            _property.InsertArrayElementAtIndex(arraySize);
+            _property.GetArrayElementAtIndex(arraySize).objectReferenceValue = value;
+            _property.serializedObject.ApplyModifiedProperties();
+            _objects.Add(new ObjectInfo(value));
+        }
+
+        public ObjectInfo FindByName(string name)
+        {
+            return _objects.Find(obj => obj.Data.name == name);
+        }
+
+        public bool Delete(AtlasSO atlas, ObjectInfo value)
+        {
+            int index = _objects.IndexOf(value);
+            if (index == -1)
+            {
+                return false;
+            }
+            else
+            {
+                string fileExtension = _isScriptableObject ? ".asset" : ".prefab";
+                string path = atlas.AtlasDataPath + value.Data.name + fileExtension;
+                string assetGUID = AssetDatabase.AssetPathToGUID(path);
+
+                if (!string.IsNullOrEmpty(assetGUID))
+                {
+                    AssetDatabase.DeleteAsset(path);
+                    _property.DeleteArrayElementAtIndex(index);
+                    _property.serializedObject.ApplyModifiedProperties();
+                    _objects.RemoveAt(index);
+                    return true;
+                }
+                return false;
+            }
+        }
+        #endregion
+    }
+
+    private class ObjectInfo
+    {
+        #region Private fields
+        private Object _data;
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+        public Object Data
+        {
+            get
+            {
+                return _data;
+            }
+        }
+        #endregion
+
+        #region Methods
+        public ObjectInfo(Object data)
+        {
+            _data = data;
+        }
+        #endregion
+    }
+
+    #region Private fields
+    private List<AtlasInfo> _atlases;
+    private List<ObjectInfo> _objectsAfterSearch;
+
+    private AtlasInfo _currentAtlas;
+    private CollectionInfo _currentCollection;
+    private ObjectInfo _currentObject;
+    private int _currentIndex;
 
     private Object _newObject;
     private string _newObjectName;
     private Type _newObjectType;
     private bool _isTypeScriptableObject;
     private string _pathToSaveNewObject;
+
     private SearchMode _currentSearchMode;
     private bool _isSearching;
 
@@ -48,6 +256,10 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     private VisualElement _searchToolbar;
     private VisualElement _backToolbar;
     private VisualElement _deleteObjectToolbar;
+
+    private event Action OnDisplayAtlases;
+    private event Action OnDisplayAtlas;
+    private event Action OnDisplayCollection;
 
     private static readonly string _styleResource = StaticInfo.StyleSheetsDirectory + "AtlasEditorWindowStyleSheet";
     private static readonly string _ussAtlasWindow = "atlas-window";
@@ -80,6 +292,11 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         }
     }
 
+    private void Update()
+    {
+        _searchToolbar.style.width = _leftPane.style.width;
+    }
+
     [MenuItem("Utils/Atlases")]
     public static void OpenWindow()
     {
@@ -87,11 +304,6 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         window.titleContent = new GUIContent("Atlases");
         window.minSize = new Vector2(700, 500);
         window.Show();
-    }
-
-    private void Update()
-    {
-        _searchToolbar.style.width = _leftPane.style.width;
     }
 
     public override void InitializeEditorWindow()
@@ -115,11 +327,34 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         _searchField.AddToClassList(_ussSearchField);
         _listView.AddToClassList(_ussListView);
 
-        _atlases = new List<AtlasSO>();
-        _collectionsPropertiesByAtlas = new Dictionary<AtlasSO, List<SerializedProperty>>();
-        _collectionObjectsByCollectionName = new Dictionary<string, List<Object>>();
-        _collectionElementTypeByCollectionName = new Dictionary<string, Type>();
-        _collectionObjectsAfterSearch = new List<Object>();
+        _atlases = new List<AtlasInfo>();
+        _objectsAfterSearch = new List<ObjectInfo>();
+
+        OnDisplayAtlases = () =>
+        {
+            ClearContent();
+            ResetSearch();
+            CancelObjectCreation();
+            _backToolbar.Clear();
+            _deleteObjectButton.SetEnabled(false);
+            _currentSearchMode = SearchMode.Global;
+        };
+        OnDisplayAtlas = () =>
+        {
+            ClearContent();
+            ResetSearch();
+            CancelObjectCreation();
+            _deleteObjectButton.SetEnabled(false);
+            _currentSearchMode = SearchMode.Collections;
+        };
+        OnDisplayCollection = () =>
+        {
+            ClearContent();
+            CancelObjectCreation();
+            _currentSearchMode = SearchMode.Collection;
+        };
+
+        GetAllData();
     }
 
     public override void ComposeToolbar()
@@ -131,23 +366,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
 
     public override void ComposeLeftPane()
     {
-        GetAllData();
         DisplayAllAtlases();
-    }
-
-    private void ClearContent()
-    {
-        _leftPane.Clear();
-        _rightPane.Clear();
-        DestroyImmediate(_newObject);
-    }
-
-    private void ResetSearch()
-    {
-        _isSearching = false;
-        _searchField.SetValueWithoutNotify("");
-        _listView.itemsSource = _currentCollectionObjects;
-        _listView.RefreshItems();
     }
 
     private void GetAllData()
@@ -156,108 +375,84 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         foreach (var atlasGuid in allAtlasesGuids)
         {
             AtlasSO atlas = AssetDatabase.LoadAssetAtPath<AtlasSO>(AssetDatabase.GUIDToAssetPath(atlasGuid));
-            _atlases.Add(atlas);
-            GetAllAtlasCollections(atlas);
+            _atlases.Add(new AtlasInfo(atlas));
         }
     }
 
-    private void GetAllAtlasCollections(AtlasSO atlas)
+    private void ClearContent()
     {
-        _collectionsPropertiesByAtlas.Add(atlas, new List<SerializedProperty>());
-        SerializedProperty iterator = new SerializedObject(atlas).GetIterator();
-        iterator.NextVisible(true);
-        while (iterator.NextVisible(false))
-        {
-            if (iterator.isArray && iterator.propertyType == SerializedPropertyType.Generic)
-            {
-                SerializedProperty collectionProperty = iterator.Copy();
-                _collectionsPropertiesByAtlas[atlas].Add(collectionProperty);
-                GetAllCollectionObjects(iterator);
-            }
-        }
+        _leftPane.Clear();
+        _rightPane.Clear();
     }
 
-    private void GetAllCollectionObjects(SerializedProperty collectionProperty)
+    private void ResetSearch()
     {
-        _collectionObjectsByCollectionName.Add(collectionProperty.name, new List<Object>());
-        _collectionElementTypeByCollectionName.Add(collectionProperty.name, GetCollectionElementType(collectionProperty));
-        for (int i = 0; i < collectionProperty.arraySize; i++)
-        {
-            Object collectionObject = collectionProperty.GetArrayElementAtIndex(i).objectReferenceValue;
-            if (collectionObject == null)
-            {
-                collectionProperty.DeleteArrayElementAtIndex(i--);
-                collectionProperty.serializedObject.ApplyModifiedProperties();
-                continue;
-            }
-            _collectionObjectsByCollectionName[collectionProperty.name].Add(collectionObject);
-        }
+        _isSearching = false;
+        _searchField.SetValueWithoutNotify("");
+        _listView.itemsSource = _currentCollection?.Objects;
+        _listView.RefreshItems();
     }
-    
+
+    private void CancelObjectCreation()
+    {
+        _createObjectButton?.SetEnabled(true);
+        DestroyImmediate(_newObject);
+    }
+
     private void DisplayAllAtlases()
     {
-        ClearContent();
-        _deleteObjectButton.SetEnabled(false);
-        _currentSearchMode = SearchMode.Global;
-        foreach (AtlasSO atlas in _atlases)
+        OnDisplayAtlases?.Invoke();
+        foreach (AtlasInfo atlasInfo in _atlases)
         {
-            AddAtlasButton(atlas);
+            AddAtlasButton(atlasInfo);
         }
     }
 
-    private void DisplayAtlas(AtlasSO atlas)
+    private void DisplayAtlas()
     {
-        ClearContent();
-        _deleteObjectButton.SetEnabled(false);
-        _currentSearchMode = SearchMode.Collections;
-        List<SerializedProperty> collectionsProperties = _collectionsPropertiesByAtlas[atlas];
-        foreach (SerializedProperty collectionProperty in collectionsProperties)
+        OnDisplayAtlas?.Invoke();
+        foreach (CollectionInfo collectionInfo in _currentAtlas.Collections)
         {
-            AddCollectionButton(atlas, collectionProperty);
+            AddCollectionButton(collectionInfo);
         }
 
-        InspectorElement atlasInspectorElement = new InspectorElement(atlas);
+        InspectorElement atlasInspectorElement = new InspectorElement(_currentAtlas.Atlas);
         _rightPane.Add(atlasInspectorElement);
     }
 
-    private void DisplayCollection(SerializedProperty collectionProperty)
+    private void DisplayCollection()
     {
-        ClearContent();
-        _currentSearchMode = SearchMode.Collection;
-        _currentCollectionObjects = _collectionObjectsByCollectionName[collectionProperty.name];
-
-        AddListViewForCollection(_currentCollectionObjects);
+        OnDisplayCollection?.Invoke();
+        AddListViewForCollection(_currentCollection.Objects);
         AddCreateObjectButton();
     }
 
     private void DisplaySearchResult()
     {
         ClearContent();
-        AddListViewForCollection(_collectionObjectsAfterSearch);
+        AddListViewForCollection(_objectsAfterSearch);
     }
 
-    private void AddAtlasButton(AtlasSO atlas)
+    private void AddAtlasButton(AtlasInfo atlasInfo)
     {
-        Button atlasButton = CreateButton(GetCorrectNameByObject(atlas), _ussContentButton);
+        Button atlasButton = CreateButton(GetCorrectName(atlasInfo.Atlas), _ussContentButton);
         atlasButton.clicked += () =>
         {
+            _currentAtlas = atlasInfo;
             AddBackToAtlasesButton();
-
-            _currentAtlas = atlas;
-            DisplayAtlas(atlas);
+            DisplayAtlas();
         };
         _leftPane.Add(atlasButton);
     }
 
-    private void AddCollectionButton(AtlasSO atlas, SerializedProperty collectionProperty)
+    private void AddCollectionButton(CollectionInfo collectionInfo)
     {
-        Button collectionButton = CreateButton(GetCorrectNameByObject(collectionProperty.displayName), _ussContentButton);
+        Button collectionButton = CreateButton(GetCorrectName(collectionInfo.Property.displayName), _ussContentButton);
         collectionButton.clicked += () =>
         {
-            AddBackToAtlasButton(atlas);
-
-            _currentCollectionProperty = collectionProperty;
-            DisplayCollection(collectionProperty);
+            _currentCollection = collectionInfo;
+            AddBackToAtlasButton();
+            DisplayCollection();
         };
         _leftPane.Add(collectionButton);
     }
@@ -265,22 +460,16 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     private void AddBackToAtlasesButton()
     {
         Button backToAtlasesButton = CreateButton("Back to atlases", _ussToolbarButton);
-        backToAtlasesButton.clicked += () =>
-        {
-            DisplayAllAtlases();
-            ResetSearch();
-            _backToolbar.Clear();
-        };
+        backToAtlasesButton.clicked += DisplayAllAtlases;
         _backToolbar.Add(backToAtlasesButton);
     }
 
-    private void AddBackToAtlasButton(AtlasSO atlas)
+    private void AddBackToAtlasButton()
     {
-        Button backToAtlasButton = CreateButton($"Back to {GetCorrectNameByObject(atlas).ToLower()}", _ussToolbarButton);
+        Button backToAtlasButton = CreateButton($"Back to {GetCorrectName(_currentAtlas.Atlas).ToLower()}", _ussToolbarButton);
         backToAtlasButton.clicked += () =>
         {
-            DisplayAtlas(atlas);
-            ResetSearch();
+            DisplayAtlas();
             _backToolbar.Remove(backToAtlasButton);
         };
         _backToolbar.Add(backToAtlasButton);
@@ -288,73 +477,8 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
 
     private void AddSearchObjectsField()
     {
-        _searchField.RegisterValueChangedCallback(evt =>
-        {
-            string searchString = evt.newValue.ToLower();
-            switch (_currentSearchMode)
-            {
-                case SearchMode.Global:
-                    {
-                        SearchGloabal(searchString);
-                    }
-                    break;
-                case SearchMode.Collections:
-                    {
-                        SearchCollections(searchString);
-                    }
-                    break;
-                case SearchMode.Collection:
-                    {
-                        SearchCollection(searchString);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        });
-        _searchField.RegisterCallback<FocusInEvent>(evt =>
-        {
-            if (_searchField.value == "")
-            {
-                switch (_currentSearchMode)
-                {
-                    case SearchMode.Global:
-                        {
-                            if (!_isSearching)
-                            {
-                                _isSearching = true;
-                                DisplaySearchResult();
-                                AddBackToAtlasesButton();
-                            }
-                            SearchGloabal("");
-                        }
-                        break;
-                    case SearchMode.Collections:
-                        {
-                            if (!_isSearching)
-                            {
-                                _isSearching = true;
-                                DisplaySearchResult();
-                                AddBackToAtlasButton(_currentAtlas);
-                            }
-                            SearchCollections("");
-                        }
-                        break;
-                    case SearchMode.Collection:
-                        {
-                            if (!_isSearching)
-                            {
-                                _isSearching = true;
-                                _listView.itemsSource = _collectionObjectsAfterSearch;
-                            }
-                            SearchCollection("");
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
+        _searchField.RegisterValueChangedCallback(evt => HandleSearchFieldChanged(evt));
+        _searchField.RegisterCallback<FocusInEvent>(evt => HandleStartSearch());
         _toolbar.Add(_searchToolbar);
         _searchToolbar.Add(_searchField);
     }
@@ -362,20 +486,19 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     private void AddDeleteObjectButton()
     {
         _deleteObjectButton = CreateButton("Delete object", _ussToolbarButton);
-        _deleteObjectButton.clicked += OnDeleteObject;
+        _deleteObjectButton.clicked += HandleDeleteObject;
         _toolbar.Add(_deleteObjectToolbar);
         _deleteObjectToolbar.Add(_deleteObjectButton);
     }
 
-    private void AddListViewForCollection(List<Object> itemSource)
+    private void AddListViewForCollection(List<ObjectInfo> itemSource)
     {
         _listView.itemsSource = itemSource;
         _listView.fixedItemHeight = 30;
-        _listView.makeItem += OnMakeObject;
-        _listView.bindItem += OnBindObject;
-        _listView.selectionChanged += OnObjectSelected;
-        _listView.selectedIndex = _selectedIndex;
-        _listView.selectionChanged += (items) => { _selectedIndex = _listView.selectedIndex; };
+        _listView.makeItem += HandleMakeObject;
+        _listView.bindItem += HandleBindObject;
+        _listView.selectionChanged += HandleObjectSelection;
+        _listView.selectedIndex = _currentIndex;
         _listView.ClearSelection();
         _listView.AddToSelection(0);
         _leftPane.Add(_listView);
@@ -383,28 +506,25 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
 
     private void AddCreateObjectButton()
     {
-        _pathToSaveNewObject = _currentAtlas.AtlasDataPath;
-        _newObjectType = _collectionElementTypeByCollectionName[_currentCollectionProperty.name];
         _createObjectButton = CreateButton("Create new object", _ussContentButton);
-        _createObjectButton.clicked += OnStartCreateObject;
+        _createObjectButton.clicked += HandleStartCreateObject;
         _leftPane.Add(_createObjectButton);
-        DisableCreateObjectButton();
     }
 
-    private void DisableCreateObjectButton()
+    private Button CreateButton(string name, string className)
     {
-        if (string.IsNullOrEmpty(_pathToSaveNewObject))
-        {
-            _createObjectButton.SetEnabled(false);
-        }
+        Button button = new Button();
+        button.AddToClassList(className);
+        button.text = name;
+        return button;
     }
 
-    private string GetCorrectNameByObject(Object obj)
+    private string GetCorrectName(Object obj)
     {
-        return GetCorrectNameByObject(obj.name);
+        return GetCorrectName(obj.name);
     }
 
-    private string GetCorrectNameByObject(string name)
+    private string GetCorrectName(string name)
     {
         name = Regex.Replace(name, @"(\p{Ll}) (\P{Ll})", m => m.Groups[1].Value + ' ' + m.Groups[2].Value.ToLower());
         return Regex.Replace(name, @"(\p{Ll})(\P{Ll})", m => m.Groups[1].Value + ' ' + m.Groups[2].Value.ToLower());
@@ -421,77 +541,58 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         };
     }
 
-    private Type GetCollectionElementType(SerializedProperty collectionProperty)
-    {
-        Type parentType = collectionProperty.serializedObject.targetObject.GetType();
-        BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
-        FieldInfo field = parentType.GetField(collectionProperty.propertyPath, fieldFlags);
-        Type type = field.FieldType.GetElementType();
-        return type;
-    }
-
-    private Button CreateButton(string name, string className)
-    {
-        Button button = new Button();
-        button.AddToClassList(className);
-        button.text = name;
-        return button;
-    }
-
-    private VisualElement OnMakeObject()
+    private VisualElement HandleMakeObject()
     {
         return new ListItem();
     }
 
-    private void OnBindObject(VisualElement item, int index)
+    private void HandleBindObject(VisualElement item, int index)
     {
-        ListItem cell = item as ListItem;
-        Object obj = _listView.itemsSource[index] as Object;
+        ObjectInfo obj = _listView.itemsSource[index] as ObjectInfo;
         if (obj == null)
         {
-            cell.RemoveFromHierarchy();
             return;
         }
-        cell.SetName(GetCorrectNameByObject(obj));
-        cell.SetIcon(GetIconByObject(obj));
+
+        ListItem cell = item as ListItem;
+        cell.SetName(GetCorrectName(obj.Data));
+        cell.SetIcon(GetIconByObject(obj.Data));
     }
 
-    private void OnObjectSelected(IEnumerable<object> selectedItems)
+    private void HandleObjectSelection(IEnumerable<object> selectedItems)
     {
-        _currentObject = selectedItems.FirstOrDefault() as Object;
-        if (_currentObject == null)
-        {
-            _rightPane.Clear();
-            _deleteObjectButton.SetEnabled(false);
-            return;
-        }
+        _currentIndex = _listView.selectedIndex;
+        _currentObject = selectedItems.FirstOrDefault() as ObjectInfo;
+        bool isItemSelected = _currentObject != null;
 
         _rightPane.Clear();
-        if (_createObjectButton != null)
-        {
-            _createObjectButton.SetEnabled(true);
-        }
-        _deleteObjectButton.SetEnabled(true);
-        DestroyImmediate(_newObject);
+        _deleteObjectButton.SetEnabled(isItemSelected);
 
-        InspectorElement inspectorElement = new InspectorElement(_currentObject);
-        inspectorElement.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
+        if (isItemSelected)
         {
-            _listView.RefreshItem(_selectedIndex);
-        });
-        _rightPane.Add(inspectorElement);
+            CancelObjectCreation();
+
+            InspectorElement inspectorElement = new InspectorElement(_currentObject.Data);
+            inspectorElement.RegisterCallback<SerializedPropertyChangeEvent>(evt => _listView.RefreshItem(_currentIndex));
+            _rightPane.Add(inspectorElement);
+        }
     }
 
-    private void OnStartCreateObject()
+    private void HandleStartCreateObject()
     {
-        ResetSearch();
+        _pathToSaveNewObject = _currentAtlas.Atlas.AtlasDataPath;
+        _newObjectType = _currentCollection.ElementType;
+        _isTypeScriptableObject = _currentCollection.IsScriptableObject;
+
         _createObjectButton.SetEnabled(false);
         _deleteObjectButton.SetEnabled(false);
-        _isTypeScriptableObject = _newObjectType.IsSubclassOf(typeof(ScriptableObject));
+        _listView.ClearSelection();
+
+        ResetSearch();
         StartCreateObject();
     }
 
-    private void OnCreateObject()
+    private void HandleCreateObject()
     {
         if (string.IsNullOrEmpty(_newObjectName))
         {
@@ -500,35 +601,107 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
 
         if (SaveObject())
         {
-            AddObjectToCurrentCollection(_newObject);
-            _newObject = null;
+            AddObjectToCurrentCollection();
             StartCreateObject();
         }
     }
 
-    private void OnDeleteObject()
+    private void HandleDeleteObject()
     {
-        int index = _currentCollectionObjects.IndexOf(_currentObject);
-        string objectType = _isTypeScriptableObject ? ".asset" : ".prefab";
-        string assetGUID = AssetDatabase.AssetPathToGUID(_currentAtlas.AtlasDataPath + _currentObject.name + objectType);
-        if (!string.IsNullOrEmpty(assetGUID))
+        foreach (AtlasInfo atlas in _atlases)
         {
-            AssetDatabase.DeleteAsset(_currentAtlas.AtlasDataPath + _currentObject.name + objectType);
-            _currentCollectionProperty.DeleteArrayElementAtIndex(index);
-            _currentCollectionProperty.serializedObject.ApplyModifiedProperties();
-            _currentCollectionObjects.Remove(_currentObject);
-            _listView.ClearSelection();
-            _listView.AddToSelection(index - 1);
-            _listView.RefreshItems();
+            if (atlas.Delete(_currentObject))
+            {
+                if (_isSearching)
+                {
+                    _objectsAfterSearch.Remove(_currentObject);
+                }
+                _listView.ClearSelection();
+                _listView.AddToSelection(_currentIndex - 1);
+                _listView.RefreshItems();
+                break;
+            }
         }
+    }
+
+    private void HandleStartSearch()
+    {
+        if (_searchField.value == "")
+        {
+            _objectsAfterSearch.Clear();
+            switch (_currentSearchMode)
+            {
+                case SearchMode.Global:
+                    {
+                        SearchGloabal("");
+                        if (!_isSearching)
+                        {
+                            _isSearching = true;
+                            DisplaySearchResult();
+                            AddBackToAtlasesButton();
+                        }
+                    }
+                    break;
+                case SearchMode.Collections:
+                    {
+                        SearchCollections(_currentAtlas, "");
+                        if (!_isSearching)
+                        {
+                            _isSearching = true;
+                            DisplaySearchResult();
+                            AddBackToAtlasButton();
+                        }
+                    }
+                    break;
+                case SearchMode.Collection:
+                    {
+                        SearchCollection(_currentCollection, "");
+                        if (!_isSearching)
+                        {
+                            _isSearching = true;
+                            _listView.itemsSource = _objectsAfterSearch;
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private void HandleSearchFieldChanged(ChangeEvent<string> evt)
+    {
+        string searchString = evt.newValue.ToLower();
+        _objectsAfterSearch.Clear();
+        switch (_currentSearchMode)
+        {
+            case SearchMode.Global:
+                {
+                    SearchGloabal(searchString);
+                }
+                break;
+            case SearchMode.Collections:
+                {
+                    SearchCollections(_currentAtlas, searchString);
+                }
+                break;
+            case SearchMode.Collection:
+                {
+                    SearchCollection(_currentCollection,searchString);
+                }
+                break;
+            default:
+                break;
+        }
+        _listView.ClearSelection();
+        _listView.AddToSelection(0);
     }
 
     private void StartCreateObject()
     {
-        _rightPane.Clear();
-        _listView.ClearSelection();
-
         _newObject = _isTypeScriptableObject ? CreateInstance(_newObjectType) : new GameObject("newPrefab", _newObjectType);
+
+        _rightPane.Clear();
 
         TextField objectNameTextField = new TextField();
         objectNameTextField.RegisterValueChangedCallback(evt =>
@@ -539,7 +712,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
 
         Button createObject = new Button();
         createObject.text = "Create";
-        createObject.clicked += OnCreateObject;
+        createObject.clicked += HandleCreateObject;
         _rightPane.Add(createObject);
 
         InspectorElement inspectorElement = new InspectorElement(_isTypeScriptableObject ? _newObject : (_newObject as GameObject).GetComponent(_newObjectType));
@@ -550,7 +723,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     {
         string assetName = _newObjectName.Replace(" ", "");
         string path = _pathToSaveNewObject + assetName;
-        if (_currentCollectionObjects.Find(obj => obj.name == assetName))
+        if (_currentCollection.FindByName(assetName) != null)
         {
             return false;
         }
@@ -571,56 +744,38 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         }
     }
 
-    private void AddObjectToCurrentCollection(Object item)
+    private void AddObjectToCurrentCollection()
     {
-        int arraySize = _currentCollectionProperty.arraySize;
-        _currentCollectionProperty.InsertArrayElementAtIndex(arraySize);
-        _currentCollectionProperty.GetArrayElementAtIndex(arraySize).objectReferenceValue = item;
-        _currentCollectionProperty.serializedObject.ApplyModifiedProperties();
-        _currentCollectionObjects.Add(item);
+        _currentCollection.AddObject(_newObject); 
+        _newObject = null;
         _listView.RefreshItems();
     }
 
     private void SearchGloabal(string searchString)
     {
-        _collectionObjectsAfterSearch.Clear();
-        foreach (List<Object> collectionObjects in _collectionObjectsByCollectionName.Values)
+        foreach (AtlasInfo atlas in _atlases)
         {
-            foreach (Object collectionObject in collectionObjects)
-            {
-                if (GetCorrectNameByObject(collectionObject).ToLower().Contains(searchString))
-                {
-                    _collectionObjectsAfterSearch.Add(collectionObject);
-                }
-            }
+            SearchCollections(atlas, searchString);
         }
         _listView.RefreshItems();
     }
 
-    private void SearchCollections(string searchString)
+    private void SearchCollections(AtlasInfo atlas, string searchString)
     {
-        _collectionObjectsAfterSearch.Clear();
-        foreach (SerializedProperty collectionProperty in _collectionsPropertiesByAtlas[_currentAtlas])
+        foreach (CollectionInfo collection in atlas.Collections)
         {
-            foreach (Object collectionObject in _collectionObjectsByCollectionName[collectionProperty.name])
-            {
-                if (GetCorrectNameByObject(collectionObject).ToLower().Contains(searchString))
-                {
-                    _collectionObjectsAfterSearch.Add(collectionObject);
-                }
-            }
+            SearchCollection(collection, searchString);
         }
         _listView.RefreshItems();
     }
 
-    private void SearchCollection(string searchString)
+    private void SearchCollection(CollectionInfo collection, string searchString)
     {
-        _collectionObjectsAfterSearch.Clear();
-        foreach (Object collectionObject in _currentCollectionObjects)
+        foreach (ObjectInfo value in collection.Objects)
         {
-            if (GetCorrectNameByObject(collectionObject).ToLower().Contains(searchString))
+            if (GetCorrectName(value.Data).ToLower().Contains(searchString))
             {
-                _collectionObjectsAfterSearch.Add(collectionObject);
+                _objectsAfterSearch.Add(value);
             }
         }
         _listView.RefreshItems();
