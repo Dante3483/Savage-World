@@ -14,7 +14,7 @@ public class PlantSO : BlockSO
     [SerializeField] private bool _isTopBlockSolid = false;
     [SerializeField] private int _chanceToSpawn;
     [SerializeField] private int _chanceToGrow;
-    [SerializeField] private bool _isBiomeSpecified;
+    [SerializeField] private bool _isBiomeSpecific;
     #endregion
 
     #region Public fields
@@ -126,16 +126,16 @@ public class PlantSO : BlockSO
         }
     }
 
-    public bool IsBiomeSpecified
+    public bool IsBiomeSpecific
     {
         get
         {
-            return _isBiomeSpecified;
+            return _isBiomeSpecific;
         }
 
         set
         {
-            _isBiomeSpecified = value;
+            _isBiomeSpecific = value;
         }
     }
     #endregion

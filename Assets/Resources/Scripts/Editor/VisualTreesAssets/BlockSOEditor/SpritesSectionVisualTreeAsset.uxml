@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <ui:ListView binding-path="_sprites" reorderable="true" show-foldout-header="true" header-title="Sprites" reorder-mode="Animated" show-add-remove-footer="true" name="sprites" style="display: none;" />
+    <uie:PropertyField binding-path="_sprites" />
+</ui:UXML>

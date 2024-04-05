@@ -1,6 +1,3 @@
-.atlas-window {
-}
-
 .atlas-window__toolbar {
     height: 30px;
     background-color: rgb(60, 60, 60);
@@ -51,6 +48,17 @@
 .atlas-window__right-pane {
     background-color: rgb(51, 50, 50);
     min-width: 400px;
+}
+
+.atlas-window__right-pane > InspectorElement{
+    padding-left: 5;
+    padding-right: 5;
+    padding-top: 5;
+    padding-bottom: 5;
+}
+
+.atlas-window__right-pane > InspectorElement > .unity-inspector-element__custom-inspector-container{
+    flex-grow: 1;
 }
 
 .atlas-window__list-view {

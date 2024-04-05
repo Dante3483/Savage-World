@@ -7,10 +7,10 @@ public class FurnitureSO : BlockSO
 {
     #region Private fields
     [SerializeField] private FurnitureBlocksID _id;
-    [SerializeField] private bool _canBePlacedOnSide;
-    [SerializeField] private bool _canBePlacedOnWall;
-    [SerializeField] private bool _canBePlacedOnFloor;
-    [SerializeField] private bool _canBePlacedOnCeiling;
+    [SerializeField] private bool _canPlaceOnSide;
+    [SerializeField] private bool _canPlaceOnWall;
+    [SerializeField] private bool _canPlaceOnFloor;
+    [SerializeField] private bool _canPlaceOnCeiling;
     #endregion
 
     #region Public fields
@@ -18,55 +18,55 @@ public class FurnitureSO : BlockSO
     #endregion
 
     #region Properties
-    public bool CanBePlacedOnSide
+    public bool CanPlaceOnSide
     {
         get
         {
-            return _canBePlacedOnSide;
+            return _canPlaceOnSide;
         }
 
         set
         {
-            _canBePlacedOnSide = value;
+            _canPlaceOnSide = value;
         }
     }
 
-    public bool CanBePlacedOnWall
+    public bool CanPlaceOnWall
     {
         get
         {
-            return _canBePlacedOnWall;
+            return _canPlaceOnWall;
         }
 
         set
         {
-            _canBePlacedOnWall = value;
+            _canPlaceOnWall = value;
         }
     }
 
-    public bool CanBePlacedOnFloor
+    public bool CanPlaceOnFloor
     {
         get
         {
-            return _canBePlacedOnFloor;
+            return _canPlaceOnFloor;
         }
 
         set
         {
-            _canBePlacedOnFloor = value;
+            _canPlaceOnFloor = value;
         }
     }
 
-    public bool CanBePlacedOnCeiling
+    public bool CanPlaceOnCeiling
     {
         get
         {
-            return _canBePlacedOnCeiling;
+            return _canPlaceOnCeiling;
         }
 
         set
         {
-            _canBePlacedOnCeiling = value;
+            _canPlaceOnCeiling = value;
         }
     }
     #endregion

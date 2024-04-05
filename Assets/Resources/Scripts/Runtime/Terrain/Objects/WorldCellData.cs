@@ -328,12 +328,12 @@ public struct WorldCellData
         return GameManager.Instance.BlocksAtlas.GetBlockById(_liquidId);
     }
 
-    public byte GetDustActionTime()
+    public uint GetDustActionTime()
     {
         return (_blockData as DustBlockSO).FallingTime;
     }
 
-    public byte GetLiquidActionTime()
+    public ushort GetLiquidActionTime()
     {
         return (GameManager.Instance.BlocksAtlas.GetBlockById(_liquidId) as LiquidBlockSO).FlowTime;
     }
@@ -377,12 +377,12 @@ public struct WorldCellData
 
     public void SetBlockDamagePercent(float damage)
     {
-        _blockDamagePercent = (byte)(Mathf.Min(damage / _blockData.MaximumDamage, 1) * 100);
+        _blockDamagePercent = (byte)(Mathf.Min(damage / _blockData.DamageToBreak, 1) * 100);
     }
 
     public void SetWallDamagePercent(float damage)
     {
-        _wallDamagePercent = (byte)(Mathf.Min(damage / WallData.MaximumDamage, 1) * 100);
+        _wallDamagePercent = (byte)(Mathf.Min(damage / WallData.DamageToBreak, 1) * 100);
     }
 
     public void MakeUnbreakable()

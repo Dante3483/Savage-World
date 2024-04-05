@@ -53,8 +53,8 @@ namespace LightSystem
             }
             else
             {
-                data.BlockLightValue = globalWorldData[dx, dy].BlockData.LightValue;
-                data.WallLightValue = globalWorldData[dx, dy].WallData.LightValue;
+                data.BlockLightIntensity = globalWorldData[dx, dy].BlockData.LightIntensity;
+                data.WallLightIntensity = globalWorldData[dx, dy].WallData.LightIntensity;
             }
 
             data.Flags = 0;

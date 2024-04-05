@@ -161,7 +161,7 @@ public class Terrain : MonoBehaviour
             ref WorldCellData rightBlock = ref WorldDataManager.Instance.GetWorldCellData(x + 1, y);
             #endregion
 
-            if (!block.BlockData.Waterproof && block.IsLiquid())
+            if (!block.BlockData.IsWaterproof && block.IsLiquid())
             {
                 CreateBlock(x, y, airBlock);
             }

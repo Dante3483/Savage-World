@@ -6,7 +6,7 @@ public class LiquidBlockSO : BlockSO
 {
     #region Private fields
     [SerializeField] private LiquidBlocksID _id;
-    [SerializeField] private byte _flowTime;
+    [SerializeField] private ushort _flowTime;
     #endregion
 
     #region Public fields
@@ -14,7 +14,7 @@ public class LiquidBlockSO : BlockSO
     #endregion
 
     #region Properties
-    public byte FlowTime
+    public ushort FlowTime
     {
         get
         {

@@ -1,6 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <Style src="project://database/Assets/Resources/Scripts/Editor/StyleSheets/AtlasEditorWindowStyleSheet.uss?fileID=7433441132597879392&amp;guid=093eeeeecd465d54ea2c0ff17cdbfcfc&amp;type=3#AtlasEditorWindowStyleSheet" />
-    <Style src="project://database/Assets/Resources/Scripts/Editor/StyleSheets/ListItemStyleSheet.uss?fileID=7433441132597879392&amp;guid=993cb49d4bba7e3408f8d37d178248d5&amp;type=3#ListItemStyleSheet" />
-    <ui:Button text="Button" parse-escape-sequences="true" display-tooltip-when-elided="true" />
-    <uie:ToolbarSearchField class="atlas-window__search-field" />
-</ui:UXML>

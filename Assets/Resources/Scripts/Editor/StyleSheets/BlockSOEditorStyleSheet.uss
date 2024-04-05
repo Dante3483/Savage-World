@@ -1,0 +1,51 @@
+.block__background {
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgb(33, 33, 33);
+    border-right-color: rgb(33, 33, 33);
+    border-top-color: rgb(33, 33, 33);
+    border-bottom-color: rgb(33, 33, 33);
+    background-color: rgb(64, 63, 63);
+}
+
+#tab {
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    flex-grow: 1;
+}
+
+#tab :checked {
+    background-color: rgb(64, 63, 63);
+    border-bottom-width: 0;
+}
+
+#tab > VisualElement {
+    justify-content: center;
+    align-items: center;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgb(33, 33, 33);
+    border-right-color: rgb(33, 33, 33);
+    border-top-color: rgb(33, 33, 33);
+    border-bottom-color: rgb(33, 33, 33);
+}
+
+#tab > VisualElement > VisualElement {
+    display: none;
+}
+
+#tab > VisualElement > Label {
+    color: rgb(210, 210, 210);
+    -unity-text-align: upper-center;
+}
+
+#creation-block-name #unity-text-input {
+}
+
+#advanced-tab-content #unity-content-viewport {
+    margin-right: 5px;
+}

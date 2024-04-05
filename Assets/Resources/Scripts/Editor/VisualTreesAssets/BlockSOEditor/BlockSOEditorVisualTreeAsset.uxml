@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <Style src="project://database/Assets/Resources/Scripts/Editor/StyleSheets/BlockSOEditorStyleSheet.uss?fileID=7433441132597879392&amp;guid=95bb2249b2bf613428db9261601094fc&amp;type=3#BlockSOEditorStyleSheet" />
+    <Style src="project://database/Assets/Resources/Scripts/Editor/StyleSheets/TabGroupStyleSheet.uss?fileID=7433441132597879392&amp;guid=6f82065aa98985347b8f606fd71b354b&amp;type=3#TabGroupStyleSheet" />
+    <ui:VisualElement name="basic" style="flex-direction: row; margin-bottom: 5px; min-height: 100px;">
+        <ObjectPreview name="basic-preview" style="width: 100px; height: 100px; margin-right: 5px;" />
+        <ui:VisualElement name="basic-properties" class="block__background" style="flex-grow: 1; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 5px; align-items: stretch; justify-content: space-between; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px; height: 100px;">
+            <ui:EnumField label="Id" type="SolidBlocksID, SavageWorld.Runtime" name="id" binding-path="_id" />
+            <ui:FloatField label="Light Intensity" value="42,2" name="light-intensity" binding-path="_lightIntensity" />
+            <uie:ColorField label="Light Color" value="RGBA(0.000, 1.000, 1.000, 1.000)" name="light-color" binding-path="_lightColor" />
+            <uie:ColorField label="Color On Map" value="RGBA(0.000, 1.000, 1.000, 1.000)" name="color-on-map" binding-path="_colorOnMap" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <TabGroup name="advanced" style="margin-bottom: 5px; flex-grow: 1;" />
+    <ui:VisualElement name="creation" focusable="false" style="justify-content: center; flex-direction: row; min-height: 30px;">
+        <ui:TextField picking-mode="Ignore" value="Block name" name="creation-block-name" style="flex-grow: 1; margin-left: 0; margin-right: 5px; margin-top: 0; margin-bottom: 0;" />
+        <ui:Button text="Create new object" parse-escape-sequences="true" display-tooltip-when-elided="true" name="creation-create-button" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; height: 30px; color: rgb(210, 210, 210); background-color: rgb(64, 63, 63);" />
+    </ui:VisualElement>
+</ui:UXML>

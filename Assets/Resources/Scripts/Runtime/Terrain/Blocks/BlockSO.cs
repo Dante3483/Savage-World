@@ -7,14 +7,14 @@ using UnityEngine;
 public abstract class BlockSO : ScriptableObject
 {
     #region Private fields
+    [SerializeField] private float _lightIntensity;
+    [SerializeField] private Color32 _lightColor = Color.black;
     [SerializeField] private List<Sprite> _sprites;
     [SerializeField] private ItemSO _drop;
     [SerializeField] private Color _colorOnMap = Color.white;
-    [SerializeField] private float _lightValue;
-    [SerializeField] private float _maximumDamage;
-    [SerializeField] private Color32 _lightColor = Color.black;
+    [SerializeField] private float _damageToBreak;
     [SerializeField] private bool _isSurfaceLight;
-    [SerializeField] private bool _waterproof = true;
+    [SerializeField] private bool _isWaterproof = true;
     protected BlockTypes _type;
     #endregion
 
@@ -57,16 +57,16 @@ public abstract class BlockSO : ScriptableObject
         }
     }
 
-    public float LightValue
+    public float LightIntensity
     {
         get
         {
-            return _lightValue;
+            return _lightIntensity;
         }
 
         set
         {
-            _lightValue = value;
+            _lightIntensity = value;
         }
     }
 
@@ -96,16 +96,16 @@ public abstract class BlockSO : ScriptableObject
         }
     }
 
-    public bool Waterproof
+    public bool IsWaterproof
     {
         get
         {
-            return _waterproof;
+            return _isWaterproof;
         }
 
         set
         {
-            _waterproof = value;
+            _isWaterproof = value;
         }
     }
 
@@ -122,11 +122,11 @@ public abstract class BlockSO : ScriptableObject
         }
     }
 
-    public float MaximumDamage
+    public float DamageToBreak
     {
         get
         {
-            return _maximumDamage;
+            return _damageToBreak;
         }
     }
     #endregion

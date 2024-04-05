@@ -7,8 +7,8 @@
 
 struct WorldCellData
 {
-    float wallLightValue;
-    float blockLightValue;
+    float wallLightIntensity;
+    float blockLightIntensity;
     uint wallLightColor;
     uint blockLightColor;
     int flags;
@@ -41,37 +41,37 @@ float4 ParseColor(uint color)
 [numthreads(250, 1, 1)]
 void FillLightBrightness(uint3 id : SV_DispatchThreadID)
 {
-    float wallLightValue = _worldData[id.x + id.y].wallLightValue;
-    float blockLightValue = _worldData[id.x + id.y].blockLightValue;
+    float wallLightIntensity = _worldData[id.x + id.y].wallLightIntensity;
+    float blockLightIntensity = _worldData[id.x + id.y].blockLightIntensity;
     int isSolid = _worldData[id.x + id.y].flags & 1;
     int isFullLiquidBlock = _worldData[id.x + id.y].flags & 2;
     int isDayLightBlock = _worldData[id.x + id.y].flags & 4;
     
     if (isSolid != 0 || isFullLiquidBlock != 0)
     {
-        _brightness[id.x + id.y] = blockLightValue;
+        _brightness[id.x + id.y] = blockLightIntensity;
     }
     else if (isDayLightBlock != 0)
     {
-        wallLightValue = lerp(0, 1, _dayLightValue);
-        if (wallLightValue >= blockLightValue)
+        wallLightIntensity = lerp(0, 1, _dayLightValue);
+        if (wallLightIntensity >= blockLightIntensity)
         {
-            _brightness[id.x + id.y] = wallLightValue;
+            _brightness[id.x + id.y] = wallLightIntensity;
         }
         else
         {
-            _brightness[id.x + id.y] = blockLightValue;
+            _brightness[id.x + id.y] = blockLightIntensity;
         }
     }
     else
     {
-        if (wallLightValue > blockLightValue)
+        if (wallLightIntensity > blockLightIntensity)
         {
-            _brightness[id.x + id.y] = wallLightValue;
+            _brightness[id.x + id.y] = wallLightIntensity;
         }
         else
         {
-            _brightness[id.x + id.y] = blockLightValue;
+            _brightness[id.x + id.y] = blockLightIntensity;
         }
     }
 }

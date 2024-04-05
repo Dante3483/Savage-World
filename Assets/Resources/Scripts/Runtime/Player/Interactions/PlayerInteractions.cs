@@ -157,7 +157,7 @@ public class PlayerInteractions : MonoBehaviour
             {
                 ref WorldCellData block = ref WorldDataManager.Instance.GetWorldCellData(blockPosition.x, blockPosition.y);
                 _miningDamageController.AddDamageToBlock(blockPosition, _blockDamageMultiplier);
-                if (_miningDamageController.IsBlockDamageReachedMaximum(blockPosition, block.BlockData.MaximumDamage))
+                if (_miningDamageController.IsBlockDamageReachedMaximum(blockPosition, block.BlockData.DamageToBreak))
                 {
                     _miningDamageController.RemoveDamageFromBlocks(blockPosition);
                     CreateDrop(new Vector3(blockPosition.x + 0.5f, blockPosition.y + 0.5f), block.BlockData.Drop, 1);
@@ -183,7 +183,7 @@ public class PlayerInteractions : MonoBehaviour
             {
                 ref WorldCellData block = ref WorldDataManager.Instance.GetWorldCellData(wallPosition.x, wallPosition.y);
                 _miningDamageController.AddDamageToWall(wallPosition, _wallDamageMultiplier);
-                if (_miningDamageController.IsWallDamageReachedMaximum(wallPosition, block.WallData.MaximumDamage))
+                if (_miningDamageController.IsWallDamageReachedMaximum(wallPosition, block.WallData.DamageToBreak))
                 {
                     _miningDamageController.RemoveDamageFromWalls(wallPosition);
                     CreateDrop(new Vector3(wallPosition.x + 0.5f, wallPosition.y + 0.5f), block.WallData.Drop, 1);

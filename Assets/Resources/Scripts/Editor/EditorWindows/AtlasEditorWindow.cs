@@ -318,7 +318,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     public override void InitializeEditorWindow()
     {
         base.InitializeEditorWindow();
-        _rightPane = new ScrollView(ScrollViewMode.Vertical);
+        //_rightPane = new ScrollView(ScrollViewMode.Vertical);
         _searchField = new ToolbarSearchField();
         _listView = new ListView();
         _searchToolbar = new VisualElement();

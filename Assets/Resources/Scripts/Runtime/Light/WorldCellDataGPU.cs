@@ -17,7 +17,7 @@ namespace LightSystem
         #endregion
 
         #region Properties
-        public float WallLightValue
+        public float WallLightIntensity
         {
             get
             {
@@ -30,7 +30,7 @@ namespace LightSystem
             }
         }
 
-        public float BlockLightValue
+        public float BlockLightIntensity
         {
             get
             {

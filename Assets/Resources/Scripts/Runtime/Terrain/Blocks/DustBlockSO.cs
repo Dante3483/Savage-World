@@ -5,7 +5,7 @@ public class DustBlockSO : BlockSO
 {
     #region Private fields
     [SerializeField] private DustBlocksID _id;
-    [SerializeField] private byte _fallingTime;
+    [SerializeField] private uint _fallingTime;
     #endregion
 
     #region Public fields
@@ -13,7 +13,7 @@ public class DustBlockSO : BlockSO
     #endregion
 
     #region Properties
-    public byte FallingTime
+    public uint FallingTime
     {
         get
         {

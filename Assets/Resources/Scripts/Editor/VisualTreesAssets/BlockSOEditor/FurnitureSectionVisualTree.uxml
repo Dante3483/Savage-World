@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <ui:Toggle label="Can Place On Side" name="can-be-placed-on-side" binding-path="_canPlaceOnSide" style="height: 20px; margin-top: 0; margin-right: 0; margin-bottom: 5px; margin-left: 0;" />
+    <ui:Toggle label="Can Place On Wall" name="can-be-placed-on-wall" binding-path="_canPlaceOnWall" style="height: 20px; margin-top: 0; margin-right: 0; margin-bottom: 5px; margin-left: 0;" />
+    <ui:Toggle label="Can Place On Floor" name="can-be-placed-on-Floor" binding-path="_canPlaceOnFloor" style="height: 20px; margin-top: 0; margin-right: 0; margin-bottom: 5px; margin-left: 0;" />
+    <ui:Toggle label="Can Place On Ceiling" name="can-be-placed-on-Ceiling" binding-path="_canPlaceOnCeiling" style="height: 20px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+</ui:UXML>

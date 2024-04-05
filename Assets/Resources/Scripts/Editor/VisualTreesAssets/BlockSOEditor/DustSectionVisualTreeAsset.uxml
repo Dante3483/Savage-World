@@ -1,0 +1,3 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <ui:UnsignedIntegerField label="Falling Time" value="0" name="falling-time" binding-path="_fallingTime" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; height: 20px;" />
+</ui:UXML>
