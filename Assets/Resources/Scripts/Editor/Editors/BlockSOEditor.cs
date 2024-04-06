@@ -28,6 +28,7 @@ public class BlockSOEditor : ObjectsCustomEditor
     private VisualElement _otherSection;
     private TabGroup _advancedTabGroup;
     private ObjectPreview _preview;
+    private ListView _spritesListView;
 
     private SerializedProperty _sprites;
     #endregion
@@ -46,19 +47,25 @@ public class BlockSOEditor : ObjectsCustomEditor
         _editorTreeAsset.CloneTree(_root);
         AddPreview();
         AddSections();
+        SetUpList();
     }
 
     private void AddPreview()
     {
         _preview = _root.Q<ObjectPreview>("basic-preview");
-        UpdatePreview();
     }
 
-    private void UpdatePreview()
+    private void UpdatePreview(int spriteIndex)
     {
         serializedObject.Update();
-        Sprite firstSprite = _sprites.arraySize > 0 ? _sprites.GetArrayElementAtIndex(0).objectReferenceValue as Sprite : null;
-        _preview.SetPreview(firstSprite);
+        if (_sprites.arraySize == 0)
+        {
+            _preview.SetSprite(null);
+            return;
+        }
+        spriteIndex = spriteIndex == -1 ? 0 : spriteIndex;
+        Sprite firstSprite = _sprites.GetArrayElementAtIndex(spriteIndex).objectReferenceValue as Sprite;
+        _preview.SetSprite(firstSprite);
     }
 
     private void AddSections()
@@ -72,13 +79,13 @@ public class BlockSOEditor : ObjectsCustomEditor
         _otherSectionTreeAsset.CloneTree(_otherSection);
 
         _advancedTabGroup = _root.Q<TabGroup>("advanced");
-        _advancedTabGroup.AddTab("Sprites", _spritesSection);
-        _advancedTabGroup.AddTab("Breaking", _breakingSection, true);
-        _advancedTabGroup.AddTab("Dust", _dustSection, true);
-        _advancedTabGroup.AddTab("Liquid", _liquidSection, true);
-        _advancedTabGroup.AddTab("Plant", _plantSection, true);
-        _advancedTabGroup.AddTab("Furniture", _furnitureSection, true);
-        _advancedTabGroup.AddTab("Other", _otherSection);
+        _advancedTabGroup.AddTab("Sprites", _spritesSection, serializedObject);
+        _advancedTabGroup.AddTab("Breaking", _breakingSection, serializedObject, true);
+        _advancedTabGroup.AddTab("Dust", _dustSection, serializedObject, true);
+        _advancedTabGroup.AddTab("Liquid", _liquidSection, serializedObject, true);
+        _advancedTabGroup.AddTab("Plant", _plantSection, serializedObject, true);
+        _advancedTabGroup.AddTab("Furniture", _furnitureSection, serializedObject, true);
+        _advancedTabGroup.AddTab("Other", _otherSection, serializedObject);
 
         switch (serializedObject.targetObject)
         {
@@ -113,6 +120,7 @@ public class BlockSOEditor : ObjectsCustomEditor
             case DustBlockSO:
             case PlantSO:
             case FurnitureSO:
+            case WallSO:
                 {
                     _advancedTabGroup.ShowTab("Breaking");
                 }
@@ -121,10 +129,32 @@ public class BlockSOEditor : ObjectsCustomEditor
                 break;
         }
 
-        var scroller = _spritesSection.Q<Scroller>(className: "unity-scroller--vertical");
-        scroller.style.display = DisplayStyle.Flex;
-        Debug.Log(scroller);
         _otherSection.SetEnabled(false);
+    }
+
+    private void SetUpList()
+    {
+        _spritesListView = _spritesSection.Q<ListView>("sprites");
+        _spritesListView.itemsSourceChanged += HandleSpritesSourceChanged;
+        _spritesListView.selectionChanged += (selection) => UpdatePreview(_spritesListView.selectedIndex);
+        _spritesListView.RegisterCallback<SerializedPropertyChangeEvent>(evt => UpdatePreview(_spritesListView.selectedIndex));
+    }
+
+    private void HandleSpritesSourceChanged()
+    {
+        _spritesListView.selectedIndex = 0;
+        _spritesListView.viewController.itemsSourceSizeChanged += HandleSpriteSourceSizeChanged;
+    }
+
+    private void HandleSpriteSourceSizeChanged()
+    {
+        UpdatePreview(0);
+        if (_sprites.arraySize - 1 == 0)
+        {
+            using SerializedPropertyChangeEvent serializedPropertyChangeEvent = SerializedPropertyChangeEvent.GetPooled(_sprites);
+            serializedPropertyChangeEvent.target = _root;
+            _root.SendEvent(serializedPropertyChangeEvent);
+        }
     }
 
     public override void FindSerializedProperties()

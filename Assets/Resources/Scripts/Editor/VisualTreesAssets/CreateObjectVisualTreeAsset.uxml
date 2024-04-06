@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <ui:VisualElement name="create-object" focusable="false" style="justify-content: center; flex-direction: row; min-height: 30px;">
+        <ui:TextField picking-mode="Ignore" name="object-name" style="flex-grow: 1; margin-left: 0; margin-right: 5px; margin-top: 0; margin-bottom: 0;" />
+        <ui:Button text="Create new" parse-escape-sequences="true" display-tooltip-when-elided="true" name="create-button" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; height: 30px; color: rgb(210, 210, 210); background-color: rgb(64, 63, 63);" />
+    </ui:VisualElement>
+</ui:UXML>

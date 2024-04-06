@@ -40,12 +40,12 @@ public class ObjectPreview : VisualElement
         Add(_preview);
     }
 
-    public void SetPreview(Sprite preview)
+    public void SetSprite(Sprite preview)
     {
         _preview.sprite = preview;
     }
 
-    public void SetPreview(Texture preview)
+    public void SetTexture(Texture preview)
     {
         _preview.image = preview;
     }

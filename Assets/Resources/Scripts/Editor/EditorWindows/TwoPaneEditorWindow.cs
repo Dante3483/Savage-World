@@ -51,6 +51,27 @@ public abstract class TwoPaneEditorWindow : EditorWindow
         _splitView.Add(_rightPane);
     }
 
+    public virtual void ComposeToolbar()
+    {
+
+    }
+
+    public virtual void ComposeLeftPane()
+    {
+
+    }
+
+    public virtual void ComposeRightPane()
+    {
+
+    }
+
+    protected void ClearContent()
+    {
+        _leftPane.Clear();
+        _rightPane.Clear();
+    }
+
     protected void HideToolbar()
     {
         _toolbar.style.display = DisplayStyle.None;
@@ -79,21 +100,6 @@ public abstract class TwoPaneEditorWindow : EditorWindow
     protected void ShowRightPane()
     {
         _rightPane.style.display = DisplayStyle.Flex;
-    }
-
-    public virtual void ComposeToolbar()
-    {
-
-    }
-
-    public virtual void ComposeLeftPane()
-    {
-
-    }
-
-    public virtual void ComposeRightPane()
-    {
-
     }
     #endregion
 }

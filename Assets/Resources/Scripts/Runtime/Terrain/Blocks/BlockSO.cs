@@ -15,7 +15,7 @@ public abstract class BlockSO : ScriptableObject
     [SerializeField] private float _damageToBreak;
     [SerializeField] private bool _isSurfaceLight;
     [SerializeField] private bool _isWaterproof = true;
-    protected BlockTypes _type;
+    [SerializeField] protected BlockTypes _type;
     #endregion
 
     #region Public fields

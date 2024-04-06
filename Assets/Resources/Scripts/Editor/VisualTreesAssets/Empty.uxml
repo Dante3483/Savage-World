@@ -1,5 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <Style src="project://database/Assets/Resources/Scripts/Editor/StyleSheets/TabGroupStyleSheet.uss?fileID=7433441132597879392&amp;guid=6f82065aa98985347b8f606fd71b354b&amp;type=3#TabGroupStyleSheet" />
-    <Style src="project://database/Assets/Resources/Scripts/Editor/StyleSheets/BlockSOEditorStyleSheet.uss?fileID=7433441132597879392&amp;guid=95bb2249b2bf613428db9261601094fc&amp;type=3#BlockSOEditorStyleSheet" />
-    <TabGroup />
-</ui:UXML>

@@ -46,6 +46,7 @@
 }
 
 .atlas-window__right-pane {
+    padding-top: 5px;
     background-color: rgb(51, 50, 50);
     min-width: 400px;
 }
@@ -53,7 +54,7 @@
 .atlas-window__right-pane > InspectorElement{
     padding-left: 5;
     padding-right: 5;
-    padding-top: 5;
+    padding-top: 0;
     padding-bottom: 5;
 }
 

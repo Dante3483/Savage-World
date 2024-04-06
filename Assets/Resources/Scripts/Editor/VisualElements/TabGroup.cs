@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Unity.VisualScripting.YamlDotNet.Core.Tokens;
+using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -22,6 +24,8 @@ public class TabGroup : VisualElement
     private static readonly string _ussTab = _ussTabGroup + "__tab";
     private static readonly string _ussTabSelected = _ussTabGroup + "__tab-selected";
     private static readonly string _ussContent = _ussTabGroup + "__content";
+
+    private SerializedObject _serializedObject;
 
     private Dictionary<Button, VisualElement> _contentByTab;
     private List<Button> _tabsList;
@@ -58,7 +62,7 @@ public class TabGroup : VisualElement
         _tabsList = new List<Button>();
     }
 
-    public void AddTab(Button tab, VisualElement content, bool hideByDefault = false)
+    public void AddTab(Button tab, VisualElement content, SerializedObject serializedObject, bool hideByDefault = false)
     {
         _tabsList.Add(tab);
         _contentByTab.TryAdd(tab, content);
@@ -66,6 +70,8 @@ public class TabGroup : VisualElement
         tab.AddToClassList(_ussTab);
         tab.clicked += () => SelectTab(tab);
         _tabs.Add(tab);
+
+        content.Bind(serializedObject);
 
         if (hideByDefault)
         {
@@ -77,11 +83,11 @@ public class TabGroup : VisualElement
         }
     }
 
-    public void AddTab(string tabName, VisualElement content, bool hideByDefault = false)
+    public void AddTab(string tabName, VisualElement content, SerializedObject serializedObject, bool hideByDefault = false)
     {
         Button tab = new Button();
         tab.text = tabName;
-        AddTab(tab, content, hideByDefault);
+        AddTab(tab, content, serializedObject, hideByDefault);
     }
 
     public void SelectTab(Button tab)
@@ -94,10 +100,12 @@ public class TabGroup : VisualElement
         {
             tab.AddToClassList(_ussTabSelected);
 
-            _selectedTab?.RemoveFromClassList(_ussTabSelected);
+            if (_selectedTab != null)
+            {
+                _selectedTab.RemoveFromClassList(_ussTabSelected);
+                _contentByTab[_selectedTab].RemoveFromHierarchy();
+            }
             _selectedTab = tab;
-
-            _content.Clear();
             _content.Add(_contentByTab[tab]);
         }
     }
