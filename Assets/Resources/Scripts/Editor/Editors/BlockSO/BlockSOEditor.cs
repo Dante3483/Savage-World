@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 [CustomEditor(typeof(BlockSO), true)]
 [CanEditMultipleObjects]
-public class BlockSOEditor : ObjectsCustomEditor
+public class BlockSOEditor : ObjectsEditor
 {
     #region Private fields
     [SerializeField] private VisualTreeAsset _editorTreeAsset;

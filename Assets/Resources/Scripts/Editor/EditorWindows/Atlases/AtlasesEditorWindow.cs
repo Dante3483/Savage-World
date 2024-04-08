@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-public class AtlasEditorWindow : TwoPaneEditorWindow
+public class AtlasesEditorWindow : EditorWindow
 {
     private enum SearchMode
     {
@@ -307,7 +307,22 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     }
 
     #region Private fields
-    [SerializeField] private VisualTreeAsset _createObjectTreeAsset;
+    [SerializeField] private VisualTreeAsset _visualTree;
+    [SerializeField] private StyleSheet _styleSheet;
+
+    private VisualElement _root;
+    private VisualElement _leftPanelContent;
+    private VisualElement _rightPanelContent;
+    private VisualElement _createObjectContent;
+    private ToolbarSearchField _searchField;
+    private Button _backToAtlasesButton;
+    private Button _backToAtlasButton;
+    private Button _deleteObjectButton;
+    private ListView _listView;
+    private Button _startCreateObjectButton;
+    private TextField _newObjectNameTextField;
+    private Button _createObjectButton;
+
     private List<AtlasInfo> _atlases;
     private List<ObjectInfo> _objectsAfterSearch;
 
@@ -324,31 +339,10 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
 
     private SearchMode _currentSearchMode;
     private bool _isSearching;
-    
-    private ToolbarSearchField _searchField;
-    private ListView _listView;
-    private Button _deleteObjectButton;
-    private Button _createObjectButton;
-    private VisualElement _searchToolbar;
-    private VisualElement _backToolbar;
-    private VisualElement _deleteObjectToolbar;
 
     private event Action OnDisplayAtlases;
     private event Action OnDisplayAtlas;
     private event Action OnDisplayCollection;
-
-    private static readonly string _styleResource = StaticInfo.StyleSheetsDirectory + "AtlasEditorWindowStyleSheet";
-    private static readonly string _ussAtlasWindow = "atlas-window";
-    private static readonly string _ussToolbar = _ussAtlasWindow + "__toolbar";
-    private static readonly string _ussSearchToolbar = _ussAtlasWindow + "__toolbar-search";
-    private static readonly string _ussBackToolbar = _ussAtlasWindow + "__toolbar-back";
-    private static readonly string _ussDeleteObjectToolbar = _ussAtlasWindow + "__toolbar-delete-object";
-    private static readonly string _ussLeftPane = _ussAtlasWindow + "__left-pane";
-    private static readonly string _ussRightPane = _ussAtlasWindow + "__right-pane";
-    private static readonly string _ussSearchField = _ussAtlasWindow + "__search-field";
-    private static readonly string _ussListView = _ussAtlasWindow + "__list-view";
-    private static readonly string _ussToolbarButton = _ussAtlasWindow + "__toolbar-button";
-    private static readonly string _ussContentButton = _ussAtlasWindow + "__content-button";
     #endregion
 
     #region Public fields
@@ -360,6 +354,14 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     #endregion
 
     #region Methods
+    [MenuItem("Utils/Atlases")]
+    public static void ShowWindow()
+    {
+        AtlasesEditorWindow wnd = GetWindow<AtlasesEditorWindow>();
+        wnd.titleContent = new GUIContent("Atlases");
+        wnd.minSize = new Vector2(700, 500);
+    }
+
     private void OnDestroy()
     {
         if (_newObject != null)
@@ -370,78 +372,108 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
 
     private void Update()
     {
-        _searchToolbar.style.width = _leftPane.style.width;
+        _searchField.parent.style.width = _leftPanelContent.parent.style.width;
     }
 
-    [MenuItem("Utils/Atlases")]
-    public static void OpenWindow()
+    public void CreateGUI()
     {
-        AtlasEditorWindow window = GetWindow<AtlasEditorWindow>();
-        window.titleContent = new GUIContent("Atlases");
-        window.minSize = new Vector2(700, 500);
-        window.Show();
+        _root = rootVisualElement;
+        _visualTree.CloneTree(_root);
+
+        FindElements();
+        InitializeData();
+        DisplayAllAtlases();
     }
 
-    public override void InitializeEditorWindow()
+    /// <summary>
+    /// Searches for all required elements in root
+    /// </summary>
+    private void FindElements()
     {
-        base.InitializeEditorWindow();
-        _searchField = new ToolbarSearchField();
+        VisualElement leftPanel = _root.Q("left-panel");
+        VisualElement rightPanel = _root.Q("right-panel");
+        _leftPanelContent = leftPanel.Q("content");
+        _rightPanelContent = rightPanel.Q("content");
+        _searchField = _root.Q<ToolbarSearchField>("search-field");
+        _backToAtlasesButton = _root.Q<Button>("back-to-atlases-button");
+        _backToAtlasButton = _root.Q<Button>("back-to-atlas-button");
+        _deleteObjectButton = _root.Q<Button>("delete-button");
+        _startCreateObjectButton = leftPanel.Q<Button>("start-create-button");
+        _createObjectContent = rightPanel.Q("create-object-content");
+        _newObjectNameTextField = _createObjectContent.Q<TextField>("name");
+        _createObjectButton = _createObjectContent.Q<Button>("create-button");
+
+        SetUpListView();
+        SetUpEventsHandlers();
+    }
+
+    /// <summary>
+    /// Set up left panel list view
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    private void SetUpListView()
+    {
         _listView = new ListView();
-        _searchToolbar = new VisualElement();
-        _backToolbar = new VisualElement();
-        _deleteObjectToolbar = new VisualElement();
+        _listView.fixedItemHeight = 30;
+        _listView.selectionType = SelectionType.Multiple;
+        _listView.makeItem += HandleMakeObject;
+        _listView.bindItem += HandleBindObject;
+        _listView.selectionChanged += HandleObjectSelection;
+    }
 
-        _root.styleSheets.Add(Resources.Load<StyleSheet>(_styleResource));
-        _toolbar.AddToClassList(_ussToolbar);
-        _searchToolbar.AddToClassList(_ussSearchToolbar);
-        _backToolbar.AddToClassList(_ussBackToolbar);
-        _deleteObjectToolbar.AddToClassList(_ussDeleteObjectToolbar);
-        _splitView.AddToClassList(_ussAtlasWindow);
-        _leftPane.AddToClassList(_ussLeftPane);
-        _rightPane.AddToClassList(_ussRightPane);
-        _searchField.AddToClassList(_ussSearchField);
-        _listView.AddToClassList(_ussListView);
+    /// <summary>
+    /// Set up all events
+    /// </summary>
+    private void SetUpEventsHandlers()
+    {
+        _searchField.RegisterValueChangedCallback(evt => HandleSearchFieldChanged(evt));
+        _searchField.RegisterCallback<FocusInEvent>(evt => HandleStartSearch());
+        _backToAtlasesButton.clicked += DisplayAllAtlases;
+        _backToAtlasButton.clicked += DisplayAtlas;
+        _deleteObjectButton.clicked += HandleDeleteObject;
+        _startCreateObjectButton.clicked += HandleStartCreateObject;
+        _newObjectNameTextField.RegisterValueChangedCallback(evt => _newObjectName = evt.newValue);
+        _createObjectButton.clicked += HandleCreateObject;
+    }
 
+    /// <summary>
+    /// Initializes all necessary data
+    /// </summary>
+    private void InitializeData()
+    {
         _atlases = new List<AtlasInfo>();
         _objectsAfterSearch = new List<ObjectInfo>();
 
         OnDisplayAtlases = () =>
         {
-            ClearContent();
-            ResetSearch();
-            CancelObjectCreation();
-            _backToolbar.Clear();
+            ResetLeftPanel();
+            ResetRightPanel();
+            ResetWindow();
+            HideBackToAtlasesButton();
+            HideBackToAtlasButton();
             _deleteObjectButton.SetEnabled(false);
             _currentSearchMode = SearchMode.Global;
         };
         OnDisplayAtlas = () =>
         {
-            ClearContent();
-            ResetSearch();
-            CancelObjectCreation();
+            ResetLeftPanel();
+            ResetRightPanel();
+            ResetWindow();
+            ShowBackToAtlasesButton();
+            HideBackToAtlasButton();
             _deleteObjectButton.SetEnabled(false);
             _currentSearchMode = SearchMode.Collections;
         };
         OnDisplayCollection = () =>
         {
-            ClearContent();
-            CancelObjectCreation();
+            ResetLeftPanel();
+            ResetRightPanel();
+            ResetWindow();
+            ShowBackToAtlasButton();
             _currentSearchMode = SearchMode.Collection;
         };
 
         GetAllData();
-    }
-
-    public override void ComposeToolbar()
-    {
-        AddSearchObjectsField();
-        _toolbar.Add(_backToolbar);
-        AddDeleteObjectButton();
-    }
-
-    public override void ComposeLeftPane()
-    {
-        DisplayAllAtlases();
     }
 
     /// <summary>
@@ -455,26 +487,6 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
             AtlasSO atlas = AssetDatabase.LoadAssetAtPath<AtlasSO>(AssetDatabase.GUIDToAssetPath(atlasGuid));
             _atlases.Add(new AtlasInfo(atlas));
         }
-    }
-
-    /// <summary>
-    /// Resets the search and, if possible, sets the current collection as the source for the ListView.
-    /// </summary>
-    private void ResetSearch()
-    {
-        _isSearching = false;
-        _searchField.SetValueWithoutNotify("");
-        _listView.itemsSource = _currentCollection?.Objects;
-        _listView.RefreshItems();
-    }
-
-    /// <summary>
-    /// Cancels the creation and removes the new item from memory.
-    /// </summary>
-    private void CancelObjectCreation()
-    {
-        _createObjectButton?.SetEnabled(true);
-        DestroyImmediate(_newObject);
     }
 
     /// <summary>
@@ -502,7 +514,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
 
         ScrollView atlasScrollView = new ScrollView(ScrollViewMode.Vertical);
         atlasScrollView.Add(new InspectorElement(_currentAtlas.Atlas));
-        _rightPane.Add(atlasScrollView);
+        _rightPanelContent.Add(atlasScrollView);
     }
 
     /// <summary>
@@ -511,8 +523,8 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     private void DisplayCollection()
     {
         OnDisplayCollection?.Invoke();
-        AddListViewForCollection(_currentCollection.Objects);
-        AddCreateObjectButton();
+        AddObjectsListView(_currentCollection.Objects);
+        ShowStartCreateObjectButton();
     }
 
     /// <summary>
@@ -520,8 +532,10 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     /// </summary>
     private void DisplaySearchResult()
     {
-        ClearContent();
-        AddListViewForCollection(_objectsAfterSearch);
+        ClearLeftPanelContent();
+        ClearRightPanelContent();
+        AddObjectsListView(_objectsAfterSearch);
+        HideCreateObjectContent();
     }
 
     /// <summary>
@@ -530,12 +544,12 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     /// <param name="types">Dictionary where the key is the type and the value is the count of occurrences.</param>
     private void DisplaySelectedTypes(Dictionary<Type, int> types)
     {
-        _rightPane.Clear();
+        ResetRightPanel();
         foreach (Type type in types.Keys)
         {
-            Button button = CreateButton($"{types[type]} {type.Name}", _ussContentButton);
-            button.clicked += () => HandleSelectType(type);
-            _rightPane.Add(button);
+            Button typeButton = CreateButton($"{types[type]} {type.Name}");
+            typeButton.clicked += () => HandleSelectType(type);
+            _rightPanelContent.Add(typeButton);
         }
     }
 
@@ -544,24 +558,15 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     /// adds an input field for entering a new object name 
     /// and a button to create the object.
     /// </summary>
-    private void DisplayNewObject()
+    private void DisplayObjectCreation()
     {
         _newObject = _isTypeScriptableObject ? CreateInstance(_newObjectType) : new GameObject("newPrefab", _newObjectType);
 
-        _rightPane.Clear();
+        ResetRightPanel();
+        ShowCreateObjectContent();
 
         InspectorElement inspectorElement = new InspectorElement(_isTypeScriptableObject ? _newObject : (_newObject as GameObject).GetComponent(_newObjectType));
-        _rightPane.Add(inspectorElement);
-
-        _createObjectTreeAsset.CloneTree(inspectorElement);
-        VisualElement createObjectElement = inspectorElement.Q("create-object");
-        createObjectElement.style.marginTop = 5;
-
-        TextField objectNameTextField = createObjectElement.Q<TextField>();
-        objectNameTextField.RegisterValueChangedCallback(evt => _newObjectName = evt.newValue);
-
-        Button createObject = createObjectElement.Q<Button>();
-        createObject.clicked += HandleCreateObject;
+        _rightPanelContent.Add(inspectorElement);
     }
 
     /// <summary>
@@ -570,14 +575,13 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     /// <param name="atlasInfo">Information about the atlas.</param>
     private void AddAtlasButton(AtlasInfo atlasInfo)
     {
-        Button atlasButton = CreateButton(GetCorrectName(atlasInfo.Atlas), _ussContentButton);
+        Button atlasButton = CreateButton(GetCorrectName(atlasInfo.Atlas));
         atlasButton.clicked += () =>
         {
             _currentAtlas = atlasInfo;
-            AddBackToAtlasesButton();
             DisplayAtlas();
         };
-        _leftPane.Add(atlasButton);
+        _leftPanelContent.Add(atlasButton);
     }
 
     /// <summary>
@@ -586,139 +590,47 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     /// <param name="collectionInfo">Information about the collection.</param>
     private void AddCollectionButton(CollectionInfo collectionInfo)
     {
-        Button collectionButton = CreateButton(GetCorrectName(collectionInfo.Property.displayName), _ussContentButton);
+        Button collectionButton = CreateButton(GetCorrectName(collectionInfo.Property.displayName));
         collectionButton.clicked += () =>
         {
             _currentCollection = collectionInfo;
-            AddBackToAtlasButton();
             DisplayCollection();
         };
-        _leftPane.Add(collectionButton);
+        _leftPanelContent.Add(collectionButton);
     }
 
     /// <summary>
-    /// Adds a button to the toolbar. When clicked, returns to all atlases.
+    /// Resets the search and, if possible, sets the current collection as the source for the ListView.
     /// </summary>
-    private void AddBackToAtlasesButton()
+    private void ResetSearch()
     {
-        Button backToAtlasesButton = CreateButton("Back to atlases", _ussToolbarButton);
-        backToAtlasesButton.clicked += DisplayAllAtlases;
-        _backToolbar.Add(backToAtlasesButton);
-    }
-
-    /// <summary>
-    /// Adds a button to the toolbar. When clicked, returns to all collections.
-    /// </summary>
-    private void AddBackToAtlasButton()
-    {
-        Button backToAtlasButton = CreateButton($"Back to {GetCorrectName(_currentAtlas.Atlas).ToLower()}", _ussToolbarButton);
-        backToAtlasButton.clicked += () =>
+        _isSearching = false;
+        _searchField.SetValueWithoutNotify("");
+        if (_currentCollection != null)
         {
-            DisplayAtlas();
-            _backToolbar.Remove(backToAtlasButton);
-        };
-        _backToolbar.Add(backToAtlasButton);
+            _listView.itemsSource = _currentCollection.Objects;
+            _listView.RefreshItems();
+        }
     }
 
     /// <summary>
-    /// Adds a field for searching objects to the toolbar.
+    /// Cancels the creation and removes the new item from memory.
     /// </summary>
-    private void AddSearchObjectsField()
+    private void CancelObjectCreation()
     {
-        _searchField.RegisterValueChangedCallback(evt => HandleSearchFieldChanged(evt));
-        _searchField.RegisterCallback<FocusInEvent>(evt => HandleStartSearch());
-        _toolbar.Add(_searchToolbar);
-        _searchToolbar.Add(_searchField);
-    }
-
-    /// <summary>
-    /// Adds a button to the toolbar for deleting one or more objects.
-    /// </summary>
-    private void AddDeleteObjectButton()
-    {
-        _deleteObjectButton = CreateButton("Delete", _ussToolbarButton);
-        _deleteObjectButton.clicked += HandleDeleteObject;
-        _toolbar.Add(_deleteObjectToolbar);
-        _deleteObjectToolbar.Add(_deleteObjectButton);
+        _startCreateObjectButton?.SetEnabled(true);
+        DestroyImmediate(_newObject);
     }
 
     /// <summary>
     /// Sets the list to a ListView and configures it.
     /// </summary>
     /// <param name="itemSource">The list for ListView.</param>
-    private void AddListViewForCollection(List<ObjectInfo> itemSource)
+    private void AddObjectsListView(List<ObjectInfo> itemSource)
     {
         _listView.itemsSource = itemSource;
-        _listView.fixedItemHeight = 30;
-        _listView.makeItem += HandleMakeObject;
-        _listView.bindItem += HandleBindObject;
-        _listView.selectionType = SelectionType.Multiple;
-        _listView.selectionChanged += HandleObjectSelection;
-        _listView.selectedIndex = _currentIndex;
-        _listView.ClearSelection();
-        _listView.AddToSelection(0);
-        _leftPane.Add(_listView);
-    }
-
-    /// <summary>
-    /// Adds a button to the left panel for creating an object.
-    /// </summary>
-    private void AddCreateObjectButton()
-    {
-        _createObjectButton = CreateButton("Create new object", _ussContentButton);
-        _createObjectButton.clicked += HandleStartCreateObject;
-        _leftPane.Add(_createObjectButton);
-    }
-
-    /// <summary>
-    /// Creates a new button.
-    /// </summary>
-    /// <param name="name">The name of the new button.</param>
-    /// <param name="className">The class name for button styles.</param>
-    /// <returns>A new button with a name and style.</returns>
-    private Button CreateButton(string name, string className)
-    {
-        Button button = new Button();
-        button.AddToClassList(className);
-        button.text = name;
-        return button;
-    }
-
-    /// <summary>
-    /// Takes the name from the object and returns the corrected one.
-    /// </summary>
-    /// <param name="obj">The object whose name needs to be returned.</param>
-    /// <returns>The name of the object with spaces between words.</returns>
-    private string GetCorrectName(Object obj)
-    {
-        return GetCorrectName(obj.name);
-    }
-
-    /// <summary>
-    /// Takes the name and returns the corrected one.
-    /// </summary>
-    /// <param name="name">The name to be processed.</param>
-    /// <returns>The name of the object with spaces between words.</returns>
-    private string GetCorrectName(string name)
-    {
-        name = Regex.Replace(name, @"(\p{Ll}) (\P{Ll})", m => m.Groups[1].Value + ' ' + m.Groups[2].Value.ToLower());
-        return Regex.Replace(name, @"(\p{Ll})(\P{Ll})", m => m.Groups[1].Value + ' ' + m.Groups[2].Value.ToLower());
-    }
-
-    /// <summary>
-    /// Retrieves the sprite based on the object's type.
-    /// </summary>
-    /// <param name="obj">The object whose sprite needs to be returned.</param>
-    /// <returns>An icon based on the object's type.</returns>
-    private Sprite GetSpriteByObject(Object obj)
-    {
-        return obj switch
-        {
-            BlockSO block => block.Sprites.Count != 0 ? block.Sprites[0] : null,
-            Tree tree => tree.GetComponent<SpriteRenderer>()?.sprite,
-            PickUpItem pickUpItem => pickUpItem.GetComponent<SpriteRenderer>()?.sprite,
-            _ => null
-        };
+        _listView.SetSelection(0);
+        _leftPanelContent.Add(_listView);
     }
 
     /// <summary>
@@ -765,8 +677,10 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
 
         if (isAnyItemSelected)
         {
-            Editor editor;
+            ResetRightPanel();
             CancelObjectCreation();
+
+            Editor editor;
             if (count > 1)
             {
                 Dictionary<Type, int> types = selectedItems
@@ -791,10 +705,9 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
                 editor = Editor.CreateEditor(_currentObject.Data);
             }
 
-            _rightPane.Clear();
             InspectorElement inspectorElement = new InspectorElement(editor);
             inspectorElement.RegisterCallback<SerializedPropertyChangeEvent>(evt => HandleUpdatePreview(evt));
-            _rightPane.Add(inspectorElement);
+            _rightPanelContent.Add(inspectorElement);
         }
     }
 
@@ -808,12 +721,12 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         _newObjectType = _currentCollection.ElementType;
         _isTypeScriptableObject = _currentCollection.IsScriptableObject;
 
-        _createObjectButton.SetEnabled(false);
+        _startCreateObjectButton.SetEnabled(false);
         _deleteObjectButton.SetEnabled(false);
         _listView.ClearSelection();
 
         ResetSearch();
-        DisplayNewObject();
+        DisplayObjectCreation();
     }
 
     /// <summary>
@@ -830,7 +743,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
         if (SaveObject())
         {
             AddObjectToCurrentCollection();
-            DisplayNewObject();
+            DisplayObjectCreation();
         }
     }
 
@@ -839,7 +752,6 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     /// </summary>
     private void HandleDeleteObject()
     {
-
         foreach (ObjectInfo selectedObject in _listView.selectedItems)
         {
             foreach (AtlasInfo atlas in _atlases)
@@ -875,7 +787,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
                         {
                             _isSearching = true;
                             DisplaySearchResult();
-                            AddBackToAtlasesButton();
+                            ShowBackToAtlasesButton();
                         }
                     }
                     break;
@@ -886,7 +798,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
                         {
                             _isSearching = true;
                             DisplaySearchResult();
-                            AddBackToAtlasButton();
+                            ShowBackToAtlasButton();
                         }
                     }
                     break;
@@ -931,15 +843,14 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
                 break;
             case SearchMode.Collection:
                 {
-                    SearchCollection(_currentCollection,searchString);
+                    SearchCollection(_currentCollection, searchString);
                 }
                 break;
             default:
                 break;
         }
         SortSearchResultByName();
-        _listView.ClearSelection();
-        _listView.AddToSelection(0);
+        _listView.SetSelection(0);
         _listView.RefreshItems();
     }
 
@@ -1009,7 +920,7 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     /// </summary>
     private void AddObjectToCurrentCollection()
     {
-        _currentCollection.AddObject(_newObject); 
+        _currentCollection.AddObject(_newObject);
         _newObject = null;
         _listView.RefreshItems();
     }
@@ -1062,5 +973,101 @@ public class AtlasEditorWindow : TwoPaneEditorWindow
     {
         _objectsAfterSearch.Sort((obj1, obj2) => obj1.Data.name.CompareTo(obj2.Data.name));
     }
+
+    /// <summary>
+    /// Creates a new button.
+    /// </summary>
+    /// <param name="name">The name of the new button.</param>
+    /// <returns>A new button with a name and style.</returns>
+    private Button CreateButton(string name)
+    {
+        Button button = new Button();
+        button.text = name;
+        return button;
+    }
+
+    /// <summary>
+    /// Takes the name from the object and returns the corrected one.
+    /// </summary>
+    /// <param name="obj">The object whose name needs to be returned.</param>
+    /// <returns>The name of the object with spaces between words.</returns>
+    private string GetCorrectName(Object obj)
+    {
+        return GetCorrectName(obj.name);
+    }
+
+    /// <summary>
+    /// Takes the name and returns the corrected one.
+    /// </summary>
+    /// <param name="name">The name to be processed.</param>
+    /// <returns>The name of the object with spaces between words.</returns>
+    private string GetCorrectName(string name)
+    {
+        name = Regex.Replace(name, @"(\p{Ll}) (\P{Ll})", m => m.Groups[1].Value + ' ' + m.Groups[2].Value.ToLower());
+        return Regex.Replace(name, @"(\p{Ll})(\P{Ll})", m => m.Groups[1].Value + ' ' + m.Groups[2].Value.ToLower());
+    }
+
+    /// <summary>
+    /// Retrieves the sprite based on the object's type.
+    /// </summary>
+    /// <param name="obj">The object whose sprite needs to be returned.</param>
+    /// <returns>An icon based on the object's type.</returns>
+    private Sprite GetSpriteByObject(Object obj)
+    {
+        return obj switch
+        {
+            BlockSO block => block.Sprites.Count != 0 ? block.Sprites[0] : null,
+            Tree tree => tree.GetComponent<SpriteRenderer>()?.sprite,
+            PickUpItem pickUpItem => pickUpItem.GetComponent<SpriteRenderer>()?.sprite,
+            _ => null
+        };
+    }
+
+    /// <summary>
+    /// Clears left panel content and hides start create button
+    /// </summary>
+    private void ResetLeftPanel()
+    {
+        ClearLeftPanelContent();
+        HideStartCreateObjectButton();
+    }
+
+    /// <summary>
+    /// Clears right panel content and hides create objectt content
+    /// </summary>
+    private void ResetRightPanel()
+    {
+        ClearRightPanelContent();
+        HideCreateObjectContent();
+    }
+
+    /// <summary>
+    /// Resets searching and cancels object creation
+    /// </summary>
+    private void ResetWindow()
+    {
+        ResetSearch();
+        CancelObjectCreation();
+    }
+
+    private void ShowBackToAtlasesButton() => _backToAtlasesButton.style.display = DisplayStyle.Flex;
+
+    private void HideBackToAtlasesButton() => _backToAtlasesButton.style.display = DisplayStyle.None;
+
+    private void ShowBackToAtlasButton() => _backToAtlasButton.style.display = DisplayStyle.Flex;
+
+    private void HideBackToAtlasButton() => _backToAtlasButton.style.display = DisplayStyle.None;
+
+    private void ShowStartCreateObjectButton() => _startCreateObjectButton.style.display = DisplayStyle.Flex;
+
+    private void HideStartCreateObjectButton() => _startCreateObjectButton.style.display = DisplayStyle.None;
+
+    private void ShowCreateObjectContent() => _createObjectContent.style.display = DisplayStyle.Flex;
+
+    private void HideCreateObjectContent() => _createObjectContent.style.display = DisplayStyle.None;
+
+    private void ClearLeftPanelContent() => _leftPanelContent.Clear();
+
+    private void ClearRightPanelContent() => _rightPanelContent.Clear();
     #endregion
 }

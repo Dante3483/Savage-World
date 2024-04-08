@@ -14,7 +14,7 @@ public class ListItem : VisualElement
     }
 
     #region Private fields
-    private static readonly string _styleResource = StaticInfo.StyleSheetsDirectory + "ListItemStyleSheet";
+    private static readonly string _styleResource = StaticInfo.StyleSheetsDirectory + "ListItem";
     private static readonly string _ussListItem = "list_item";
     private static readonly string _ussIcon = _ussListItem + "__icon";
     private static readonly string _ussName = _ussListItem + "__name";

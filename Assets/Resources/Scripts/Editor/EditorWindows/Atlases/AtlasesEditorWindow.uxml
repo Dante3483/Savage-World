@@ -1,0 +1,28 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/Resources/Scripts/Editor/EditorWindows/AtlasEditorWindow/AtlasEditor.uss?fileID=7433441132597879392&amp;guid=86eea768c2352b54b919a9cf0e0070ef&amp;type=3#AtlasEditor" />
+    <uie:Toolbar style="height: 30px; border-top-width: 1px; align-items: center;">
+        <ui:VisualElement name="search" style="height: 100%; justify-content: center; width: 200px; padding-right: 5px; padding-left: 5px;">
+            <uie:ToolbarSearchField name="search-field" style="height: 20px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; width: auto;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="back" style="height: 100%; border-left-width: 1px; border-left-color: rgb(89, 89, 89); border-right-color: rgb(89, 89, 89); border-top-color: rgb(89, 89, 89); border-bottom-color: rgb(89, 89, 89); padding-right: 5px; padding-left: 5px; flex-direction: row; flex-grow: 1; align-items: center;">
+            <ui:Button text="Back to atlases" parse-escape-sequences="true" display-tooltip-when-elided="true" name="back-to-atlases-button" class="toolbar-button" />
+            <ui:Button text="Back to block atlas" parse-escape-sequences="true" display-tooltip-when-elided="true" name="back-to-atlas-button" class="toolbar-button" />
+        </ui:VisualElement>
+        <ui:VisualElement name="delete" style="height: 100%; border-left-color: rgb(89, 89, 89); border-right-color: rgb(89, 89, 89); border-top-color: rgb(89, 89, 89); border-bottom-color: rgb(89, 89, 89); border-left-width: 1px; justify-content: center; padding-left: 5px;">
+            <ui:Button text="Delete" parse-escape-sequences="true" display-tooltip-when-elided="true" name="delete-button" class="toolbar-button" />
+        </ui:VisualElement>
+    </uie:Toolbar>
+    <SplitView fixed-pane-initial-dimension="200">
+        <ui:VisualElement name="left-panel" style="flex-grow: 1; min-width: 200px; background-color: rgb(60, 60, 60); padding-top: 5px;">
+            <ui:VisualElement name="content" style="flex-grow: 1;" />
+            <ui:Button text="Create new object" parse-escape-sequences="true" display-tooltip-when-elided="true" name="start-create-button" style="margin-top: 5px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="right-panel" style="flex-grow: 1; min-width: 400px; background-color: rgb(51, 50, 50); padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px;">
+            <ui:VisualElement name="content" style="flex-grow: 1;" />
+            <ui:VisualElement name="create-object-content" focusable="false" style="justify-content: center; flex-direction: row; min-height: 30px; margin-top: 5px;">
+                <ui:TextField picking-mode="Ignore" name="name" style="flex-grow: 1; margin-left: 0; margin-right: 5px; margin-top: 0; margin-bottom: 0;" />
+                <ui:Button text="Create new" parse-escape-sequences="true" display-tooltip-when-elided="true" name="create-button" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; height: 30px; color: rgb(210, 210, 210); background-color: rgb(64, 63, 63);" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </SplitView>
+</ui:UXML>
