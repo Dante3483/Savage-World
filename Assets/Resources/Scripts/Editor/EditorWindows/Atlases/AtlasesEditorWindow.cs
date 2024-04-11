@@ -523,7 +523,7 @@ public class AtlasesEditorWindow : EditorWindow
     private void DisplayCollection()
     {
         OnDisplayCollection?.Invoke();
-        AddObjectsListView(_currentCollection.Objects);
+        AddObjectsToListView(_currentCollection.Objects);
         ShowStartCreateObjectButton();
     }
 
@@ -534,7 +534,7 @@ public class AtlasesEditorWindow : EditorWindow
     {
         ClearLeftPanelContent();
         ClearRightPanelContent();
-        AddObjectsListView(_objectsAfterSearch);
+        AddObjectsToListView(_objectsAfterSearch);
         HideCreateObjectContent();
     }
 
@@ -626,10 +626,10 @@ public class AtlasesEditorWindow : EditorWindow
     /// Sets the list to a ListView and configures it.
     /// </summary>
     /// <param name="itemSource">The list for ListView.</param>
-    private void AddObjectsListView(List<ObjectInfo> itemSource)
+    private void AddObjectsToListView(List<ObjectInfo> itemSource)
     {
         _listView.itemsSource = itemSource;
-        _listView.SetSelection(0);
+        SetListViewSelection(0);
         _leftPanelContent.Add(_listView);
     }
 
@@ -850,7 +850,7 @@ public class AtlasesEditorWindow : EditorWindow
                 break;
         }
         SortSearchResultByName();
-        _listView.SetSelection(0);
+        SetListViewSelection(0);
         _listView.RefreshItems();
     }
 
@@ -871,7 +871,7 @@ public class AtlasesEditorWindow : EditorWindow
                 newSelectedIndices.Add(selectedIndices.ElementAt(i));
             }
         }
-        _listView.SetSelection(newSelectedIndices);
+        SetListViewSelection(newSelectedIndices);
     }
 
     /// <summary>
@@ -1048,6 +1048,26 @@ public class AtlasesEditorWindow : EditorWindow
     {
         ResetSearch();
         CancelObjectCreation();
+    }
+
+    /// <summary>
+    /// Sets selection using index
+    /// </summary>
+    /// <param name="index">Index of object to select</param>
+    private void SetListViewSelection(int index)
+    {
+        _listView.ClearSelection();
+        _listView.SetSelection(index);
+    }
+
+    /// <summary>
+    /// Sets selection using idices
+    /// </summary>
+    /// <param name="indices">Indices of objects to select</param>
+    private void SetListViewSelection(IEnumerable<int> indices)
+    {
+        _listView.ClearSelection();
+        _listView.SetSelection(indices);
     }
 
     private void ShowBackToAtlasesButton() => _backToAtlasesButton.style.display = DisplayStyle.Flex;
