@@ -635,7 +635,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: White_frame
+      name: White_frame_1
       rect:
         serializedVersion: 2
         x: 16
@@ -656,7 +656,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: White_box
+      name: White_box_1
       rect:
         serializedVersion: 2
         x: 16
@@ -686,13 +686,76 @@ TextureImporter:
         height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 2, y: 2, z: 2, w: 2}
+      border: {x: 3, y: 3, z: 3, w: 3}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
       spriteID: 27f361a7c3aadef42a0f16e000786f1d
       internalID: 1132701740
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: White_box_2
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 800
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 2, y: 2, z: 2, w: 2}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0939f617eb8df6f4195112d32476351e
+      internalID: 401030169
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: White_box_3
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 800
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 2, y: 2, z: 2, w: 2}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a1a56a39de652f14a8bf01895c849637
+      internalID: -1113999072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: White_frame_3
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 752
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 3, y: 1, z: 3, w: 3}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c0150228ec8aba043939b4e40c66e661
+      internalID: 171750693
       vertices: []
       indices: 
       edges: []
@@ -733,9 +796,12 @@ TextureImporter:
       Wheater_Sky_1: -2108123033
       Wheater_Sky_2: -2043034011
       Wheather_Sun_2: -104205578
-      White_box: 582120584
-      White_frame: -2061142399
+      White_box_1: 582120584
+      White_box_2: 401030169
+      White_box_3: -1113999072
+      White_frame_1: -2061142399
       White_frame_2: 1132701740
+      White_frame_3: 171750693
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
