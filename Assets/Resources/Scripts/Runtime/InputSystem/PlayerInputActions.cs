@@ -62,6 +62,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Open/Close Research"",
+                    ""type"": ""Button"",
+                    ""id"": ""8479ec89-3fb0-4610-ba83-8d9415990cca"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -108,6 +117,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Open/Close Furnace"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""19b4b0e5-9762-4430-a382-e9336808f27a"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Open/Close Research"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -120,6 +140,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_UI_OpenCloseCraftStation = m_UI.FindAction("Open/Close CraftStation", throwIfNotFound: true);
         m_UI_OpenCloseDebug = m_UI.FindAction("Open/Close Debug", throwIfNotFound: true);
         m_UI_OpenCloseFurnace = m_UI.FindAction("Open/Close Furnace", throwIfNotFound: true);
+        m_UI_OpenCloseResearch = m_UI.FindAction("Open/Close Research", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -185,6 +206,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_OpenCloseCraftStation;
     private readonly InputAction m_UI_OpenCloseDebug;
     private readonly InputAction m_UI_OpenCloseFurnace;
+    private readonly InputAction m_UI_OpenCloseResearch;
     public struct UIActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -193,6 +215,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @OpenCloseCraftStation => m_Wrapper.m_UI_OpenCloseCraftStation;
         public InputAction @OpenCloseDebug => m_Wrapper.m_UI_OpenCloseDebug;
         public InputAction @OpenCloseFurnace => m_Wrapper.m_UI_OpenCloseFurnace;
+        public InputAction @OpenCloseResearch => m_Wrapper.m_UI_OpenCloseResearch;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -214,6 +237,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @OpenCloseFurnace.started += instance.OnOpenCloseFurnace;
             @OpenCloseFurnace.performed += instance.OnOpenCloseFurnace;
             @OpenCloseFurnace.canceled += instance.OnOpenCloseFurnace;
+            @OpenCloseResearch.started += instance.OnOpenCloseResearch;
+            @OpenCloseResearch.performed += instance.OnOpenCloseResearch;
+            @OpenCloseResearch.canceled += instance.OnOpenCloseResearch;
         }
 
         private void UnregisterCallbacks(IUIActions instance)
@@ -230,6 +256,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @OpenCloseFurnace.started -= instance.OnOpenCloseFurnace;
             @OpenCloseFurnace.performed -= instance.OnOpenCloseFurnace;
             @OpenCloseFurnace.canceled -= instance.OnOpenCloseFurnace;
+            @OpenCloseResearch.started -= instance.OnOpenCloseResearch;
+            @OpenCloseResearch.performed -= instance.OnOpenCloseResearch;
+            @OpenCloseResearch.canceled -= instance.OnOpenCloseResearch;
         }
 
         public void RemoveCallbacks(IUIActions instance)
@@ -253,5 +282,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnOpenCloseCraftStation(InputAction.CallbackContext context);
         void OnOpenCloseDebug(InputAction.CallbackContext context);
         void OnOpenCloseFurnace(InputAction.CallbackContext context);
+        void OnOpenCloseResearch(InputAction.CallbackContext context);
     }
 }

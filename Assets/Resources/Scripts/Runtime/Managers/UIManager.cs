@@ -18,7 +18,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private UIPage _inventoryUI;
     [SerializeField] private UIPage _craftStationUI;
     [SerializeField] private UIPage _hotbarUI;
-
+    [SerializeField] private UIPage _researchUI;
     #endregion
 
     #region Public fields
@@ -91,6 +91,8 @@ public class UIManager : MonoBehaviour
             return _craftStationUI;
         }
     }
+
+    public UIPage ResearchUI { get => _researchUI; set => _researchUI = value; }
     #endregion
 
     #region Methods

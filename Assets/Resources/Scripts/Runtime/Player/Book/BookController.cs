@@ -9,6 +9,7 @@ public class BookController : MonoBehaviour
     [SerializeField] private CraftStationSO _furnaceCraftStation;
     private InventoryController _inventoryController;
     private CraftStationController _craftStationController;
+    private ResearchController _researchController;
     private IBookPageController _currentController;
     #endregion
 
@@ -25,12 +26,14 @@ public class BookController : MonoBehaviour
     {
         _inventoryController = GetComponent<InventoryController>();
         _craftStationController = GetComponent<CraftStationController>();
+        _researchController = GetComponent<ResearchController>();
 
         PlayerInputActions inputActions = new PlayerInputActions();
         inputActions.UI.Enable();
         inputActions.UI.OpenCloseInventory.performed += OpenCloseInventory;
         inputActions.UI.OpenCloseCraftStation.performed += OpenCloseCraftStation;
         inputActions.UI.OpenCloseFurnace.performed += OpenCloseFurnace;
+        inputActions.UI.OpenCloseResearch.performed += OpenCloseResearch;
     }
 
     private void SetController(IBookPageController controller)
@@ -74,6 +77,11 @@ public class BookController : MonoBehaviour
     private void OpenCloseInventory(InputAction.CallbackContext context)
     {
         SetController(_inventoryController);
+    }
+
+     private void OpenCloseResearch(InputAction.CallbackContext context)
+    {
+        SetController(_researchController);
     }
     #endregion
 }
