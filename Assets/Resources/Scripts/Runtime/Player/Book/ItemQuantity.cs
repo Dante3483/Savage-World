@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public struct RecipeItem
+public struct ItemQuantity
 {
     #region Private fields
     [SerializeField] private ItemSO _item;

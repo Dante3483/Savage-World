@@ -84,7 +84,7 @@ public class CraftStationController : MonoBehaviour, IBookPageController
     {
         int i = 0;
         _craftStationUI.UpdateBigImage(_currentRecipe.Result.Item.BigItemImage);
-        foreach (RecipeItem material in _currentRecipe.Materials)
+        foreach (ItemQuantity material in _currentRecipe.Materials)
         {
             _craftStationUI.UpdateRecipeMaterial(i++, material.Item.SmallItemImage, material.Item.Name, material.Quantity);
         }
@@ -106,7 +106,7 @@ public class CraftStationController : MonoBehaviour, IBookPageController
         int itemQuantity;
         int currentRecipeQuantity;
         int minRecipeQuantity = int.MaxValue;
-        foreach (RecipeItem material in _currentRecipe.Materials)
+        foreach (ItemQuantity material in _currentRecipe.Materials)
         {
             itemQuantity = _inventoryData.GetItemQuantity(material.Item);
             currentRecipeQuantity = Mathf.FloorToInt(itemQuantity / material.Quantity);
@@ -155,7 +155,7 @@ public class CraftStationController : MonoBehaviour, IBookPageController
 
     private void HandleCreateItem(int quantity)
     {
-        foreach (RecipeItem material in _currentRecipe.Materials)
+        foreach (ItemQuantity material in _currentRecipe.Materials)
         {
             _inventoryData.RemoveItemFromFirstSlot(material.Item, material.Quantity * quantity);
         }

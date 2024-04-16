@@ -9,7 +9,7 @@ public class ResearchController : MonoBehaviour, IBookPageController
     #endregion
 
     #region Public fields
-    public bool IsActive => throw new System.NotImplementedException();
+    public bool IsActive => UIManager.Instance.ResearchUI.IsActive;
     #endregion
 
     #region Properties

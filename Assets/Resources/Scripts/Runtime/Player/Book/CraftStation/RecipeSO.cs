@@ -7,8 +7,9 @@ using UnityEngine;
 public class RecipeSO : ScriptableObject
 {
     #region Private fields
-    [SerializeField] private RecipeItem[] _materials;
-    [SerializeField] private RecipeItem _result;
+    [SerializeField] private ItemQuantity[] _materials;
+    [SerializeField] private ItemQuantity _result;
+    [SerializeField] private bool _isUnlocked;
     #endregion
 
     #region Public fields
@@ -16,7 +17,7 @@ public class RecipeSO : ScriptableObject
     #endregion
 
     #region Properties
-    public RecipeItem[] Materials
+    public ItemQuantity[] Materials
     {
         get
         {
@@ -24,13 +25,15 @@ public class RecipeSO : ScriptableObject
         }
     }
 
-    public RecipeItem Result
+    public ItemQuantity Result
     {
         get
         {
             return _result;
         }
     }
+
+    public bool IsUnlocked { get => _isUnlocked; set => _isUnlocked = value; }
     #endregion
 
     #region Methods
