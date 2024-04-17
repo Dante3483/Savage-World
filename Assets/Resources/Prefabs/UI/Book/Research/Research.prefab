@@ -1320,7 +1320,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3846390570245577611}
   m_Layer: 0
-  m_Name: Node
+  m_Name: Research
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

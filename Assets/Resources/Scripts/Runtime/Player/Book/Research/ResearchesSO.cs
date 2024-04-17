@@ -42,6 +42,50 @@ public class ResearchesSO : ScriptableObject
         }
         research.Complete();
     }
-    // Add methods to return values from a recipe
+    // Method for nodes
+    public string GetName(int index)
+    {
+        if (index < 0 || index >= _listOfReserches.Count)
+        {
+            return null;
+        }
+        else if(_listOfReserches[index].Name is null)
+        {
+            return "default name";
+        }
+        return _listOfReserches[index].Name;
+    }
+    public Sprite GetIconImage(int index)
+    {
+        if (index < 0 || index >= _listOfReserches.Count)
+        {
+            return null;
+        }
+        return _listOfReserches[index].IconImage;
+    }
+    public string GetDescription(int index)
+    {
+        if (index < 0 || index >= _listOfReserches.Count)
+        {
+            return null;
+        }
+        return _listOfReserches[index].Description;
+    }
+    public List<RecipeSO> GetListOfRewards(int index)
+    {
+        if (index < 0 || index >= _listOfReserches.Count)
+        {
+            return null;
+        }
+        return _listOfReserches[index].ListOfRewards;
+    }
+    public List<ItemQuantity> GetListOfCosts(int index)
+    {
+        if (index < 0 || index >= _listOfReserches.Count)
+        {
+            return null;
+        }
+        return _listOfReserches[index].ListOfCosts;
+    }
     #endregion
 }

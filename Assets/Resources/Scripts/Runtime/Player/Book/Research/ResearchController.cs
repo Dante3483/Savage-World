@@ -5,7 +5,7 @@ using UnityEngine;
 public class ResearchController : MonoBehaviour, IBookPageController
 {
     #region Private fields
-
+    private int _indexOfActiveResearch;
     #endregion
 
     #region Public fields

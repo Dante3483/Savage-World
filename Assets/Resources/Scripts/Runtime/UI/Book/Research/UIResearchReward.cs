@@ -5,17 +5,18 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System;
 
-public class UIResearchGroup : MonoBehaviour, IPointerEnterHandler,
+public class UIResearchReward : MonoBehaviour, IPointerEnterHandler,
         IPointerExitHandler
 {
     #region Private fields
     private bool _isMouseAbove;
-    private event Action<UIResearchGroup> OnMouseEnter;
-    private event Action OnMouseLeave;
+    [SerializeField]
+    private Image _image;
     #endregion
-
+    
     #region Public fields
-
+    public event Action<UIResearchReward> OnMouseEnter;
+    public event Action OnMouseLeave;
     #endregion
 
     #region Properties
