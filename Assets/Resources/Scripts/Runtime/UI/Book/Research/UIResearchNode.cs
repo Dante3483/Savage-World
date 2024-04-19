@@ -19,12 +19,14 @@ public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     [SerializeField]
     private RectTransform _rewardsContent;
     private List<UIResearchReward> _listOfRewards;
+    private UIFillAmount _uIFillAmount;
+
     #endregion
 
     #region Public fields
-    public event Action<UIResearchNode> OnMouseEnter;
+    public event Action<UIResearchNode> OnMouseEnter, OnRightMouseDown;
 
-    public event Action OnMouseLeave;
+    public event Action OnMouseLeave, OnRightMouseUp;
     #endregion
 
     #region Properties
@@ -35,6 +37,22 @@ public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     public void Awake()
     {
         _listOfRewards = new();
+    }
+
+    public void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (_isMouseAbove)
+            {
+                _uIFillAmount.FillFrame();
+                OnRightMouseDown?.Invoke(this);
+            }
+        }
+        else
+        {
+            OnRightMouseUp?.Invoke();
+        }
     }
     
     public void OnPointerEnter(PointerEventData pointerData)

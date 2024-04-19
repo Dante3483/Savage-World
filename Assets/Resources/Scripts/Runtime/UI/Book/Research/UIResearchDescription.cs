@@ -14,7 +14,9 @@ public class UIResearchDescription : MonoBehaviour//, IPointerEnterHandler, IPoi
     private UIResearchReward _rewardPrefab;
     [SerializeField]
     private RectTransform _rewardsContent;
+     private RectTransform _costsContent;
     private List<UIResearchReward> _listOfRewards;
+    //private List<UIResearchReward> _listOfCosts;
     #endregion
 
     #region Public fields
