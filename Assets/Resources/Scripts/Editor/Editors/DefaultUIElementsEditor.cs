@@ -6,7 +6,7 @@ using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-[CustomEditor(typeof(Object), true, isFallback = false)]
+//[CustomEditor(typeof(Object), true, isFallback = false)]
 public class DefaultUIElementsEditor : Editor
 {
     #region Private fields

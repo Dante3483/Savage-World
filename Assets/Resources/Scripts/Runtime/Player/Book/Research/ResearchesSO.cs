@@ -20,27 +20,22 @@ public class ResearchesSO : ScriptableObject
     #endregion
 
     #region Methods
-    public void ExamineResearch(int index)
+    public bool ExamineResearch(int index)
     {
         ResearchSO research = _listOfReserches[index];
-        bool isEnoughItems = true;
         foreach (var item in research.ListOfCosts)
         {
             if (_inventoryData.GetItemQuantity(item.Item) < item.Quantity)
             {
-                isEnoughItems = false;
-                break;
+                return false;
             }
-        }
-        if (!isEnoughItems)
-        {
-            return;
         }
         foreach (var item in research.ListOfCosts)
         {
             _inventoryData.RemoveItemFromFirstSlot(item.Item, item.Quantity);
         }
         research.Complete();
+        return true;
     }
     // Method for nodes
     public string GetName(int index)

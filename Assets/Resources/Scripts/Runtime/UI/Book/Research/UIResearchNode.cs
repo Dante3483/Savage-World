@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
-public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
 {
     #region Private fields
     private bool _isMouseAbove;
@@ -19,12 +19,13 @@ public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     [SerializeField]
     private RectTransform _rewardsContent;
     private List<UIResearchReward> _listOfRewards;
+    [SerializeField]
     private UIFillAmount _uIFillAmount;
 
     #endregion
 
     #region Public fields
-    public event Action<UIResearchNode> OnMouseEnter, OnRightMouseDown;
+    public event Action<UIResearchNode> OnMouseEnter, OnRightMouseDown, OnFinishResearch;
 
     public event Action OnMouseLeave, OnRightMouseUp;
     #endregion
@@ -37,36 +38,44 @@ public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     public void Awake()
     {
         _listOfRewards = new();
+        _uIFillAmount.OnFrameFilled += HandleFrameFilled;
     }
 
     public void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (_isMouseAbove)
-            {
-                _uIFillAmount.FillFrame();
-                OnRightMouseDown?.Invoke(this);
-            }
-        }
-        else
-        {
-            OnRightMouseUp?.Invoke();
-        }
+
     }
-    
+
+    public void Finish()
+    {
+        _uIFillAmount.Stop();
+    }
+
+    private void HandleFrameFilled()
+    {
+        OnFinishResearch?.Invoke(this);
+    }
+
     public void OnPointerEnter(PointerEventData pointerData)
     {
         // _isMouseAbove = true;
         // OnMouseEnter?.Invoke(this);
-        Debug.Log("OnPointerEnter in ResearchNode");
     }
 
     public void OnPointerExit(PointerEventData pointerData)
     {
         // _isMouseAbove = false;
         // OnMouseLeave?.Invoke();
-         Debug.Log("OnPointerExit in ResearchNode");
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        _uIFillAmount.IsFill = true;
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        _uIFillAmount.IsFill = false;
     }
     #endregion
 }
