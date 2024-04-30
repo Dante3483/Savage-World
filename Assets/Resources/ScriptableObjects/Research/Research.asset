@@ -20,7 +20,42 @@ MonoBehaviour:
   _isCompleted: 1
   _listOfRewards:
   - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
   _listOfCosts:
+  - _item: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+    _quantity: 69
+  - _item: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+    _quantity: 69
+  - _item: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+    _quantity: 69
   - _item: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
     _quantity: 69
   _listOfParents: []
