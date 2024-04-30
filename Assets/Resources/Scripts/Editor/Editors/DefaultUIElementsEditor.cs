@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-//[CustomEditor(typeof(Object), true, isFallback = false)]
+[CustomEditor(typeof(Object), true, isFallback = true)]
 public class DefaultUIElementsEditor : Editor
 {
     #region Private fields
@@ -22,9 +23,14 @@ public class DefaultUIElementsEditor : Editor
     #endregion
 
     #region Methods
-    public override VisualElement CreateInspectorGUI()
+    private void OnEnable()
     {
         _root = new VisualElement();
+        _root.RegisterCallback<GeometryChangedEvent>(evt => FixListView());
+    }
+
+    public override VisualElement CreateInspectorGUI()
+    {
         AddFields();
         AddButtons();
         return _root;
@@ -33,14 +39,17 @@ public class DefaultUIElementsEditor : Editor
     private void AddFields()
     {
         InspectorElement.FillDefaultInspector(_root, serializedObject, this);
-        _root.RegisterCallback<GeometryChangedEvent>(evt =>
+    }
+
+    private void FixListView()
+    {
+        List<ListView> listViews = _root.Query<ListView>().Where(l => l.virtualizationMethod == CollectionVirtualizationMethod.DynamicHeight).ToList();
+        foreach (ListView listView in listViews)
         {
-            List<ListView> listViews = _root.Query<ListView>().Where(l => l.virtualizationMethod == CollectionVirtualizationMethod.DynamicHeight).ToList();
-            foreach (ListView listView in listViews)
-            {
-                listView.virtualizationMethod = CollectionVirtualizationMethod.FixedHeight;
-            }
-        });
+            listView.focusable = false;
+        }
+        Debug.Log("Callback");
+        _root.UnregisterCallback<GeometryChangedEvent>(evt => FixListView());
     }
 
     private void AddButtons()
