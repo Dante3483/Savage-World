@@ -18,7 +18,8 @@ MonoBehaviour:
     by size, being long (pasta lunga), short (pasta corta), stuffed (ripiena), ...
   _isUnlocked: 0
   _isCompleted: 1
-  _listOfRewards: []
+  _listOfRewards:
+  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
   _listOfCosts:
   - _item: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
     _quantity: 69

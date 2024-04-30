@@ -25,7 +25,7 @@ public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     #endregion
 
     #region Public fields
-    public event Action<UIResearchNode> OnMouseEnter, OnRightMouseDown, OnFinishResearch;
+    public event Action<UIResearchNode> OnMouseEnter, OnFinishResearch;
 
     public event Action OnMouseLeave, OnRightMouseUp;
     #endregion
@@ -58,14 +58,14 @@ public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerEnter(PointerEventData pointerData)
     {
-        // _isMouseAbove = true;
-        // OnMouseEnter?.Invoke(this);
+        _isMouseAbove = true;
+        OnMouseEnter?.Invoke(this);
     }
 
     public void OnPointerExit(PointerEventData pointerData)
     {
-        // _isMouseAbove = false;
-        // OnMouseLeave?.Invoke();
+        _isMouseAbove = false;
+        OnMouseLeave?.Invoke();
     }
 
     public void OnPointerDown(PointerEventData eventData)

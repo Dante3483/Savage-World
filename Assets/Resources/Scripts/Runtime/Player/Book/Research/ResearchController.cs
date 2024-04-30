@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -37,6 +38,7 @@ public class ResearchController : MonoBehaviour, IBookPageController
     {
         _researchPage.InitializePage(1);
         _researchPage.OnTryFinishResearch += HandleTryFinishResearch;
+        _researchPage.OnResearchDescriptionRequested += HandleResearchDescriptionRequested;
     }
 
     public void ResetData()
@@ -49,6 +51,19 @@ public class ResearchController : MonoBehaviour, IBookPageController
         if (_researchData.ExamineResearch(index))
         {
             _researchPage.FinishResearch(index);
+        }
+    }
+
+    private void HandleResearchDescriptionRequested(int index)
+    {
+        _researchPage.UpdateResearchDescription(_researchData.GetName(index), _researchData.GetDescription(index));
+        foreach (var reward in _researchData.GetListOfRewards(index))
+        {
+            _researchPage.AddRewardToResearchDescription(reward.Result.Item.SmallItemImage);
+        }
+        foreach (var cost in _researchData.GetListOfCosts(index))
+        {
+            _researchPage.AddCostToResearchDescription(cost.Item.SmallItemImage, cost.Quantity);
         }
     }
     #endregion

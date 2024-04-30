@@ -6,13 +6,15 @@ using UnityEngine.UI;
 using System;
 using TMPro;
 
-public class UIResearchReward : MonoBehaviour, IPointerEnterHandler,
+public class UIResearchCost : MonoBehaviour, IPointerEnterHandler,
         IPointerExitHandler
 {
-    #region Private fields
+ #region Private fields
     private bool _isMouseAbove;
     [SerializeField]
     private Image _image;
+    [SerializeField]
+    private TMP_Text _quantity;
     #endregion
 
     #region Public fields
@@ -21,7 +23,8 @@ public class UIResearchReward : MonoBehaviour, IPointerEnterHandler,
     #endregion
 
     #region Properties
-    public Image Image { get => _image; set => _image = value; }    
+    public Image Image { get => _image; set => _image = value; }
+    public TMP_Text Quantity { get => _quantity; set => _quantity = value; }
     #endregion
 
     #region Methods
