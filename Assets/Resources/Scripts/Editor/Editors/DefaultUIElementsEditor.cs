@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -46,9 +47,9 @@ public class DefaultUIElementsEditor : Editor
         List<ListView> listViews = _root.Query<ListView>().Where(l => l.virtualizationMethod == CollectionVirtualizationMethod.DynamicHeight).ToList();
         foreach (ListView listView in listViews)
         {
-            listView.focusable = false;
+            listView.RegisterCallback<SerializedPropertyChangeEvent>(evt => listView.ClearSelection());
+            listView.selectionChanged += (items) => listView.ClearSelection();
         }
-        Debug.Log("Callback");
         _root.UnregisterCallback<GeometryChangedEvent>(evt => FixListView());
     }
 
