@@ -18,7 +18,7 @@ public class UIResearchPage : MonoBehaviour
     #endregion
 
     #region Public fields
-    public event Action<int> OnTryFinishResearch, OnResearchDescriptionRequested; 
+    public event Action<int> OnTryFinishResearch, OnResearchDescriptionRequested, OnRewardDescriptionRequested, OnCostDescriptionRequested; 
     #endregion
 
     #region Properties
@@ -40,37 +40,21 @@ public class UIResearchPage : MonoBehaviour
             uiItem.name = "Research";
             uiItem.OnFinishResearch += HandleFinishResearch;
             uiItem.OnMouseEnter += HandleUpdateResearchDescription;
-            uiItem.OnMouseLeave += HandleResearchDescription;
+            uiItem.OnMouseLeave += HideResearchDescription;
             _listOfResearches.Add(uiItem);
         }
+        _researchDescription.OnRewardDescriptionRequested += HandleRewardDescriptionRequested;
+        _researchDescription.OnCostDescriptionRequested += HandleCostDescriptionRequested;
+        _researchDescription.OnHideItemDescription += HideItemDescription;
     }
-
-
 
     public void FinishResearch(int index)
     {
         _listOfResearches[index].Finish();
     }
 
-    private void HandleFinishResearch(UIResearchNode research)
-    {
-        int index = _listOfResearches.IndexOf(research);
-        OnTryFinishResearch?.Invoke(index);
-    }
-    private void HandleUpdateResearchDescription(UIResearchNode research)
-    {
-        int index = _listOfResearches.IndexOf(research);
-        OnResearchDescriptionRequested?.Invoke(index);
-    }
-
-    private void HandleResearchDescription()
-    {
-        HideResearchDescription();
-    }
-
     private void HideResearchDescription()
     {
-        _researchDescription.Clear();
         _researchDescription.gameObject.SetActive(false);
     }
 
@@ -91,10 +75,45 @@ public class UIResearchPage : MonoBehaviour
         _researchDescription.AddCost(image, quantity);
     }
 
+    public void UpdateItemDescription(Sprite image, String name, string description)
+    {
+        _itemDescription.gameObject.SetActive(true);
+        _itemDescription.SetData(image, name, description);
+    }
+
+    private void HideItemDescription()
+    {
+        _itemDescription.gameObject.SetActive(false);
+    }
+
     public void ResetPage()
     {
+        HideItemDescription();
         HideResearchDescription();
     }
-    
+
+    private void HandleFinishResearch(UIResearchNode research)
+    {
+        int index = _listOfResearches.IndexOf(research);
+        OnTryFinishResearch?.Invoke(index);
+    }
+
+    private void HandleUpdateResearchDescription(UIResearchNode research)
+    {
+        int index = _listOfResearches.IndexOf(research);
+        OnResearchDescriptionRequested?.Invoke(index);
+        _researchDescription.transform.SetParent(research.transform);
+        _itemDescription.transform.SetParent(research.transform);
+    }    
+
+    private void HandleRewardDescriptionRequested(int index)
+    {
+        OnRewardDescriptionRequested?.Invoke(index);
+    }
+
+    private void HandleCostDescriptionRequested(int index)
+    {
+        OnCostDescriptionRequested?.Invoke(index);
+    } 
     #endregion
 }

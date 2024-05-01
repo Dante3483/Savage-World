@@ -41,7 +41,8 @@ public class UIResearchDescription : MonoBehaviour//, IPointerEnterHandler, IPoi
     #endregion
 
     #region Public fields
-
+    public event Action<int> OnRewardDescriptionRequested, OnCostDescriptionRequested;
+    public event Action OnHideItemDescription;
     #endregion
 
     #region Properties
@@ -58,18 +59,16 @@ public class UIResearchDescription : MonoBehaviour//, IPointerEnterHandler, IPoi
 
         for (int i = 0; i < _starterRewardsPoolSize; i++)
         {
-            UIResearchReward uiItem = Instantiate(_rewardPrefab, Vector3.zero, Quaternion.identity);
-            uiItem.transform.SetParent(_rewardsPool);
-            uiItem.name = "Reward";
-            _listOfFreeRewards.Add(uiItem);
+            _listOfFreeRewards.Add(InstantiateReward());
         }
         for (int i = 0; i < _starterCostsPoolSize; i++)
         {
-            UIResearchCost uiItem = Instantiate(_costPrefab, Vector3.zero, Quaternion.identity);
-            uiItem.transform.SetParent(_costsPool);
-            uiItem.name = "Cost";
-            _listOfFreeCosts.Add(uiItem);
+            _listOfFreeCosts.Add(InstantiateCost());
         }
+    }
+    private void OnDisable() 
+    {
+        Clear();    
     }
 
     public void UpdateName(String text)
@@ -119,9 +118,7 @@ public class UIResearchDescription : MonoBehaviour//, IPointerEnterHandler, IPoi
         UIResearchReward freeReward = _listOfFreeRewards.FirstOrDefault();
         if (freeReward is null)
         {
-            freeReward = Instantiate(_rewardPrefab, Vector3.zero, Quaternion.identity);
-            freeReward.transform.SetParent(_rewardsPool);
-            freeReward.name = "Reward";
+            freeReward = InstantiateReward();
         }
         else
         {
@@ -135,9 +132,7 @@ public class UIResearchDescription : MonoBehaviour//, IPointerEnterHandler, IPoi
         UIResearchCost freeCost = _listOfFreeCosts.FirstOrDefault();
         if (freeCost is null)
         {
-            freeCost = Instantiate(_costPrefab, Vector3.zero, Quaternion.identity);
-            freeCost.transform.SetParent(_costsPool);
-            freeCost.name = "Cost";
+            freeCost = InstantiateCost();
         }
         else
         {
@@ -146,5 +141,40 @@ public class UIResearchDescription : MonoBehaviour//, IPointerEnterHandler, IPoi
         return freeCost;
     }
 
+    private UIResearchReward InstantiateReward()
+    {
+        UIResearchReward reward = Instantiate(_rewardPrefab, Vector3.zero, Quaternion.identity);
+        reward.transform.SetParent(_rewardsPool);
+        reward.name = "Reward";
+        reward.OnMouseEnter += HandleRewardDesription;
+        reward.OnMouseLeave += HandleHideItemDescription;
+        return reward;
+    }
+
+    private UIResearchCost InstantiateCost()
+    {
+        UIResearchCost cost = Instantiate(_costPrefab, Vector3.zero, Quaternion.identity);
+        cost.transform.SetParent(_costsPool);
+        cost.name = "Cost";
+        cost.OnMouseEnter += HandleCostDesription;
+        cost.OnMouseLeave += HandleHideItemDescription;
+        return cost;
+    }
+    private void HandleRewardDesription(UIResearchReward reward)
+    {
+        int index = _listOfRewards.IndexOf(reward);
+        OnRewardDescriptionRequested?.Invoke(index);
+    }
+
+    private void HandleCostDesription(UIResearchCost cost)
+    {
+        int index = _listOfCosts.IndexOf(cost);
+        OnCostDescriptionRequested?.Invoke(index);
+    }
+
+    private void HandleHideItemDescription()
+    {
+        OnHideItemDescription?.Invoke();
+    }
     #endregion
 }

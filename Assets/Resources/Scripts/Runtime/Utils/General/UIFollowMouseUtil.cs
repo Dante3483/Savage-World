@@ -26,6 +26,11 @@ public class UIFollowMouseUtil : MonoBehaviour
         FollowMouse();
     }
 
+    private void OnEnable() 
+    {
+        FollowMouse();    
+    }
+
     public void FollowMouse()
     {
         transform.position = Input.mousePosition + _offset;

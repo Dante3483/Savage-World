@@ -27,16 +27,14 @@ public class UIResearchReward : MonoBehaviour, IPointerEnterHandler,
     #region Methods
     public void OnPointerEnter(PointerEventData pointerData)
     {
-        // _isMouseAbove = true;
-        // OnMouseEnter?.Invoke(this);
-        Debug.Log("OnPointerEnter in ResearchGroup");
+        _isMouseAbove = true;
+        OnMouseEnter?.Invoke(this);
     }
 
     public void OnPointerExit(PointerEventData pointerData)
     {
-        // _isMouseAbove = false;
-        // OnMouseLeave?.Invoke();
-        Debug.Log("OnPointerExit in ResearchGroup");
+        _isMouseAbove = false;
+        OnMouseLeave?.Invoke();
     }
     #endregion
 }

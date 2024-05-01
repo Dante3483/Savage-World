@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Items;
 using UnityEngine;
 
 public class ResearchController : MonoBehaviour, IBookPageController
@@ -39,11 +40,14 @@ public class ResearchController : MonoBehaviour, IBookPageController
         _researchPage.InitializePage(1);
         _researchPage.OnTryFinishResearch += HandleTryFinishResearch;
         _researchPage.OnResearchDescriptionRequested += HandleResearchDescriptionRequested;
+        _researchPage.OnRewardDescriptionRequested += HandleRewardDescriptionRequested;
+        _researchPage.OnCostDescriptionRequested += HandleCostDescriptionRequested;
     }
 
     public void ResetData()
     {
         UIManager.Instance.ResearchUI.ReverseActivity();
+        _researchPage.ResetPage();
     }
 
     private void HandleTryFinishResearch(int index)
@@ -56,6 +60,7 @@ public class ResearchController : MonoBehaviour, IBookPageController
 
     private void HandleResearchDescriptionRequested(int index)
     {
+        _indexOfActiveResearch = index;
         _researchPage.UpdateResearchDescription(_researchData.GetName(index), _researchData.GetDescription(index));
         foreach (var reward in _researchData.GetListOfRewards(index))
         {
@@ -66,5 +71,18 @@ public class ResearchController : MonoBehaviour, IBookPageController
             _researchPage.AddCostToResearchDescription(cost.Item.SmallItemImage, cost.Quantity);
         }
     }
+
+    private void HandleRewardDescriptionRequested(int index)
+    {
+        ItemSO reward = _researchData.GetListOfRewards(_indexOfActiveResearch)[index].Result.Item;
+        _researchPage.UpdateItemDescription(reward.SmallItemImage, reward.ColoredName, reward.Description);
+    }
+
+    private void HandleCostDescriptionRequested(int index)
+    {
+        ItemSO cost = _researchData.GetListOfCosts(_indexOfActiveResearch)[index].Item;
+        _researchPage.UpdateItemDescription(cost.SmallItemImage, cost.ColoredName, cost.Description);
+    }
+
     #endregion
 }

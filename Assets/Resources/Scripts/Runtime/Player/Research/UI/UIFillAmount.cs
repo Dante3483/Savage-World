@@ -57,6 +57,7 @@ public class UIFillAmount : MonoBehaviour
     {
         _currentFillAmount = 0f;
         _image.fillAmount = _currentFillAmount;
+        IsFill = false;
     }
 
     public void Stop()

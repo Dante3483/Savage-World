@@ -46,6 +46,11 @@ public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     }
 
+    private void OnDisable() 
+    {
+        _uIFillAmount.ResetFrame();
+    }
+
     public void Finish()
     {
         _uIFillAmount.Stop();

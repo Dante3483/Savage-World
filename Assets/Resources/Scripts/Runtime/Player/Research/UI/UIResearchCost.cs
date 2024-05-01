@@ -18,7 +18,7 @@ public class UIResearchCost : MonoBehaviour, IPointerEnterHandler,
     #endregion
 
     #region Public fields
-    public event Action<UIResearchReward> OnMouseEnter;
+    public event Action<UIResearchCost> OnMouseEnter;
     public event Action OnMouseLeave;
     #endregion
 
@@ -30,16 +30,14 @@ public class UIResearchCost : MonoBehaviour, IPointerEnterHandler,
     #region Methods
     public void OnPointerEnter(PointerEventData pointerData)
     {
-        // _isMouseAbove = true;
-        // OnMouseEnter?.Invoke(this);
-        Debug.Log("OnPointerEnter in ResearchGroup");
+        _isMouseAbove = true;
+        OnMouseEnter?.Invoke(this);
     }
 
     public void OnPointerExit(PointerEventData pointerData)
     {
-        // _isMouseAbove = false;
-        // OnMouseLeave?.Invoke();
-        Debug.Log("OnPointerExit in ResearchGroup");
+        _isMouseAbove = false;
+        OnMouseLeave?.Invoke();
     }
     #endregion
 }
