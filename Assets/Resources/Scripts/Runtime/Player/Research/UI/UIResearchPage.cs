@@ -30,7 +30,6 @@ public class UIResearchPage : MonoBehaviour
     private void Awake()
     {
         _uiScaler = GetComponent<UIScaler>();
-        _uiScaler.OnScaleChanged += HandlePageScaleChanged;
     }
 
     public void InitializePage(int countOfResearches)
@@ -66,17 +65,21 @@ public class UIResearchPage : MonoBehaviour
         _researchDescription.gameObject.SetActive(true);
     }
 
-    private void HideResearchDescription()
+    public void HideResearchDescription()
     {
         _researchDescription.gameObject.SetActive(false);
     }
 
-    private void UpdateResearchDescriptionPosition(float scale)
+    public void UpdateResearchDescriptionPosition(float scale)
     {
+        if (_currentResearch == null)
+        {
+            return;
+        }
         Vector3 position = _currentResearch.transform.position;
         Vector2 size = (_currentResearch.transform as RectTransform).sizeDelta * scale;
+        _researchDescription.transform.SetParent(_currentResearch.transform, false);
         _researchDescription.transform.position = new Vector3(position.x + size.x / 2f, position.y + size.y / 2f);
-        _researchDescription.transform.SetParent(_currentResearch.transform);
     }
 
     public void UpdateResearchDescription(string name, string description)
@@ -118,14 +121,6 @@ public class UIResearchPage : MonoBehaviour
     {
         HideItemDescription();
         HideResearchDescription();
-    }
-
-    private void HandlePageScaleChanged(float scale)
-    {
-        if (_currentResearch != null)
-        {
-            UpdateResearchDescriptionPosition(scale);
-        }
     }
 
     private void HandleFinishResearch(UIResearchNode research)

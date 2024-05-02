@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UIFillAmount : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+public class UIFillAmount : MonoBehaviour, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
 {
     #region Private fields
     [SerializeField]
@@ -39,10 +39,12 @@ public class UIFillAmount : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
             }
         };
     }
+
     private void FixedUpdate() 
     {
         _fillFrame?.Invoke();
     }
+
     public void FillFrame(float value)
     {
         _currentFillAmount += value;
@@ -53,6 +55,7 @@ public class UIFillAmount : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
             OnFrameFilled?.Invoke();
         }
     }
+
     public void ResetFrame()
     {
         _currentFillAmount = 0f;
@@ -63,6 +66,11 @@ public class UIFillAmount : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     public void Stop()
     {
         _fillFrame = null;
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        _isFill = false;
     }
 
     public void OnPointerUp(PointerEventData eventData)
