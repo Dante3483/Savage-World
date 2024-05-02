@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 using System;
 using System.Linq;
 
-public class UIResearchDescription : MonoBehaviour//, IPointerEnterHandler, IPointerExitHandler
+public class UIResearchDescription : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     #region Private fields
     [Header("Main")] 
@@ -175,6 +175,16 @@ public class UIResearchDescription : MonoBehaviour//, IPointerEnterHandler, IPoi
     private void HandleHideItemDescription()
     {
         OnHideItemDescription?.Invoke();
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+
     }
     #endregion
 }

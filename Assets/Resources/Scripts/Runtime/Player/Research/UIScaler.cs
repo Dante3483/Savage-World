@@ -1,6 +1,7 @@
+using System;
 using UnityEngine;
 
-public class UiCanvasScaler : MonoBehaviour
+public class UIScaler : MonoBehaviour
 {
     #region Private fields
     [SerializeField]
@@ -9,16 +10,23 @@ public class UiCanvasScaler : MonoBehaviour
     private float _dragMultiplier = 1f;
     [SerializeField]
 
+    private float _prevScale;
     private Vector3 _dragOffset;
     private bool _isDragging;
     #endregion
 
     #region Public fields
-
+    public event Action<float> OnScaleChanged;
     #endregion
 
     #region Properties
-
+    public float Scale
+    {
+        get
+        {
+            return _scale;
+        }
+    }
     #endregion
 
     #region Methods
@@ -44,7 +52,12 @@ public class UiCanvasScaler : MonoBehaviour
 
     private void LateUpdate()
     {
-        transform.localScale = Vector3.one * _scale;
+        if (_scale != _prevScale)
+        {
+            transform.localScale = Vector3.one * _scale;
+            OnScaleChanged?.Invoke(_scale);
+            _prevScale = _scale;
+        }
     }
 
     private Vector3 GetMouseWorldPosition()

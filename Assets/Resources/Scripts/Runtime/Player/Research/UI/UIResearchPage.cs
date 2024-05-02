@@ -13,8 +13,9 @@ public class UIResearchPage : MonoBehaviour
     private UIItemDescription _itemDescription;
     [SerializeField]
     private RectTransform _researchesContent;
+    private UIScaler _uiScaler;
     private List<UIResearchNode> _listOfResearches = new();
-    
+    private UIResearchNode _currentResearch;
     #endregion
 
     #region Public fields
@@ -28,7 +29,8 @@ public class UIResearchPage : MonoBehaviour
     #region Methods
     private void Awake()
     {
-        
+        _uiScaler = GetComponent<UIScaler>();
+        _uiScaler.OnScaleChanged += HandlePageScaleChanged;
     }
 
     public void InitializePage(int countOfResearches)
@@ -47,6 +49,7 @@ public class UIResearchPage : MonoBehaviour
         _researchDescription.OnCostDescriptionRequested += HandleCostDescriptionRequested;
         _researchDescription.OnHideItemDescription += HideItemDescription;
     }
+
     public void UpdateResearch(int index, string name, Sprite image)
     {
         UIResearchNode research = _listOfResearches[index];
@@ -58,14 +61,28 @@ public class UIResearchPage : MonoBehaviour
         _listOfResearches[index].Finish();
     }
 
+    private void ShowResearchDescription()
+    {
+        _researchDescription.gameObject.SetActive(true);
+    }
+
     private void HideResearchDescription()
     {
         _researchDescription.gameObject.SetActive(false);
     }
 
+    private void UpdateResearchDescriptionPosition(float scale)
+    {
+        Vector3 position = _currentResearch.transform.position;
+        Vector2 size = (_currentResearch.transform as RectTransform).sizeDelta * scale;
+        _researchDescription.transform.position = new Vector3(position.x + size.x / 2f, position.y + size.y / 2f);
+        _researchDescription.transform.SetParent(_currentResearch.transform);
+    }
+
     public void UpdateResearchDescription(string name, string description)
     {
-        _researchDescription.gameObject.SetActive(true);
+        ShowResearchDescription();
+        UpdateResearchDescriptionPosition(_uiScaler.Scale);
         _researchDescription.UpdateName(name);
         _researchDescription.UpdateDescriptionText(description);
     }
@@ -80,9 +97,16 @@ public class UIResearchPage : MonoBehaviour
         _researchDescription.AddCost(image, quantity);
     }
 
-    public void UpdateItemDescription(Sprite image, String name, string description)
+    public void UpdateItemDescription(Sprite image, string name, string description)
     {
+        ShowItemDescription();
         _itemDescription.SetData(image, name, description);
+    }
+
+    private void ShowItemDescription()
+    {
+        _itemDescription.gameObject.SetActive(true);
+        //_itemDescription.transform.SetParent(research.transform);
     }
 
     private void HideItemDescription()
@@ -96,6 +120,14 @@ public class UIResearchPage : MonoBehaviour
         HideResearchDescription();
     }
 
+    private void HandlePageScaleChanged(float scale)
+    {
+        if (_currentResearch != null)
+        {
+            UpdateResearchDescriptionPosition(scale);
+        }
+    }
+
     private void HandleFinishResearch(UIResearchNode research)
     {
         int index = _listOfResearches.IndexOf(research);
@@ -105,18 +137,9 @@ public class UIResearchPage : MonoBehaviour
     private void HandleUpdateResearchDescription(UIResearchNode research)
     {
         int index = _listOfResearches.IndexOf(research);
-        Vector3 position = research.transform.position;
-        Vector2 size = (research.transform as RectTransform).sizeDelta;
-        Debug.Log(size);
+        _currentResearch = research;
         OnResearchDescriptionRequested?.Invoke(index);
-        
-
-        _researchDescription.transform.position = new Vector3(position.x + size.x, position.y + size.y);
-        //_researchDescription.transform.SetParent(research.transform);
-
-        _itemDescription.gameObject.SetActive(true);
-        _itemDescription.transform.SetParent(research.transform);
-    }    
+    }
 
     private void HandleRewardDescriptionRequested(int index)
     {
