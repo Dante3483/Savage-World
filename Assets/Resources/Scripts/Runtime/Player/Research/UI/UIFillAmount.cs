@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UIFillAmount : MonoBehaviour
+public class UIFillAmount : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     #region Private fields
     [SerializeField]
@@ -21,7 +21,7 @@ public class UIFillAmount : MonoBehaviour
     #endregion
 
     #region Properties
-    public bool IsFill { get => _isFill; set => _isFill = value; }
+
     #endregion
 
     #region Methods
@@ -57,12 +57,28 @@ public class UIFillAmount : MonoBehaviour
     {
         _currentFillAmount = 0f;
         _image.fillAmount = _currentFillAmount;
-        IsFill = false;
+        _isFill = false;
     }
 
     public void Stop()
     {
         _fillFrame = null;
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            _isFill = false;
+        }
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            _isFill = true;
+        }
     }
     #endregion
 }

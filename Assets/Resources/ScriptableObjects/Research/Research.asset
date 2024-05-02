@@ -29,4 +29,5 @@ MonoBehaviour:
   - _item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
     _quantity: 1
   _listOfParents: []
-  _listOfChildren: []
+  _listOfChildren:
+  - {fileID: 11400000, guid: c617ebe1514b5ab43ad99f07b3623298, type: 2}

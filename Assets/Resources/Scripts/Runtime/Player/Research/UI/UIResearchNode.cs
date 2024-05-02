@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
-public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
+public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     #region Private fields
     private bool _isMouseAbove;
@@ -41,14 +41,15 @@ public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         _uIFillAmount.OnFrameFilled += HandleFrameFilled;
     }
 
-    public void Update()
-    {
-
-    }
-
     private void OnDisable() 
     {
         _uIFillAmount.ResetFrame();
+    }
+
+    public void SetData(string name, Sprite image)
+    {
+        _nameTxt.text = name;
+        _image.sprite = image;
     }
 
     public void Finish()
@@ -71,16 +72,6 @@ public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         _isMouseAbove = false;
         OnMouseLeave?.Invoke();
-    }
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        _uIFillAmount.IsFill = true;
-    }
-
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        _uIFillAmount.IsFill = false;
     }
     #endregion
 }

@@ -35,7 +35,7 @@ public class UIResearchPage : MonoBehaviour
     {
         for (int i = 0; i < countOfResearches; i++)
         {
-            UIResearchNode uiItem = Instantiate(_researchPrefab, Vector3.zero, Quaternion.identity);
+            UIResearchNode uiItem = Instantiate(_researchPrefab, new Vector3(0+300*i,0+300*i,0), Quaternion.identity);
             uiItem.transform.SetParent(_researchesContent, false);
             uiItem.name = "Research";
             uiItem.OnFinishResearch += HandleFinishResearch;
@@ -46,6 +46,11 @@ public class UIResearchPage : MonoBehaviour
         _researchDescription.OnRewardDescriptionRequested += HandleRewardDescriptionRequested;
         _researchDescription.OnCostDescriptionRequested += HandleCostDescriptionRequested;
         _researchDescription.OnHideItemDescription += HideItemDescription;
+    }
+    public void UpdateResearch(int index, string name, Sprite image)
+    {
+        UIResearchNode research = _listOfResearches[index];
+        research.SetData(name, image);
     }
 
     public void FinishResearch(int index)
@@ -77,7 +82,6 @@ public class UIResearchPage : MonoBehaviour
 
     public void UpdateItemDescription(Sprite image, String name, string description)
     {
-        _itemDescription.gameObject.SetActive(true);
         _itemDescription.SetData(image, name, description);
     }
 
@@ -101,8 +105,16 @@ public class UIResearchPage : MonoBehaviour
     private void HandleUpdateResearchDescription(UIResearchNode research)
     {
         int index = _listOfResearches.IndexOf(research);
+        Vector3 position = research.transform.position;
+        Vector2 size = (research.transform as RectTransform).sizeDelta;
+        Debug.Log(size);
         OnResearchDescriptionRequested?.Invoke(index);
-        _researchDescription.transform.SetParent(research.transform);
+        
+
+        _researchDescription.transform.position = new Vector3(position.x + size.x, position.y + size.y);
+        //_researchDescription.transform.SetParent(research.transform);
+
+        _itemDescription.gameObject.SetActive(true);
         _itemDescription.transform.SetParent(research.transform);
     }    
 

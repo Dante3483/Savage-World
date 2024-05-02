@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _listOfReserches:
   - {fileID: 11400000, guid: ecf3f96df25bf5c4094fb7c0b39a9402, type: 2}
+  - {fileID: 11400000, guid: c617ebe1514b5ab43ad99f07b3623298, type: 2}
   _inventoryData: {fileID: 11400000, guid: ddb9f8cda83b055498ce3a67b07c92c7, type: 2}
