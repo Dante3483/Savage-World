@@ -15,19 +15,19 @@ MonoBehaviour:
   DisableAll: 0
   EnableAll: 0
   FlatWorldGeneration: 1
-  LandscapeGeneration: 0
-  BiomesGeneration: 0
-  ClustersGeneration: 0
-  CavesGeneration: 0
-  StarterCavesGeneration: 0
-  LakesGeneration: 0
-  OasisesGeneration: 0
-  GrassSeeding: 0
-  PlantsGeneration: 0
-  TreesGeneration: 0
-  PickUpItemsGeneration: 0
-  SetRandomTiles: 0
-  BlockProcessing: 0
+  LandscapeGeneration: 1
+  BiomesGeneration: 1
+  ClustersGeneration: 1
+  CavesGeneration: 1
+  StarterCavesGeneration: 1
+  LakesGeneration: 1
+  OasisesGeneration: 1
+  GrassSeeding: 1
+  PlantsGeneration: 1
+  TreesGeneration: 1
+  PickUpItemsGeneration: 1
+  SetRandomTiles: 1
+  BlockProcessing: 1
   SaveLoadTest: 0
   TerrainWidth: 8400
   TerrainHeight: 2400

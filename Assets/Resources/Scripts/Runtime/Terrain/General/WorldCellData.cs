@@ -3,12 +3,6 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Linq;
 
-//Firt 4 bit of _tileId = blockTileId
-//Last 4 bit of _tileId = wallTileId
-//1 bit of _flags = is it possible to break
-//2 bit of _flags = is it possible to place inside
-//3 bit of _flags = is tree
-//4 bit of _flags = is tree trunk
 public struct WorldCellData
 {
     #region Private fields
@@ -16,17 +10,28 @@ public struct WorldCellData
     #region Main
     private ushort _blockId;
     private ushort _wallId;
-    private byte _tileId;
     private BlockTypes _blockType;
+    private Vector2Ushort _coords;
 
     private BlockSO _blockData;
     private BlockSO _wallData;
 
-    private Vector2Ushort _coords;
+    /// <summary>
+    /// <br>First 4 bits of _tileId = blockTileId</br>
+    /// <br>Last 4 bits of _tileId = wallTileId</br>
+    /// </summary>
+    private byte _tileId;
+    /// <summary>
+    /// <br>1 bit of _flags = is unbreakable</br>
+    /// <br>2 bit of _flags = is occupied</br>
+    /// <br>3 bit of _flags = is tree</br>
+    /// <br>4 bit of _flags = is tree trunk</br>
+    /// </summary>
+    private byte _flags;
     private byte _currentActionTime;
     private byte _blockDamagePercent;
     private byte _wallDamagePercent;
-    private byte _flags;
+    private byte _colliderType;
     #endregion
 
     #region Liquid
@@ -240,6 +245,19 @@ public struct WorldCellData
             return _wallDamagePercent;
         }
     }
+
+    public byte ColliderType
+    {
+        get
+        {
+            return _colliderType;
+        }
+
+        set
+        {
+            _colliderType = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -256,6 +274,7 @@ public struct WorldCellData
         _blockDamagePercent = 0;
         _wallDamagePercent = 0;
         _flags = 0;
+        _colliderType = 0;
 
         _liquidId = 255;
         _isFlowsDown = false;
@@ -284,7 +303,8 @@ public struct WorldCellData
             $"Is breakable: {IsBreakable()}\n" +
             $"Is tree: {IsTree()}\n" +
             $"Is tree trunk: {IsTreeTrunk()}\n" +
-            $"Is free: {IsFree()}\n";
+            $"Is free: {IsFree()}\n" +
+            $"Collider type: {_colliderType}\n";
     }
 
     public Sprite GetBlockSprite()
@@ -387,42 +407,52 @@ public struct WorldCellData
 
     public void MakeUnbreakable()
     {
-        _flags |= 0x01;
+        _flags |= StaticInfo.Bit1;
     }
 
     public void MakeBreakable()
     {
-        _flags &= 0xFE;
+        _flags &= StaticInfo.InvertedBit1;
     }
 
     public void MakeOccupied()
     {
-        _flags |= 0x02;
+        _flags |= StaticInfo.Bit2;
     }
 
     public void MakeFree()
     {
-        _flags &= 0xFD;
+        _flags &= StaticInfo.InvertedBit2;
     }
 
     public void MakeTree()
     {
-        _flags |= 0x04;
+        _flags |= StaticInfo.Bit3;
     }
 
     public void RemoveTree()
     {
-        _flags &= 0xFB;
+        _flags &= StaticInfo.InvertedBit3;
     }
 
     public void MakeTreeTrunk()
     {
-        _flags |= 0x08;
+        _flags |= StaticInfo.Bit4;
     }
 
     public void RemoveTreeTrunk()
     {
-        _flags &= 0xF7;
+        _flags &= StaticInfo.InvertedBit4;
+    }
+
+    public void MakeHorizontalFlipped()
+    {
+        _flags |= StaticInfo.Bit5;
+    }
+
+    public void RemoveHorizontalFlipped()
+    {
+        _flags &= StaticInfo.InvertedBit5;
     }
 
     public bool CompareBlock(BlockSO block)
@@ -492,22 +522,27 @@ public struct WorldCellData
 
     public bool IsBreakable()
     {
-        return (_flags & 0x01) == 0;
+        return (_flags & StaticInfo.Bit1) == 0;
     }
 
     public bool IsFree()
     {
-        return (_flags & 0x02) == 0 && !IsTree() && !IsTreeTrunk();
+        return (_flags & StaticInfo.Bit2) == 0 && !IsTree() && !IsTreeTrunk();
     }
 
     public bool IsTree()
     {
-        return (_flags & 0x04) == 0x04;
+        return (_flags & StaticInfo.Bit3) == StaticInfo.Bit3;
     }
 
     public bool IsTreeTrunk()
     {
-        return (_flags & 0x08) == 0x08;
+        return (_flags & StaticInfo.Bit4) == StaticInfo.Bit4;
+    }
+
+    public bool IsHorizontalFlipped()
+    {
+        return (_flags & StaticInfo.Bit5) == StaticInfo.Bit5;
     }
 
     public void Drain()

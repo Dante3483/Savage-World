@@ -1,0 +1,138 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a4aeed76b201e74fa156f1d231a4b00, type: 3}
+  m_Name: InventoryData
+  m_EditorClassIdentifier: 
+  _storageItems:
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  _hotbarItems:
+  - _quantity: 1
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  _accessoriesItems:
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  _armorItems:
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  _bufferItem:
+    _quantity: 0
+    _itemData: {fileID: 0}
+  _selectedItem:
+    _quantity: 0
+    _itemData: {fileID: 0}
+  _storageSize: 36
+  _hotbarFullSize: 10
+  _accessoriesSize: 6
+  _armorSize: 3

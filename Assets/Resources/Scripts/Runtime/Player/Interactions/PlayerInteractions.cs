@@ -1,3 +1,4 @@
+using CustomTilemap;
 using Items;
 using System.Collections;
 using UnityEngine;
@@ -128,7 +129,7 @@ public class PlayerInteractions : MonoBehaviour
         if (WorldDataManager.Instance.IsEmpty(intPos.x, intPos.y) && 
             (WorldDataManager.Instance.IsWall(intPos.x, intPos.y) || WorldDataManager.Instance.IsSolidAnyNeighbor(intPos.x, intPos.y)))
         {
-            GameManager.Instance.Terrain.CreateBlock(intPos.x, intPos.y, blockItem.BlockToPlace);
+            WorldDataManager.Instance.SetBlockData(intPos.x, intPos.y, blockItem.BlockToPlace);
             _inventoryData.DecreaseSelectedItemQuantity(1);
             UpdateNeighboringBlocks(intPos);
             StartCoroutine(WaitForPlacingCooldown());
@@ -161,7 +162,8 @@ public class PlayerInteractions : MonoBehaviour
                 {
                     _miningDamageController.RemoveDamageFromBlocks(blockPosition);
                     CreateDrop(new Vector3(blockPosition.x + 0.5f, blockPosition.y + 0.5f), block.BlockData.Drop, 1);
-                    GameManager.Instance.Terrain.CreateBlock(blockPosition.x, blockPosition.y, GameManager.Instance.BlocksAtlas.Air);
+                    WorldDataManager.Instance.SetBlockData(blockPosition.x, blockPosition.y, GameManager.Instance.BlocksAtlas.Air);
+                    Tilemap.Instance.RemovePlatform(blockPosition);
                     UpdateNeighboringBlocks(blockPosition);
                 }
             }
@@ -217,7 +219,7 @@ public class PlayerInteractions : MonoBehaviour
 
             Vector2Int intPos = Vector2Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
 
-            GameManager.Instance.Terrain.CreateBlock((ushort)intPos.x, (ushort)intPos.y, GameManager.Instance.BlocksAtlas.GetBlockById(FurnitureBlocksID.Torch));
+            WorldDataManager.Instance.SetBlockData((ushort)intPos.x, (ushort)intPos.y, GameManager.Instance.BlocksAtlas.GetBlockById(FurnitureBlocksID.Torch));
 
             UpdateNeighboringBlocks(intPos);
         }

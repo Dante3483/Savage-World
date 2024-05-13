@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -74,6 +75,143 @@ public class WorldDataManager : MonoBehaviour
                 _worldData[x, y] = new WorldCellData(x, y, airBlock, airWall);
             }
         });
+    }
+
+    public void SetBlockData(int x, int y, BlockSO data)
+    {
+        if (data == null)
+        {
+            return;
+        }
+        _worldData[x, y].SetBlockData(data);
+        if (GameManager.Instance.IsGameSession && !GameManager.Instance.IsWorldLoading)
+        {
+            if (_worldData[x, y].IsEmpty())
+            {
+                _worldData[x, y].ColliderType = byte.MaxValue;
+                RemoveCorners(x, y);
+                for (int i = -1; i <= 1; i++)
+                {
+                    for (int j = -1; j <= 1; j++)
+                    {
+                        if (i == 0 && j == 0)
+                        {
+                            continue;
+                        }
+                        if (_worldData[x + i, y + j].IsSolid())
+                        {
+                            SetRules(x + i, y + j);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                SetCorners(x, y);
+                SetRules(x, y);
+                for (int i = -1; i <= 1; i++)
+                {
+                    for (int j = -1; j <= 1; j++)
+                    {
+                        if (i == 0 && j == 0)
+                        {
+                            continue;
+                        }
+                        if (_worldData[x + i, y + j].IsSolid())
+                        {
+                            SetRules(x + i, y + j);
+                        }
+                    }
+                }
+            }
+            List<Vector2> points = new();
+            data.Sprites[0].GetPhysicsShape(0, points);
+            points.ForEach(point => Debug.Log(point));
+            _worldData[x, y].SetRandomBlockTile(GameManager.Instance.RandomVar);
+        }
+    }
+
+    private void SetRules(int x, int y)
+    {
+        for (byte i = 0; i < CustomTilemap.Tilemap.Instance.SolidRules.Count; i++)
+        {
+            bool result = true;
+            SolidRule solidRule = CustomTilemap.Tilemap.Instance.SolidRules[i];
+            foreach (SolidRule.Rule rule in solidRule.Rules)
+            {
+                result = CheckRule(x, y, rule.RuleType, rule.Position);
+                if (solidRule.IsHorizontalFlip)
+                {
+                    result |= CheckRule(x, y, rule.RuleType, -rule.Position);
+                }
+                if (!result)
+                {
+                    break;
+                }
+            }
+            if (result)
+            {
+                _worldData[x, y].ColliderType = i;
+                break;
+            }
+            else
+            {
+                _worldData[x, y].ColliderType = byte.MaxValue;
+            }
+        }
+    }
+
+    private bool CheckRule(int x, int y, SolidRule.RuleType ruleType, Vector2Int position)
+    {
+        int ruleX = x + position.x;
+        int ruleY = y + position.y;
+        switch (ruleType)
+        {
+            case SolidRule.RuleType.IsEmpty:
+                {
+                    return _worldData[ruleX, ruleY].IsEmpty();
+                }
+            case SolidRule.RuleType.IsSolid:
+                {
+                    return _worldData[ruleX, ruleY].IsSolid();
+                }
+            case SolidRule.RuleType.IsCorner:
+                {
+                    return _worldData[ruleX, ruleY].ColliderType == 254;
+                }
+            default:
+                {
+                    return false;
+                }
+        }
+    }
+
+    private void SetCorners(int x, int y)
+    {
+        SetCorner(x, y, 1);
+        SetCorner(x, y, -1);
+    }
+
+    private void SetCorner(int x, int y, int side)
+    {
+        if (_worldData[x + side, y].IsEmpty())
+        {
+            _worldData[x + side, y].ColliderType = 254;
+        }
+    }
+
+    private void RemoveCorners(int x, int y)
+    {
+        RemoveCorner(x, y, 1);
+        RemoveCorner(x, y, -1);
+    }
+
+    private void RemoveCorner(int x, int y, int side)
+    {
+        if (_worldData[x + side, y].IsEmpty())
+        {
+            _worldData[x + side, y].ColliderType = byte.MaxValue;
+        }
     }
 
     public ref WorldCellData GetWorldCellData(int x, int y)

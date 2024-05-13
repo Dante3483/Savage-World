@@ -7,12 +7,27 @@ public class StaticInfo
     #region Private fields
     private static string _playersDirectory;
     private static string _worldsDirectory;
-    private static string _styleSheetsDirectory;
-    private static char[] _digitsCharArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' '};
     #endregion
 
     #region Public fields
-
+    public readonly static string StyleSheetsDirectory = "Scripts/Editor/StyleSheets/";
+    public readonly static char[] DigitsCharArray = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ' };
+    public readonly static byte Bit1 = 0b0000_0001;
+    public readonly static byte Bit2 = 0b0000_0010;
+    public readonly static byte Bit3 = 0b0000_0100;
+    public readonly static byte Bit4 = 0b0000_1000;
+    public readonly static byte Bit5 = 0b0001_0000;
+    public readonly static byte Bit6 = 0b0010_0000;
+    public readonly static byte Bit7 = 0b0100_0000;
+    public readonly static byte Bit8 = 0b1000_0000;
+    public readonly static byte InvertedBit1 = (byte)~Bit1;
+    public readonly static byte InvertedBit2 = (byte)~Bit2;
+    public readonly static byte InvertedBit3 = (byte)~Bit3;
+    public readonly static byte InvertedBit4 = (byte)~Bit4;
+    public readonly static byte InvertedBit5 = (byte)~Bit5;
+    public readonly static byte InvertedBit6 = (byte)~Bit6;
+    public readonly static byte InvertedBit7 = (byte)~Bit7;
+    public readonly static byte InvertedBit8 = (byte)~Bit8;
     #endregion
 
     #region Properties
@@ -29,27 +44,6 @@ public class StaticInfo
         get
         {
             return _worldsDirectory;
-        }
-    }
-
-    public static string StyleSheetsDirectory
-    {
-        get
-        {
-            return "Scripts/Editor/StyleSheets/";
-        }
-    }
-
-    public static char[] DigitsCharArray
-    {
-        get
-        {
-            return _digitsCharArray;
-        }
-
-        set
-        {
-            _digitsCharArray = value;
         }
     }
     #endregion

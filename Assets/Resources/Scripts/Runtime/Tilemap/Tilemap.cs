@@ -1,5 +1,10 @@
+using Codice.Client.Common;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor.Overlays;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UIElements;
 
 namespace CustomTilemap
 {
@@ -7,22 +12,44 @@ namespace CustomTilemap
     {
         #region Private fields
         [Header("Main")]
-        [SerializeField] private int _width;
-        [SerializeField] private int _height;
+        [SerializeField] 
+        private int _width;
+        [SerializeField] 
+        private int _height;
 
         [Header("Solid tilemap")]
-        [SerializeField] private UnityEngine.Tilemaps.Tilemap _solidTilemap;
-        [SerializeField] private SolidRuleTile _solidRuleTIle;
-        [SerializeField] private CornerRuleTile _cornerRuleTile;
+        [SerializeField]
+        private List<SolidRule> _solidRules;
+        [SerializeField] 
+        private UnityEngine.Tilemaps.Tilemap _solidTilemap;
+        [SerializeField] 
+        private SolidRuleTile _solidRuleTIle;
+        [SerializeField] 
+        private CornerRuleTile _cornerRuleTile;
 
         [Header("Blocks tilemap")]
-        [SerializeField] private Tile _tilePrefab;
-        [SerializeField] private Transform _blocksTilemap;
-        [SerializeField] private Vector2 _tilesOffset = new Vector2(0.5f, 0.5f);
+        [SerializeField] 
+        private Tile _tilePrefab;
+        [SerializeField] 
+        private Transform _blocksTilemap;
+        [SerializeField] 
+        private Vector2 _tilesOffset = new Vector2(0.5f, 0.5f);
 
         [Header("Tile damage")]
-        [SerializeField] private Sprite[] _blockDamageSprites;
-        [SerializeField] private Sprite[] _wallDamageSprites;
+        [SerializeField] 
+        private Sprite[] _blockDamageSprites;
+        [SerializeField] 
+        private Sprite[] _wallDamageSprites;
+
+        [Header("Platforms")]
+        [SerializeField] 
+        private SolidPlatform _platformPrefab;
+        [SerializeField]
+        private Transform _platformsParrent;
+        [SerializeField] 
+        private Dictionary<Vector2Int, SolidPlatform> _listOfUsedPlatforms;
+        [SerializeField] 
+        private List<SolidPlatform> _listOfFreePlatforms;
 
         private Vector3Int _currentPosition;
         private Vector3Int _prevPosition;
@@ -35,22 +62,33 @@ namespace CustomTilemap
         #endregion
 
         #region Public fields
-
+        public static Tilemap Instance;
+        public Sprite _testSprite;
         #endregion
 
         #region Properties
-
+        public List<SolidRule> SolidRules
+        {
+            get
+            {
+                return _solidRules;
+            }
+        }
         #endregion
 
         #region Methods
         private void Awake()
         {
+            Instance = this;
+
             InitializeTiles();
             _solidTilesCoords = new Vector3Int[_width * _height * 2];
             _solidTiles = new TileBase[_width * _height * 2];
             _prevAreaRect = new RectInt(new Vector2Int(0, 0), new Vector2Int(_width, _height));
             _currentAreaRect = new RectInt(new Vector2Int(0, 0), new Vector2Int(_width, _height));
             _prevPosition = Vector3Int.FloorToInt(Camera.main.transform.position) - new Vector3Int(_width / 2, _height / 2, -30);
+            _listOfUsedPlatforms = new();
+            _listOfFreePlatforms = new();
         }
 
         private void FixedUpdate()
@@ -109,6 +147,7 @@ namespace CustomTilemap
                 {
                     _solidTilesCoords[length + i].x = position.x;
                     _solidTilesCoords[length + i].y = position.y;
+                    SetPlatformActive(position);
                 }
                 else
                 {
@@ -121,7 +160,7 @@ namespace CustomTilemap
 
         private void UpdateTileData(int x, int y)
         {
-            Vector3Int blockPosition = new Vector3Int();
+            Vector2Int blockPosition = new();
             byte blockDamage;
             byte wallDamage;
 
@@ -173,6 +212,68 @@ namespace CustomTilemap
                     _solidTiles[x * _height + y] = _cornerRuleTile;
                 }
             }
+            SetPlatformInactive(blockPosition);
+        }
+
+        public void CreatePlatform(Vector2Int position)
+        {
+            _listOfUsedPlatforms.TryGetValue(position, out SolidPlatform platform);
+            if (platform == null)
+            {
+                platform = GetFirstFreePlatform();
+                platform.SetActive();
+                platform.SetPolygonColliderPoints(_testSprite);
+                platform.transform.position = new Vector2(position.x, position.y) + _tilesOffset;
+                _listOfUsedPlatforms.Add(position, platform);
+            }
+        }
+
+        public void RemovePlatform(Vector2Int position)
+        {
+            _listOfUsedPlatforms.TryGetValue(position, out SolidPlatform platform);
+            if (platform == null)
+            {
+                return;
+            }
+            _listOfUsedPlatforms.Remove(position);
+            SetPlatformFree(platform);
+        }
+
+        private SolidPlatform GetFirstFreePlatform()
+        {
+            SolidPlatform freePlatform = _listOfFreePlatforms.FirstOrDefault();
+            if (freePlatform == null)
+            {
+                return Instantiate(_platformPrefab, _platformsParrent);
+            }
+            _listOfFreePlatforms.Remove(freePlatform);
+            return freePlatform;
+        }
+
+        private void SetPlatformFree(SolidPlatform usedPlatform)
+        {
+            usedPlatform.transform.position = new(-10, -10);
+            _listOfFreePlatforms.Add(usedPlatform);
+        }
+
+        private void SetPlatformInactive(Vector2Int position)
+        {
+            _listOfUsedPlatforms.TryGetValue(position, out SolidPlatform platform);
+            if (platform == null)
+            {
+                return;
+            }
+            platform.SetInactive();
+        }
+
+        private void SetPlatformActive(Vector2Int position)
+        {
+            _listOfUsedPlatforms.TryGetValue(position, out SolidPlatform platform);
+            if (platform == null)
+            {
+                return;
+            }
+            platform.SetActive();
         }
         #endregion
     }

@@ -128,7 +128,7 @@ public class DropPhysics : MonoBehaviour
 
     private bool CheckAdjacentBlock(int x, int y)
     {
-        return WorldDataManager.Instance.GetAdjacentWorldCellData(_intPosition.x, _intPosition.y, new Vector2Int(x, y)).IsSolid();
+        return WorldDataManager.Instance.IsSolid(_intPosition.x + x, _intPosition.y + y);
     }
 
     public void AddForce()
