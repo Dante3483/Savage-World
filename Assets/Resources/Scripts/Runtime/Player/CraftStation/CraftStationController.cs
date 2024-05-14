@@ -65,7 +65,10 @@ public class CraftStationController : MonoBehaviour, IBookPageController
         _craftStationUI.ResetAllRecipes();
         foreach (RecipeSO recipe in _currentCraftStation.GetRecipes())
         {
-            _craftStationUI.UpdateRecipe(recipe.Result.Item.SmallItemImage, recipe.Result.Item.Name);
+            if (recipe.IsUnlocked)
+            {
+                _craftStationUI.UpdateRecipe(recipe.Result.Item.SmallItemImage, recipe.Result.Item.Name);
+            }
         }
         _craftStationUI.SelectRecipe(0);
     }

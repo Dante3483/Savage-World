@@ -20,4 +20,4 @@ MonoBehaviour:
   _result:
     _item: {fileID: 11400000, guid: 8cbc00e1665eeb74aa80d820992b6345, type: 2}
     _quantity: 1
-  _isUnlocked: 1
+  _isUnlocked: 0

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,14 +13,23 @@ public class ResearchesSO : ScriptableObject
     #endregion
 
     #region Public fields
-
+    public event Action<int, ResearchState> OnResearchChangedState;
     #endregion
 
     #region Properties
-    public List<ResearchSO> ListOfReserches { get => _listOfReserches; set => _listOfReserches = value; }
+
     #endregion
 
     #region Methods
+    public void Initialize()
+    {
+        foreach (ResearchSO research in _listOfReserches)
+        {
+            research.ResetData();
+            research.OnStateChanged += HandleResearchChangedState;
+        }
+    }
+
     public bool ExamineResearch(int index)
     {
         ResearchSO research = _listOfReserches[index];
@@ -37,50 +47,90 @@ public class ResearchesSO : ScriptableObject
         research.Complete();
         return true;
     }
-    // Method for nodes
+
     public string GetName(int index)
     {
-        if (index < 0 || index >= _listOfReserches.Count)
+        if (CheckIndex(index))
         {
             return null;
         }
-        else if(_listOfReserches[index].Name is null)
-        {
-            return "default name";
-        }
         return _listOfReserches[index].Name;
     }
+
     public Sprite GetIconImage(int index)
     {
-        if (index < 0 || index >= _listOfReserches.Count)
+        if (CheckIndex(index))
         {
             return null;
         }
         return _listOfReserches[index].IconImage;
     }
+
     public string GetDescription(int index)
     {
-        if (index < 0 || index >= _listOfReserches.Count)
+        if (CheckIndex(index))
         {
             return null;
         }
         return _listOfReserches[index].Description;
     }
+
+    public Vector3 GetPosition(int index)
+    {
+        return _listOfReserches[index].Position;
+    }
+
+    public Vector3 GetPosition(ResearchSO research)
+    {
+        return _listOfReserches.Find(r => r == research).Position;
+    }
+
+    public ResearchState GetState(int index)
+    {
+        return _listOfReserches[index].State;
+    }
+
+    public int GetResearchCount()
+    {
+        return _listOfReserches.Count;
+    }
+
     public List<RecipeSO> GetListOfRewards(int index)
     {
-        if (index < 0 || index >= _listOfReserches.Count)
+        if (CheckIndex(index))
         {
             return null;
         }
         return _listOfReserches[index].ListOfRewards;
     }
+
     public List<ItemQuantity> GetListOfCosts(int index)
     {
-        if (index < 0 || index >= _listOfReserches.Count)
+        if (CheckIndex(index))
         {
             return null;
         }
         return _listOfReserches[index].ListOfCosts;
+    }
+
+    public List<ResearchSO> GetListOfPerents(int index)
+    {
+        if (CheckIndex(index))
+        {
+            return null;
+        }
+        return _listOfReserches[index].ListOfParents;
+    }
+
+    private bool CheckIndex(int index)
+    {
+        return index < 0 || index >= _listOfReserches.Count;
+    }
+
+    private void HandleResearchChangedState(ResearchSO research)
+    {
+        int index = _listOfReserches.IndexOf(research);
+        OnResearchChangedState?.Invoke(index, research.State);
     }
     #endregion
 }

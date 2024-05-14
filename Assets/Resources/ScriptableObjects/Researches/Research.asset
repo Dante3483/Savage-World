@@ -16,17 +16,19 @@ MonoBehaviour:
   _iconImage: {fileID: 21300000, guid: 01277527e5240774fabcc56be1097b35, type: 3}
   _description: There are many different varieties of pasta. They are usually sorted
     by size, being long (pasta lunga), short (pasta corta), stuffed (ripiena), ...
-  _isUnlocked: 0
-  _isCompleted: 1
+  _state: 2
+  _position: {x: 0, y: 0, z: 0}
   _listOfRewards:
-  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
-  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
-  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
-  - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
+  - {fileID: 11400000, guid: 58fcfceb403d95f4c9ddd430eb2941fe, type: 2}
   _listOfCosts:
   - _item: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
     _quantity: 69
   - _item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
     _quantity: 1
   _listOfParents: []
-  _listOfChildren: []
+  _listOfChildren:
+  - {fileID: 11400000, guid: 190b8e33272f97242b66a96c6ba13e88, type: 2}
+  - {fileID: 11400000, guid: d1fa481a024dfdc4bac0ed8ca5f38ee1, type: 2}
+  - {fileID: 11400000, guid: 41ccfc17d00e253499e53db674534e01, type: 2}
+  - {fileID: 11400000, guid: c681414b1055f404ba9f20e8ef2777e1, type: 2}
+  - {fileID: 11400000, guid: c617ebe1514b5ab43ad99f07b3623298, type: 2}

@@ -3,13 +3,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UIFillAmount : MonoBehaviour
+public class UIFillAmount : MonoBehaviour, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
 {
     #region Private fields
     [SerializeField]
     private Image _image;
     [SerializeField]
-    public float _fillSpeed = 0.5f;
+    private float _fillSpeed = 0.5f;
     [SerializeField]
     private float _currentFillAmount = 0f;
     private bool _isFill;
@@ -21,7 +21,7 @@ public class UIFillAmount : MonoBehaviour
     #endregion
 
     #region Properties
-    public bool IsFill { get => _isFill; set => _isFill = value; }
+    public Image Image { get => _image; set => _image = value; }
     #endregion
 
     #region Methods
@@ -39,10 +39,12 @@ public class UIFillAmount : MonoBehaviour
             }
         };
     }
+
     private void FixedUpdate() 
     {
         _fillFrame?.Invoke();
     }
+
     public void FillFrame(float value)
     {
         _currentFillAmount += value;
@@ -53,16 +55,38 @@ public class UIFillAmount : MonoBehaviour
             OnFrameFilled?.Invoke();
         }
     }
+
     public void ResetFrame()
     {
         _currentFillAmount = 0f;
         _image.fillAmount = _currentFillAmount;
-        IsFill = false;
+        _isFill = false;
     }
 
     public void Stop()
     {
         _fillFrame = null;
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        _isFill = false;
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            _isFill = true;
+        }
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            _isFill = false;
+        }
     }
     #endregion
 }

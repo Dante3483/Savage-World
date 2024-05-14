@@ -87,8 +87,9 @@ GameObject:
   - component: {fileID: 7325884461068720688}
   - component: {fileID: 6345919250143130489}
   - component: {fileID: 3868096672334991739}
+  - component: {fileID: 472622540595074061}
   m_Layer: 0
-  m_Name: ProgressFrameMask
+  m_Name: ProgressBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -101,13 +102,13 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 593477390112411263}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6259539938010377525}
-  m_Father: {fileID: 4916567642409863479}
+  m_Father: {fileID: 3846390570245577611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -165,6 +166,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 0
+--- !u!114 &472622540595074061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 593477390112411263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a67645f95c8abaf4890a1a064c6453a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _image: {fileID: 6345919250143130489}
+  _fillSpeed: 0.5
+  _currentFillAmount: 0
 --- !u!1 &688083825321438317
 GameObject:
   m_ObjectHideFlags: 0
@@ -738,7 +754,7 @@ MonoBehaviour:
   m_Color: {r: 0.55, g: 0.49393207, b: 0.38446605, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 0
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -798,7 +814,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3846390570245577611}
-  - component: {fileID: 5557823083676269609}
   - component: {fileID: 4632218533212024494}
   m_Layer: 0
   m_Name: Research
@@ -821,6 +836,7 @@ RectTransform:
   m_Children:
   - {fileID: 4916567642409863479}
   - {fileID: 1807390178586380640}
+  - {fileID: 2171291970579692226}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -828,21 +844,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 148, y: 225}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &5557823083676269609
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4861118750790011875}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a67645f95c8abaf4890a1a064c6453a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _image: {fileID: 6345919250143130489}
-  _fillSpeed: 0.5
-  _currentFillAmount: 0
 --- !u!114 &4632218533212024494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -857,9 +858,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _nameTxt: {fileID: 5036284958830881632}
   _image: {fileID: 3513383039660328708}
+  _frame: {fileID: 6684534359992491641}
+  _currentColor: {r: 0, g: 0, b: 0, a: 0}
+  _lockedColor: {r: 0.65, g: 0.65, b: 0.65, a: 1}
+  _unlockedColor: {r: 1, g: 0.5372549, b: 0, a: 1}
+  _completedColor: {r: 0, g: 0.64705884, b: 0.06666667, a: 1}
   _rewardPrefab: {fileID: 6938807181089945094, guid: a8cc2c03d6682f645b697cbb282a59d8, type: 3}
+  _linePrefab: {fileID: 2513172723225267505, guid: 99674b13187c4f44a90fa0b03784b58a, type: 3}
   _rewardsContent: {fileID: 8946639901444542256}
-  _uIFillAmount: {fileID: 5557823083676269609}
+  _uiFillAmount: {fileID: 472622540595074061}
 --- !u!1 &4949375972976191260
 GameObject:
   m_ObjectHideFlags: 0
@@ -891,7 +898,6 @@ RectTransform:
   - {fileID: 8364230539962545645}
   - {fileID: 7732381355070044345}
   - {fileID: 1992069146414385067}
-  - {fileID: 2171291970579692226}
   m_Father: {fileID: 3846390570245577611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -951,7 +957,7 @@ GameObject:
   - component: {fileID: 1457375705540833162}
   - component: {fileID: 3864839280813324893}
   m_Layer: 0
-  m_Name: ProgressFrame
+  m_Name: Frame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
