@@ -9,7 +9,6 @@ using TMPro;
 public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     #region Private fields
-    private bool _isMouseAbove;
     [SerializeField]
     private TMP_Text _nameTxt;
     [SerializeField]
@@ -17,20 +16,22 @@ public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     [SerializeField]
     private Image _frame;
     [SerializeField]
+    private Color _currentColor;
+    [SerializeField]
     private Color _lockedColor;
     [SerializeField]
     private Color _unlockedColor;
     [SerializeField]
-    private Color _finishedColor;
+    private Color _completedColor;
     [SerializeField]
     private UIResearchReward _rewardPrefab;
     [SerializeField]
     private UILine _linePrefab;
     [SerializeField]
     private RectTransform _rewardsContent;
-    private List<UIResearchReward> _listOfRewards;
     [SerializeField]
-    private UIFillAmount _uIFillAmount;
+    private UIFillAmount _uiFillAmount;
+    private List<UIResearchReward> _listOfRewards;
     private List<UILine> _listOfLines;
     #endregion
 
@@ -48,35 +49,72 @@ public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     public void Awake()
     {
         _listOfRewards = new();
-        _uIFillAmount.OnFrameFilled += HandleFrameFilled;
+        _uiFillAmount.OnFrameFilled += HandleFrameFilled;
     }
 
     private void OnDisable() 
     {
-        _uIFillAmount.ResetFrame();
+        _uiFillAmount.ResetFrame();
     }
 
-    public void SetData(string name, Sprite image, int parentsCount)
+    public void SetData(string name, Sprite image)
     {
         _listOfLines = new();
         _nameTxt.text = name;
         _image.sprite = image;
-        for (int i = 0; i < parentsCount; i++)
-        {
-            UILine uiItem = Instantiate(_linePrefab, new Vector3(0,0,0), Quaternion.identity);
-            uiItem.transform.SetParent(transform, false);
-            _listOfLines.Add(uiItem);
-        }
-    }
-    public void SetLines(int countOflines, Vector3 childLine, Vector3 PerentLine)
-    {
-        _linePrefab.SetLine(childLine, PerentLine);
     }
 
-    public void Finish()
+    public void ChangeState(ResearchState state)
     {
-        _frame.color = _finishedColor;
-        _uIFillAmount.Stop();
+        switch (state)
+        {
+            case ResearchState.Locked:
+                {
+                    _currentColor = _lockedColor;
+                    _uiFillAmount.gameObject.SetActive(false);
+                }
+                break;
+            case ResearchState.Unlocked:
+                {
+                    _currentColor = _unlockedColor;
+                    _uiFillAmount.gameObject.SetActive(true);
+                }
+                break;
+            case ResearchState.Completed:
+                {
+                    _currentColor = _completedColor;
+                    Complete();
+                }
+                break;
+            default:
+                break;
+        }
+        UpdateFrameColor();
+        UpdateLinesColor();
+    }
+
+    public void CreateLine(RectTransform linesContent, Vector3 fromPosition, Vector3 toPosition)
+    {
+        UILine uiItem = Instantiate(_linePrefab, new Vector3(0, 0, 0), Quaternion.identity);
+        uiItem.transform.SetParent(linesContent, false);
+        uiItem.name = "Line";
+        uiItem.SetData(_currentColor, fromPosition, toPosition);
+        _listOfLines.Add(uiItem);
+    }
+
+    public void Complete()
+    {
+        _uiFillAmount.Stop();
+    }
+
+    private void UpdateFrameColor()
+    {
+        _frame.color = _currentColor;
+    }
+
+    private void UpdateLinesColor()
+    {
+        _listOfLines.ForEach(l => l.SetColor(_currentColor));
     }
 
     private void HandleFrameFilled()
@@ -86,13 +124,11 @@ public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     
     public void OnPointerEnter(PointerEventData pointerData)
     {
-        _isMouseAbove = true;
         OnMouseEnter?.Invoke(this);
     }
 
     public void OnPointerExit(PointerEventData pointerData)
     {
-        _isMouseAbove = false;
         OnMouseLeave?.Invoke();
     }
     #endregion

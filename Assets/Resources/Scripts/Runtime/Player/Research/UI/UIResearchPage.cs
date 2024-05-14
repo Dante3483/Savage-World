@@ -12,9 +12,11 @@ public class UIResearchPage : MonoBehaviour
     [SerializeField]
     private UIItemDescription _itemDescription;
     [SerializeField]
-    private UILine _line;
-    [SerializeField]
     private RectTransform _researchesContent;
+    [SerializeField]
+    private RectTransform _linesContent;
+    [SerializeField]
+    private RectTransform _activeResearchContent;
     private UIScaler _uiScaler;
     private List<UIResearchNode> _listOfResearches = new();
     private UIResearchNode _currentResearch;
@@ -38,13 +40,14 @@ public class UIResearchPage : MonoBehaviour
     {
         for (int i = 0; i < countOfResearches; i++)
         {
-            UIResearchNode uiItem = Instantiate(_researchPrefab, new Vector3(0+300*i,0+300*i,0), Quaternion.identity);
+            UIResearchNode uiItem = Instantiate(_researchPrefab, Vector3.zero, Quaternion.identity);
             uiItem.transform.SetParent(_researchesContent, false);
             uiItem.name = "Research";
             uiItem.OnFinishResearch += HandleFinishResearch;
             uiItem.OnMouseEnter += HandleUpdateResearchDescription;
+            uiItem.OnMouseEnter += HandleSetResearchActive;
             uiItem.OnMouseLeave += HideResearchDescription;
-            //uiItem.SetLines(uiItem.ListOfLines.Count, new Vector3(0+300*i,0+300*i,0),  new Vector3(0+300*i,0+300*i,0));
+            uiItem.OnMouseLeave += HandleSetResearchInactive;
             _listOfResearches.Add(uiItem);
         }
         _researchDescription.OnRewardDescriptionRequested += HandleRewardDescriptionRequested;
@@ -52,16 +55,28 @@ public class UIResearchPage : MonoBehaviour
         _researchDescription.OnHideItemDescription += HideItemDescription;
     }
 
-    public void UpdateResearch(int index, string name, Sprite image, int perentCount)
+    public void UpdateResearch(int index, string name, Sprite image, Vector3 position, ResearchState state)
     {
         UIResearchNode research = _listOfResearches[index];
-        research.SetData(name, image, perentCount);
-        
+        research.transform.localPosition = position;
+        research.SetData(name, image);
+        UpdateResearchState(index, state);
+    }
+
+    public void UpdateResearchState(int index, ResearchState state)
+    {
+        UIResearchNode research = _listOfResearches[index];
+        research.ChangeState(state);
+    }
+
+    public void CreateResearchLine(int index, Vector3 fromPosition, Vector3 toPosition)
+    {
+        _listOfResearches[index].CreateLine(_linesContent, fromPosition, toPosition);
     }
 
     public void FinishResearch(int index)
     {
-        _listOfResearches[index].Finish();
+        _listOfResearches[index].Complete();
     }
 
     private void ShowResearchDescription()
@@ -149,5 +164,18 @@ public class UIResearchPage : MonoBehaviour
     {
         OnCostDescriptionRequested?.Invoke(index);
     } 
+
+    private void HandleSetResearchActive(UIResearchNode research)
+    {
+        research.transform.SetParent(_activeResearchContent, false);
+    }
+
+    private void HandleSetResearchInactive()
+    {
+        foreach (Transform children in _activeResearchContent)
+        {
+            children.SetParent(_researchesContent, false);
+        }
+    }
     #endregion
 }

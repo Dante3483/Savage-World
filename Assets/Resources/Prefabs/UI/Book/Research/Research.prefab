@@ -859,12 +859,14 @@ MonoBehaviour:
   _nameTxt: {fileID: 5036284958830881632}
   _image: {fileID: 3513383039660328708}
   _frame: {fileID: 6684534359992491641}
-  _lockedColor: {r: 0.3207547, g: 0.3207547, b: 0.3207547, a: 1}
+  _currentColor: {r: 0, g: 0, b: 0, a: 0}
+  _lockedColor: {r: 0.65, g: 0.65, b: 0.65, a: 1}
   _unlockedColor: {r: 1, g: 0.5372549, b: 0, a: 1}
-  _finishedColor: {r: 0, g: 0.64705884, b: 0.06666667, a: 1}
+  _completedColor: {r: 0, g: 0.64705884, b: 0.06666667, a: 1}
   _rewardPrefab: {fileID: 6938807181089945094, guid: a8cc2c03d6682f645b697cbb282a59d8, type: 3}
+  _linePrefab: {fileID: 2513172723225267505, guid: 99674b13187c4f44a90fa0b03784b58a, type: 3}
   _rewardsContent: {fileID: 8946639901444542256}
-  _uIFillAmount: {fileID: 472622540595074061}
+  _uiFillAmount: {fileID: 472622540595074061}
 --- !u!1 &4949375972976191260
 GameObject:
   m_ObjectHideFlags: 0

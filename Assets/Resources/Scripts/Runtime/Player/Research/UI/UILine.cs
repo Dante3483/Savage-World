@@ -5,13 +5,9 @@ public class UILine : MonoBehaviour
 {
     #region Private fields
     [SerializeField]
-    private Image _lineSprite;
+    private RectTransform _rectTransform;
     [SerializeField]
-    private Color _lockedColor;
-    [SerializeField]
-    private Color _unlockedColor;
-    [SerializeField]
-    private Color _finishedColor;
+    private Image _lineImage;
 
     #endregion
 
@@ -24,25 +20,22 @@ public class UILine : MonoBehaviour
     #endregion
 
     #region Methods
-
-    public void SetLine(Vector3 FirstNodePosition, Vector3 LastNodePosition)
+    private void Awake()
     {
-        transform.position = (FirstNodePosition + LastNodePosition) / 2; 
-        transform.localScale = new Vector3(1, 1, Vector3.Distance(FirstNodePosition, LastNodePosition)); 
-        transform.rotation = Quaternion.FromToRotation(Vector3.right, LastNodePosition - FirstNodePosition); 
-    }
-    public void SetColorLocked()
-    {
-        _lineSprite.color = _lockedColor;
-    }
-    public void SetColorUnlocked()
-    {
-        _lineSprite.color = _unlockedColor;
-    }
-    public void SetColorFinished()
-    {
-        _lineSprite.color = _finishedColor;
+        _rectTransform = GetComponent<RectTransform>();    
     }
 
+    public void SetData(Color color, Vector3 fromPosition, Vector3 toPosition)
+    {
+        _rectTransform.localPosition = fromPosition;
+        _rectTransform.sizeDelta = new(Vector2.Distance(fromPosition, toPosition), _rectTransform.sizeDelta.y);
+        _rectTransform.rotation = Quaternion.FromToRotation(Vector3.left, toPosition - fromPosition);
+        SetColor(color);
+    }
+
+    public void SetColor(Color color)
+    {
+        _lineImage.color = color;
+    }
     #endregion
 }

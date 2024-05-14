@@ -73,19 +73,19 @@ public class UIFillAmount : MonoBehaviour, IPointerExitHandler, IPointerDownHand
         _isFill = false;
     }
 
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        if (eventData.button == PointerEventData.InputButton.Left)
-        {
-            _isFill = false;
-        }
-    }
-
     public void OnPointerDown(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Left)
         {
             _isFill = true;
+        }
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            _isFill = false;
         }
     }
     #endregion

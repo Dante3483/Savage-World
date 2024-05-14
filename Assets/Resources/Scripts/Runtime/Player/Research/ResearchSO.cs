@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Items;
@@ -14,9 +15,9 @@ public class ResearchSO : ScriptableObject
     [SerializeField]
     private string _description;
     [SerializeField]
-    private bool _isUnlocked;
+    private ResearchState _state;
     [SerializeField]
-    private bool _isCompleted;
+    private Vector3 _position;
     [SerializeField]
     private List<RecipeSO> _listOfRewards = new ();
     [SerializeField]
@@ -28,7 +29,7 @@ public class ResearchSO : ScriptableObject
     #endregion
 
     #region Public fields
-
+    public event Action<ResearchSO> OnStateChanged;
     #endregion
 
     #region Properties
@@ -39,23 +40,69 @@ public class ResearchSO : ScriptableObject
     public List<ResearchSO> ListOfParents { get => _listOfParents; set => _listOfParents = value; }
     public List<ResearchSO> ListOfChildren { get => _listOfChildren; set => _listOfChildren = value; }
     public string Description { get => _description; set => _description = value; }
-    public bool IsUnlocked
-    { 
+    public Vector3 Position
+    {
         get
         {
-            return _listOfParents.Count == 0 || !_listOfParents.Any(r => !r.IsUnlocked);
+            return _position;
         }
-        set => _isUnlocked = value; 
+
+        set
+        {
+            _position = value;
+        }
+    }
+    public ResearchState State
+    {
+        get
+        {
+            return _state;
+        }
+
+        set
+        {
+            _state = value;
+        }
     }
     #endregion
 
     #region Methods
+    public void ResetData()
+    {
+        _state = _listOfParents.Count == 0 ? ResearchState.Unlocked : ResearchState.Locked;
+    }
+
     public void Complete()
     {
-        _isCompleted = true;
-        foreach (var reward in _listOfRewards)
+        foreach (RecipeSO reward in _listOfRewards)
         {
             reward.IsUnlocked = true;
+        }
+        ChangeState(ResearchState.Completed);
+        _listOfChildren.ForEach(r => r.TryUnlock());
+    }
+
+    private void TryUnlock()
+    {
+        if (_listOfParents.Any(r => r._state != ResearchState.Completed))
+        {
+            return;
+        }
+        ChangeState(ResearchState.Unlocked);
+    }
+
+    private void ChangeState(ResearchState state)
+    {
+        _state = state;
+        OnStateChanged?.Invoke(this);
+    }
+
+    [Button("Update references")]
+    private void UpdateChildrens()
+    {
+        foreach (ResearchSO parent in _listOfParents)
+        {
+            parent.ListOfChildren.Add(this);
         }
     }
     #endregion

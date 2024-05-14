@@ -26,22 +26,32 @@ public class ResearchController : MonoBehaviour, IBookPageController
     #region Methods
     private void Awake()
     {
-        PrepareUI();
         PrepareData();
+        PrepareUI();
     }
 
     public void PrepareData()
     {
-        
+        _researchData.Initialize();
+        _researchData.OnResearchChangedState += HandleUpdateUIResearchState;
     }
 
     public void PrepareUI()
     {
-        _researchPage.InitializePage(2);
-        for (int i = 0; i < _researchData.ListOfReserches.Count; i++)
+        int researchesCount = _researchData.GetResearchCount();
+        _researchPage.InitializePage(researchesCount);
+        for (int i = 0; i < _researchData.GetResearchCount(); i++)
         {
-            _researchPage.UpdateResearch(i, _researchData.GetName(i), _researchData.GetIconImage(i), _researchData.GetListOfPerents(i).Count );
-            
+            _researchPage.UpdateResearch(
+                i, 
+                _researchData.GetName(i), 
+                _researchData.GetIconImage(i), 
+                _researchData.GetPosition(i), 
+                _researchData.GetState(i));
+            foreach (ResearchSO parent in _researchData.GetListOfPerents(i))
+            {
+                _researchPage.CreateResearchLine(i, _researchData.GetPosition(i), _researchData.GetPosition(parent));
+            }
         }
         _researchPage.OnTryFinishResearch += HandleTryFinishResearch;
         _researchPage.OnResearchDescriptionRequested += HandleResearchDescriptionRequested;
@@ -89,5 +99,9 @@ public class ResearchController : MonoBehaviour, IBookPageController
         _researchPage.UpdateItemDescription(cost.SmallItemImage, cost.ColoredName, cost.Description);
     }
 
+    private void HandleUpdateUIResearchState(int index, ResearchState state)
+    {
+        _researchPage.UpdateResearchState(index, state);
+    }
     #endregion
 }

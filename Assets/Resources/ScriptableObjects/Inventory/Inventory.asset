@@ -13,124 +13,126 @@ MonoBehaviour:
   m_Name: Inventory
   m_EditorClassIdentifier: 
   _storageItems:
-  - Quantity: 9999
-    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
-  - Quantity: 9999
-    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
-  - Quantity: 9999
-    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
-  - Quantity: 9999
-    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
-  - Quantity: 9999
-    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
-  - Quantity: 6079
-    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
+  - _quantity: 9930
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
   _hotbarItems:
-  - Quantity: 9999
-    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
+  - _quantity: 9898
+    _itemData: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
+  - _quantity: 9999
+    _itemData: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
   _accessoriesItems:
-  - Quantity: 9999
-    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
-  - Quantity: 3093
-    Item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  - Quantity: 0
-    Item: {fileID: 0}
-  _helmetItem:
-    Quantity: 0
-    Item: {fileID: 0}
-  _chestplateItem:
-    Quantity: 0
-    Item: {fileID: 0}
-  _leggingsItem:
-    Quantity: 0
-    Item: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  _armorItems:
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
+  - _quantity: 0
+    _itemData: {fileID: 0}
   _bufferItem:
-    Quantity: 0
-    Item: {fileID: 0}
+    _quantity: 0
+    _itemData: {fileID: 0}
+  _selectedItem:
+    _quantity: 9999
+    _itemData: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
   _storageSize: 36
-  _hotbarSize: 10
+  _hotbarFullSize: 10
   _accessoriesSize: 6
+  _armorSize: 3
