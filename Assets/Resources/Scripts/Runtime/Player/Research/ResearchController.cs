@@ -40,7 +40,8 @@ public class ResearchController : MonoBehaviour, IBookPageController
         _researchPage.InitializePage(2);
         for (int i = 0; i < _researchData.ListOfReserches.Count; i++)
         {
-            _researchPage.UpdateResearch(i, _researchData.GetName(i), _researchData.GetIconImage(i));
+            _researchPage.UpdateResearch(i, _researchData.GetName(i), _researchData.GetIconImage(i), _researchData.GetListOfPerents(i).Count );
+            
         }
         _researchPage.OnTryFinishResearch += HandleTryFinishResearch;
         _researchPage.OnResearchDescriptionRequested += HandleResearchDescriptionRequested;

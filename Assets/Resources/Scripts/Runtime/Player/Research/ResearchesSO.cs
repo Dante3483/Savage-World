@@ -82,5 +82,13 @@ public class ResearchesSO : ScriptableObject
         }
         return _listOfReserches[index].ListOfCosts;
     }
+    public List<ResearchSO> GetListOfPerents(int index)
+    {
+        if (index < 0 || index >= _listOfReserches.Count)
+        {
+            return null;
+        }
+        return _listOfReserches[index].ListOfParents;
+    }
     #endregion
 }

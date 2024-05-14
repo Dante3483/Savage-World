@@ -7573,6 +7573,7 @@ MonoBehaviour:
   _researchPrefab: {fileID: 4632218533212024494, guid: 8c1e24582fd551c46a6469d94aac3bd5, type: 3}
   _researchDescription: {fileID: 9135667267053042760}
   _itemDescription: {fileID: 3182910609143534474}
+  _line: {fileID: 0}
   _researchesContent: {fileID: 735297584}
 --- !u!114 &735297586
 MonoBehaviour:

@@ -9,7 +9,7 @@ public class UIFillAmount : MonoBehaviour, IPointerExitHandler, IPointerDownHand
     [SerializeField]
     private Image _image;
     [SerializeField]
-    public float _fillSpeed = 0.5f;
+    private float _fillSpeed = 0.5f;
     [SerializeField]
     private float _currentFillAmount = 0f;
     private bool _isFill;
@@ -21,7 +21,7 @@ public class UIFillAmount : MonoBehaviour, IPointerExitHandler, IPointerDownHand
     #endregion
 
     #region Properties
-
+    public Image Image { get => _image; set => _image = value; }
     #endregion
 
     #region Methods

@@ -12,6 +12,8 @@ public class UIResearchPage : MonoBehaviour
     [SerializeField]
     private UIItemDescription _itemDescription;
     [SerializeField]
+    private UILine _line;
+    [SerializeField]
     private RectTransform _researchesContent;
     private UIScaler _uiScaler;
     private List<UIResearchNode> _listOfResearches = new();
@@ -42,6 +44,7 @@ public class UIResearchPage : MonoBehaviour
             uiItem.OnFinishResearch += HandleFinishResearch;
             uiItem.OnMouseEnter += HandleUpdateResearchDescription;
             uiItem.OnMouseLeave += HideResearchDescription;
+            //uiItem.SetLines(uiItem.ListOfLines.Count, new Vector3(0+300*i,0+300*i,0),  new Vector3(0+300*i,0+300*i,0));
             _listOfResearches.Add(uiItem);
         }
         _researchDescription.OnRewardDescriptionRequested += HandleRewardDescriptionRequested;
@@ -49,10 +52,11 @@ public class UIResearchPage : MonoBehaviour
         _researchDescription.OnHideItemDescription += HideItemDescription;
     }
 
-    public void UpdateResearch(int index, string name, Sprite image)
+    public void UpdateResearch(int index, string name, Sprite image, int perentCount)
     {
         UIResearchNode research = _listOfResearches[index];
-        research.SetData(name, image);
+        research.SetData(name, image, perentCount);
+        
     }
 
     public void FinishResearch(int index)
