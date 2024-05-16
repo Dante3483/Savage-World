@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -14,8 +13,7 @@ public class MiningDamageData
     #endregion
 
     #region Public fields
-    public delegate void SetDamageDelegate(ref WorldCellData block, float damage);
-    public SetDamageDelegate OnUpdateDamage;
+    public event Action<int, int, float> OnDamageUpdated;
     #endregion
 
     #region Properties
@@ -38,7 +36,7 @@ public class MiningDamageData
     {
         foreach (Vector2Int key in _damageByPosition.Keys.ToList())
         {
-            OnUpdateDamage?.Invoke(ref WorldDataManager.Instance.GetWorldCellData(key.x, key.y), _damageByPosition[key]);
+            OnDamageUpdated?.Invoke(key.x, key.y, _damageByPosition[key]);
             if (key == _miningPosition)
             {
                 continue;

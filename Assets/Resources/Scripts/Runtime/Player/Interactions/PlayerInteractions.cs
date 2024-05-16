@@ -1,4 +1,3 @@
-using CustomTilemap;
 using Items;
 using System.Collections;
 using UnityEngine;
@@ -6,8 +5,6 @@ using UnityEngine.UIElements;
 
 public class PlayerInteractions : MonoBehaviour
 {
-    delegate void SetDamageDelegate(ref WorldCellData block, float damage);
-
     #region Private fields
     [Header("Main")]
     [SerializeField] private Drop _dropPrefab;
@@ -126,7 +123,7 @@ public class PlayerInteractions : MonoBehaviour
         {
             return;
         }
-        if (WorldDataManager.Instance.IsEmpty(intPos.x, intPos.y) && 
+        if (WorldDataManager.Instance.IsEmpty(intPos.x, intPos.y) &&
             (WorldDataManager.Instance.IsWall(intPos.x, intPos.y) || WorldDataManager.Instance.IsSolidAnyNeighbor(intPos.x, intPos.y)))
         {
             WorldDataManager.Instance.SetBlockData(intPos.x, intPos.y, blockItem.BlockToPlace);
@@ -163,7 +160,6 @@ public class PlayerInteractions : MonoBehaviour
                     _miningDamageController.RemoveDamageFromBlocks(blockPosition);
                     CreateDrop(new Vector3(blockPosition.x + 0.5f, blockPosition.y + 0.5f), block.BlockData.Drop, 1);
                     WorldDataManager.Instance.SetBlockData(blockPosition.x, blockPosition.y, GameManager.Instance.BlocksAtlas.Air);
-                    Tilemap.Instance.RemovePlatform(blockPosition);
                     UpdateNeighboringBlocks(blockPosition);
                 }
             }

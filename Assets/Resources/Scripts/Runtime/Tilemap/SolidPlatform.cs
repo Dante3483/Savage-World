@@ -4,7 +4,8 @@ using UnityEngine;
 public class SolidPlatform : MonoBehaviour
 {
     #region Private fields
-    [SerializeField] private PolygonCollider2D _polygonCollider;
+    [SerializeField]
+    private PolygonCollider2D _polygonCollider;
     [SerializeField]
     private LayerMask _activePlatformExcludeLayers;
     [SerializeField]
@@ -35,11 +36,16 @@ public class SolidPlatform : MonoBehaviour
         _polygonCollider.enabled = false;
     }
 
-    public void SetPolygonColliderPoints(Sprite sprite)
+    public void SetPolygonColliderPoints(List<Vector2> physicsShape, bool isHorizontalFlipped)
     {
-        List<Vector2> points = new();
-        sprite.GetPhysicsShape(0, points);
-        _polygonCollider.SetPath(0, points);
+        if (physicsShape == null)
+        {
+            _polygonCollider.enabled = false;
+            return;
+        }
+        transform.rotation = isHorizontalFlipped ? Quaternion.Euler(0f, 180f, 0f) : Quaternion.Euler(0f, 0f, 0f);
+        _polygonCollider.enabled = true;
+        _polygonCollider.SetPath(0, physicsShape);
     }
     #endregion
 }

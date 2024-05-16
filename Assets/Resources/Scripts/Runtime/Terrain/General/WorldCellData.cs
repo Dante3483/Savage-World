@@ -1,7 +1,6 @@
-using Random = System.Random;
-using UnityEngine;
-using UnityEngine.Tilemaps;
 using System.Linq;
+using UnityEngine;
+using Random = System.Random;
 
 public struct WorldCellData
 {
@@ -26,12 +25,13 @@ public struct WorldCellData
     /// <br>2 bit of _flags = is occupied</br>
     /// <br>3 bit of _flags = is tree</br>
     /// <br>4 bit of _flags = is tree trunk</br>
+    /// <br>5 bit of _flags = is collider horizontal flipped</br>
     /// </summary>
     private byte _flags;
     private byte _currentActionTime;
     private byte _blockDamagePercent;
     private byte _wallDamagePercent;
-    private byte _colliderType;
+    private byte _colliderIndex;
     #endregion
 
     #region Liquid
@@ -246,16 +246,16 @@ public struct WorldCellData
         }
     }
 
-    public byte ColliderType
+    public byte ColliderIndex
     {
         get
         {
-            return _colliderType;
+            return _colliderIndex;
         }
 
         set
         {
-            _colliderType = value;
+            _colliderIndex = value;
         }
     }
     #endregion
@@ -274,9 +274,9 @@ public struct WorldCellData
         _blockDamagePercent = 0;
         _wallDamagePercent = 0;
         _flags = 0;
-        _colliderType = 0;
+        _colliderIndex = byte.MaxValue;
 
-        _liquidId = 255;
+        _liquidId = byte.MaxValue;
         _isFlowsDown = false;
         _flowValue = 0;
         _countToStop = 0;
@@ -304,7 +304,8 @@ public struct WorldCellData
             $"Is tree: {IsTree()}\n" +
             $"Is tree trunk: {IsTreeTrunk()}\n" +
             $"Is free: {IsFree()}\n" +
-            $"Collider type: {_colliderType}\n";
+            $"Is horizontal flip: {IsColliderHorizontalFlipped()}" +
+            $"Collider type: {_colliderIndex}\n";
     }
 
     public Sprite GetBlockSprite()
@@ -445,12 +446,12 @@ public struct WorldCellData
         _flags &= StaticInfo.InvertedBit4;
     }
 
-    public void MakeHorizontalFlipped()
+    public void MakeColliderHorizontalFlipped()
     {
         _flags |= StaticInfo.Bit5;
     }
 
-    public void RemoveHorizontalFlipped()
+    public void RemoveColliderHorizontalFlipped()
     {
         _flags &= StaticInfo.InvertedBit5;
     }
@@ -540,7 +541,7 @@ public struct WorldCellData
         return (_flags & StaticInfo.Bit4) == StaticInfo.Bit4;
     }
 
-    public bool IsHorizontalFlipped()
+    public bool IsColliderHorizontalFlipped()
     {
         return (_flags & StaticInfo.Bit5) == StaticInfo.Bit5;
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -5,12 +6,17 @@ using UnityEngine;
 public class WorldDataManager : MonoBehaviour
 {
     #region Private fields
+    [Header("Collider rules")]
+    [SerializeField]
+    private ColliderRulesSO _mainRules;
     private WorldCellData[,] _worldData;
     private string _blockInfo;
+    private Dictionary<Sprite, List<Vector2>> _physicsShapesBySprite;
     #endregion
 
     #region Public fields
     public static WorldDataManager Instance;
+    public event Action<int, int> OnDataChanged, OnColliderChanged;
     #endregion
 
     #region Properties
@@ -45,11 +51,12 @@ public class WorldDataManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        InitializePhysicsShapes();
     }
 
     private void Update()
     {
-        if (!GameManager.Instance.IsInputTextInFocus && Input.GetMouseButtonDown(1))
+        if (!GameManager.Instance.IsInputTextInFocus && Input.GetMouseButtonDown(2))
         {
             Vector3 clickPosition = Input.mousePosition;
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
@@ -77,6 +84,21 @@ public class WorldDataManager : MonoBehaviour
         });
     }
 
+    private void InitializePhysicsShapes()
+    {
+        _physicsShapesBySprite = new();
+        List<Vector2> physicShape;
+        foreach (ColliderRule rule in _mainRules.Rules)
+        {
+            physicShape = new();
+            rule.Sprite.GetPhysicsShape(0, physicShape);
+            _physicsShapesBySprite.Add(rule.Sprite, physicShape);
+        }
+        physicShape = new();
+        _mainRules.CornerRule.Sprite.GetPhysicsShape(0, physicShape);
+        _physicsShapesBySprite.Add(_mainRules.CornerRule.Sprite, physicShape);
+    }
+
     public void SetBlockData(int x, int y, BlockSO data)
     {
         if (data == null)
@@ -86,132 +108,30 @@ public class WorldDataManager : MonoBehaviour
         _worldData[x, y].SetBlockData(data);
         if (GameManager.Instance.IsGameSession && !GameManager.Instance.IsWorldLoading)
         {
-            if (_worldData[x, y].IsEmpty())
-            {
-                _worldData[x, y].ColliderType = byte.MaxValue;
-                RemoveCorners(x, y);
-                for (int i = -1; i <= 1; i++)
-                {
-                    for (int j = -1; j <= 1; j++)
-                    {
-                        if (i == 0 && j == 0)
-                        {
-                            continue;
-                        }
-                        if (_worldData[x + i, y + j].IsSolid())
-                        {
-                            SetRules(x + i, y + j);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                SetCorners(x, y);
-                SetRules(x, y);
-                for (int i = -1; i <= 1; i++)
-                {
-                    for (int j = -1; j <= 1; j++)
-                    {
-                        if (i == 0 && j == 0)
-                        {
-                            continue;
-                        }
-                        if (_worldData[x + i, y + j].IsSolid())
-                        {
-                            SetRules(x + i, y + j);
-                        }
-                    }
-                }
-            }
-            List<Vector2> points = new();
-            data.Sprites[0].GetPhysicsShape(0, points);
-            points.ForEach(point => Debug.Log(point));
             _worldData[x, y].SetRandomBlockTile(GameManager.Instance.RandomVar);
-        }
-    }
 
-    private void SetRules(int x, int y)
-    {
-        for (byte i = 0; i < CustomTilemap.Tilemap.Instance.SolidRules.Count; i++)
-        {
-            bool result = true;
-            SolidRule solidRule = CustomTilemap.Tilemap.Instance.SolidRules[i];
-            foreach (SolidRule.Rule rule in solidRule.Rules)
+            if (_worldData[x, y].IsEmpty() || _worldData[x, y].IsSolid())
             {
-                result = CheckRule(x, y, rule.RuleType, rule.Position);
-                if (solidRule.IsHorizontalFlip)
-                {
-                    result |= CheckRule(x, y, rule.RuleType, -rule.Position);
-                }
-                if (!result)
-                {
-                    break;
-                }
+                _worldData[x, y].ColliderIndex = byte.MaxValue;
+                UpdateCollidersAround(x, y);
+                UpdateCollider(x, y);
             }
-            if (result)
-            {
-                _worldData[x, y].ColliderType = i;
-                break;
-            }
-            else
-            {
-                _worldData[x, y].ColliderType = byte.MaxValue;
-            }
+            OnDataChanged?.Invoke(x, y);
         }
     }
 
-    private bool CheckRule(int x, int y, SolidRule.RuleType ruleType, Vector2Int position)
+    public List<Vector2> GetColliderShape(int x, int y)
     {
-        int ruleX = x + position.x;
-        int ruleY = y + position.y;
-        switch (ruleType)
+        byte colliderType = _worldData[x, y].ColliderIndex;
+        if (colliderType == byte.MaxValue)
         {
-            case SolidRule.RuleType.IsEmpty:
-                {
-                    return _worldData[ruleX, ruleY].IsEmpty();
-                }
-            case SolidRule.RuleType.IsSolid:
-                {
-                    return _worldData[ruleX, ruleY].IsSolid();
-                }
-            case SolidRule.RuleType.IsCorner:
-                {
-                    return _worldData[ruleX, ruleY].ColliderType == 254;
-                }
-            default:
-                {
-                    return false;
-                }
+            return null;
         }
-    }
-
-    private void SetCorners(int x, int y)
-    {
-        SetCorner(x, y, 1);
-        SetCorner(x, y, -1);
-    }
-
-    private void SetCorner(int x, int y, int side)
-    {
-        if (_worldData[x + side, y].IsEmpty())
+        if (colliderType == 254)
         {
-            _worldData[x + side, y].ColliderType = 254;
+            return _physicsShapesBySprite[_mainRules.CornerRule.Sprite];
         }
-    }
-
-    private void RemoveCorners(int x, int y)
-    {
-        RemoveCorner(x, y, 1);
-        RemoveCorner(x, y, -1);
-    }
-
-    private void RemoveCorner(int x, int y, int side)
-    {
-        if (_worldData[x + side, y].IsEmpty())
-        {
-            _worldData[x + side, y].ColliderType = byte.MaxValue;
-        }
+        return _physicsShapesBySprite[_mainRules.Rules[colliderType].Sprite];
     }
 
     public ref WorldCellData GetWorldCellData(int x, int y)
@@ -224,11 +144,24 @@ public class WorldDataManager : MonoBehaviour
         return ref _worldData[x + direction.x, y + direction.y];
     }
 
-    public void SetBlockInfoByCoords(Vector2Int blockCoords)
+    public void SetBlockInfoByCoords(Vector2Int position)
     {
-        _blockInfo = _worldData[blockCoords.x, blockCoords.y].ToString();
+        _blockInfo = _worldData[position.x, position.y].ToString();
     }
 
+    public void SetBlockDamagePercent(int x, int y, float damage)
+    {
+        _worldData[x, y].SetBlockDamagePercent(damage);
+        OnDataChanged?.Invoke(x, y);
+    }
+
+    public void SetWallDamagePercent(int x, int y, float damage)
+    {
+        _worldData[x, y].SetWallDamagePercent(damage);
+        OnDataChanged?.Invoke(x, y);
+    }
+
+    #region Flags
     public void MakeOccupied(int x, int y)
     {
         _worldData[x, y].MakeOccupied();
@@ -268,7 +201,9 @@ public class WorldDataManager : MonoBehaviour
     {
         _worldData[x, y].RemoveTreeTrunk();
     }
+    #endregion
 
+    #region Checks
     public bool IsEmpty(int x, int y)
     {
         return _worldData[x, y].IsEmpty();
@@ -299,5 +234,181 @@ public class WorldDataManager : MonoBehaviour
     {
         return _worldData[x, y].IsBreakable();
     }
+
+    public bool IsColliderHorizontalFlipped(int x, int y)
+    {
+        return _worldData[x, y].IsColliderHorizontalFlipped();
+    }
+    #endregion
+
+    #region Collider
+    public void UpdateCollider(int x, int y)
+    {
+        UpdateCornerCollider(x, y);
+        UpdateBlockCollider(x, y);
+    }
+
+    public void UpdateBlockCollider(int x, int y)
+    {
+        if (_worldData[x, y].IsSolid())
+        {
+            CheckRules(x, y, _mainRules, out byte i);
+            _worldData[x, y].ColliderIndex = i;
+            OnColliderChanged?.Invoke(x, y);
+        }
+    }
+
+    public void UpdateCornerCollider(int x, int y)
+    {
+        if (!_worldData[x, y].IsSolid())
+        {
+            byte prevIndex = _worldData[x, y].ColliderIndex;
+            if (CheckRule(x, y, _mainRules.CornerRule))
+            {
+                _worldData[x, y].ColliderIndex = 254;
+            }
+            else
+            {
+                _worldData[x, y].ColliderIndex = byte.MaxValue;
+            }
+            if (_worldData[x, y].ColliderIndex != prevIndex)
+            {
+                UpdateCollidersAround(x, y);
+            }
+            OnColliderChanged?.Invoke(x, y);
+        }
+    }
+
+    private void UpdateCollidersAround(int x, int y)
+    {
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int j = -1; j <= 1; j++)
+            {
+                if (i == 0 && j == 0)
+                {
+                    continue;
+                }
+                UpdateCollider(x + i, y + j);
+            }
+        }
+    }
+
+    public void UpdateColliderWithoutNotification(int x, int y)
+    {
+        UpdateCornerColliderWithoutNotification(x, y);
+        UpdateBlockColliderWithoutNotification(x, y);
+    }
+
+    public void UpdateBlockColliderWithoutNotification(int x, int y)
+    {
+        if (_worldData[x, y].IsSolid())
+        {
+            CheckRules(x, y, _mainRules, out byte i);
+            _worldData[x, y].ColliderIndex = i;
+        }
+    }
+
+    public void UpdateCornerColliderWithoutNotification(int x, int y)
+    {
+        if (!_worldData[x, y].IsSolid())
+        {
+            byte prevIndex = _worldData[x, y].ColliderIndex;
+            if (CheckRule(x, y, _mainRules.CornerRule))
+            {
+                _worldData[x, y].ColliderIndex = 254;
+            }
+            else
+            {
+                _worldData[x, y].ColliderIndex = byte.MaxValue;
+            }
+            if (_worldData[x, y].ColliderIndex != prevIndex)
+            {
+                UpdateCollidersAroundWithoutNotification(x, y);
+            }
+        }
+    }
+
+    private void UpdateCollidersAroundWithoutNotification(int x, int y)
+    {
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int j = -1; j <= 1; j++)
+            {
+                if (i == 0 && j == 0)
+                {
+                    continue;
+                }
+                UpdateBlockColliderWithoutNotification(x + i, y + j);
+            }
+        }
+    }
+
+    private bool CheckRules(int x, int y, ColliderRulesSO rules, out byte index)
+    {
+        index = byte.MaxValue;
+        for (byte i = 0; i < rules.Rules.Length; i++)
+        {
+            if (CheckRule(x, y, rules.Rules[i]))
+            {
+                index = i;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private bool CheckRule(int x, int y, ColliderRule rule)
+    {
+        if (CheckRule(x, y, rule, false))
+        {
+            _worldData[x, y].RemoveColliderHorizontalFlipped();
+            return true;
+        }
+        else if (rule.IsHorizontalFlip && CheckRule(x, y, rule, true))
+        {
+            _worldData[x, y].MakeColliderHorizontalFlipped();
+            return true;
+        }
+        return false;
+    }
+
+    private bool CheckRule(int x, int y, ColliderRule rule, bool isHprizontalFlipped)
+    {
+        foreach (ColliderRuleData ruleData in rule.Data)
+        {
+            if (!isHprizontalFlipped)
+            {
+                if (!CheckRuleData(x, y, ruleData.RuleType, ruleData.Position))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (!CheckRuleData(x, y, ruleData.RuleType, new(-ruleData.Position.x, ruleData.Position.y)))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private bool CheckRuleData(int x, int y, ColliderRuleType ruleType, Vector2Int position)
+    {
+        int ruleX = x + position.x;
+        int ruleY = y + position.y;
+        return ruleType switch
+        {
+            ColliderRuleType.Nothing => !_worldData[ruleX, ruleY].IsSolid() && _worldData[ruleX, ruleY].ColliderIndex != 254,
+            ColliderRuleType.Empty => !_worldData[ruleX, ruleY].IsSolid(),
+            ColliderRuleType.Solid => _worldData[ruleX, ruleY].IsSolid(),
+            ColliderRuleType.Corner => _worldData[ruleX, ruleY].ColliderIndex == 254,
+            _ => false
+        };
+    }
+    #endregion
+
     #endregion
 }

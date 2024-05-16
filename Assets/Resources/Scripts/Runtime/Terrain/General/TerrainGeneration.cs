@@ -78,6 +78,10 @@ public class TerrainGeneration
         {
             _generationPhases.Add(new BlockProcessingGenerationPhase());
         }
+        if (terrainConfiguration.SetPhysicsShapes)
+        {
+            _generationPhases.Add(new SetPhysicsShapesGenerationPhase());
+        }
         if (terrainConfiguration.SaveLoadTest)
         {
             _generationPhases.Clear();
