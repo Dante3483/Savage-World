@@ -8527,7 +8527,7 @@ MonoBehaviour:
   _blocksAtlas: {fileID: 11400000, guid: 09f4ecc386a348a4288186a9733a7630, type: 2}
   _treesAtlas: {fileID: 11400000, guid: 10b2c8f2d6ac1d349ac7ddf07a5282b8, type: 2}
   _pickUpItemsAtlas: {fileID: 11400000, guid: 839a488f0ebda0d498ac76d689d5f647, type: 2}
-  _itemsAtlas: {fileID: 0}
+  _itemsAtlas: {fileID: 11400000, guid: 14b406f0c03c4084fbec39f329f7f07e, type: 2}
   _playerName: 
   _worldName: 
   _seed: 171845
