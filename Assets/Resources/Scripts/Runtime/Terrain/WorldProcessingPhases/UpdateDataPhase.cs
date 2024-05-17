@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-public class BlockProcessingGenerationPhase : IGenerationPhase
+public class UpdateDataPhase : IWorldProcessingPhase
 {
     #region Private fields
     private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;

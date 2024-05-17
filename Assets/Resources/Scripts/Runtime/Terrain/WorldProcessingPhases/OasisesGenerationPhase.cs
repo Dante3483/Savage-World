@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = System.Random;
 
-public class OasisesGenerationPhase : IGenerationPhase
+public class OasisesGenerationPhase : IWorldProcessingPhase
 {
     #region Private fields
     private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;

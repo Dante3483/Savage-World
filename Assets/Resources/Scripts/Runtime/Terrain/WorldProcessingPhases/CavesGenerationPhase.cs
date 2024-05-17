@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Random = System.Random;
 
-public class CavesGenerationPhase : IGenerationPhase
+public class CavesGenerationPhase : IWorldProcessingPhase
 {
     #region Private fields
     byte[,] _visitedCaveMap;

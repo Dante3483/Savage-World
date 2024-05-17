@@ -1,4 +1,4 @@
-public interface IGenerationPhase
+public interface IWorldProcessingPhase
 {
     #region Private fields
 

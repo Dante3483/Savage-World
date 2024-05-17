@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Items;
 using UnityEngine;
 
@@ -12,15 +9,28 @@ public class ResearchController : MonoBehaviour, IBookPageController
     [SerializeField]
     private ResearchesSO _researchData;
     private int _indexOfActiveResearch;
-    
+
     #endregion
 
     #region Public fields
-    public bool IsActive => UIManager.Instance.ResearchUI.IsActive;
+
     #endregion
 
     #region Properties
+    public bool IsActive => UIManager.Instance.ResearchUI.IsActive;
 
+    public ResearchesSO ResearchData
+    {
+        get
+        {
+            return _researchData;
+        }
+
+        set
+        {
+            _researchData = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -38,15 +48,15 @@ public class ResearchController : MonoBehaviour, IBookPageController
 
     public void PrepareUI()
     {
-        int researchesCount = _researchData.GetResearchCount();
+        int researchesCount = _researchData.GetResearchesCount();
         _researchPage.InitializePage(researchesCount);
-        for (int i = 0; i < _researchData.GetResearchCount(); i++)
+        for (int i = 0; i < _researchData.GetResearchesCount(); i++)
         {
             _researchPage.UpdateResearch(
-                i, 
-                _researchData.GetName(i), 
-                _researchData.GetIconImage(i), 
-                _researchData.GetPosition(i), 
+                i,
+                _researchData.GetName(i),
+                _researchData.GetIconImage(i),
+                _researchData.GetPosition(i),
                 _researchData.GetState(i));
             foreach (ResearchSO parent in _researchData.GetListOfPerents(i))
             {

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e4cb737b9c1527419e2a632f40ecd19, type: 3}
+  m_Name: ItemsAtlas
+  m_EditorClassIdentifier: 
+  _atlasDataPath: Assets/Resources/ScriptableObjects/Items/
+  _items:
+  - {fileID: 11400000, guid: 8cbc00e1665eeb74aa80d820992b6345, type: 2}
+  - {fileID: 11400000, guid: 806b2f67988046d42a9bfac331bbf9e7, type: 2}
+  - {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
+  - {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
+  - {fileID: 11400000, guid: ae20231260a0fca4d8c291a821f8c887, type: 2}
+  - {fileID: 11400000, guid: 89c6202afccbcc04e886085c0512b591, type: 2}
+  - {fileID: 11400000, guid: d853439b573bf0547827a7e6cd0bfa97, type: 2}
+  - {fileID: 11400000, guid: ac2b953039ebeb441a7d27eceae4b1c5, type: 2}

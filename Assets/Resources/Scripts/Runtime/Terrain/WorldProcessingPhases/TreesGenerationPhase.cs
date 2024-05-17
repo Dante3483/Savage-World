@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = System.Random;
 
-public class TreesGenerationPhase : IGenerationPhase
+public class TreesGenerationPhase : IWorldProcessingPhase
 {
     #region Private fields
     private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;

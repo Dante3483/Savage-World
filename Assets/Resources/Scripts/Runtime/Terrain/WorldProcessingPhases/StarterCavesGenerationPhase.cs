@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = System.Random;
 
-public class StarterCavesGenerationPhase : IGenerationPhase
+public class StarterCavesGenerationPhase : IWorldProcessingPhase
 {
     #region Private fields
     private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;

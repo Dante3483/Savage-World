@@ -1,7 +1,7 @@
 using UnityEngine;
 using Random = System.Random;
 
-public class LandscapeGenerationPhase : IGenerationPhase
+public class LandscapeGenerationPhase : IWorldProcessingPhase
 {
     #region Private fields
 
@@ -34,7 +34,7 @@ public class LandscapeGenerationPhase : IGenerationPhase
         int prevHeight = -1;
         int x;
         int y;
-        
+
         Vector2Int vector = new Vector2Int();
 
         foreach (BiomeSO biome in terrainConfiguration.Biomes)

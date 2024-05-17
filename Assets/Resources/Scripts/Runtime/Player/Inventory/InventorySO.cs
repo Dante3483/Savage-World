@@ -30,6 +30,7 @@ public class InventorySO : ScriptableObject
     private int _hotbarStartIndex => _isFirstPartOfHotbar ? 0 : _hotbarSize;
     private int _hotbarEndIndex => (_isFirstPartOfHotbar ? _hotbarSize : _hotbarFullSize) - 1;
     private int _indexOfSelectedItem;
+    private bool _isInitialized;
     #endregion
 
     #region Public fields
@@ -74,45 +75,70 @@ public class InventorySO : ScriptableObject
             return _indexOfSelectedItem;
         }
     }
+
+    public int ArmorSize
+    {
+        get
+        {
+            return _armorSize;
+        }
+    }
+
+    public bool IsInitialized
+    {
+        get
+        {
+            return _isInitialized;
+        }
+
+        set
+        {
+            _isInitialized = value;
+        }
+    }
     #endregion
 
     #region Methods
     public void Initialize()
     {
-        _itemsByLocation = new Dictionary<ItemLocations, InventoryItem[]>();
-        _storageItems = new InventoryItem[_storageSize];
-        _hotbarItems = new InventoryItem[_hotbarFullSize];
-        _accessoriesItems = new InventoryItem[_accessoriesSize];
-        _armorItems = new InventoryItem[_armorSize];
-
-        for (int i = 0; i < _storageSize; i++)
+        if (!_isInitialized)
         {
-            _storageItems[i] = InventoryItem.GetEmptyItem();
+            _itemsByLocation = new Dictionary<ItemLocations, InventoryItem[]>();
+            _storageItems = new InventoryItem[_storageSize];
+            _hotbarItems = new InventoryItem[_hotbarFullSize];
+            _accessoriesItems = new InventoryItem[_accessoriesSize];
+            _armorItems = new InventoryItem[_armorSize];
+
+            for (int i = 0; i < _storageSize; i++)
+            {
+                _storageItems[i] = InventoryItem.GetEmptyItem();
+            }
+
+            for (int i = 0; i < _hotbarFullSize; i++)
+            {
+                _hotbarItems[i] = InventoryItem.GetEmptyItem();
+            }
+
+            for (int i = 0; i < _accessoriesSize; i++)
+            {
+                _accessoriesItems[i] = InventoryItem.GetEmptyItem();
+            }
+
+            for (int i = 0; i < _armorSize; i++)
+            {
+                _armorItems[i] = InventoryItem.GetEmptyItem();
+            }
+
+            _itemsByLocation.Add(ItemLocations.Storage, _storageItems);
+            _itemsByLocation.Add(ItemLocations.Hotbar, _hotbarItems);
+            _itemsByLocation.Add(ItemLocations.Accessories, _accessoriesItems);
+            _itemsByLocation.Add(ItemLocations.Armor, _armorItems);
+
+            _bufferItem = InventoryItem.GetEmptyItem();
+
+            _isFirstPartOfHotbar = true;
+            _isInitialized = true;
         }
-
-        for (int i = 0; i < _hotbarFullSize; i++)
-        {
-            _hotbarItems[i] = InventoryItem.GetEmptyItem();
-        }
-
-        for (int i = 0; i < _accessoriesSize; i++)
-        {
-            _accessoriesItems[i] = InventoryItem.GetEmptyItem();
-        }
-
-        for (int i = 0; i < _armorSize; i++)
-        {
-            _armorItems[i] = InventoryItem.GetEmptyItem();
-        }
-
-        _itemsByLocation.Add(ItemLocations.Storage, _storageItems);
-        _itemsByLocation.Add(ItemLocations.Hotbar, _hotbarItems);
-        _itemsByLocation.Add(ItemLocations.Accessories, _accessoriesItems);
-        _itemsByLocation.Add(ItemLocations.Armor, _armorItems);
-
-        _bufferItem = InventoryItem.GetEmptyItem();
-
-        _isFirstPartOfHotbar = true;
     }
 
     public void UpdateUI()
@@ -185,6 +211,16 @@ public class InventorySO : ScriptableObject
         item.UpdateQuantity(quantity);
         UpdateUI();
         return quantity;
+    }
+
+    public void AddItemAtWithoutNotification(ItemSO itemData, int quantity, int index, ItemLocations location)
+    {
+        if (_itemsByLocation[location][index].IsEmpty)
+        {
+            InventoryItem inventoryItem = new();
+            inventoryItem.UpdateData(quantity, itemData);
+            _itemsByLocation[location][index] = inventoryItem;
+        }
     }
 
     private int AddItemToFirstFreeSlot(ItemSO itemData, int quantity, ItemLocations location)
@@ -377,7 +413,7 @@ public class InventorySO : ScriptableObject
         }
     }
 
-    private InventoryItem GetItem(int index, ItemLocations location)
+    public InventoryItem GetItem(int index, ItemLocations location)
     {
         return _itemsByLocation[location][index];
     }
@@ -396,7 +432,7 @@ public class InventorySO : ScriptableObject
     {
         return _hotbarItems.Union(_storageItems).Where(i => i.ItemData == itemData).Sum(i => i.Quantity);
     }
-    
+
     public void RemoveItemAt(int index, ItemLocations location)
     {
         GetItem(index, location).ClearData();

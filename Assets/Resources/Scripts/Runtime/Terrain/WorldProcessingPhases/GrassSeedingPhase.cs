@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class GrassSeedingGenerationPhase : IGenerationPhase
+public class GrassSeedingPhase : IWorldProcessingPhase
 {
     #region Private fields
     private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;

@@ -1,15 +1,17 @@
+using Inventory;
+using Items;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 
 public class SaveLoadManager : MonoBehaviour
 {
     #region Private fields
     private List<int> _worldColumnIndexes;
-    private int _worldColumnSize;
+    private int _worldDataSize;
+    private float _loadingStep;
     #endregion
 
     #region Public fields
@@ -36,10 +38,11 @@ public class SaveLoadManager : MonoBehaviour
 
     private void SaveMetaData(BinaryWriter binaryWriter)
     {
+        Debug.Log("Save meta data");
         binaryWriter.Write(GameManager.Instance.Seed);
         binaryWriter.Write(GameManager.Instance.CurrentTerrainWidth);
         binaryWriter.Write(GameManager.Instance.CurrentTerrainHeight);
-        binaryWriter.Write(_worldColumnSize);
+        binaryWriter.Write(_worldDataSize);
 
         foreach (var worldColumnIndex in _worldColumnIndexes)
         {
@@ -49,14 +52,16 @@ public class SaveLoadManager : MonoBehaviour
 
     private void SaveChunks(BinaryWriter binaryWriter)
     {
+        Debug.Log("Save chunks");
         foreach (var chunk in ChunksManager.Instance.Chunks)
         {
             binaryWriter.Write((byte)chunk.Biome.Id);
         }
     }
 
-    private void SaveWorldCellData(BinaryWriter binaryWriter)
+    private void SaveWorldData(BinaryWriter binaryWriter)
     {
+        Debug.Log("Save world data");
         int startColumn = 0;
         for (int x = 0; x < GameManager.Instance.CurrentTerrainWidth; x++)
         {
@@ -178,11 +183,12 @@ public class SaveLoadManager : MonoBehaviour
                 #endregion
             }
         }
-        _worldColumnSize = startColumn;
+        _worldDataSize = startColumn;
     }
 
     private void SaveTrees(BinaryWriter binaryWriter)
     {
+        Debug.Log("Save trees");
         binaryWriter.Write(GameManager.Instance.Terrain.Trees.transform.childCount);
         foreach (Transform treeTransform in GameManager.Instance.Terrain.Trees.transform)
         {
@@ -195,6 +201,7 @@ public class SaveLoadManager : MonoBehaviour
 
     private void SavePickUpItems(BinaryWriter binaryWriter)
     {
+        Debug.Log("Save pickup items");
         binaryWriter.Write(GameManager.Instance.Terrain.PickUpItems.transform.childCount);
         foreach (Transform pickUpItemTransform in GameManager.Instance.Terrain.PickUpItems.transform)
         {
@@ -205,34 +212,87 @@ public class SaveLoadManager : MonoBehaviour
         }
     }
 
+    private void SavePlayer(BinaryWriter binaryWriter)
+    {
+        Debug.Log("Save player");
+        SavePlayerPosition(binaryWriter);
+        SavePlayerInventory(binaryWriter);
+        SavePlayerResearches(binaryWriter);
+    }
+
+    private void SavePlayerPosition(BinaryWriter binaryWriter)
+    {
+        Vector3 position = GameManager.Instance.GetPlayerTransform().position;
+        binaryWriter.Write(position.x);
+        binaryWriter.Write(position.y);
+    }
+
+    private void SavePlayerInventory(BinaryWriter binaryWriter)
+    {
+        InventorySO inventory = GameManager.Instance.GetPlayerInventory();
+        SavePlayerInventoryPart(binaryWriter, inventory, inventory.HotbarSize, ItemLocations.Hotbar);
+        SavePlayerInventoryPart(binaryWriter, inventory, inventory.StorageSize, ItemLocations.Storage);
+        SavePlayerInventoryPart(binaryWriter, inventory, inventory.AccessoriesSize, ItemLocations.Accessories);
+        SavePlayerInventoryPart(binaryWriter, inventory, inventory.ArmorSize, ItemLocations.Armor);
+    }
+
+    private void SavePlayerInventoryPart(BinaryWriter binaryWriter, InventorySO inventory, int size, ItemLocations location)
+    {
+        for (int i = 0; i < size; i++)
+        {
+            InventoryItem inventoryItem = inventory.GetItem(i, location);
+            bool isEmpty = inventoryItem.IsEmpty;
+            binaryWriter.Write(isEmpty);
+            if (!isEmpty)
+            {
+                binaryWriter.Write((ushort)inventoryItem.ItemData.Id);
+                binaryWriter.Write(inventoryItem.Quantity);
+            }
+        }
+    }
+
+    private void SavePlayerResearches(BinaryWriter binaryWriter)
+    {
+        ResearchesSO researches = GameManager.Instance.GetPlayerResearches();
+        for (int i = 0; i < researches.GetResearchesCount(); i++)
+        {
+            binaryWriter.Write((byte)researches.GetState(i));
+        }
+    }
+
     private void LoadMetaData(BinaryReader binaryReader)
     {
+        Debug.Log("Load meta data");
         GameManager.Instance.Seed = binaryReader.ReadInt32();
         GameManager.Instance.CurrentTerrainWidth = binaryReader.ReadInt32();
         GameManager.Instance.CurrentTerrainHeight = binaryReader.ReadInt32();
-        _worldColumnSize = binaryReader.ReadInt32();
+        _worldDataSize = binaryReader.ReadInt32();
 
         for (int x = 0; x < GameManager.Instance.CurrentTerrainWidth; x++)
         {
             _worldColumnIndexes.Add(binaryReader.ReadInt32());
         }
+        GameManager.Instance.LoadingValue += _loadingStep;
     }
 
     private void LoadChunks(BinaryReader binaryReader)
     {
+        Debug.Log("Load chunks");
         TerrainConfigurationSO terrainConfiguration = GameManager.Instance.TerrainConfiguration;
         foreach (var chunk in ChunksManager.Instance.Chunks)
         {
             ChunksManager.Instance.SetChunkBiome(chunk, terrainConfiguration.GetBiome((BiomesID)binaryReader.ReadByte()));
         }
+        GameManager.Instance.LoadingValue += _loadingStep;
     }
 
-    private void LoadWorldCellData(BinaryReader binaryReader)
+    private void LoadWorldData(BinaryReader binaryReader)
     {
+        Debug.Log("Load world data");
         Terrain terrain = GameManager.Instance.Terrain;
         BlocksAtlasSO blockAtlas = GameManager.Instance.BlocksAtlas;
 
-        byte[] worldData = binaryReader.ReadBytes(_worldColumnSize);
+        byte[] worldData = binaryReader.ReadBytes(_worldDataSize);
         try
         {
             Parallel.For(0, GameManager.Instance.CurrentTerrainWidth, index =>
@@ -316,6 +376,7 @@ public class SaveLoadManager : MonoBehaviour
                     y += count;
                 }
             });
+            GameManager.Instance.LoadingValue += _loadingStep;
         }
         catch (Exception e)
         {
@@ -325,6 +386,7 @@ public class SaveLoadManager : MonoBehaviour
 
     private void LoadTrees(BinaryReader binaryReader)
     {
+        Debug.Log("Load trees");
         foreach (Transform child in GameManager.Instance.Terrain.Trees.transform)
         {
             GameObject.Destroy(child.gameObject);
@@ -344,10 +406,12 @@ public class SaveLoadManager : MonoBehaviour
             GameObject treeGameObject = GameObject.Instantiate(tree.gameObject, position, Quaternion.identity, GameManager.Instance.Terrain.Trees.transform);
             treeGameObject.name = tree.gameObject.name;
         }
+        GameManager.Instance.LoadingValue += _loadingStep;
     }
 
     private void LoadPickUpItems(BinaryReader binaryReader)
     {
+        Debug.Log("Load pickup items");
         foreach (Transform child in GameManager.Instance.Terrain.PickUpItems.transform)
         {
             GameObject.Destroy(child.gameObject);
@@ -368,6 +432,59 @@ public class SaveLoadManager : MonoBehaviour
             pickUpItemGameObject.name = pickUpItem.gameObject.name;
             WorldDataManager.Instance.MakeOccupied(position.x, position.y);
         }
+        GameManager.Instance.LoadingValue += _loadingStep;
+    }
+
+    private void LoadPlayer(BinaryReader binaryReader)
+    {
+        Debug.Log("Load player");
+        LoadPlayerPosition(binaryReader);
+        LoadPlayerInventory(binaryReader);
+        LoadPlayerResearches(binaryReader);
+    }
+
+    private void LoadPlayerPosition(BinaryReader binaryReader)
+    {
+        float x = binaryReader.ReadSingle();
+        float y = binaryReader.ReadSingle();
+        GameManager.Instance.SetPlayerPosition(x, y);
+    }
+
+    private void LoadPlayerInventory(BinaryReader binaryReader)
+    {
+        InventorySO inventory = GameManager.Instance.GetPlayerInventory();
+        inventory.Initialize();
+        LoadPlayerInventoryPart(binaryReader, inventory, inventory.HotbarSize, ItemLocations.Hotbar);
+        LoadPlayerInventoryPart(binaryReader, inventory, inventory.StorageSize, ItemLocations.Storage);
+        LoadPlayerInventoryPart(binaryReader, inventory, inventory.AccessoriesSize, ItemLocations.Accessories);
+        LoadPlayerInventoryPart(binaryReader, inventory, inventory.ArmorSize, ItemLocations.Armor);
+    }
+
+    private void LoadPlayerInventoryPart(BinaryReader binaryReader, InventorySO inventory, int size, ItemLocations location)
+    {
+        for (int i = 0; i < size; i++)
+        {
+            bool isEmpty = binaryReader.ReadBoolean();
+            if (!isEmpty)
+            {
+                ItemsID id = (ItemsID)binaryReader.ReadUInt16();
+                int quantity = binaryReader.ReadInt32();
+                ItemSO itemData = GameManager.Instance.ItemsAtlas.GetItemByID(id);
+                Debug.Log(itemData);
+                inventory.AddItemAtWithoutNotification(itemData, quantity, i, location);
+            }
+        }
+    }
+
+    private void LoadPlayerResearches(BinaryReader binaryReader)
+    {
+        ResearchesSO researches = GameManager.Instance.GetPlayerResearches();
+        researches.Initialize();
+        for (int i = 0; i < researches.GetResearchesCount(); i++)
+        {
+            ResearchState state = (ResearchState)binaryReader.ReadByte();
+            researches.SetResearchState(i, state);
+        }
     }
 
     public void Save()
@@ -377,6 +494,7 @@ public class SaveLoadManager : MonoBehaviour
         string worldDirectory = StaticInfo.WorldsDirectory + $"/{GameManager.Instance.WorldName}";
         string worldSaveFile = worldDirectory + $"/{GameManager.Instance.WorldName}.sw.world";
         string worldMetaFile = worldDirectory + $"/{GameManager.Instance.WorldName}.swm.world";
+        string playerFile = StaticInfo.PlayersDirectory + $"/{GameManager.Instance.PlayerName}.sw.player";
 
         Directory.CreateDirectory(worldDirectory);
 
@@ -384,24 +502,23 @@ public class SaveLoadManager : MonoBehaviour
         {
             Debug.Log("Save data to: " + worldSaveFile);
             SaveChunks(binaryWriter);
-            Debug.Log("Chunks saved");
-            SaveWorldCellData(binaryWriter);
-            Debug.Log("World saved");
+            SaveWorldData(binaryWriter);
             SaveTrees(binaryWriter);
-            Debug.Log("Trees saved");
             SavePickUpItems(binaryWriter);
-            Debug.Log("PickUp items saved");
-            //SavePlayer(binaryWriter);
-            //Debug.Log("Player saved");
+        }
+
+        using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(playerFile, FileMode.Create)))
+        {
+            Debug.Log("Save data to: " + playerFile);
+            SavePlayer(binaryWriter);
         }
 
         using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(worldMetaFile, FileMode.Create)))
         {
             Debug.Log("Save data to: " + worldMetaFile);
             SaveMetaData(binaryWriter);
-            Debug.Log("Meta data saved");
         }
-        Debug.Log("Save Complete");
+        Debug.Log("Saving Complete");
     }
 
     public void Load()
@@ -411,32 +528,36 @@ public class SaveLoadManager : MonoBehaviour
         string worldDirectory = StaticInfo.WorldsDirectory + $"/{GameManager.Instance.WorldName}";
         string worldSaveFile = worldDirectory + $"/{GameManager.Instance.WorldName}.sw.world";
         string worldMetaFile = worldDirectory + $"/{GameManager.Instance.WorldName}.swm.world";
+        string playerFile = StaticInfo.PlayersDirectory + $"/{GameManager.Instance.PlayerName}.sw.player";
 
-        float loadingStep = 100f / 5f;
+        _loadingStep = 100f / 5f;
 
-        using (BinaryReader binaryReader = new BinaryReader(File.Open(worldMetaFile, FileMode.Open)))
+        using (BinaryReader binaryReader = new(File.Open(worldMetaFile, FileMode.Open)))
         {
             LoadMetaData(binaryReader);
-            GameManager.Instance.LoadingValue += loadingStep;
         }
 
-        using (BinaryReader binaryReader = new BinaryReader(File.Open(worldSaveFile, FileMode.Open)))
+        using (BinaryReader binaryReader = new(File.Open(worldSaveFile, FileMode.Open)))
         {
             LoadChunks(binaryReader);
-            GameManager.Instance.LoadingValue += loadingStep;
-            LoadWorldCellData(binaryReader);
-            GameManager.Instance.LoadingValue += loadingStep;
+            LoadWorldData(binaryReader);
             ActionInMainThreadUtil.Instance.Invoke(() =>
             {
                 LoadTrees(binaryReader);
-                GameManager.Instance.LoadingValue += loadingStep;
                 LoadPickUpItems(binaryReader);
-                GameManager.Instance.LoadingValue += loadingStep;
             });
-            //SavePlayer(binaryWriter);
-            //Debug.Log("Player loaded");
         }
-        Debug.Log("Load Complete");
+
+        using (BinaryReader binaryReader = new(File.Open(playerFile, FileMode.Open)))
+        {
+            ActionInMainThreadUtil.Instance.Invoke(() =>
+            {
+                LoadPlayer(binaryReader);
+            });
+        }
+
+        new SetPhysicsShapesPhase().StartPhase();
+        Debug.Log("Loading Complete");
     }
     #endregion
 }

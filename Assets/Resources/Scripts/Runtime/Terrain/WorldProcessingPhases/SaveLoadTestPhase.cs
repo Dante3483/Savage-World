@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEngine;
 
-public class SaveLoadTestGenerationPhase : IGenerationPhase
+public class SaveLoadTestPhase : IWorldProcessingPhase
 {
     #region Private fields
 
@@ -14,7 +11,7 @@ public class SaveLoadTestGenerationPhase : IGenerationPhase
     #endregion
 
     #region Properties
-    public string Name => "Save/Load generation";
+    public string Name => "Save/Load test";
     #endregion
 
     #region Methods

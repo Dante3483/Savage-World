@@ -1,6 +1,6 @@
 using Random = System.Random;
 
-public class SetRandomTilesGenerationPhase : IGenerationPhase
+public class SetRandomTilesPhase : IWorldProcessingPhase
 {
     #region Private fields
     private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;

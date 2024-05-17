@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-public class FlatWorldGenerationPhase : IGenerationPhase
+public class FlatWorldGenerationPhase : IWorldProcessingPhase
 {
     #region Private fields
 

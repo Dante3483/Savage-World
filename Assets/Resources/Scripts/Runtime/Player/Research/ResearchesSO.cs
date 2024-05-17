@@ -10,6 +10,7 @@ public class ResearchesSO : ScriptableObject
     private List<ResearchSO> _listOfReserches = new();
     [SerializeField]
     private InventorySO _inventoryData;
+    private bool _isInitialized;
     #endregion
 
     #region Public fields
@@ -17,16 +18,31 @@ public class ResearchesSO : ScriptableObject
     #endregion
 
     #region Properties
+    public bool IsInitialized
+    {
+        get
+        {
+            return _isInitialized;
+        }
 
+        set
+        {
+            _isInitialized = value;
+        }
+    }
     #endregion
 
     #region Methods
     public void Initialize()
     {
-        foreach (ResearchSO research in _listOfReserches)
+        if (!_isInitialized)
         {
-            research.ResetData();
-            research.OnStateChanged += HandleResearchChangedState;
+            foreach (ResearchSO research in _listOfReserches)
+            {
+                research.ResetData();
+                research.OnStateChanged += HandleResearchChangedState;
+            }
+            _isInitialized = true;
         }
     }
 
@@ -90,7 +106,7 @@ public class ResearchesSO : ScriptableObject
         return _listOfReserches[index].State;
     }
 
-    public int GetResearchCount()
+    public int GetResearchesCount()
     {
         return _listOfReserches.Count;
     }
@@ -120,6 +136,19 @@ public class ResearchesSO : ScriptableObject
             return null;
         }
         return _listOfReserches[index].ListOfParents;
+    }
+
+    public void SetResearchState(int index, ResearchState state)
+    {
+        ResearchSO research = _listOfReserches[index];
+        if (state == ResearchState.Completed)
+        {
+            research.Complete();
+        }
+        else
+        {
+            research.ChangeState(state);
+        }
     }
 
     private bool CheckIndex(int index)

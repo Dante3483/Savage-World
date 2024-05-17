@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Random = System.Random;
 
-public class PlantsGenerationPhase : IGenerationPhase
+public class PlantsGenerationPhase : IWorldProcessingPhase
 {
     #region Private fields
     private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;

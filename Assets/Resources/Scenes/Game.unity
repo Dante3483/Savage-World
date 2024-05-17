@@ -7649,7 +7649,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _inventoryUI: {fileID: 1499264831}
   _inventoryData: {fileID: 11400000, guid: ddb9f8cda83b055498ce3a67b07c92c7, type: 2}
-  _isTestDataEnabled: 1
+  _isTestDataEnabled: 0
   _initStorageItems:
   - {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
   - {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
@@ -8527,6 +8527,7 @@ MonoBehaviour:
   _blocksAtlas: {fileID: 11400000, guid: 09f4ecc386a348a4288186a9733a7630, type: 2}
   _treesAtlas: {fileID: 11400000, guid: 10b2c8f2d6ac1d349ac7ddf07a5282b8, type: 2}
   _pickUpItemsAtlas: {fileID: 11400000, guid: 839a488f0ebda0d498ac76d689d5f647, type: 2}
+  _itemsAtlas: {fileID: 0}
   _playerName: 
   _worldName: 
   _seed: 171845

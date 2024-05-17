@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-public class SetPhysicsShapesGenerationPhase : IGenerationPhase
+public class SetPhysicsShapesPhase : IWorldProcessingPhase
 {
     #region Private fields
 
@@ -28,7 +28,7 @@ public class SetPhysicsShapesGenerationPhase : IGenerationPhase
         {
             for (int y = 5; y < terrainHeight - 5; y++)
             {
-                WorldDataManager.Instance.UpdateCornerColliderWithoutNotification(x, y);
+                WorldDataManager.Instance.UpdateCornerColliderWithoutNotification(x, y, true);
             }
         });
 

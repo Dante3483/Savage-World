@@ -1,6 +1,6 @@
 using Random = System.Random;
 
-public class BiomesGenerationPhase : IGenerationPhase
+public class BiomesSettingPhase : IWorldProcessingPhase
 {
     #region Private fields
     private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
@@ -18,7 +18,7 @@ public class BiomesGenerationPhase : IGenerationPhase
     #endregion
 
     #region Properties
-    public string Name => "Biomes generation";
+    public string Name => "Biomes setting";
     #endregion
 
     #region Methods

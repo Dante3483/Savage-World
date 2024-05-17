@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37f41c3fc409d42499b8733a6bf2a64e, type: 3}
   m_Name: Accessory
   m_EditorClassIdentifier: 
-  _id: 6
+  _id: 1
   _itemType: 4
   _itemRarity: {fileID: 11400000, guid: ddd32f58fffdb79469e4e8303aa87b40, type: 2}
   _isStackable: 0

@@ -258,7 +258,7 @@ public class WorldDataManager : MonoBehaviour
         }
     }
 
-    public void UpdateCornerCollider(int x, int y)
+    public void UpdateCornerCollider(int x, int y, bool stopPropagation = false)
     {
         if (!_worldData[x, y].IsSolid())
         {
@@ -271,7 +271,7 @@ public class WorldDataManager : MonoBehaviour
             {
                 _worldData[x, y].ColliderIndex = byte.MaxValue;
             }
-            if (_worldData[x, y].ColliderIndex != prevIndex)
+            if (!stopPropagation && _worldData[x, y].ColliderIndex != prevIndex)
             {
                 UpdateCollidersAround(x, y);
             }
@@ -309,7 +309,7 @@ public class WorldDataManager : MonoBehaviour
         }
     }
 
-    public void UpdateCornerColliderWithoutNotification(int x, int y)
+    public void UpdateCornerColliderWithoutNotification(int x, int y, bool stopPropagation = false)
     {
         if (!_worldData[x, y].IsSolid())
         {
@@ -322,7 +322,7 @@ public class WorldDataManager : MonoBehaviour
             {
                 _worldData[x, y].ColliderIndex = byte.MaxValue;
             }
-            if (_worldData[x, y].ColliderIndex != prevIndex)
+            if (!stopPropagation && _worldData[x, y].ColliderIndex != prevIndex)
             {
                 UpdateCollidersAroundWithoutNotification(x, y);
             }

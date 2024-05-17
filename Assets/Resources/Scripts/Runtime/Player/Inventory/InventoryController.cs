@@ -33,6 +33,19 @@ public class InventoryController : MonoBehaviour, IBookPageController
 
     #region Properties
     public bool IsActive => UIManager.Instance.InventoryUI.IsActive;
+
+    public InventorySO InventoryData
+    {
+        get
+        {
+            return _inventoryData;
+        }
+
+        set
+        {
+            _inventoryData = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -107,7 +120,7 @@ public class InventoryController : MonoBehaviour, IBookPageController
             _inventoryUI.UpdateHotbarItemData(i, hotbarState[i].ItemData?.SmallItemImage, hotbarState[i].Quantity);
         }
     }
-     
+
     private void HandleUpdateAccessoriesUI(InventoryItem[] accessoriesState)
     {
         for (int i = 0; i < accessoriesState.Length; i++)

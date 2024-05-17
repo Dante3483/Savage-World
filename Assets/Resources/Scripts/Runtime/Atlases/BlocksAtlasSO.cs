@@ -6,13 +6,20 @@ using UnityEngine;
 public class BlocksAtlasSO : AtlasSO
 {
     #region Private fields
-    [SerializeField] private AbstractBlockSO[] _abstractBlocks;
-    [SerializeField] private SolidBlockSO[] _solidBlocks;
-    [SerializeField] private DustBlockSO[] _dustBlocks;
-    [SerializeField] private LiquidBlockSO[] _liquidBlocks;
-    [SerializeField] private PlantSO[] _plantBlocks;
-    [SerializeField] private WallSO[] _walls;
-    [SerializeField] private FurnitureSO[] _furniture;
+    [SerializeField]
+    private AbstractBlockSO[] _abstractBlocks;
+    [SerializeField]
+    private SolidBlockSO[] _solidBlocks;
+    [SerializeField]
+    private DustBlockSO[] _dustBlocks;
+    [SerializeField]
+    private LiquidBlockSO[] _liquidBlocks;
+    [SerializeField]
+    private PlantSO[] _plantBlocks;
+    [SerializeField]
+    private WallSO[] _walls;
+    [SerializeField]
+    private FurnitureSO[] _furniture;
 
     private Dictionary<BlockTypes, Dictionary<ushort, BlockSO>> _blockByTypeAndId;
     private Dictionary<BiomesID, BlockSO> _grassByBiome;

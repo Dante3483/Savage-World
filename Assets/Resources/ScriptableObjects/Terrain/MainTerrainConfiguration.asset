@@ -28,6 +28,7 @@ MonoBehaviour:
   PickUpItemsGeneration: 1
   SetRandomTiles: 1
   BlockProcessing: 1
+  SetPhysicsShapes: 1
   SaveLoadTest: 0
   TerrainWidth: 8400
   TerrainHeight: 2400
@@ -35,7 +36,7 @@ MonoBehaviour:
   HorizontalChunksCount: 84
   VerticalChunksCount: 24
   Equator: 2150
-  DeepOceanY: 1894
+  DeepOceanY: 1877
   Levels:
   - {fileID: 11400000, guid: abfc12d2ebd9c244a95107aae1c41b37, type: 2}
   - {fileID: 11400000, guid: 318a27e219dd34042a9bc397b17bb678, type: 2}

@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Random = System.Random;
 
-public class ClustersGenerationPhase : IGenerationPhase
+public class ClustersGenerationPhase : IWorldProcessingPhase
 {
     #region Private fields
     private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;

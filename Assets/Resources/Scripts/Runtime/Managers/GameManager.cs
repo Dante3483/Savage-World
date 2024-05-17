@@ -1,13 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 using Random = System.Random;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
@@ -31,6 +27,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private BlocksAtlasSO _blocksAtlas;
     [SerializeField] private TreesAtlasSO _treesAtlas;
     [SerializeField] private PickUpItemsAtlasSO _pickUpItemsAtlas;
+    [SerializeField] private ItemsAtlasSO _itemsAtlas;
 
     [Header("Session data")]
     [SerializeField] private string _playerName;
@@ -305,12 +302,27 @@ public class GameManager : MonoBehaviour
             _isInputTextInFocus = value;
         }
     }
+
+    public ItemsAtlasSO ItemsAtlas
+    {
+        get
+        {
+            return _itemsAtlas;
+        }
+
+        set
+        {
+            _itemsAtlas = value;
+        }
+    }
     #endregion
 
     #region Methods
     private void OnApplicationQuit()
     {
         UpdateGameState(GameState.CloseApplication);
+        GetPlayerInventory().IsInitialized = false;
+        GetPlayerResearches().IsInitialized = false;
     }
 
     private void Awake()
@@ -392,7 +404,7 @@ public class GameManager : MonoBehaviour
                 ChunksManager.Instance.Initialize,
                 _terrain.Initialize,
             };
-            
+
             float loadingStep = 100f / initializationSteps.Count;
 
             UIManager.Instance.MainMenuUI.IsActive = false;
@@ -450,6 +462,7 @@ public class GameManager : MonoBehaviour
         _blocksAtlas.InitializeAtlas();
         _treesAtlas.InitializeAtlas();
         _pickUpItemsAtlas.InitializeAtlas();
+        _itemsAtlas.InitializeAtlas();
     }
 
     private void InitializePlayersData()
@@ -498,6 +511,21 @@ public class GameManager : MonoBehaviour
     public Transform GetPlayerTransform()
     {
         return _player.transform;
+    }
+
+    public InventorySO GetPlayerInventory()
+    {
+        return _player.GetComponentInChildren<InventoryController>().InventoryData;
+    }
+
+    public ResearchesSO GetPlayerResearches()
+    {
+        return _player.GetComponentInChildren<ResearchController>().ResearchData;
+    }
+
+    public void SetPlayerPosition(float x, float y)
+    {
+        _player.transform.position = new(x, y);
     }
     #endregion
 }
