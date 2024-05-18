@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class UIHotbarPage : MonoBehaviour
@@ -39,7 +37,7 @@ public class UIHotbarPage : MonoBehaviour
 
     private void SetHandlers(UIHotbarItemCell uiItem)
     {
-        
+
     }
 
     public void UpdateHotbarItemData(int itemIndex, Sprite itemImage, int itemQuantity)

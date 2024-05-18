@@ -1,4 +1,3 @@
-using Inventory;
 using Items;
 using System;
 using System.Collections.Generic;
@@ -229,14 +228,14 @@ public class SaveLoadManager : MonoBehaviour
 
     private void SavePlayerInventory(BinaryWriter binaryWriter)
     {
-        InventorySO inventory = GameManager.Instance.GetPlayerInventory();
+        Inventory inventory = GameManager.Instance.GetPlayerInventory();
         SavePlayerInventoryPart(binaryWriter, inventory, inventory.HotbarSize, ItemLocations.Hotbar);
         SavePlayerInventoryPart(binaryWriter, inventory, inventory.StorageSize, ItemLocations.Storage);
         SavePlayerInventoryPart(binaryWriter, inventory, inventory.AccessoriesSize, ItemLocations.Accessories);
         SavePlayerInventoryPart(binaryWriter, inventory, inventory.ArmorSize, ItemLocations.Armor);
     }
 
-    private void SavePlayerInventoryPart(BinaryWriter binaryWriter, InventorySO inventory, int size, ItemLocations location)
+    private void SavePlayerInventoryPart(BinaryWriter binaryWriter, Inventory inventory, int size, ItemLocations location)
     {
         for (int i = 0; i < size; i++)
         {
@@ -393,7 +392,7 @@ public class SaveLoadManager : MonoBehaviour
         }
 
         int treesCount = binaryReader.ReadInt32();
-        Vector3 position = new Vector3();
+        Vector3 position = new();
 
         for (int i = 0; i < treesCount; i++)
         {
@@ -418,7 +417,7 @@ public class SaveLoadManager : MonoBehaviour
         }
 
         int pickUpItemsCount = binaryReader.ReadInt32();
-        Vector3Int position = new Vector3Int();
+        Vector3Int position = new();
 
         for (int i = 0; i < pickUpItemsCount; i++)
         {
@@ -452,7 +451,7 @@ public class SaveLoadManager : MonoBehaviour
 
     private void LoadPlayerInventory(BinaryReader binaryReader)
     {
-        InventorySO inventory = GameManager.Instance.GetPlayerInventory();
+        Inventory inventory = GameManager.Instance.GetPlayerInventory();
         inventory.Initialize();
         LoadPlayerInventoryPart(binaryReader, inventory, inventory.HotbarSize, ItemLocations.Hotbar);
         LoadPlayerInventoryPart(binaryReader, inventory, inventory.StorageSize, ItemLocations.Storage);
@@ -460,7 +459,7 @@ public class SaveLoadManager : MonoBehaviour
         LoadPlayerInventoryPart(binaryReader, inventory, inventory.ArmorSize, ItemLocations.Armor);
     }
 
-    private void LoadPlayerInventoryPart(BinaryReader binaryReader, InventorySO inventory, int size, ItemLocations location)
+    private void LoadPlayerInventoryPart(BinaryReader binaryReader, Inventory inventory, int size, ItemLocations location)
     {
         for (int i = 0; i < size; i++)
         {
@@ -498,7 +497,7 @@ public class SaveLoadManager : MonoBehaviour
 
         Directory.CreateDirectory(worldDirectory);
 
-        using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(worldSaveFile, FileMode.Create)))
+        using (BinaryWriter binaryWriter = new(File.Open(worldSaveFile, FileMode.Create)))
         {
             Debug.Log("Save data to: " + worldSaveFile);
             SaveChunks(binaryWriter);
@@ -507,13 +506,13 @@ public class SaveLoadManager : MonoBehaviour
             SavePickUpItems(binaryWriter);
         }
 
-        using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(playerFile, FileMode.Create)))
+        using (BinaryWriter binaryWriter = new(File.Open(playerFile, FileMode.Create)))
         {
             Debug.Log("Save data to: " + playerFile);
             SavePlayer(binaryWriter);
         }
 
-        using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(worldMetaFile, FileMode.Create)))
+        using (BinaryWriter binaryWriter = new(File.Open(worldMetaFile, FileMode.Create)))
         {
             Debug.Log("Save data to: " + worldMetaFile);
             SaveMetaData(binaryWriter);

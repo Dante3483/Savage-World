@@ -4,12 +4,14 @@ public class MiningDamageController : MonoBehaviour
 {
     #region Private fields
     [Header("Main")]
-    [SerializeField] private MiningDamageData _blocksDamageData;
-    [SerializeField] private MiningDamageData _wallsDamageData;
+    [SerializeField]
+    private MiningDamageData _blocksDamageData;
+    [SerializeField]
+    private MiningDamageData _wallsDamageData;
     #endregion
 
     #region Public fields
-
+    public static MiningDamageController Instance;
     #endregion
 
     #region Properties
@@ -19,6 +21,7 @@ public class MiningDamageController : MonoBehaviour
     #region Methods
     private void Awake()
     {
+        Instance = this;
         _blocksDamageData.Initialize();
         _wallsDamageData.Initialize();
         _blocksDamageData.OnDamageUpdated += (x, y, damage) => WorldDataManager.Instance.SetBlockDamagePercent(x, y, damage);

@@ -19,31 +19,54 @@ public class GameManager : MonoBehaviour
 {
     #region Private fields
     [Header("Main")]
-    [SerializeField] private GameState _currentGameState;
-    [SerializeField] private TerrainConfigurationSO _terrainConfiguration;
-    [SerializeField] private GameObject _player;
+    [SerializeField]
+    private GameState _currentGameState;
+    [SerializeField]
+    private TerrainConfigurationSO _terrainConfiguration;
+    [SerializeField]
+    private Player _playerPrefab;
+    [SerializeField]
+    private Transform _playerParrent;
+    [SerializeField]
+    private Player _player;
 
     [Header("Atlases")]
-    [SerializeField] private BlocksAtlasSO _blocksAtlas;
-    [SerializeField] private TreesAtlasSO _treesAtlas;
-    [SerializeField] private PickUpItemsAtlasSO _pickUpItemsAtlas;
-    [SerializeField] private ItemsAtlasSO _itemsAtlas;
+    [SerializeField]
+    private BlocksAtlasSO _blocksAtlas;
+    [SerializeField]
+    private TreesAtlasSO _treesAtlas;
+    [SerializeField]
+    private PickUpItemsAtlasSO _pickUpItemsAtlas;
+    [SerializeField]
+    private ItemsAtlasSO _itemsAtlas;
 
     [Header("Session data")]
-    [SerializeField] private string _playerName;
-    [SerializeField] private string _worldName;
-    [SerializeField] private int _seed;
-    [SerializeField] private int _currentTerrainWidth;
-    [SerializeField] private int _currentTerrainHeight;
+    [SerializeField]
+    private string _playerName;
+    [SerializeField]
+    private string _worldName;
+    [SerializeField]
+    private int _seed;
+    [SerializeField]
+    private int _currentTerrainWidth;
+    [SerializeField]
+    private int _currentTerrainHeight;
+    [SerializeField]
+    private ResearchesSO _researches;
 
     [Header("Terrain")]
-    [SerializeField] private GameObject _terrainGameObject;
+    [SerializeField]
+    private GameObject _terrainGameObject;
 
     [Header("Conditions")]
-    [SerializeField] private bool _isStaticSeed;
-    [SerializeField] private bool _isMenuActive;
-    [SerializeField] private bool _isLoadingProgressActive;
-    [SerializeField] private bool _isInputTextInFocus;
+    [SerializeField]
+    private bool _isStaticSeed;
+    [SerializeField]
+    private bool _isMenuActive;
+    [SerializeField]
+    private bool _isLoadingProgressActive;
+    [SerializeField]
+    private bool _isInputTextInFocus;
 
     private List<string> _playerNames;
     private List<string> _worldNames;
@@ -315,6 +338,19 @@ public class GameManager : MonoBehaviour
             _itemsAtlas = value;
         }
     }
+
+    public ResearchesSO Researches
+    {
+        get
+        {
+            return _researches;
+        }
+
+        set
+        {
+            _researches = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -344,7 +380,7 @@ public class GameManager : MonoBehaviour
     {
         if (!IsInputTextInFocus && Input.GetKeyDown(KeyCode.P))
         {
-            _player.SetActive(true);
+            _player.gameObject.SetActive(true);
         }
     }
 
@@ -395,7 +431,7 @@ public class GameManager : MonoBehaviour
         try
         {
             var watch = Stopwatch.StartNew();
-            List<Action> initializationSteps = new List<Action>()
+            List<Action> initializationSteps = new()
             {
                 InitializeAtlases,
                 InitializePlayersData,
@@ -441,6 +477,11 @@ public class GameManager : MonoBehaviour
         ResetLoadingValue();
 
         Terrain.CreateNewWorld();
+        ActionInMainThreadUtil.Instance.Invoke(() =>
+        {
+            CreateNewPlayer();
+            SetPlayerPosition(3655, 2200);
+        });
         UIManager.Instance.MainMenuProgressBarUI.IsActive = false;
 
         UpdateGameState(GameState.GameSession);
@@ -451,6 +492,10 @@ public class GameManager : MonoBehaviour
         UIManager.Instance.MainMenuProgressBarUI.IsActive = true;
         ResetLoadingValue();
 
+        ActionInMainThreadUtil.Instance.Invoke(() =>
+        {
+            CreateNewPlayer();
+        });
         Terrain.LoadWorld();
         UIManager.Instance.MainMenuProgressBarUI.IsActive = false;
 
@@ -477,7 +522,7 @@ public class GameManager : MonoBehaviour
 
     private void GetAllPlayerNames()
     {
-        DirectoryInfo directoryInfo = new DirectoryInfo(StaticInfo.PlayersDirectory);
+        DirectoryInfo directoryInfo = new(StaticInfo.PlayersDirectory);
         FileInfo[] filesInfo = directoryInfo.GetFiles("*.sw.player");
         _playerNames = new List<string>();
         foreach (FileInfo fileInfo in filesInfo)
@@ -488,7 +533,7 @@ public class GameManager : MonoBehaviour
 
     private void GetAllWorldNames()
     {
-        DirectoryInfo directoryInfo = new DirectoryInfo(StaticInfo.WorldsDirectory);
+        DirectoryInfo directoryInfo = new(StaticInfo.WorldsDirectory);
         DirectoryInfo[] directoriesInfo = directoryInfo.GetDirectories();
         _worldNames = new List<string>();
         foreach (DirectoryInfo directoryIndo in directoriesInfo)
@@ -507,20 +552,28 @@ public class GameManager : MonoBehaviour
         return x >= 0 && x < _currentTerrainWidth && y >= 0 && y < _currentTerrainHeight;
     }
 
-    //Delete
+    private void CreateNewPlayer()
+    {
+        _player = Instantiate(_playerPrefab, Vector3.zero, Quaternion.identity);
+        _player.transform.SetParent(_playerParrent);
+        _player.name = "Player";
+        _player.Initialize();
+        Camera.main.GetComponent<FollowObject>().Target = _player.transform;
+    }
+
     public Transform GetPlayerTransform()
     {
         return _player.transform;
     }
 
-    public InventorySO GetPlayerInventory()
+    public Inventory GetPlayerInventory()
     {
-        return _player.GetComponentInChildren<InventoryController>().InventoryData;
+        return _player.Inventory;
     }
 
     public ResearchesSO GetPlayerResearches()
     {
-        return _player.GetComponentInChildren<ResearchController>().ResearchData;
+        return _researches;
     }
 
     public void SetPlayerPosition(float x, float y)

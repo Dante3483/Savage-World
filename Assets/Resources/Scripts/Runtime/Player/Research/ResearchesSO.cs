@@ -8,8 +8,6 @@ public class ResearchesSO : ScriptableObject
     #region Private fields
     [SerializeField]
     private List<ResearchSO> _listOfReserches = new();
-    [SerializeField]
-    private InventorySO _inventoryData;
     private bool _isInitialized;
     #endregion
 
@@ -46,19 +44,19 @@ public class ResearchesSO : ScriptableObject
         }
     }
 
-    public bool ExamineResearch(int index)
+    public bool ExamineResearch(Inventory inventory, int index)
     {
         ResearchSO research = _listOfReserches[index];
         foreach (var item in research.ListOfCosts)
         {
-            if (_inventoryData.GetItemQuantity(item.Item) < item.Quantity)
+            if (inventory.GetItemQuantity(item.Item) < item.Quantity)
             {
                 return false;
             }
         }
         foreach (var item in research.ListOfCosts)
         {
-            _inventoryData.RemoveItemFromFirstSlot(item.Item, item.Quantity);
+            inventory.RemoveItemFromFirstSlot(item.Item, item.Quantity);
         }
         research.Complete();
         return true;

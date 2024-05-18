@@ -20,13 +20,13 @@ MonoBehaviour:
     and reservoirs. Fishing techniques include hand-gathering, spearing, netting,
     angling, shooting and trapping, as well as more destructive and often illegal
     techniques such as electrocution, blasting and poisoning. '
-  _state: 1
+  _state: 2
   _position: {x: 300, y: 300, z: 0}
   _listOfRewards:
   - {fileID: 11400000, guid: 5db4e509b2223af4c8c0a4486d274bbf, type: 2}
   _listOfCosts:
   - _item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
-    _quantity: 100
+    _quantity: 10
   _listOfParents:
   - {fileID: 11400000, guid: ecf3f96df25bf5c4094fb7c0b39a9402, type: 2}
   _listOfChildren: []

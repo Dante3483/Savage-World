@@ -1,4 +1,3 @@
-using Inventory;
 using Items;
 using System;
 using System.Collections.Generic;
@@ -6,8 +5,8 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Inventory", menuName = "Player/Inventory/Inventory")]
-public class InventorySO : ScriptableObject
+[Serializable]
+public class Inventory
 {
     #region Private fields
     [SerializeField] private InventoryItem[] _storageItems;

@@ -1,17 +1,19 @@
-using Inventory;
 using UnityEngine;
 
 public class HotbarController : MonoBehaviour
 {
     #region Private fields
     [Header("Main")]
-    [SerializeField] private UIHotbarPage _hotbarUI;
-    [SerializeField] private InventorySO _inventoryData;
+    [SerializeField]
+    private Player _player;
+    [SerializeField]
+    private UIHotbarPage _hotbarUI;
+    private Inventory _inventory;
 
     private KeyCode[] _hotbarKeys = new KeyCode[]
     {
-        KeyCode.Alpha1,KeyCode.Alpha2, 
-        KeyCode.Alpha3,KeyCode.Alpha4, 
+        KeyCode.Alpha1,KeyCode.Alpha2,
+        KeyCode.Alpha3,KeyCode.Alpha4,
         KeyCode.Alpha5,
     };
     #endregion
@@ -28,8 +30,12 @@ public class HotbarController : MonoBehaviour
     private void Awake()
     {
         UIManager.Instance.HotbarUI.IsActive = true;
+        if (_player is null)
+        {
+            _player = GetComponentInParent<Player>();
+        }
+        PrepareData();
         PrepareUI();
-        PrepareInventoryData();
     }
 
     private void Update()
@@ -38,14 +44,16 @@ public class HotbarController : MonoBehaviour
         CheckMouseScroll();
     }
 
-    private void PrepareUI()
+    private void PrepareData()
     {
-        _hotbarUI.InitializePage(_inventoryData.HotbarSize);
+        _inventory = _player.Inventory;
+        _inventory.OnHotbarChanged += HandleUpdateHotbarUI;
     }
 
-    private void PrepareInventoryData()
+    private void PrepareUI()
     {
-        _inventoryData.OnHotbarChanged += HandleUpdateHotbarUI;
+        _hotbarUI = UIManager.Instance.HotbarUI.Content.GetComponentInChildren<UIHotbarPage>();
+        _hotbarUI.InitializePage(_inventory.HotbarSize);
         SelectCell(0);
     }
 
@@ -64,21 +72,21 @@ public class HotbarController : MonoBehaviour
     private void CheckMouseScroll()
     {
         int scrollDeltaY = Mathf.Clamp((int)Input.mouseScrollDelta.y, -1, 1);
-        int newIndex = _inventoryData.HotbarSelectedIndex + scrollDeltaY;
-        if (newIndex >= _inventoryData.HotbarSize)
+        int newIndex = _inventory.HotbarSelectedIndex + scrollDeltaY;
+        if (newIndex >= _inventory.HotbarSize)
         {
             newIndex = 0;
         }
         if (newIndex < 0)
         {
-            newIndex = _inventoryData.HotbarSize - 1;
+            newIndex = _inventory.HotbarSize - 1;
         }
         SelectCell(newIndex);
     }
 
     private void SelectCell(int index)
     {
-        _inventoryData.SelectItem(index);
+        _inventory.SelectItem(index);
         _hotbarUI.SelectCell(index);
     }
 
