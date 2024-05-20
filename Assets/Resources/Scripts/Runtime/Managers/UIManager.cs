@@ -104,7 +104,7 @@ public class UIManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        PlayerInputActions inputActions = new PlayerInputActions();
+        PlayerInputActions inputActions = new();
         inputActions.UI.Enable();
         inputActions.UI.OpenCloseDebug.performed += ResetDebugUI;
     }

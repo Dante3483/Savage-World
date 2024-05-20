@@ -28,6 +28,7 @@ public class TerrainConfigurationSO : ScriptableObject
     public bool PickUpItemsGeneration;
     public bool SetRandomTiles;
     public bool BlockProcessing;
+    public bool SetPhysicsShapes;
 
     [Header("Phases for tests")]
     public bool SaveLoadTest;
@@ -118,6 +119,7 @@ public class TerrainConfigurationSO : ScriptableObject
             PickUpItemsGeneration = false;
             SetRandomTiles = false;
             BlockProcessing = false;
+            SetPhysicsShapes = false;
         }
         if (EnableAll)
         {
@@ -136,6 +138,7 @@ public class TerrainConfigurationSO : ScriptableObject
             PickUpItemsGeneration = true;
             SetRandomTiles = true;
             BlockProcessing = true;
+            SetPhysicsShapes = true;
         }
         #endregion
 

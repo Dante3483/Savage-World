@@ -28,6 +28,19 @@ public class UIPage : MonoBehaviour
             _isActive = value;
         }
     }
+
+    public RectTransform Content
+    {
+        get
+        {
+            return _content;
+        }
+
+        set
+        {
+            _content = value;
+        }
+    }
     #endregion
 
     #region Methods

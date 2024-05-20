@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 [CustomEditor(typeof(Object), true, isFallback = true)]
+[CanEditMultipleObjects]
 public class DefaultUIElementsEditor : Editor
 {
     #region Private fields
@@ -24,14 +23,10 @@ public class DefaultUIElementsEditor : Editor
     #endregion
 
     #region Methods
-    private void OnEnable()
+    public override VisualElement CreateInspectorGUI()
     {
         _root = new VisualElement();
         _root.RegisterCallback<GeometryChangedEvent>(evt => FixListView());
-    }
-
-    public override VisualElement CreateInspectorGUI()
-    {
         AddFields();
         AddButtons();
         return _root;

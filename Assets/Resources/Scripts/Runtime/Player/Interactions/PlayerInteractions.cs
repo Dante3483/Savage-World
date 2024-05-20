@@ -5,28 +5,41 @@ using UnityEngine.UIElements;
 
 public class PlayerInteractions : MonoBehaviour
 {
-    delegate void SetDamageDelegate(ref WorldCellData block, float damage);
-
     #region Private fields
     [Header("Main")]
-    [SerializeField] private Drop _dropPrefab;
-    [SerializeField] private ItemSO _item;
-    [SerializeField] private InventorySO _inventoryData;
+    [SerializeField]
+    private Player _player;
+    [SerializeField]
+    private Drop _dropPrefab;
+    [SerializeField]
+    private ItemSO _item;
+    private Inventory _inventory;
 
     [Header("Interaction area")]
-    [SerializeField] private bool _isAreaDrawing;
-    [SerializeField] private Vector2 _areaSize;
-    [SerializeField] private bool _isMouseInsideArea;
+    [SerializeField]
+    private bool _isAreaDrawing;
+    [SerializeField]
+    private Vector2 _areaSize;
+    [SerializeField]
+    private bool _isMouseInsideArea;
 
     [Header("Mining")]
-    [Min(0.001f)][SerializeField] private float _blockDamageMultiplier;
-    [Min(0.001f)][SerializeField] private float _wallDamageMultiplier;
-    [SerializeField] private MiningDamageController _miningDamageController;
+    [Min(0.001f)]
+    [SerializeField]
+    private float _blockDamageMultiplier;
+    [Min(0.001f)]
+    [SerializeField]
+    private float _wallDamageMultiplier;
+    [SerializeField]
+    private MiningDamageController _miningDamageController;
 
     [Header("Placing")]
-    [SerializeField] private float _placingCooldown;
-    [SerializeField] private bool _isPlacingAllowed;
-    [SerializeField] private LayerMask _playerLayerMask;
+    [SerializeField]
+    private float _placingCooldown;
+    [SerializeField]
+    private bool _isPlacingAllowed;
+    [SerializeField]
+    private LayerMask _playerLayerMask;
     private BoxCastUtil _checkPlayerBoxCast;
     #endregion
 
@@ -41,10 +54,16 @@ public class PlayerInteractions : MonoBehaviour
     #region Methods
     private void Awake()
     {
-        _inventoryData.OnInventoryFull += HandleThrowItem;
+        if (_player is null)
+        {
+            _player = GetComponent<Player>();
+        }
+        _inventory = _player.Inventory;
+        _inventory.OnInventoryFull += HandleThrowItem;
         _checkPlayerBoxCast.OriginOffset = new Vector2(0.5f, 0.5f);
         _checkPlayerBoxCast.Size = new Vector2(1f, 1f);
         _checkPlayerBoxCast.LayerMask = _playerLayerMask;
+        _miningDamageController = MiningDamageController.Instance;
         _isPlacingAllowed = true;
     }
 
@@ -94,7 +113,7 @@ public class PlayerInteractions : MonoBehaviour
 
     private void InteractWithItemInHotbar()
     {
-        switch (_inventoryData.GetSelectedItem().ItemData)
+        switch (_inventory.GetSelectedItem().ItemData)
         {
             case BlockItemSO blockItem:
                 {
@@ -125,11 +144,11 @@ public class PlayerInteractions : MonoBehaviour
         {
             return;
         }
-        if (WorldDataManager.Instance.IsEmpty(intPos.x, intPos.y) && 
+        if (WorldDataManager.Instance.IsEmpty(intPos.x, intPos.y) &&
             (WorldDataManager.Instance.IsWall(intPos.x, intPos.y) || WorldDataManager.Instance.IsSolidAnyNeighbor(intPos.x, intPos.y)))
         {
-            GameManager.Instance.Terrain.CreateBlock(intPos.x, intPos.y, blockItem.BlockToPlace);
-            _inventoryData.DecreaseSelectedItemQuantity(1);
+            WorldDataManager.Instance.SetBlockData(intPos.x, intPos.y, blockItem.BlockToPlace);
+            _inventory.DecreaseSelectedItemQuantity(1);
             UpdateNeighboringBlocks(intPos);
             StartCoroutine(WaitForPlacingCooldown());
         }
@@ -161,7 +180,7 @@ public class PlayerInteractions : MonoBehaviour
                 {
                     _miningDamageController.RemoveDamageFromBlocks(blockPosition);
                     CreateDrop(new Vector3(blockPosition.x + 0.5f, blockPosition.y + 0.5f), block.BlockData.Drop, 1);
-                    GameManager.Instance.Terrain.CreateBlock(blockPosition.x, blockPosition.y, GameManager.Instance.BlocksAtlas.Air);
+                    WorldDataManager.Instance.SetBlockData(blockPosition.x, blockPosition.y, GameManager.Instance.BlocksAtlas.Air);
                     UpdateNeighboringBlocks(blockPosition);
                 }
             }
@@ -217,7 +236,7 @@ public class PlayerInteractions : MonoBehaviour
 
             Vector2Int intPos = Vector2Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
 
-            GameManager.Instance.Terrain.CreateBlock((ushort)intPos.x, (ushort)intPos.y, GameManager.Instance.BlocksAtlas.GetBlockById(FurnitureBlocksID.Torch));
+            WorldDataManager.Instance.SetBlockData((ushort)intPos.x, (ushort)intPos.y, GameManager.Instance.BlocksAtlas.GetBlockById(FurnitureBlocksID.Torch));
 
             UpdateNeighboringBlocks(intPos);
         }
@@ -229,29 +248,29 @@ public class PlayerInteractions : MonoBehaviour
         {
             return;
         }
-        int remainder = _inventoryData.AddItem(drop.Item, drop.Quantity, ItemLocations.Hotbar);
+        int remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Hotbar);
         drop.Quantity = remainder;
 
         if (remainder != 0)
         {
-            remainder = _inventoryData.AddItem(drop.Item, drop.Quantity, ItemLocations.Storage);
+            remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Storage);
             drop.Quantity = remainder;
         }
     }
 
     public bool IsEnoughSpaceToTakeDrop(Drop drop)
     {
-        return !_inventoryData.IsEnoughSpaceForItem(drop.Item, ItemLocations.Hotbar) || !_inventoryData.IsEnoughSpaceForItem(drop.Item, ItemLocations.Storage);
+        return !_inventory.IsEnoughSpaceForItem(drop.Item, ItemLocations.Hotbar) || !_inventory.IsEnoughSpaceForItem(drop.Item, ItemLocations.Storage);
     }
 
     public void ThrowSelectedItem()
     {
-        Drop drop = CreateDrop(transform.position, _inventoryData.GetSelectedItem().ItemData, _inventoryData.GetSelectedItem().Quantity);
+        Drop drop = CreateDrop(transform.position, _inventory.GetSelectedItem().ItemData, _inventory.GetSelectedItem().Quantity);
         if (drop != null)
         {
             DropPhysics dropPhysics = drop.GetComponent<DropPhysics>();
             dropPhysics.AddForce();
-            _inventoryData.RemoveSelectedItem();
+            _inventory.RemoveSelectedItem();
         }
     }
 

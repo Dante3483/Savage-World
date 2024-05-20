@@ -3,7 +3,7 @@ using UnityEngine;
 public class AtlasSO : ScriptableObject
 {
     #region Private fields
-    [FolderPath(label:"Path to atlas data", title:"Select atlas data folder", startFolder:"Assets/Resources")]
+    [FolderPath(label: "Path to atlas data", title: "Select atlas data folder", startFolder: "Assets/Resources")]
     [SerializeField] private string _atlasDataPath;
     #endregion
 

@@ -1,5 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace CustomTilemap
 {
@@ -7,35 +8,46 @@ namespace CustomTilemap
     {
         #region Private fields
         [Header("Main")]
-        [SerializeField] private int _width;
-        [SerializeField] private int _height;
-
-        [Header("Solid tilemap")]
-        [SerializeField] private UnityEngine.Tilemaps.Tilemap _solidTilemap;
-        [SerializeField] private SolidRuleTile _solidRuleTIle;
-        [SerializeField] private CornerRuleTile _cornerRuleTile;
+        [SerializeField]
+        private int _width;
+        [SerializeField]
+        private int _height;
+        [SerializeField]
+        private CompositeCollider2D _compositeCollider;
 
         [Header("Blocks tilemap")]
-        [SerializeField] private Tile _tilePrefab;
-        [SerializeField] private Transform _blocksTilemap;
-        [SerializeField] private Vector2 _tilesOffset = new Vector2(0.5f, 0.5f);
+        [SerializeField]
+        private Tile _tilePrefab;
+        [SerializeField]
+        private Transform _blocksTilemap;
+        [SerializeField]
+        private Vector2 _tilesOffset = new(0.5f, 0.5f);
 
         [Header("Tile damage")]
-        [SerializeField] private Sprite[] _blockDamageSprites;
-        [SerializeField] private Sprite[] _wallDamageSprites;
+        [SerializeField]
+        private Sprite[] _blockDamageSprites;
+        [SerializeField]
+        private Sprite[] _wallDamageSprites;
 
+        [Header("Platforms")]
+        [SerializeField]
+        private SolidPlatform _platformPrefab;
+        [SerializeField]
+        private Transform _platformsContent;
+        private Dictionary<Vector2Int, SolidPlatform> _listOfUsedPlatforms;
+        private List<SolidPlatform> _listOfFreePlatforms;
+        private bool _needUpdateCompositeCollider;
+        private bool _needUpdateTiles;
         private Vector3Int _currentPosition;
         private Vector3Int _prevPosition;
         private RectInt _currentAreaRect;
         private RectInt _prevAreaRect;
         private TileSprites _tileSprites;
-        private Vector3Int[] _solidTilesCoords;
-        private TileBase[] _solidTiles;
         private Tile[,] _tiles;
         #endregion
 
         #region Public fields
-
+        public static Tilemap Instance;
         #endregion
 
         #region Properties
@@ -45,12 +57,21 @@ namespace CustomTilemap
         #region Methods
         private void Awake()
         {
+            Instance = this;
+
             InitializeTiles();
-            _solidTilesCoords = new Vector3Int[_width * _height * 2];
-            _solidTiles = new TileBase[_width * _height * 2];
+            InitializePlatforms();
+            _compositeCollider = _platformsContent.GetComponent<CompositeCollider2D>();
             _prevAreaRect = new RectInt(new Vector2Int(0, 0), new Vector2Int(_width, _height));
             _currentAreaRect = new RectInt(new Vector2Int(0, 0), new Vector2Int(_width, _height));
             _prevPosition = Vector3Int.FloorToInt(Camera.main.transform.position) - new Vector3Int(_width / 2, _height / 2, -30);
+        }
+
+        private void Start()
+        {
+            WorldDataManager.Instance.OnColliderChanged += HandleColliderChanged;
+            WorldDataManager.Instance.OnDataChanged += HandleDataChanged;
+            _needUpdateTiles = true;
         }
 
         private void FixedUpdate()
@@ -75,102 +96,181 @@ namespace CustomTilemap
             }
         }
 
+        private void InitializePlatforms()
+        {
+            _listOfUsedPlatforms = new();
+            _listOfFreePlatforms = new();
+            for (int i = 0; i < _width * _height; i++)
+            {
+                SolidPlatform platform = Instantiate(_platformPrefab, _platformsContent);
+                _listOfFreePlatforms.Add(platform);
+            }
+        }
+
         private void UpdateTilemap()
         {
             int differenceX = _currentPosition.x - _prevPosition.x;
             int differenceY = _currentPosition.y - _prevPosition.y;
+            bool isPositionChanged = differenceX != 0 || differenceY != 0;
+            _prevAreaRect.position = new(_prevPosition.x, _prevPosition.y);
+            _currentAreaRect.position = new(_currentPosition.x, _currentPosition.y);
 
-            if (differenceX != 0 || differenceY != 0)
+            if (isPositionChanged)
             {
-                ClearUnnecessarySolidTiles();
+                foreach (Vector2Int position in _prevAreaRect.allPositionsWithin)
+                {
+                    if (!_currentAreaRect.Contains(position))
+                    {
+                        RemovePlatform(position);
+                    }
+                }
+                _needUpdateTiles = true;
+                _needUpdateCompositeCollider = true;
             }
-
-            for (int x = 0; x < _width; x++)
+            if (_needUpdateTiles)
             {
-                for (int y = 0; y < _height; y++)
+                _needUpdateTiles = false;
+                foreach (Vector2Int position in _currentAreaRect.allPositionsWithin)
                 {
-                    UpdateTileData(x, y);
+                    UpdateTileData(position);
                 }
             }
-
-            _solidTilemap.SetTiles(_solidTilesCoords, _solidTiles);
-        }
-
-        private void ClearUnnecessarySolidTiles()
-        {
-            int length = _width * _height;
-            int i = 0;
-            _prevAreaRect.position = new Vector2Int(_prevPosition.x, _prevPosition.y);
-            _currentAreaRect.position = new Vector2Int(_currentPosition.x, _currentPosition.y);
-
-            foreach (Vector2Int position in _prevAreaRect.allPositionsWithin)
+            if (_needUpdateCompositeCollider)
             {
-                if (!_currentAreaRect.Contains(position))
-                {
-                    _solidTilesCoords[length + i].x = position.x;
-                    _solidTilesCoords[length + i].y = position.y;
-                }
-                else
-                {
-                    _solidTilesCoords[length + i].x = -1;
-                    _solidTilesCoords[length + i].y = -1;
-                }
-                i++;
+                _needUpdateCompositeCollider = false;
+                UpdateCompositeCollider();
             }
         }
 
-        private void UpdateTileData(int x, int y)
+        private void UpdateTileData(Vector2Int position)
         {
-            Vector3Int blockPosition = new Vector3Int();
-            byte blockDamage;
-            byte wallDamage;
+            int tileX = position.x - _currentPosition.x;
+            int tileY = position.y - _currentPosition.y;
 
-            blockPosition.x = _currentPosition.x + x;
-            blockPosition.y = _currentPosition.y + y;
-            ref WorldCellData blockData = ref WorldDataManager.Instance.GetWorldCellData(blockPosition.x, blockPosition.y);
+            ref WorldCellData blockData = ref WorldDataManager.Instance.GetWorldCellData(position.x, position.y);
+            UpdateBlockSprite(ref blockData);
+            UpdateWallSprite(ref blockData);
+            UpdateLiquidSprite(ref blockData);
+            UpdateBlockDamageSprite(blockData.BlockDamagePercent);
+            UpdateWallDamageSprite(blockData.WallDamagePercent);
+            CreatePlatform(position);
+            _tiles[tileX, tileY].UpdateSprites(_tileSprites);
+        }
 
-            _tileSprites.BlockSprite = blockData.GetBlockSprite();
+        private void UpdateBlockSprite(ref WorldCellData data)
+        {
+            _tileSprites.BlockSprite = data.GetBlockSprite();
+        }
 
-            _tileSprites.WallSprite = blockData.GetWallSprite();
+        private void UpdateWallSprite(ref WorldCellData data)
+        {
+            _tileSprites.WallSprite = data.GetWallSprite();
+        }
 
+        private void UpdateLiquidSprite(ref WorldCellData data)
+        {
             _tileSprites.LiquidSprite = null;
-            if (blockData.IsEmptyForLiquid() && blockData.IsLiquid())
+            if (data.IsEmptyForLiquid() && data.IsLiquid())
             {
-                _tileSprites.LiquidSprite = blockData.GetLiquidSprite();
+                _tileSprites.LiquidSprite = data.GetLiquidSprite();
             }
+        }
 
+        private void UpdateBlockDamageSprite(byte damage)
+        {
             _tileSprites.BlockDamageSprite = null;
-            blockDamage = blockData.BlockDamagePercent;
-            if (blockDamage != 0)
+            if (damage != 0)
             {
-                int index = Mathf.CeilToInt(blockDamage / (100f / _blockDamageSprites.Length)) - 1;
+                int index = Mathf.CeilToInt(damage / (100f / _blockDamageSprites.Length)) - 1;
                 _tileSprites.BlockDamageSprite = _blockDamageSprites[index];
             }
+        }
 
+        private void UpdateWallDamageSprite(byte damage)
+        {
             _tileSprites.WallDamageSprite = null;
-            wallDamage = blockData.WallDamagePercent;
-            if (wallDamage != 0)
+            if (damage != 0)
             {
-                int index = Mathf.CeilToInt(wallDamage / (100f / _wallDamageSprites.Length)) - 1;
+                int index = Mathf.CeilToInt(damage / (100f / _wallDamageSprites.Length)) - 1;
                 _tileSprites.WallDamageSprite = _wallDamageSprites[index];
             }
+        }
 
-            _tiles[x, y].UpdateSprites(_tileSprites);
+        private void UpdateCompositeCollider()
+        {
+            _compositeCollider.GenerateGeometry();
+        }
 
-            _solidTilesCoords[x * _height + y].x = blockPosition.x;
-            _solidTilesCoords[x * _height + y].y = blockPosition.y;
-            _solidTiles[x * _height + y] = null;
-            if (blockData.IsSolid())
+        public void CreatePlatform(Vector2Int position)
+        {
+            int x = position.x;
+            int y = position.y;
+            _listOfUsedPlatforms.TryGetValue(position, out SolidPlatform platform);
+            if (platform == null)
             {
-                _solidTiles[x * _height + y] = _solidRuleTIle;
+                platform = GetFirstFreePlatform();
+                platform.SetActive();
+                platform.transform.position = new Vector2(x, y) + _tilesOffset;
+                _listOfUsedPlatforms.Add(position, platform);
             }
-            else if (WorldDataManager.Instance.IsSolid(blockPosition.x, blockPosition.y - 1))
+            platform.SetPolygonColliderPoints(
+                WorldDataManager.Instance.GetColliderShape(x, y),
+                WorldDataManager.Instance.IsColliderHorizontalFlipped(x, y));
+        }
+
+        public void RemovePlatform(Vector2Int position)
+        {
+            _listOfUsedPlatforms.TryGetValue(position, out SolidPlatform platform);
+            if (platform != null)
             {
-                bool isLeftSolid = WorldDataManager.Instance.IsSolid(blockPosition.x - 1, blockPosition.y);
-                bool isRightSolid = WorldDataManager.Instance.IsSolid(blockPosition.x + 1, blockPosition.y);
-                if ((isLeftSolid && !isRightSolid) || (!isLeftSolid && isRightSolid))
+                _listOfUsedPlatforms.Remove(position);
+                SetPlatformFree(platform);
+            }
+        }
+
+        private SolidPlatform GetFirstFreePlatform()
+        {
+            SolidPlatform freePlatform = _listOfFreePlatforms.FirstOrDefault();
+            if (freePlatform == null)
+            {
+                return Instantiate(_platformPrefab, _platformsContent);
+            }
+            _listOfFreePlatforms.Remove(freePlatform);
+            freePlatform.SetActive();
+            return freePlatform;
+        }
+
+        private void SetPlatformFree(SolidPlatform usedPlatform)
+        {
+            usedPlatform.transform.position = new(-10, -10);
+            usedPlatform.SetInactive();
+            _listOfFreePlatforms.Add(usedPlatform);
+        }
+
+        private bool IsInRenderArea(int x, int y)
+        {
+            return _currentAreaRect.Contains(new(x, y));
+        }
+
+        private void HandleDataChanged(int x, int y)
+        {
+            if (IsInRenderArea(x, y))
+            {
+                UpdateTileData(new(x, y));
+            }
+        }
+
+        private void HandleColliderChanged(int x, int y)
+        {
+            if (IsInRenderArea(x, y))
+            {
+                _listOfUsedPlatforms.TryGetValue(new(x, y), out SolidPlatform platform);
+                if (platform != null)
                 {
-                    _solidTiles[x * _height + y] = _cornerRuleTile;
+                    platform.SetPolygonColliderPoints(
+                        WorldDataManager.Instance.GetColliderShape(x, y),
+                        WorldDataManager.Instance.IsColliderHorizontalFlipped(x, y));
+                    _needUpdateCompositeCollider = true;
                 }
             }
         }

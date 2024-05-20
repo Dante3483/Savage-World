@@ -17,13 +17,14 @@ public class UIResearchPage : MonoBehaviour
     private RectTransform _linesContent;
     [SerializeField]
     private RectTransform _activeResearchContent;
+    [SerializeField]
     private UIScaler _uiScaler;
     private List<UIResearchNode> _listOfResearches = new();
     private UIResearchNode _currentResearch;
     #endregion
 
     #region Public fields
-    public event Action<int> OnTryFinishResearch, OnResearchDescriptionRequested, OnRewardDescriptionRequested, OnCostDescriptionRequested; 
+    public event Action<int> OnTryFinishResearch, OnResearchDescriptionRequested, OnRewardDescriptionRequested, OnCostDescriptionRequested;
     #endregion
 
     #region Properties
@@ -31,11 +32,6 @@ public class UIResearchPage : MonoBehaviour
     #endregion
 
     #region Methods
-    private void Awake()
-    {
-        _uiScaler = GetComponent<UIScaler>();
-    }
-
     public void InitializePage(int countOfResearches)
     {
         for (int i = 0; i < countOfResearches; i++)
@@ -163,7 +159,7 @@ public class UIResearchPage : MonoBehaviour
     private void HandleCostDescriptionRequested(int index)
     {
         OnCostDescriptionRequested?.Invoke(index);
-    } 
+    }
 
     private void HandleSetResearchActive(UIResearchNode research)
     {

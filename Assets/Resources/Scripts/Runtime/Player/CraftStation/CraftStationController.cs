@@ -1,18 +1,26 @@
 using Items;
-using System;
 using UnityEngine;
 
 public class CraftStationController : MonoBehaviour, IBookPageController
 {
     #region Private fields
     [Header("Main")]
-    [SerializeField] private UICraftStationPage _craftStationUI;
-    [SerializeField] private CraftStationSO _currentCraftStation;
-    [SerializeField] private RecipeSO _currentRecipe;
-    [SerializeField] private InventorySO _inventoryData;
-    [SerializeField] private int _bookmarksCount;
-    [SerializeField] private int _recipeMaterialsCount;
-    [SerializeField] private bool _isQuantityForRecipeRepeating;
+    [SerializeField]
+    private Player _player;
+    [SerializeField]
+    private UICraftStationPage _craftStationUI;
+    [SerializeField]
+    private CraftStationSO _currentCraftStation;
+    [SerializeField]
+    private RecipeSO _currentRecipe;
+    [SerializeField]
+    private Inventory _inventoryData;
+    [SerializeField]
+    private int _bookmarksCount;
+    [SerializeField]
+    private int _recipeMaterialsCount;
+    [SerializeField]
+    private bool _isQuantityForRecipeRepeating;
     #endregion
 
     #region Public fields
@@ -26,22 +34,28 @@ public class CraftStationController : MonoBehaviour, IBookPageController
     #region Methods
     private void Awake()
     {
-        PrepareUI();
+        if (_player is null)
+        {
+            _player = GetComponentInParent<Player>();
+        }
         PrepareData();
+        PrepareUI();
+    }
+
+    public void PrepareData()
+    {
+        _inventoryData = _player.Inventory;
+        _inventoryData.OnItemsUpdate += HandleUpdateMaxRecipeQuantity;
     }
 
     public void PrepareUI()
     {
+        _craftStationUI = UIManager.Instance.CraftStationUI.Content.GetComponentInChildren<UICraftStationPage>();
         _craftStationUI.InitializePage(_bookmarksCount, _recipeMaterialsCount);
         _craftStationUI.OnBookmarkSelected += HandleUpdateSet;
         _craftStationUI.OnRecipeSelected += HandleUpdateRecipeInfo;
         _craftStationUI.OnItemCreate += HandleCreateItem;
         _craftStationUI.OnSearchRecipes += UpdateRecipes;
-    }
-
-    public void PrepareData()
-    {
-        _inventoryData.OnItemsUpdate += HandleUpdateMaxRecipeQuantity;
     }
 
     public void ResetData()

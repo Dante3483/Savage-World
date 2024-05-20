@@ -1,4 +1,3 @@
-using Inventory;
 using Items;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,19 +8,30 @@ public class InventoryController : MonoBehaviour, IBookPageController
 {
     #region Private fields
     [Header("Main")]
-    [SerializeField] private UIInventoryPage _inventoryUI;
-    [SerializeField] private InventorySO _inventoryData;
+    [SerializeField]
+    private Player _player;
+    [SerializeField]
+    private UIInventoryPage _inventoryUI;
+    private Inventory _inventory;
 
     [Header("Test data")]
-    [SerializeField] private bool _isTestDataEnabled;
-    [SerializeField] private List<ItemSO> _initStorageItems;
-    [SerializeField] private List<ItemSO> _initHotbarItems;
-    [SerializeField] private List<ItemSO> _initAccessoriesItems;
+    [SerializeField]
+    private bool _isTestDataEnabled;
+    [SerializeField]
+    private List<ItemSO> _initStorageItems;
+    [SerializeField]
+    private List<ItemSO> _initHotbarItems;
+    [SerializeField]
+    private List<ItemSO> _initAccessoriesItems;
 
-    [SerializeField] private float _minTimeToTakeItem;
-    [SerializeField] private float _maxTimeToTakeItem;
-    [SerializeField] private float _stepToLerpTimeToTakeItem;
-    [SerializeField] private float _currentTimeToTakeItem;
+    [SerializeField]
+    private float _minTimeToTakeItem;
+    [SerializeField]
+    private float _maxTimeToTakeItem;
+    [SerializeField]
+    private float _stepToLerpTimeToTakeItem;
+    [SerializeField]
+    private float _currentTimeToTakeItem;
 
     private Coroutine _takeItemCoroutine;
     private bool _isTurboTakeItem;
@@ -38,8 +48,12 @@ public class InventoryController : MonoBehaviour, IBookPageController
     #region Methods
     private void Awake()
     {
-        PrepareUI();
+        if (_player is null)
+        {
+            _player = GetComponentInParent<Player>();
+        }
         PrepareData();
+        PrepareUI();
         _currentTimeToTakeItem = _maxTimeToTakeItem;
     }
 
@@ -49,37 +63,38 @@ public class InventoryController : MonoBehaviour, IBookPageController
         {
             foreach (ItemSO item in _initStorageItems)
             {
-                _inventoryData.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Storage);
+                _inventory.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Storage);
             }
             foreach (ItemSO item in _initHotbarItems)
             {
-                _inventoryData.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Hotbar);
+                _inventory.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Hotbar);
             }
             foreach (ItemSO item in _initAccessoriesItems)
             {
-                _inventoryData.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Accessories);
+                _inventory.AddItem(item, Random.Range(10, item.MaxStackSize), ItemLocations.Accessories);
             }
         }
     }
 
+    public void PrepareData()
+    {
+        _inventory = _player.Inventory;
+        _inventory.Initialize();
+        _inventory.OnStorageChanged += HandleUpdateStorageUI;
+        _inventory.OnHotbarChanged += HandleUpdateHotbarUI;
+        _inventory.OnAccessoriesChanged += HandleUpdateAccessoriesUI;
+        _inventory.OnArmorChanged += HandleUpdateArmorUI;
+        _inventory.OnBufferItemChanged += HandleUpdateItemInBufferUI;
+    }
+
     public void PrepareUI()
     {
-        _inventoryUI.InitializePage(_inventoryData.StorageSize, _inventoryData.HotbarSize, _inventoryData.AccessoriesSize);
-
+        _inventoryUI = UIManager.Instance.InventoryUI.Content.GetComponentInChildren<UIInventoryPage>();
+        _inventoryUI.InitializePage(_inventory.StorageSize, _inventory.HotbarSize, _inventory.AccessoriesSize);
         _inventoryUI.OnDraggingItem += HandleDragItem;
         _inventoryUI.OnStartTakeItem += HandleStartTakeItem;
         _inventoryUI.OnStopTakeItem += HandleStopTakeItem;
         _inventoryUI.OnDescriptionRequested += HandleDescriptionRequest;
-    }
-
-    public void PrepareData()
-    {
-        _inventoryData.Initialize();
-        _inventoryData.OnStorageChanged += HandleUpdateStorageUI;
-        _inventoryData.OnHotbarChanged += HandleUpdateHotbarUI;
-        _inventoryData.OnAccessoriesChanged += HandleUpdateAccessoriesUI;
-        _inventoryData.OnArmorChanged += HandleUpdateArmorUI;
-        _inventoryData.OnBufferItemChanged += HandleUpdateItemInBufferUI;
     }
 
     public void ResetData()
@@ -88,7 +103,7 @@ public class InventoryController : MonoBehaviour, IBookPageController
         if (!UIManager.Instance.InventoryUI.IsActive)
         {
             _inventoryUI.ResetPage();
-            _inventoryData.ClearBuffer();
+            _inventory.ClearBuffer();
         }
     }
 
@@ -107,7 +122,7 @@ public class InventoryController : MonoBehaviour, IBookPageController
             _inventoryUI.UpdateHotbarItemData(i, hotbarState[i].ItemData?.SmallItemImage, hotbarState[i].Quantity);
         }
     }
-     
+
     private void HandleUpdateAccessoriesUI(InventoryItem[] accessoriesState)
     {
         for (int i = 0; i < accessoriesState.Length; i++)
@@ -131,19 +146,19 @@ public class InventoryController : MonoBehaviour, IBookPageController
 
     private void HandleDescriptionRequest(int itemIndex, ItemLocations itemLocation)
     {
-        _inventoryUI.UpdateTooltip(_inventoryData.GetItemDescription(itemIndex, itemLocation));
+        _inventoryUI.UpdateTooltip(_inventory.GetItemDescription(itemIndex, itemLocation));
     }
 
     private void HandleDragItem(int itemIndex, ItemLocations itemLocation)
     {
-        _inventoryData.TakeItem(itemIndex, itemLocation);
+        _inventory.TakeItem(itemIndex, itemLocation);
     }
 
     private void HandleStartTakeItem(int itemIndex, ItemLocations itemLocation)
     {
         if (_takeItemCoroutine == null)
         {
-            _currentTimeToTakeItem = _inventoryData.CompareItemWithBuffer(itemIndex, itemLocation) ? _currentTimeToTakeItem : _maxTimeToTakeItem;
+            _currentTimeToTakeItem = _inventory.CompareItemWithBuffer(itemIndex, itemLocation) ? _currentTimeToTakeItem : _maxTimeToTakeItem;
             _takeItemCoroutine = StartCoroutine(TakeItemCoroutine(itemIndex, itemLocation));
         }
     }
@@ -161,7 +176,7 @@ public class InventoryController : MonoBehaviour, IBookPageController
     private IEnumerator TakeItemCoroutine(int index, ItemLocations location)
     {
         _isTurboTakeItem = _currentTimeToTakeItem <= (_minTimeToTakeItem + _minTimeToTakeItem / 10);
-        _inventoryData.TakeItem(index, location, _isTurboTakeItem ? 50 : 1);
+        _inventory.TakeItem(index, location, _isTurboTakeItem ? 50 : 1);
         yield return new WaitForSeconds(_currentTimeToTakeItem);
         _currentTimeToTakeItem = Mathf.Lerp(_currentTimeToTakeItem, _minTimeToTakeItem, _stepToLerpTimeToTakeItem);
         _takeItemCoroutine = null;

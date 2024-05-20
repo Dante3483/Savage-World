@@ -53,42 +53,65 @@ public class PlayerMovementNew : MonoBehaviour
 
     #region Private fields
     [Header("Main")]
-    [SerializeField] private PlayerStats _playerStats;
-    [SerializeField] private PlayerFlags _playerFlags;
-    [SerializeField] private PlayerAnimationsController _playerAnimationsController;
-    [SerializeField] private Rigidbody2D _rigidbody;
-    [SerializeField] private BoxCollider2D _boxCollider;
+    [SerializeField]
+    private Player _player;
+    private PlayerStats _playerStats;
+    [SerializeField]
+    private PlayerFlags _playerFlags;
+    [SerializeField]
+    private PlayerAnimationsController _playerAnimationsController;
+    [SerializeField]
+    private Rigidbody2D _rigidbody;
+    [SerializeField]
+    private BoxCollider2D _boxCollider;
 
     [Header("Movement")]
-    [SerializeField] private float _movementDirection;
-    [SerializeField] private float _slideDirection;
-    [SerializeField] private float _slidingCooldown;
+    [SerializeField]
+    private float _movementDirection;
+    [SerializeField]
+    private float _slideDirection;
+    [SerializeField]
+    private float _slidingCooldown;
 
     [Header("State properties")]
-    [SerializeField] private StateProperties _currentState;
-    [SerializeField] private StateProperties _fullHeightState;
-    [SerializeField] private StateProperties _crouchState;
-    [SerializeField] private StateProperties _slideState;
+    [SerializeField]
+    private StateProperties _currentState;
+    [SerializeField]
+    private StateProperties _fullHeightState;
+    [SerializeField]
+    private StateProperties _crouchState;
+    [SerializeField]
+    private StateProperties _slideState;
 
     [Header("Layers")]
-    [SerializeField] private LayerMask _groundLayer;
+    [SerializeField]
+    private LayerMask _groundLayer;
 
     [Header("Ground check")]
-    [SerializeField] private BoxCastUtil _groundCheckBoxCast;
+    [SerializeField]
+    private BoxCastUtil _groundCheckBoxCast;
 
     [Header("Wall check")]
-    [SerializeField] private BoxCastUtil _wallCheckBoxCast;
+    [SerializeField]
+    private BoxCastUtil _wallCheckBoxCast;
 
     [Header("Ceiling check")]
-    [SerializeField] private BoxCastUtil _ceilingCheckBoxCast;
+    [SerializeField]
+    private BoxCastUtil _ceilingCheckBoxCast;
 
     [Header("Slope check")]
-    [SerializeField] private float _slopeCheckDistanceLeft;
-    [SerializeField] private float _slopeCheckDistanceRight;
-    [SerializeField] private float _slopeAngle;
-    [SerializeField] private Vector2 _slopeNormalPerpendicular;
-    [SerializeField] private PhysicsMaterial2D _noFriction;
-    [SerializeField] private PhysicsMaterial2D _fullFriction;
+    [SerializeField]
+    private float _slopeCheckDistanceLeft;
+    [SerializeField]
+    private float _slopeCheckDistanceRight;
+    [SerializeField]
+    private float _slopeAngle;
+    [SerializeField]
+    private Vector2 _slopeNormalPerpendicular;
+    [SerializeField]
+    private PhysicsMaterial2D _noFriction;
+    [SerializeField]
+    private PhysicsMaterial2D _fullFriction;
     private RaycastUtil _slopeCheckRaycast;
 
     private Coroutine _waitForMaxSlidingTime;
@@ -106,7 +129,11 @@ public class PlayerMovementNew : MonoBehaviour
     private void Awake()
     {
         #region Initialization
-        _playerStats = GetComponent<PlayerStats>();
+        if (_player is null)
+        {
+            _player = GetComponent<Player>();
+        }
+        _playerStats = _player.Stats;
         _playerFlags = GetComponent<PlayerFlags>();
         _playerAnimationsController = GetComponent<PlayerAnimationsController>();
         _rigidbody = GetComponent<Rigidbody2D>();
@@ -180,7 +207,7 @@ public class PlayerMovementNew : MonoBehaviour
         _playerFlags.IsIdle = !keyA && !keyD;
         _playerFlags.IsWalk = keyA || keyD;
     }
-    
+
     private void ReadJump()
     {
         if (_playerFlags.IsJumpBlocked)
@@ -461,7 +488,7 @@ public class PlayerMovementNew : MonoBehaviour
         {
             return;
         }
-        
+
         _playerFlags.IsFaceToTheRight = !_playerFlags.IsFaceToTheRight;
         transform.Rotate(0.0f, 180.0f, 0.0f);
     }

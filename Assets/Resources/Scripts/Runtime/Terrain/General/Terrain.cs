@@ -8,8 +8,10 @@ public class Terrain : MonoBehaviour
 {
     #region Private fields
     [Header("Sections")]
-    [SerializeField] private GameObject _trees;
-    [SerializeField] private GameObject _pickUpItems;
+    [SerializeField] 
+    private GameObject _trees;
+    [SerializeField] 
+    private GameObject _pickUpItems;
 
     private WorldCellData[,] _worldData;
 
@@ -188,7 +190,7 @@ public class Terrain : MonoBehaviour
                     block.CurrentActionTime = 0;
                     if (bottomBlock.IsEmpty())
                     {
-                        CreateBlock(x, (ushort)(y - 1), block.BlockData);
+                        CreateBlock(x, y - 1, block.BlockData);
                         CreateBlock(x, y, airBlock);
                         NeedToUpdate.Add(bottomBlock.Coords);
                         if (topBlock.IsDust())
@@ -429,7 +431,7 @@ public class Terrain : MonoBehaviour
                     {
                         NeedToUpdate.Add(bottomBlock.Coords);
                     }
-                    CreateBlock((ushort)x, (ushort)y, airBlock);
+                    CreateBlock(x, y, airBlock);
                 }
 
                 if (plant.IsBottomBlockSolid && bottomBlock.IsEmptyForPlant())
@@ -438,7 +440,7 @@ public class Terrain : MonoBehaviour
                     {
                         NeedToUpdate.Add(topBlock.Coords);
                     }
-                    CreateBlock((ushort)x, (ushort)y, airBlock);
+                    CreateBlock(x, y, airBlock);
                 }
             }
         }
@@ -532,14 +534,14 @@ public class Terrain : MonoBehaviour
                     {
                         if (y + 1 <= maxY && topBlock.IsEmpty())
                         {
-                            CreateBlock((ushort)x, (ushort)(y + 1), plant);
+                            CreateBlock(x, y + 1, plant);
                         }
                     }
                     if (plant.IsTopBlockSolid)
                     {
                         if (y - 1 >= minY && bottomBlock.IsEmpty())
                         {
-                            CreateBlock((ushort)x, (ushort)(y - 1), plant);
+                            CreateBlock(x, y - 1, plant);
                         }
                     }
                 }
@@ -551,15 +553,7 @@ public class Terrain : MonoBehaviour
     #region Helpful
     public void CreateBlock(int x, int y, BlockSO block)
     {
-        if (block == null)
-        {
-            return;
-        }
-        _worldData[x, y].SetBlockData(block);
-        if (GameManager.Instance.IsGameSession && !GameManager.Instance.IsWorldLoading)
-        {
-            _worldData[x, y].SetRandomBlockTile(GameManager.Instance.RandomVar);
-        }
+        WorldDataManager.Instance.SetBlockData(x, y, block);
     }
 
     public void CreateWall(int x, int y, BlockSO block)

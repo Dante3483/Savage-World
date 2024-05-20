@@ -1,4 +1,4 @@
-public enum ItemsID : short
+public enum ItemsID : ushort
 {
     DirtBlock = 0,
 

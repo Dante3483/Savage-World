@@ -5,7 +5,7 @@ using Stopwatch = System.Diagnostics.Stopwatch;
 public class TerrainGeneration
 {
     #region Private fields
-    private List<IGenerationPhase> _generationPhases;
+    private List<IWorldProcessingPhase> _generationPhases;
     #endregion
 
     #region Public fields
@@ -17,11 +17,10 @@ public class TerrainGeneration
     #endregion
 
     #region Methods
-
     public TerrainGeneration()
     {
         TerrainConfigurationSO terrainConfiguration = GameManager.Instance.TerrainConfiguration;
-        _generationPhases = new List<IGenerationPhase>();
+        _generationPhases = new List<IWorldProcessingPhase>();
         if (terrainConfiguration.FlatWorldGeneration)
         {
             _generationPhases.Add(new FlatWorldGenerationPhase());
@@ -32,7 +31,7 @@ public class TerrainGeneration
         }
         if (terrainConfiguration.BiomesGeneration)
         {
-            _generationPhases.Add(new BiomesGenerationPhase());
+            _generationPhases.Add(new BiomesSettingPhase());
         }
         if (terrainConfiguration.ClustersGeneration)
         {
@@ -56,7 +55,7 @@ public class TerrainGeneration
         }
         if (terrainConfiguration.GrassSeeding)
         {
-            _generationPhases.Add(new GrassSeedingGenerationPhase());
+            _generationPhases.Add(new GrassSeedingPhase());
         }
         if (terrainConfiguration.PlantsGeneration)
         {
@@ -72,16 +71,20 @@ public class TerrainGeneration
         }
         if (terrainConfiguration.SetRandomTiles)
         {
-            _generationPhases.Add(new SetRandomTilesGenerationPhase());
+            _generationPhases.Add(new SetRandomTilesPhase());
         }
         if (terrainConfiguration.BlockProcessing)
         {
-            _generationPhases.Add(new BlockProcessingGenerationPhase());
+            _generationPhases.Add(new UpdateDataPhase());
+        }
+        if (terrainConfiguration.SetPhysicsShapes)
+        {
+            _generationPhases.Add(new SetPhysicsShapesPhase());
         }
         if (terrainConfiguration.SaveLoadTest)
         {
             _generationPhases.Clear();
-            _generationPhases.Add(new SaveLoadTestGenerationPhase());
+            _generationPhases.Add(new SaveLoadTestPhase());
         }
         SurfaceCoords = new List<Vector2Int>();
     }
@@ -92,7 +95,7 @@ public class TerrainGeneration
         float step = 100f / _generationPhases.Count;
 
         Stopwatch watch = Stopwatch.StartNew();
-        foreach (IGenerationPhase generationPhase in _generationPhases)
+        foreach (IWorldProcessingPhase generationPhase in _generationPhases)
         {
             watch.Restart();
             generationPhase.StartPhase();
@@ -106,6 +109,5 @@ public class TerrainGeneration
         Debug.Log($"Total time: {totalTime}");
         GameManager.Instance.PhasesInfo += $"Total time: {totalTime}\n";
     }
-
     #endregion
 }

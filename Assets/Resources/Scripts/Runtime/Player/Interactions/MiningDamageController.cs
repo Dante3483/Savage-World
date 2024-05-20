@@ -1,20 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class MiningDamageController : MonoBehaviour
 {
-    delegate void SetDamageDelegate(ref WorldCellData block, float damage);
-
     #region Private fields
     [Header("Main")]
-    [SerializeField] private MiningDamageData _blocksDamageData;
-    [SerializeField] private MiningDamageData _wallsDamageData;
+    [SerializeField]
+    private MiningDamageData _blocksDamageData;
+    [SerializeField]
+    private MiningDamageData _wallsDamageData;
     #endregion
 
     #region Public fields
-
+    public static MiningDamageController Instance;
     #endregion
 
     #region Properties
@@ -24,10 +21,11 @@ public class MiningDamageController : MonoBehaviour
     #region Methods
     private void Awake()
     {
+        Instance = this;
         _blocksDamageData.Initialize();
         _wallsDamageData.Initialize();
-        _blocksDamageData.OnUpdateDamage += (ref WorldCellData block, float damage) => block.SetBlockDamagePercent(damage);
-        _wallsDamageData.OnUpdateDamage += (ref WorldCellData block, float damage) => block.SetWallDamagePercent(damage);
+        _blocksDamageData.OnDamageUpdated += (x, y, damage) => WorldDataManager.Instance.SetBlockDamagePercent(x, y, damage);
+        _wallsDamageData.OnDamageUpdated += (x, y, damage) => WorldDataManager.Instance.SetWallDamagePercent(x, y, damage);
     }
 
     private void FixedUpdate()

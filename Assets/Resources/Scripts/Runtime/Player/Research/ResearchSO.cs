@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Items;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Research", menuName = "NodeSO")]
@@ -19,9 +18,9 @@ public class ResearchSO : ScriptableObject
     [SerializeField]
     private Vector3 _position;
     [SerializeField]
-    private List<RecipeSO> _listOfRewards = new ();
+    private List<RecipeSO> _listOfRewards = new();
     [SerializeField]
-    private List<ItemQuantity> _listOfCosts = new ();
+    private List<ItemQuantity> _listOfCosts = new();
     [SerializeField]
     private List<ResearchSO> _listOfParents = new();
     [SerializeField]
@@ -91,7 +90,7 @@ public class ResearchSO : ScriptableObject
         ChangeState(ResearchState.Unlocked);
     }
 
-    private void ChangeState(ResearchState state)
+    public void ChangeState(ResearchState state)
     {
         _state = state;
         OnStateChanged?.Invoke(this);
