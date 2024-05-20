@@ -9,6 +9,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private UIPage _mainMenuProgressBarUI;
     [SerializeField] private UIPage _mainMenuPlayersUI;
     [SerializeField] private UIPage _mainMenuWorldsUI;
+    [SerializeField] private UIPage _mainMenuMultiplayerUI;
+    [SerializeField] private UIPage _mainMenuConnecntIPUI;
 
     [Header("Debug")]
     [SerializeField] private UIPage _debugPhasesInfoUI;
@@ -57,6 +59,8 @@ public class UIManager : MonoBehaviour
             return _mainMenuWorldsUI;
         }
     }
+    public UIPage MainMenuMultiplayerUI { get => _mainMenuMultiplayerUI; }
+    public UIPage MainMenuConnecntIPUI { get => _mainMenuConnecntIPUI;}
 
     public UIPage InventoryUI
     {
@@ -93,6 +97,7 @@ public class UIManager : MonoBehaviour
     }
 
     public UIPage ResearchUI { get => _researchUI; set => _researchUI = value; }
+
     #endregion
 
     #region Methods
