@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEngine;
 
 public class ListOfExistingPlayersController : MonoBehaviour
@@ -46,7 +43,7 @@ public class ListOfExistingPlayersController : MonoBehaviour
         string playerName = $"Player {GameManager.Instance.PlayerNames.Count + 1}";
         string playerPath = StaticInfo.PlayersDirectory + $"/{playerName}.sw.player";
 
-        using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(playerPath, FileMode.Create)))
+        using (BinaryWriter binaryWriter = new(File.Open(playerPath, FileMode.Create)))
         {
             binaryWriter.Write(playerName);
         }

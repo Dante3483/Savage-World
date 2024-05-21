@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.Netcode;
 using UnityEngine;
 
 public class WorldDataManager : MonoBehaviour
@@ -62,6 +63,12 @@ public class WorldDataManager : MonoBehaviour
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
             SetBlockInfoByCoords(Vector2Int.FloorToInt(worldPosition));
         }
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            Debug.Log($"Is server: {NetworkManager.Singleton.IsServer}");
+            Debug.Log($"Is host: {NetworkManager.Singleton.IsHost}");
+            Debug.Log($"Is client: {NetworkManager.Singleton.IsClient}");
+        }
     }
 
     public void Initialize()
@@ -101,6 +108,10 @@ public class WorldDataManager : MonoBehaviour
 
     public void SetBlockData(int x, int y, BlockSO data)
     {
+        if (GameManager.Instance.IsGameSession && !NetworkManager.Singleton.IsHost)
+        {
+            return;
+        }
         if (data == null)
         {
             return;
@@ -108,6 +119,7 @@ public class WorldDataManager : MonoBehaviour
         _worldData[x, y].SetBlockData(data);
         if (GameManager.Instance.IsGameSession && !GameManager.Instance.IsWorldLoading)
         {
+            Debug.Log("SetData");
             _worldData[x, y].SetRandomBlockTile(GameManager.Instance.RandomVar);
 
             if (_worldData[x, y].IsEmpty() || _worldData[x, y].IsSolid())
@@ -116,6 +128,25 @@ public class WorldDataManager : MonoBehaviour
                 UpdateCollidersAround(x, y);
                 UpdateCollider(x, y);
             }
+            OnDataChanged?.Invoke(x, y);
+        }
+    }
+
+    public void LoadData(int x, int y, BlockSO block, BlockSO wall, byte liquidId, float flowValue, byte tileId, byte colliderIndex, byte flags)
+    {
+        if (block is null || wall is null)
+        {
+            return;
+        }
+        _worldData[x, y].SetBlockData(block);
+        _worldData[x, y].SetWallData(wall);
+        _worldData[x, y].SetLiquidBlockData(liquidId, flowValue);
+        _worldData[x, y].Flags = flags;
+        _worldData[x, y].TileId = tileId;
+        _worldData[x, y].ColliderIndex = colliderIndex;
+        if (GameManager.Instance.IsGameSession && !GameManager.Instance.IsWorldLoading)
+        {
+            OnColliderChanged?.Invoke(x, y);
             OnDataChanged?.Invoke(x, y);
         }
     }
@@ -342,6 +373,20 @@ public class WorldDataManager : MonoBehaviour
                 UpdateBlockColliderWithoutNotification(x + i, y + j);
             }
         }
+    }
+
+    public void SetColliderIndex(int x, int y, byte index, bool isHorizontalFlipped)
+    {
+        if (isHorizontalFlipped)
+        {
+            _worldData[x, y].MakeColliderHorizontalFlipped();
+        }
+        else
+        {
+            _worldData[x, y].RemoveColliderHorizontalFlipped();
+        }
+        _worldData[x, y].ColliderIndex = index;
+        OnColliderChanged?.Invoke(x, y);
     }
 
     private bool CheckRules(int x, int y, ColliderRulesSO rules, out byte index)

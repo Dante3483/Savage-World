@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = System.Random;
@@ -74,6 +75,7 @@ public class GameManager : MonoBehaviour
     private Terrain _terrain;
     private float _loadingValue;
     private string _phasesInfo;
+    private bool _isMultiplayer;
     #endregion
 
     #region Public fields
@@ -351,6 +353,32 @@ public class GameManager : MonoBehaviour
             _researches = value;
         }
     }
+
+    public bool IsMultiplayer
+    {
+        get
+        {
+            return _isMultiplayer;
+        }
+
+        set
+        {
+            _isMultiplayer = value;
+        }
+    }
+
+    public Player Player
+    {
+        get
+        {
+            return _player;
+        }
+
+        set
+        {
+            _player = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -380,7 +408,8 @@ public class GameManager : MonoBehaviour
     {
         if (!IsInputTextInFocus && Input.GetKeyDown(KeyCode.P))
         {
-            _player.gameObject.SetActive(true);
+            _player.EnableMovement();
+            _terrain.gameObject.SetActive(true);
         }
     }
 
@@ -401,8 +430,6 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.NewGameState:
                 {
-                    //Set random seed
-                    //IsGameSession = false;
                     if (!IsStaticSeed)
                     {
                         Seed = UnityEngine.Random.Range(-1000000, 1000000);
@@ -414,8 +441,6 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.LoadGameState:
                 {
-                    //Set random seed
-                    //IsGameSession = false;
                     _terrainGameObject.SetActive(true);
                     Task.Run(() => HandleLoadGameState());
                     _terrain.StartCoroutinesAndThreads();
@@ -479,11 +504,31 @@ public class GameManager : MonoBehaviour
         Terrain.CreateNewWorld();
         ActionInMainThreadUtil.Instance.Invoke(() =>
         {
-            CreateNewPlayer();
-            SetPlayerPosition(3655, 2200);
+            if (_isMultiplayer)
+            {
+                NetworkManager.Singleton.StartHost();
+                NetworkManager.Singleton.ConnectionApprovalCallback += HandleConnectionApprovalCallback;
+            }
+            else
+            {
+                CreateNewPlayer();
+                SetPlayerPosition(3655, 2200);
+            }
         });
         UIManager.Instance.MainMenuProgressBarUI.IsActive = false;
+        UpdateGameState(GameState.GameSession);
+    }
 
+    private void HandleConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+    {
+        response.CreatePlayerObject = true;
+        response.Position = new(3655, 2200);
+    }
+
+    public void Connect()
+    {
+        NetworkManager.Singleton.StartClient();
+        UIManager.Instance.MainMenuConnecntIPUI.IsActive = false;
         UpdateGameState(GameState.GameSession);
     }
 
@@ -498,7 +543,10 @@ public class GameManager : MonoBehaviour
         });
         Terrain.LoadWorld();
         UIManager.Instance.MainMenuProgressBarUI.IsActive = false;
+        if (_isMultiplayer)
+        {
 
+        }
         UpdateGameState(GameState.GameSession);
     }
 
@@ -557,8 +605,14 @@ public class GameManager : MonoBehaviour
         _player = Instantiate(_playerPrefab, Vector3.zero, Quaternion.identity);
         _player.transform.SetParent(_playerParrent);
         _player.name = "Player";
+        InitializePlayer(0, 0);
+    }
+
+    public void InitializePlayer(int x, int y)
+    {
         _player.Initialize();
         Camera.main.GetComponent<FollowObject>().Target = _player.transform;
+        SetPlayerPosition(x, y);
     }
 
     public Transform GetPlayerTransform()

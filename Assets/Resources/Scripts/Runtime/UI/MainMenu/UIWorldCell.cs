@@ -1,15 +1,17 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class UIWorldCell : MonoBehaviour, IPointerClickHandler
 {
     #region Private fields
     [Header("Main")]
-    [SerializeField] private TMP_Text _worldName;
+    [SerializeField]
+    private Button _button;
+    [SerializeField]
+    private TMP_Text _worldName;
     #endregion
 
     #region Public fields
@@ -21,6 +23,15 @@ public class UIWorldCell : MonoBehaviour, IPointerClickHandler
     #endregion
 
     #region Methods
+    private void Awake()
+    {
+        _button = GetComponent<Button>();
+        _button.onClick.AddListener(() =>
+        {
+            OnWorldSelect?.Invoke(_worldName.text);
+        });
+    }
+
     public void SetData(string worldName)
     {
         _worldName.text = worldName;
@@ -28,10 +39,6 @@ public class UIWorldCell : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData pointerData)
     {
-        if (pointerData.button == PointerEventData.InputButton.Left)
-        {
-            OnWorldSelect?.Invoke(_worldName.text);
-        }
         if (pointerData.button == PointerEventData.InputButton.Right)
         {
             OnWorldDelete?.Invoke(_worldName.text);

@@ -1,16 +1,17 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class UIPlayerCell : MonoBehaviour, IPointerClickHandler
 {
     #region Private fields
     [Header("Main")]
-    [SerializeField] private TMP_Text _playerName;
+    [SerializeField]
+    private Button _button;
+    [SerializeField]
+    private TMP_Text _playerName;
     #endregion
 
     #region Public fields
@@ -22,6 +23,15 @@ public class UIPlayerCell : MonoBehaviour, IPointerClickHandler
     #endregion
 
     #region Methods
+    private void Awake()
+    {
+        _button = GetComponent<Button>();
+        _button.onClick.AddListener(() =>
+        {
+            OnPlayerSelect?.Invoke(_playerName.text);
+        });
+    }
+
     public void SetData(string playerName)
     {
         _playerName.text = playerName;
@@ -29,10 +39,6 @@ public class UIPlayerCell : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData pointerData)
     {
-        if (pointerData.button == PointerEventData.InputButton.Left)
-        {
-            OnPlayerSelect?.Invoke(_playerName.text);
-        }
         if (pointerData.button == PointerEventData.InputButton.Right)
         {
             OnPlayerDelete?.Invoke(_playerName.text);

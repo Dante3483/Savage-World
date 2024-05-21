@@ -1,8 +1,9 @@
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 using Random = System.Random;
 
-public struct WorldCellData
+public struct WorldCellData : INetworkSerializable
 {
     #region Private fields
 
@@ -256,6 +257,19 @@ public struct WorldCellData
         set
         {
             _colliderIndex = value;
+        }
+    }
+
+    public byte Flags
+    {
+        get
+        {
+            return _flags;
+        }
+
+        set
+        {
+            _flags = value;
         }
     }
     #endregion
@@ -550,6 +564,13 @@ public struct WorldCellData
     {
         _liquidId = 255;
         _flowValue = 0f;
+    }
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref _blockId);
+        serializer.SerializeValue(ref _wallId);
+        serializer.SerializeValue(ref _blockType);
     }
     #endregion
 }
