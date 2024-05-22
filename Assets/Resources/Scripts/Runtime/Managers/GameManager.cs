@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = System.Random;
@@ -506,8 +505,7 @@ public class GameManager : MonoBehaviour
         {
             if (_isMultiplayer)
             {
-                NetworkManager.Singleton.StartHost();
-                NetworkManager.Singleton.ConnectionApprovalCallback += HandleConnectionApprovalCallback;
+                ConnectionManager.Instance.StartHostIp(_playerName);
             }
             else
             {
@@ -519,15 +517,9 @@ public class GameManager : MonoBehaviour
         UpdateGameState(GameState.GameSession);
     }
 
-    private void HandleConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
-    {
-        response.CreatePlayerObject = true;
-        response.Position = new(3655, 2200);
-    }
-
     public void Connect()
     {
-        NetworkManager.Singleton.StartClient();
+        ConnectionManager.Instance.StartClientIp(_playerName);
         UIManager.Instance.MainMenuConnecntIPUI.IsActive = false;
         UpdateGameState(GameState.GameSession);
     }
