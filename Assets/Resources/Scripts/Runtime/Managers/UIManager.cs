@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class UIManager : MonoBehaviour
+public class UIManager : Singleton<UIManager>
 {
     #region Private fields
     [Header("Main menu")]
@@ -10,7 +10,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private UIPage _mainMenuPlayersUI;
     [SerializeField] private UIPage _mainMenuWorldsUI;
     [SerializeField] private UIPage _mainMenuMultiplayerUI;
-    [SerializeField] private UIPage _mainMenuConnecntIPUI;
+    [SerializeField] private UIPage _mainMenuConnectIPUI;
 
     [Header("Debug")]
     [SerializeField] private UIPage _debugPhasesInfoUI;
@@ -24,7 +24,7 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region Public fields
-    public static UIManager Instance;
+
     #endregion
 
     #region Properties
@@ -59,8 +59,10 @@ public class UIManager : MonoBehaviour
             return _mainMenuWorldsUI;
         }
     }
+
     public UIPage MainMenuMultiplayerUI { get => _mainMenuMultiplayerUI; }
-    public UIPage MainMenuConnecntIPUI { get => _mainMenuConnecntIPUI;}
+
+    public UIPage MainMenuConnectIPUI { get => _mainMenuConnectIPUI; }
 
     public UIPage InventoryUI
     {
@@ -101,9 +103,9 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region Methods
-    private void Awake()
+    protected override void Awake()
     {
-        Instance = this;
+        base.Awake();
         PlayerInputActions inputActions = new();
         inputActions.UI.Enable();
         inputActions.UI.OpenCloseDebug.performed += ResetDebugUI;

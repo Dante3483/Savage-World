@@ -171,7 +171,7 @@ namespace LightSystem
             _startX = _intVector.x - _width / 2;
             _startY = _intVector.y - _height / 2;
 
-            LightSystemGetWorldDataJob getWorldDataJob = new LightSystemGetWorldDataJob(_startX, _startY, _width, _height, _isColoredMode, _worldDataNativeArray);
+            LightSystemGetWorldDataJob getWorldDataJob = new(_startX, _startY, _width, _height, _isColoredMode, _worldDataNativeArray);
             _jobHandle = getWorldDataJob.Schedule(_width * _height, 64);
             _jobHandle.Complete();
 

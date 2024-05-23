@@ -1,14 +1,15 @@
-using System.IO;
+using System;
 using UnityEngine;
 
-public class ListOfExistingPlayersController : MonoBehaviour
+public class ListOfExistingPlayersController : Singleton<ListOfExistingPlayersController>
 {
     #region Private fields
     [SerializeField] private UIListOfExistingPlayers _listOfExistingPlayersUI;
     #endregion
 
     #region Public fields
-
+    public event Action OnPlayerCreated;
+    public event Action<string> OnPlayerSelected, OnPlayerDeleted;
     #endregion
 
     #region Properties
@@ -40,32 +41,18 @@ public class ListOfExistingPlayersController : MonoBehaviour
 
     private void HandleCreatePlayer()
     {
-        string playerName = $"Player {GameManager.Instance.PlayerNames.Count + 1}";
-        string playerPath = StaticInfo.PlayersDirectory + $"/{playerName}.sw.player";
-
-        using (BinaryWriter binaryWriter = new(File.Open(playerPath, FileMode.Create)))
-        {
-            binaryWriter.Write(playerName);
-        }
-
-        GameManager.Instance.PlayerNames.Add(playerName);
-
+        OnPlayerCreated?.Invoke();
         UpdateUI();
     }
 
     private void HandlePlayerSelect(string playerName)
     {
-        GameManager.Instance.PlayerName = playerName;
-        UIManager.Instance.MainMenuPlayersUI.IsActive = false;
-        UIManager.Instance.MainMenuWorldsUI.IsActive = true;
-        ListOfExistingWorldsController.Instance.UpdateUI();
+        OnPlayerSelected?.Invoke(playerName);
     }
 
     private void HandlePlayerDelete(string playerName)
     {
-        string playerPath = StaticInfo.PlayersDirectory + $"/{playerName}.sw.player";
-        File.Delete(playerPath);
-        GameManager.Instance.PlayerNames.Remove(playerName);
+        OnPlayerDeleted?.Invoke(playerName);
         UpdateUI();
     }
     #endregion

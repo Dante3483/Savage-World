@@ -1,7 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 
-public class ConnectionManager : Singleton<ConnectionManager>
+public class ConnectionManager : Singleton<ConnectionManager>, IStateMachine<ConnectionStateBase>
 {
     #region Private fields
     [SerializeField]
@@ -9,7 +9,7 @@ public class ConnectionManager : Singleton<ConnectionManager>
     [SerializeField]
     private int _numberOfReconnectAttempts = 2;
 
-    private ConnectionStateBase _currentState;
+    private StateMachine<ConnectionStateBase> _stateMachine;
     private OfflineState _offlineState;
     private ClientConnectingState _clientConnectingState;
     private ClientConnectedState _clientConnectedState;
@@ -91,6 +91,13 @@ public class ConnectionManager : Singleton<ConnectionManager>
             return _numberOfReconnectAttempts;
         }
     }
+    public StateMachine<ConnectionStateBase> StateMachine => _stateMachine;
+
+    public ConnectionStateBase CurrentState => _stateMachine.CurrentState;
+
+    public ConnectionStateBase PrevState => _stateMachine.PrevState;
+
+
     #endregion
 
     #region Methods
@@ -98,6 +105,7 @@ public class ConnectionManager : Singleton<ConnectionManager>
     {
         base.Awake();
         _networkManager = GetComponent<NetworkManager>();
+        _stateMachine = new(GetType().Name);
         _offlineState = new(this);
         _clientConnectingState = new(this);
         _clientConnectedState = new(this);
@@ -108,7 +116,7 @@ public class ConnectionManager : Singleton<ConnectionManager>
 
     private void Start()
     {
-        _currentState = OfflineState;
+        ChangeState(OfflineState);
 
         NetworkManager.OnClientConnectedCallback += OnClientConnectedCallback;
         NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
@@ -120,59 +128,52 @@ public class ConnectionManager : Singleton<ConnectionManager>
 
     public void ChangeState(ConnectionStateBase nextState)
     {
-        Debug.Log($"{name}: Changed connection state from {_currentState.GetType().Name} to {nextState.GetType().Name}.");
-
-        if (_currentState != null)
-        {
-            _currentState.Exit();
-        }
-        _currentState = nextState;
-        _currentState.Enter();
+        StateMachine.ChangeState(nextState);
     }
 
     private void OnClientDisconnectCallback(ulong clientId)
     {
-        _currentState.OnClientDisconnect(clientId);
+        CurrentState.OnClientDisconnect(clientId);
     }
 
     private void OnClientConnectedCallback(ulong clientId)
     {
-        _currentState.OnClientConnected(clientId);
+        CurrentState.OnClientConnected(clientId);
     }
 
     private void OnServerStarted()
     {
-        _currentState.OnServerStarted();
+        CurrentState.OnServerStarted();
     }
 
     private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
     {
-        _currentState.ApprovalCheck(request, response);
+        CurrentState.ApprovalCheck(request, response);
     }
 
     private void OnTransportFailure()
     {
-        _currentState.OnTransportFailure();
+        CurrentState.OnTransportFailure();
     }
 
     private void OnServerStopped(bool _)
     {
-        _currentState.OnServerStopped();
+        CurrentState.OnServerStopped();
     }
 
     public void StartClientIp(string playerName, string address = "127.0.0.1", ushort port = 7777)
     {
-        _currentState.StartClientIP(playerName, address, port);
+        CurrentState.StartClientIP(playerName, address, port);
     }
 
     public void StartHostIp(string playerName, string address = "127.0.0.1", ushort port = 7777)
     {
-        _currentState.StartHostIP(playerName, address, port);
+        CurrentState.StartHostIP(playerName, address, port);
     }
 
     public void RequestShutdown()
     {
-        _currentState.OnUserRequestedShutdown();
+        CurrentState.OnUserRequestedShutdown();
     }
     #endregion
 }

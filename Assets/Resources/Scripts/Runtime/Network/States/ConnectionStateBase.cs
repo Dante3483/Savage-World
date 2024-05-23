@@ -1,6 +1,6 @@
 using Unity.Netcode;
 
-public abstract class ConnectionStateBase
+public abstract class ConnectionStateBase : StateBase
 {
     #region Private fields
     protected ConnectionManager _connectionManager;
@@ -19,10 +19,6 @@ public abstract class ConnectionStateBase
     {
         _connectionManager = connectionManager;
     }
-
-    public abstract void Enter();
-
-    public abstract void Exit();
 
     public virtual void OnClientConnected(ulong clientId) { }
 

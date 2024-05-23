@@ -2,22 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 public class Terrain : MonoBehaviour
 {
     #region Private fields
     [Header("Sections")]
-    [SerializeField] 
+    [SerializeField]
     private GameObject _trees;
-    [SerializeField] 
+    [SerializeField]
     private GameObject _pickUpItems;
 
     private WorldCellData[,] _worldData;
 
     #region World data update
     private HashSet<Vector2Ushort> _needToUpdate;
-    private List<Vector2Ushort> vectors = new List<Vector2Ushort>();
+    private List<Vector2Ushort> vectors = new();
     #endregion
 
     #region Threads
@@ -98,7 +97,7 @@ public class Terrain : MonoBehaviour
         {
             GameManager.Instance.RandomVar = new System.Random(GameManager.Instance.Seed);
 
-            TerrainGeneration terrainGeneration = new TerrainGeneration();
+            TerrainGeneration terrainGeneration = new();
             terrainGeneration.StartTerrainGeneration();
         }
         catch (Exception e)
@@ -456,15 +455,15 @@ public class Terrain : MonoBehaviour
         int y;
         byte chanceToAction;
 
-        WorldCellData block = new WorldCellData();
-        WorldCellData bottomBlock = new WorldCellData();
-        WorldCellData topBlock = new WorldCellData();
-        WorldCellData leftBlock = new WorldCellData();
-        WorldCellData rightBlock = new WorldCellData();
+        WorldCellData block = new();
+        WorldCellData bottomBlock = new();
+        WorldCellData topBlock = new();
+        WorldCellData leftBlock = new();
+        WorldCellData rightBlock = new();
 
         PlantSO plant;
 
-        System.Random randomVar = new System.Random(GameManager.Instance.Seed);
+        System.Random randomVar = new(GameManager.Instance.Seed);
 
         while (!GameManager.Instance.IsGameSession)
         {

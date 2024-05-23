@@ -1,11 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = System.Random;
-using Stopwatch = System.Diagnostics.Stopwatch;
 
 // KeyCode.H - Low quality of light system
 // KeyCode.J - Medium quality of light system
@@ -15,7 +11,7 @@ using Stopwatch = System.Diagnostics.Stopwatch;
 // KeyCode.P - Set active player
 // KeyCode.L - Create torch
 // KeyCode.O - Enable/Disable debug UI
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
 {
     #region Private fields
     [Header("Main")]
@@ -68,6 +64,14 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private bool _isInputTextInFocus;
 
+    private StateMachine<GameStateBase> _stateMachine;
+    private InitializationState _initializationState;
+    private MainMenuState _mainMenuState;
+    private CreatingWorldState _creatingWorldState;
+    private LoadingWorldState _loadingWorldState;
+    private PlayingState _playingState;
+    private QuitGameState _quitGameState;
+
     private List<string> _playerNames;
     private List<string> _worldNames;
     private Random _randomVar;
@@ -75,10 +79,11 @@ public class GameManager : MonoBehaviour
     private float _loadingValue;
     private string _phasesInfo;
     private bool _isMultiplayer;
+    private bool _isClient;
     #endregion
 
     #region Public fields
-    public static GameManager Instance;
+
     #endregion
 
     #region Properties
@@ -255,7 +260,7 @@ public class GameManager : MonoBehaviour
     {
         get
         {
-            return _currentGameState == GameState.GameSession;
+            return CurrentState == _playingState;
         }
     }
 
@@ -378,20 +383,93 @@ public class GameManager : MonoBehaviour
             _player = value;
         }
     }
+
+    public InitializationState InitializationState
+    {
+        get
+        {
+            return _initializationState;
+        }
+    }
+
+    public MainMenuState MainMenuState
+    {
+        get
+        {
+            return _mainMenuState;
+        }
+    }
+
+    public StateMachine<GameStateBase> StateMachine => _stateMachine;
+
+    public GameStateBase CurrentState => StateMachine.CurrentState;
+
+    public GameStateBase PrevState => StateMachine.PrevState;
+
+    public CreatingWorldState CreatingWorldState
+    {
+        get
+        {
+            return _creatingWorldState;
+        }
+    }
+
+    public LoadingWorldState LoadingWorldState
+    {
+        get
+        {
+            return _loadingWorldState;
+        }
+    }
+
+    public GameObject TerrainGameObject
+    {
+        get
+        {
+            return _terrainGameObject;
+        }
+    }
+
+    public PlayingState PlayingState
+    {
+        get
+        {
+            return _playingState;
+        }
+    }
+
+    public bool IsClient
+    {
+        get
+        {
+            return _isClient;
+        }
+
+        set
+        {
+            _isClient = value;
+        }
+    }
     #endregion
 
     #region Methods
     private void OnApplicationQuit()
     {
-        UpdateGameState(GameState.CloseApplication);
+        ChangeState(_quitGameState);
+        _currentGameState = GameState.CloseApplication;
         GetPlayerInventory().IsInitialized = false;
         GetPlayerResearches().IsInitialized = false;
     }
 
-    private void Awake()
+    protected override void Awake()
     {
-        Instance = this;
-
+        base.Awake();
+        _stateMachine = new(GetType().Name);
+        _initializationState = new();
+        _mainMenuState = new();
+        _creatingWorldState = new();
+        _loadingWorldState = new();
+        _playingState = new();
         _terrain = _terrainGameObject.GetComponent<Terrain>();
         _terrainGameObject.SetActive(false);
         InputSystem.EnableDevice(Keyboard.current);
@@ -400,7 +478,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        UpdateGameState(GameState.GameInitializationState);
+        ChangeState(_initializationState);
     }
 
     private void Update()
@@ -412,177 +490,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void UpdateGameState(GameState gameState)
+    public void ChangeState(GameStateBase nextState)
     {
-        _currentGameState = gameState;
-        switch (gameState)
-        {
-            case GameState.GameInitializationState:
-                {
-                    Task.Run(() => HandleGameInitializationState());
-                }
-                break;
-            case GameState.MainMenuState:
-                {
-                    HandleMainMenuState();
-                }
-                break;
-            case GameState.NewGameState:
-                {
-                    if (!IsStaticSeed)
-                    {
-                        Seed = UnityEngine.Random.Range(-1000000, 1000000);
-                    }
-                    _terrainGameObject.SetActive(true);
-                    Task.Run(() => HandleNewGameState());
-                    _terrain.StartCoroutinesAndThreads();
-                }
-                break;
-            case GameState.LoadGameState:
-                {
-                    _terrainGameObject.SetActive(true);
-                    Task.Run(() => HandleLoadGameState());
-                    _terrain.StartCoroutinesAndThreads();
-                }
-                break;
-            default:
-                break;
-        }
+        StateMachine.ChangeState(nextState);
     }
 
-    private void HandleGameInitializationState()
-    {
-        try
-        {
-            var watch = Stopwatch.StartNew();
-            List<Action> initializationSteps = new()
-            {
-                InitializeAtlases,
-                InitializePlayersData,
-                InitializeWorldsData,
-                WorldDataManager.Instance.Initialize,
-                ChunksManager.Instance.Initialize,
-                _terrain.Initialize,
-            };
-
-            float loadingStep = 100f / initializationSteps.Count;
-
-            UIManager.Instance.MainMenuUI.IsActive = false;
-            UIManager.Instance.MainMenuProgressBarUI.IsActive = true;
-
-            foreach (Action initializationStep in initializationSteps)
-            {
-                initializationStep?.Invoke();
-                _loadingValue += loadingStep;
-            }
-
-            watch.Stop();
-            Debug.Log($"Game initialization: {watch.Elapsed.TotalSeconds}");
-            _phasesInfo += $"Game initialization: {watch.Elapsed.TotalSeconds}\n";
-
-            UpdateGameState(GameState.MainMenuState);
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-        }
-    }
-
-    private void HandleMainMenuState()
-    {
-        UIManager.Instance.MainMenuUI.IsActive = true;
-        UIManager.Instance.MainMenuProgressBarUI.IsActive = false;
-    }
-
-    private void HandleNewGameState()
-    {
-        UIManager.Instance.MainMenuUI.IsActive = false;
-        UIManager.Instance.MainMenuProgressBarUI.IsActive = true;
-        ResetLoadingValue();
-
-        Terrain.CreateNewWorld();
-        ActionInMainThreadUtil.Instance.Invoke(() =>
-        {
-            if (_isMultiplayer)
-            {
-                ConnectionManager.Instance.StartHostIp(_playerName);
-            }
-            else
-            {
-                CreateNewPlayer();
-                SetPlayerPosition(3655, 2200);
-            }
-        });
-        UIManager.Instance.MainMenuProgressBarUI.IsActive = false;
-        UpdateGameState(GameState.GameSession);
-    }
-
-    public void Connect()
-    {
-        ConnectionManager.Instance.StartClientIp(_playerName);
-        UIManager.Instance.MainMenuConnecntIPUI.IsActive = false;
-        UpdateGameState(GameState.GameSession);
-    }
-
-    private void HandleLoadGameState()
-    {
-        UIManager.Instance.MainMenuProgressBarUI.IsActive = true;
-        ResetLoadingValue();
-
-        ActionInMainThreadUtil.Instance.Invoke(() =>
-        {
-            CreateNewPlayer();
-        });
-        Terrain.LoadWorld();
-        UIManager.Instance.MainMenuProgressBarUI.IsActive = false;
-        if (_isMultiplayer)
-        {
-
-        }
-        UpdateGameState(GameState.GameSession);
-    }
-
-    private void InitializeAtlases()
-    {
-        _blocksAtlas.InitializeAtlas();
-        _treesAtlas.InitializeAtlas();
-        _pickUpItemsAtlas.InitializeAtlas();
-        _itemsAtlas.InitializeAtlas();
-    }
-
-    private void InitializePlayersData()
-    {
-        GetAllPlayerNames();
-    }
-
-    private void InitializeWorldsData()
-    {
-        GetAllWorldNames();
-    }
-
-    private void GetAllPlayerNames()
-    {
-        DirectoryInfo directoryInfo = new(StaticInfo.PlayersDirectory);
-        FileInfo[] filesInfo = directoryInfo.GetFiles("*.sw.player");
-        _playerNames = new List<string>();
-        foreach (FileInfo fileInfo in filesInfo)
-        {
-            _playerNames.Add(fileInfo.Name.Replace(".sw.player", ""));
-        }
-    }
-
-    private void GetAllWorldNames()
-    {
-        DirectoryInfo directoryInfo = new(StaticInfo.WorldsDirectory);
-        DirectoryInfo[] directoriesInfo = directoryInfo.GetDirectories();
-        _worldNames = new List<string>();
-        foreach (DirectoryInfo directoryIndo in directoriesInfo)
-        {
-            _worldNames.Add(directoryIndo.Name);
-        }
-    }
-
-    private void ResetLoadingValue()
+    public void ResetLoadingValue()
     {
         LoadingValue = 0;
     }
@@ -590,14 +503,6 @@ public class GameManager : MonoBehaviour
     public bool IsInMapRange(int x, int y)
     {
         return x >= 0 && x < _currentTerrainWidth && y >= 0 && y < _currentTerrainHeight;
-    }
-
-    private void CreateNewPlayer()
-    {
-        _player = Instantiate(_playerPrefab, Vector3.zero, Quaternion.identity);
-        _player.transform.SetParent(_playerParrent);
-        _player.name = "Player";
-        InitializePlayer(0, 0);
     }
 
     public void InitializePlayer(int x, int y)

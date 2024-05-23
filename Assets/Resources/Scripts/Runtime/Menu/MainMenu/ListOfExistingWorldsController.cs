@@ -1,26 +1,22 @@
-using System.IO;
+using System;
 using UnityEngine;
 
-public class ListOfExistingWorldsController : MonoBehaviour
+public class ListOfExistingWorldsController : Singleton<ListOfExistingWorldsController>
 {
     #region Private fields
     [SerializeField] private UIListOfExistingWorlds _listOfExistingWorldsUI;
     #endregion
 
     #region Public fields
-
+    public event Action OnWorldCreated;
+    public event Action<string> OnWorldSelected, OnWorldDeleted;
     #endregion
 
     #region Properties
-    public static ListOfExistingWorldsController Instance;
+
     #endregion
 
     #region Methods
-    private void Awake()
-    {
-        Instance = this;
-    }
-
     private void Start()
     {
         PrepareUI();
@@ -45,23 +41,17 @@ public class ListOfExistingWorldsController : MonoBehaviour
 
     private void HandleCreateWorld()
     {
-        GameManager.Instance.WorldName = $"World {GameManager.Instance.WorldNames.Count + 1}";
-        UIManager.Instance.MainMenuWorldsUI.IsActive = false;
-        GameManager.Instance.UpdateGameState(GameState.NewGameState);
+        OnWorldCreated?.Invoke();
     }
 
     private void HandleWorldSelect(string worldName)
     {
-        GameManager.Instance.WorldName = worldName;
-        UIManager.Instance.MainMenuWorldsUI.IsActive = false;
-        GameManager.Instance.UpdateGameState(GameState.LoadGameState);
+        OnWorldSelected?.Invoke(worldName);
     }
 
     private void HandleWorldDelete(string worldName)
     {
-        string worldPath = StaticInfo.WorldsDirectory + $"/{worldName}";
-        Directory.Delete(worldPath, true);
-        GameManager.Instance.WorldNames.Remove(worldName);
+        OnWorldDeleted?.Invoke(worldName);
         UpdateUI();
     }
     #endregion
