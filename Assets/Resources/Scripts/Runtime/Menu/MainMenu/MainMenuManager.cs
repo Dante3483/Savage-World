@@ -141,7 +141,7 @@ public class MainMenuManager : Singleton<MainMenuManager>, IStateMachine<MainMen
         {
             ConnectionManager.Instance.StartClientIp(playerName);
             ChangeState(null);
-            GameManager.Instance.ChangeState(GameManager.Instance.PlayingState);
+            GameManager.Instance.ChangeState(GameManager.Instance.LoadingDataFromHostState);
         }
         else
         {

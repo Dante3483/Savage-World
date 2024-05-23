@@ -95,10 +95,10 @@ public class InitializationState : GameStateBase
     {
         DirectoryInfo directoryInfo = new(StaticInfo.PlayersDirectory);
         FileInfo[] filesInfo = directoryInfo.GetFiles("*.sw.player");
-        GameManager.Instance.PlayerNames = new List<string>();
+        _gameManager.PlayerNames = new();
         foreach (FileInfo fileInfo in filesInfo)
         {
-            GameManager.Instance.PlayerNames.Add(fileInfo.Name.Replace(".sw.player", ""));
+            _gameManager.PlayerNames.Add(fileInfo.Name.Replace(".sw.player", ""));
         }
     }
 

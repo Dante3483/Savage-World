@@ -1049,7 +1049,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a602bb37118bbaa4dac3d0404410965f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _listOfExistingPlayersUI: {fileID: 0}
 --- !u!1 &70073721
 GameObject:
   m_ObjectHideFlags: 0
@@ -25794,5 +25793,5 @@ SceneRoots:
   - {fileID: 1074330279}
   - {fileID: 2109985273}
   - {fileID: 147951359}
-  - {fileID: 618957603}
   - {fileID: 2062244578}
+  - {fileID: 618957603}

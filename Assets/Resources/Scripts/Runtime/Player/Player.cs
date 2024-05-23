@@ -68,10 +68,6 @@ public class Player : NetworkBehaviour
         {
             return;
         }
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            StartCoroutine(SendData());
-        }
     }
 
     public void Initialize()
@@ -92,7 +88,7 @@ public class Player : NetworkBehaviour
         GetComponent<PlayerMovementNew>().enabled = true;
     }
 
-    private IEnumerator SendData()
+    public IEnumerator SendData(ulong clientId)
     {
         int chunkSize = GameManager.Instance.TerrainConfiguration.ChunkSize;
         Vector2Int defaultClientPosition = new(3655, 2200);
@@ -101,10 +97,11 @@ public class Player : NetworkBehaviour
         {
             for (int y = centerChunkPosition.y - 1; y <= centerChunkPosition.y + 1; y++)
             {
-                SendChunk(x, y);
+                SendChunk(x, y, clientId);
                 yield return null;
             }
         }
+        DataLoadingCompleteRpc(RpcTarget.Single(clientId, RpcTargetUse.Persistent));
     }
 
     private void HandleDataChanged(int x, int y)
@@ -119,7 +116,7 @@ public class Player : NetworkBehaviour
         data.FlowValue = blockData.FlowValue;
         data.ColliderIndex = blockData.ColliderIndex;
         data.Flags = blockData.Flags;
-        SendBlockRpc(data, x, y);
+        SendBlockDataRpc(data, x, y, RpcTarget.NotServer);
         SendMessage($"X: {x} Y: {y} Data: {data}");
     }
 
@@ -129,7 +126,7 @@ public class Player : NetworkBehaviour
         SendColliderIndexRpc(blockData.ColliderIndex, blockData.IsColliderHorizontalFlipped(), x, y);
     }
 
-    private void SendChunk(int chunkX, int chunkY)
+    private void SendChunk(int chunkX, int chunkY, ulong clientId)
     {
         int chunkSize = GameManager.Instance.TerrainConfiguration.ChunkSize;
         int startX = chunkX * chunkSize;
@@ -152,14 +149,13 @@ public class Player : NetworkBehaviour
                 data.FlowValue = blockData.FlowValue;
                 data.ColliderIndex = blockData.ColliderIndex;
                 data.Flags = blockData.Flags;
-                SendBlockRpc(data, x, y);
+                SendBlockDataRpc(data, x, y, RpcTarget.Single(clientId, RpcTargetUse.Persistent));
             }
         }
-        SendMessageRpc($"X: {startX} Y: {startY} completed");
     }
 
-    [Rpc(SendTo.NotServer)]
-    private void SendBlockRpc(Data data, int x, int y)
+    [Rpc(SendTo.SpecifiedInParams, AllowTargetOverride = true)]
+    private void SendBlockDataRpc(Data data, int x, int y, RpcParams rpcParams)
     {
         ushort blockId = data.BlockId;
         ushort wallId = data.WallId;
@@ -180,8 +176,14 @@ public class Player : NetworkBehaviour
         WorldDataManager.Instance.SetColliderIndex(x, y, index, isHorizontalFlipped);
     }
 
-    [Rpc(SendTo.NotServer)]
-    private void SendMessageRpc(string message)
+    [Rpc(SendTo.SpecifiedInParams, AllowTargetOverride = true)]
+    private void DataLoadingCompleteRpc(RpcParams rpcParams)
+    {
+        GameManager.Instance.ChangeState(GameManager.Instance.PlayingState);
+    }
+
+    [Rpc(SendTo.SpecifiedInParams, AllowTargetOverride = true)]
+    private void SendMessageRpc(string message, RpcParams rpcParams)
     {
         Debug.Log(message);
     }
@@ -222,14 +224,6 @@ public class Player : NetworkBehaviour
                 serializer.GetFastBufferReader().ReadValueSafe(out Flags);
                 serializer.GetFastBufferReader().ReadValueSafe(out ColliderIndex);
             }
-            //serializer.SerializeValue(ref BlockId);
-            //serializer.SerializeValue(ref WallId);
-            //serializer.SerializeValue(ref LiquidId);
-            //serializer.SerializeValue(ref TileId);
-            //serializer.SerializeValue(ref BlockType);
-            //serializer.SerializeValue(ref FlowValue);
-            //serializer.SerializeValue(ref Flags);
-            //serializer.SerializeValue(ref ColliderIndex);
         }
     }
 }

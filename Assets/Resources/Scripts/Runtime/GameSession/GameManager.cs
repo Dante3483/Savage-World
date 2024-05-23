@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = System.Random;
@@ -69,9 +70,11 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
     private MainMenuState _mainMenuState;
     private CreatingWorldState _creatingWorldState;
     private LoadingWorldState _loadingWorldState;
+    private LoadingDataFromHostState _loadingDataFromHostState;
     private PlayingState _playingState;
     private QuitGameState _quitGameState;
 
+    private List<FileInfo> _playersFiles;
     private List<string> _playerNames;
     private List<string> _worldNames;
     private Random _randomVar;
@@ -450,6 +453,19 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
             _isClient = value;
         }
     }
+
+    public LoadingDataFromHostState LoadingDataFromHostState
+    {
+        get
+        {
+            return _loadingDataFromHostState;
+        }
+
+        set
+        {
+            _loadingDataFromHostState = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -469,6 +485,7 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
         _mainMenuState = new();
         _creatingWorldState = new();
         _loadingWorldState = new();
+        _loadingDataFromHostState = new();
         _playingState = new();
         _terrain = _terrainGameObject.GetComponent<Terrain>();
         _terrainGameObject.SetActive(false);

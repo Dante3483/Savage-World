@@ -48,5 +48,13 @@ public class HostingState : OnlineState
     {
         _connectionManager.ChangeState(_connectionManager.OfflineState);
     }
+
+    public override void OnClientConnected(ulong clientId)
+    {
+        if (clientId != _connectionManager.NetworkManager.LocalClientId)
+        {
+            _connectionManager.StartCoroutine(GameManager.Instance.Player.SendData(clientId));
+        }
+    }
     #endregion
 }
