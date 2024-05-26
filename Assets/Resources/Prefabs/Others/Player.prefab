@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 8580786190906558709}
   - component: {fileID: -5708172213814605346}
   - component: {fileID: 1181441038070284372}
+  - component: {fileID: 2913288188363348028}
   - component: {fileID: 786310154602479331}
   - component: {fileID: 5913716759420320057}
   - component: {fileID: 4426414403718054618}
@@ -202,7 +203,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3649145745
+  GlobalObjectIdHash: 1131654402
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -254,6 +255,31 @@ MonoBehaviour:
     _hotbarFullSize: 10
     _accessoriesSize: 6
     _armorSize: 3
+  _playerNetwork: {fileID: 0}
+--- !u!114 &2913288188363348028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 181470870697314535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c096a01f08c9364d8ac8a2bcab36b98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _player: {fileID: 0}
+  _ownerOnlyComponents:
+  - {fileID: 786310154602479331}
+  - {fileID: 5913716759420320057}
+  - {fileID: 4426414403718054618}
+  - {fileID: 7923999271663014828}
+  - {fileID: 7534789336813920865}
+  - {fileID: 5053575174140987769}
+  - {fileID: 7536904177451949051}
+  - {fileID: 178026743630104726}
+  - {fileID: 7284444889832481490}
+  - {fileID: 2140670296289761362}
 --- !u!114 &786310154602479331
 MonoBehaviour:
   m_ObjectHideFlags: 0
