@@ -113,8 +113,8 @@ public class UIManager : Singleton<UIManager>
 
     private void ResetDebugUI(InputAction.CallbackContext context)
     {
-        _debugPhasesInfoUI.ReverseActivity();
-        _debugBlockInfoUI.ReverseActivity();
+        _debugPhasesInfoUI.ToggleActive();
+        _debugBlockInfoUI.ToggleActive();
     }
     #endregion
 }

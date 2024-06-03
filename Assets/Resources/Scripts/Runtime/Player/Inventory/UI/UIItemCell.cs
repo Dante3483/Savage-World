@@ -3,20 +3,20 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UIItemCell : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
+public abstract class UIItemCell : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         IPointerExitHandler
 {
     #region Private fields
     [Header("Main")]
-    [SerializeField] private Image _itemImage;
-
+    [SerializeField]
+    private Image _itemImage;
     private bool _isMouseAbove;
     #endregion
 
     #region Public fields
-    public event Action<UIItemCell> OnLeftButtonClick, 
-        OnMouseEnter, OnRightMouseDown;
-    public event Action OnMouseLeave, OnRightMouseUp;
+    public event Action<UIItemCell> LeftButtonClicked,
+        MouseEntered, RightMouseDowned;
+    public event Action MouseLeft, RightMouseUpped;
     #endregion
 
     #region Properties
@@ -35,12 +35,12 @@ public class UIItemCell : MonoBehaviour, IPointerClickHandler, IPointerEnterHand
         {
             if (_isMouseAbove)
             {
-                OnRightMouseDown?.Invoke(this);
+                RightMouseDowned?.Invoke(this);
             }
         }
         else
         {
-            OnRightMouseUp?.Invoke();
+            RightMouseUpped?.Invoke();
         }
     }
 
@@ -54,7 +54,7 @@ public class UIItemCell : MonoBehaviour, IPointerClickHandler, IPointerEnterHand
         _itemImage.gameObject.SetActive(false);
     }
 
-    public virtual void SetData(Sprite sprite)
+    public virtual void SetSprite(Sprite sprite)
     {
         if (sprite == null)
         {
@@ -65,24 +65,29 @@ public class UIItemCell : MonoBehaviour, IPointerClickHandler, IPointerEnterHand
         _itemImage.sprite = sprite;
     }
 
+    public virtual void SetQuantity(int quantity)
+    {
+
+    }
+
     public void OnPointerClick(PointerEventData pointerData)
     {
         if (pointerData.button == PointerEventData.InputButton.Left)
         {
-            OnLeftButtonClick?.Invoke(this);
+            LeftButtonClicked?.Invoke(this);
         }
     }
 
     public void OnPointerEnter(PointerEventData pointerData)
     {
         _isMouseAbove = true;
-        OnMouseEnter?.Invoke(this);
+        MouseEntered?.Invoke(this);
     }
 
     public void OnPointerExit(PointerEventData pointerData)
     {
         _isMouseAbove = false;
-        OnMouseLeave?.Invoke();
+        MouseLeft?.Invoke();
     }
     #endregion
 }

@@ -4,7 +4,8 @@ using UnityEngine.UI;
 public class UIWearableItemCell : UIItemCell
 {
     #region Private fields
-    [SerializeField] private Image _silhouette;
+    [SerializeField]
+    private Image _silhouette;
     #endregion
 
     #region Public fields
@@ -22,13 +23,13 @@ public class UIWearableItemCell : UIItemCell
         _silhouette.gameObject.SetActive(true);
     }
 
-    public override void SetData(Sprite sprite)
+    public override void SetSprite(Sprite sprite)
     {
         if (sprite != null)
         {
             _silhouette.gameObject.SetActive(false);
         }
-        base.SetData(sprite);
+        base.SetSprite(sprite);
     }
     #endregion
 }

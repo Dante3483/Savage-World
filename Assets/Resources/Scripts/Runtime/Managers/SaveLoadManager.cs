@@ -228,25 +228,25 @@ public class SaveLoadManager : MonoBehaviour
 
     private void SavePlayerInventory(BinaryWriter binaryWriter)
     {
-        Inventory inventory = GameManager.Instance.GetPlayerInventory();
+        InventoryModelOld inventory = GameManager.Instance.GetPlayerInventory();
         SavePlayerInventoryPart(binaryWriter, inventory, inventory.HotbarSize, ItemLocations.Hotbar);
         SavePlayerInventoryPart(binaryWriter, inventory, inventory.StorageSize, ItemLocations.Storage);
         SavePlayerInventoryPart(binaryWriter, inventory, inventory.AccessoriesSize, ItemLocations.Accessories);
         SavePlayerInventoryPart(binaryWriter, inventory, inventory.ArmorSize, ItemLocations.Armor);
     }
 
-    private void SavePlayerInventoryPart(BinaryWriter binaryWriter, Inventory inventory, int size, ItemLocations location)
+    private void SavePlayerInventoryPart(BinaryWriter binaryWriter, InventoryModelOld inventory, int size, ItemLocations location)
     {
         for (int i = 0; i < size; i++)
         {
-            InventoryItem inventoryItem = inventory.GetItem(i, location);
-            bool isEmpty = inventoryItem.IsEmpty;
-            binaryWriter.Write(isEmpty);
-            if (!isEmpty)
-            {
-                binaryWriter.Write((ushort)inventoryItem.ItemData.Id);
-                binaryWriter.Write(inventoryItem.Quantity);
-            }
+            //InventoryItem inventoryItem = inventory.GetItem(i, location);
+            //bool isEmpty = inventoryItem.IsEmpty;
+            //binaryWriter.Write(isEmpty);
+            //if (!isEmpty)
+            //{
+            //    binaryWriter.Write((ushort)inventoryItem.Data.Id);
+            //    binaryWriter.Write(inventoryItem.Quantity);
+            //}
         }
     }
 
@@ -451,15 +451,15 @@ public class SaveLoadManager : MonoBehaviour
 
     private void LoadPlayerInventory(BinaryReader binaryReader)
     {
-        Inventory inventory = GameManager.Instance.GetPlayerInventory();
-        inventory.Initialize();
-        LoadPlayerInventoryPart(binaryReader, inventory, inventory.HotbarSize, ItemLocations.Hotbar);
-        LoadPlayerInventoryPart(binaryReader, inventory, inventory.StorageSize, ItemLocations.Storage);
-        LoadPlayerInventoryPart(binaryReader, inventory, inventory.AccessoriesSize, ItemLocations.Accessories);
-        LoadPlayerInventoryPart(binaryReader, inventory, inventory.ArmorSize, ItemLocations.Armor);
+        //InventoryModel inventory = GameManager.Instance.GetPlayerInventory();
+        //inventory.Initialize();
+        //LoadPlayerInventoryPart(binaryReader, inventory, inventory.HotbarSize, ItemLocations.Hotbar);
+        //LoadPlayerInventoryPart(binaryReader, inventory, inventory.StorageSize, ItemLocations.Storage);
+        //LoadPlayerInventoryPart(binaryReader, inventory, inventory.AccessoriesSize, ItemLocations.Accessories);
+        //LoadPlayerInventoryPart(binaryReader, inventory, inventory.ArmorSize, ItemLocations.Armor);
     }
 
-    private void LoadPlayerInventoryPart(BinaryReader binaryReader, Inventory inventory, int size, ItemLocations location)
+    private void LoadPlayerInventoryPart(BinaryReader binaryReader, InventoryModelOld inventory, int size, ItemLocations location)
     {
         for (int i = 0; i < size; i++)
         {

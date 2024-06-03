@@ -64,10 +64,11 @@ public class UIPage : MonoBehaviour
         _onActiveUpdate -= SetActiveNextUpdate;
     }
 
-    public void ReverseActivity()
+    public bool ToggleActive()
     {
         _isActive = !_isActive;
         _content.gameObject.SetActive(_isActive);
+        return _isActive;
     }
     #endregion
 }

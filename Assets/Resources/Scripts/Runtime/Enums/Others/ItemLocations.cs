@@ -1,4 +1,4 @@
-public enum ItemLocations: byte
+public enum ItemLocations : byte
 {
     None = 0,
 
@@ -9,4 +9,6 @@ public enum ItemLocations: byte
     Accessories = 3,
 
     Armor = 4,
+
+    Buffer = 5,
 }

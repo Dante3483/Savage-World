@@ -1,7 +1,7 @@
 using Items;
 using UnityEngine;
 
-public class ResearchController : MonoBehaviour, IBookPageController
+public class ResearchController : Singleton<ResearchController>
 {
     #region Private fields
     [Header("Main")]
@@ -10,7 +10,7 @@ public class ResearchController : MonoBehaviour, IBookPageController
     [SerializeField]
     private UIResearchPage _researchPage;
     private ResearchesSO _researchesData;
-    private Inventory _inventoryData;
+    private InventoryModelOld _inventoryData;
     private int _indexOfActiveResearch;
 
     #endregion
@@ -21,6 +21,8 @@ public class ResearchController : MonoBehaviour, IBookPageController
 
     #region Properties
     public bool IsActive => UIManager.Instance.ResearchUI.IsActive;
+
+    public BookControllerType Type => BookControllerType.Research;
     #endregion
 
     #region Methods
@@ -30,19 +32,19 @@ public class ResearchController : MonoBehaviour, IBookPageController
         {
             _player = GetComponentInParent<Player>();
         }
-        PrepareData();
-        PrepareUI();
+        InitializeData();
+        InitializeUI();
     }
 
-    public void PrepareData()
+    public void InitializeData()
     {
-        _inventoryData = _player.Inventory;
+        //_inventoryData = _player.Inventory;
         _researchesData = GameManager.Instance.Researches;
         _researchesData.Initialize();
         _researchesData.OnResearchChangedState += HandleUpdateUIResearchState;
     }
 
-    public void PrepareUI()
+    public void InitializeUI()
     {
         int researchesCount = _researchesData.GetResearchesCount();
         _researchPage = UIManager.Instance.ResearchUI.Content.GetComponentInChildren<UIResearchPage>();
@@ -66,9 +68,9 @@ public class ResearchController : MonoBehaviour, IBookPageController
         _researchPage.OnCostDescriptionRequested += HandleCostDescriptionRequested;
     }
 
-    public void ResetData()
+    public void ResetPresenter()
     {
-        UIManager.Instance.ResearchUI.ReverseActivity();
+        UIManager.Instance.ResearchUI.ToggleActive();
         _researchPage.ResetPage();
     }
 

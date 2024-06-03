@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Text;
 using TMPro;
 using UnityEngine;

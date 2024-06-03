@@ -1,4 +1,4 @@
-public interface IBookPageController
+public abstract class ModelBase
 {
     #region Private fields
 
@@ -9,12 +9,10 @@ public interface IBookPageController
     #endregion
 
     #region Properties
-    public bool IsActive { get;}
+
     #endregion
 
     #region Methods
-    public void PrepareUI();
-    public void PrepareData();
-    public void ResetData();
+    public abstract void Initialize();
     #endregion
 }

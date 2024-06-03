@@ -51,7 +51,18 @@ public class UIHotbarItemCell : MonoBehaviour
         _quantityTxt.gameObject.SetActive(false);
     }
 
-    public void SetData(Sprite sprite, int quantity)
+    public void SetSprite(Sprite sprite)
+    {
+        if (sprite == null)
+        {
+            ResetData();
+            return;
+        }
+        _itemImage.gameObject.SetActive(true);
+        _itemImage.sprite = sprite;
+    }
+
+    public void SetQuantity(int quantity)
     {
         _quantityTxt.gameObject.SetActive(true);
         if (quantity < 10)
@@ -74,14 +85,6 @@ public class UIHotbarItemCell : MonoBehaviour
             Converter.FromIntToCharArray(quantity, _quantityCharArray4Digit);
             _quantityTxt.SetText(_quantityCharArray4Digit);
         }
-
-        if (sprite == null)
-        {
-            ResetData();
-            return;
-        }
-        _itemImage.gameObject.SetActive(true);
-        _itemImage.sprite = sprite;
     }
 
     public void Select()

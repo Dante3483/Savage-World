@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
@@ -8,7 +9,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private PlayerStats _stats;
     [SerializeField]
-    private Inventory _inventory;
+    private InventoryModel _inventory;
     [SerializeField]
     private PlayerNetwork _playerNetwork;
     [SerializeField]
@@ -20,16 +21,11 @@ public class Player : MonoBehaviour
     #endregion
 
     #region Properties
-    public Inventory Inventory
+    public InventoryModel Inventory
     {
         get
         {
             return _inventory;
-        }
-
-        set
-        {
-            _inventory = value;
         }
     }
 
@@ -58,12 +54,12 @@ public class Player : MonoBehaviour
     {
         get
         {
-            return _isHost;
+            return _isOwner;
         }
 
         set
         {
-            _isHost = value;
+            _isOwner = value;
         }
     }
     #endregion
@@ -76,8 +72,15 @@ public class Player : MonoBehaviour
 
     public void Initialize()
     {
+        PlayerInputActions playerInputActions = GameManager.Instance.PlayerInputActions;
+        playerInputActions.UI.Enable();
+        playerInputActions.UI.OpenCloseInventory.performed += ToggleInventoryEventHandler;
+        playerInputActions.UI.OpenCloseCraftStation.performed += ToggleCraftStationEventHandler;
+        playerInputActions.UI.OpenCloseResearch.performed += ToggleResearchEventHandler;
         _stats.Reset();
-        _inventory.Initialize();
+        _inventory = new();
+        BookManager.Instance.InitializeInventory(_inventory);
+        BookManager.Instance.InitializeHotbar(_inventory);
     }
 
     public void DisableMovement()
@@ -90,6 +93,21 @@ public class Player : MonoBehaviour
     {
         GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
         GetComponent<PlayerMovementNew>().enabled = true;
+    }
+
+    private void ToggleInventoryEventHandler(InputAction.CallbackContext context)
+    {
+        BookManager.Instance.TogglePresenter(BookManager.Instance.InventoryPresenter);
+    }
+
+    private void ToggleCraftStationEventHandler(InputAction.CallbackContext context)
+    {
+
+    }
+
+    private void ToggleResearchEventHandler(InputAction.CallbackContext context)
+    {
+
     }
     #endregion
 }

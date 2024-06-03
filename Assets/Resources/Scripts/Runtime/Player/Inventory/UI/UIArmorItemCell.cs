@@ -1,11 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class UIArmorItemCell : UIWearableItemCell
 {
     #region Private fields
-    [SerializeField] private ArmorTypes _armorType;
+    [SerializeField]
+    private ArmorTypes _armorType;
     #endregion
 
     #region Public fields
@@ -20,11 +19,6 @@ public class UIArmorItemCell : UIWearableItemCell
         get
         {
             return _armorType;
-        }
-
-        set
-        {
-            _armorType = value;
         }
     }
     #endregion

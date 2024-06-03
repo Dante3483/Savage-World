@@ -44,21 +44,21 @@ public class ResearchesSO : ScriptableObject
         }
     }
 
-    public bool ExamineResearch(Inventory inventory, int index)
+    public bool ExamineResearch(InventoryModelOld inventory, int index)
     {
-        ResearchSO research = _listOfReserches[index];
-        foreach (var item in research.ListOfCosts)
-        {
-            if (inventory.GetItemQuantity(item.Item) < item.Quantity)
-            {
-                return false;
-            }
-        }
-        foreach (var item in research.ListOfCosts)
-        {
-            inventory.RemoveItemFromFirstSlot(item.Item, item.Quantity);
-        }
-        research.Complete();
+        //ResearchSO research = _listOfReserches[index];
+        //foreach (var item in research.ListOfCosts)
+        //{
+        //    if (inventory.GetItemQuantity(item.Item) < item.Quantity)
+        //    {
+        //        return false;
+        //    }
+        //}
+        //foreach (var item in research.ListOfCosts)
+        //{
+        //    inventory.RemoveItemFromFirstSlot(item.Item, item.Quantity);
+        //}
+        //research.Complete();
         return true;
     }
 

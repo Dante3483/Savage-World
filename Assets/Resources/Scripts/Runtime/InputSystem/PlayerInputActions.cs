@@ -71,6 +71,24 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Select Hotbar Cell By Keyboard"",
+                    ""type"": ""Button"",
+                    ""id"": ""88092ce9-b97c-44dc-9ce6-d3be75fe0604"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Select Hotbar Cell By Scrolling"",
+                    ""type"": ""Value"",
+                    ""id"": ""ce7401d4-eb31-4187-a033-01e0275f147a"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -128,6 +146,72 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Open/Close Research"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c9de772e-1a44-4f2c-8a6c-af028476f14a"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=0)"",
+                    ""groups"": """",
+                    ""action"": ""Select Hotbar Cell By Keyboard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8e3c37c6-ab44-41a4-8620-8c56469d9c90"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale"",
+                    ""groups"": """",
+                    ""action"": ""Select Hotbar Cell By Keyboard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cb9a458c-b894-4a60-8588-9d629b2dfe8c"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=2)"",
+                    ""groups"": """",
+                    ""action"": ""Select Hotbar Cell By Keyboard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""16457e48-ebd4-44a2-ac46-30f0453a9ec7"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=3)"",
+                    ""groups"": """",
+                    ""action"": ""Select Hotbar Cell By Keyboard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4da9e2d1-4dca-4ae5-888b-f5984d070426"",
+                    ""path"": ""<Keyboard>/5"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=4)"",
+                    ""groups"": """",
+                    ""action"": ""Select Hotbar Cell By Keyboard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1c14039c-6eea-4a59-9013-4121a89ab44d"",
+                    ""path"": ""<Mouse>/scroll/y"",
+                    ""interactions"": """",
+                    ""processors"": ""Clamp(min=-1,max=1)"",
+                    ""groups"": """",
+                    ""action"": ""Select Hotbar Cell By Scrolling"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -141,6 +225,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_UI_OpenCloseDebug = m_UI.FindAction("Open/Close Debug", throwIfNotFound: true);
         m_UI_OpenCloseFurnace = m_UI.FindAction("Open/Close Furnace", throwIfNotFound: true);
         m_UI_OpenCloseResearch = m_UI.FindAction("Open/Close Research", throwIfNotFound: true);
+        m_UI_SelectHotbarCellByKeyboard = m_UI.FindAction("Select Hotbar Cell By Keyboard", throwIfNotFound: true);
+        m_UI_SelectHotbarCellByScrolling = m_UI.FindAction("Select Hotbar Cell By Scrolling", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -207,6 +293,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_OpenCloseDebug;
     private readonly InputAction m_UI_OpenCloseFurnace;
     private readonly InputAction m_UI_OpenCloseResearch;
+    private readonly InputAction m_UI_SelectHotbarCellByKeyboard;
+    private readonly InputAction m_UI_SelectHotbarCellByScrolling;
     public struct UIActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -216,6 +304,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @OpenCloseDebug => m_Wrapper.m_UI_OpenCloseDebug;
         public InputAction @OpenCloseFurnace => m_Wrapper.m_UI_OpenCloseFurnace;
         public InputAction @OpenCloseResearch => m_Wrapper.m_UI_OpenCloseResearch;
+        public InputAction @SelectHotbarCellByKeyboard => m_Wrapper.m_UI_SelectHotbarCellByKeyboard;
+        public InputAction @SelectHotbarCellByScrolling => m_Wrapper.m_UI_SelectHotbarCellByScrolling;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -240,6 +330,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @OpenCloseResearch.started += instance.OnOpenCloseResearch;
             @OpenCloseResearch.performed += instance.OnOpenCloseResearch;
             @OpenCloseResearch.canceled += instance.OnOpenCloseResearch;
+            @SelectHotbarCellByKeyboard.started += instance.OnSelectHotbarCellByKeyboard;
+            @SelectHotbarCellByKeyboard.performed += instance.OnSelectHotbarCellByKeyboard;
+            @SelectHotbarCellByKeyboard.canceled += instance.OnSelectHotbarCellByKeyboard;
+            @SelectHotbarCellByScrolling.started += instance.OnSelectHotbarCellByScrolling;
+            @SelectHotbarCellByScrolling.performed += instance.OnSelectHotbarCellByScrolling;
+            @SelectHotbarCellByScrolling.canceled += instance.OnSelectHotbarCellByScrolling;
         }
 
         private void UnregisterCallbacks(IUIActions instance)
@@ -259,6 +355,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @OpenCloseResearch.started -= instance.OnOpenCloseResearch;
             @OpenCloseResearch.performed -= instance.OnOpenCloseResearch;
             @OpenCloseResearch.canceled -= instance.OnOpenCloseResearch;
+            @SelectHotbarCellByKeyboard.started -= instance.OnSelectHotbarCellByKeyboard;
+            @SelectHotbarCellByKeyboard.performed -= instance.OnSelectHotbarCellByKeyboard;
+            @SelectHotbarCellByKeyboard.canceled -= instance.OnSelectHotbarCellByKeyboard;
+            @SelectHotbarCellByScrolling.started -= instance.OnSelectHotbarCellByScrolling;
+            @SelectHotbarCellByScrolling.performed -= instance.OnSelectHotbarCellByScrolling;
+            @SelectHotbarCellByScrolling.canceled -= instance.OnSelectHotbarCellByScrolling;
         }
 
         public void RemoveCallbacks(IUIActions instance)
@@ -283,5 +385,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnOpenCloseDebug(InputAction.CallbackContext context);
         void OnOpenCloseFurnace(InputAction.CallbackContext context);
         void OnOpenCloseResearch(InputAction.CallbackContext context);
+        void OnSelectHotbarCellByKeyboard(InputAction.CallbackContext context);
+        void OnSelectHotbarCellByScrolling(InputAction.CallbackContext context);
     }
 }

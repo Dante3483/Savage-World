@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Security;
-using System.Text;
 using TMPro;
 using UnityEngine;
 
@@ -31,7 +27,7 @@ public class UIStorageItemCell : UIItemCell
         _quantityTxt.gameObject.SetActive(false);
     }
 
-    public void SetData(Sprite sprite, int quantity)
+    public override void SetQuantity(int quantity)
     {
         _quantityTxt.gameObject.SetActive(true);
         if (quantity < 10)
@@ -54,7 +50,6 @@ public class UIStorageItemCell : UIItemCell
             Converter.FromIntToCharArray(quantity, _quantityCharArray4Digit);
             _quantityTxt.SetText(_quantityCharArray4Digit);
         }
-        SetData(sprite);
     }
     #endregion
 }

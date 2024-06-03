@@ -1,10 +1,7 @@
-using UnityEngine;
-using UnityEngine.UI;
-
 public class UIAccessoryItemCell : UIWearableItemCell
 {
     #region Private fields
-    
+
     #endregion
 
     #region Public fields
@@ -16,6 +13,6 @@ public class UIAccessoryItemCell : UIWearableItemCell
     #endregion
 
     #region Methods
-    
+
     #endregion
 }

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = System.Random;
@@ -26,6 +25,8 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
     private Transform _playerParrent;
     [SerializeField]
     private Player _player;
+    [SerializeField]
+    private PlayerInputActions _playerInputActions;
 
     [Header("Atlases")]
     [SerializeField]
@@ -74,7 +75,6 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
     private PlayingState _playingState;
     private QuitGameState _quitGameState;
 
-    private List<FileInfo> _playersFiles;
     private List<string> _playerNames;
     private List<string> _worldNames;
     private Random _randomVar;
@@ -466,6 +466,18 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
             _loadingDataFromHostState = value;
         }
     }
+
+    public PlayerInputActions PlayerInputActions
+    {
+        get
+        {
+            if (_playerInputActions is null)
+            {
+                _playerInputActions = new();
+            }
+            return _playerInputActions;
+        }
+    }
     #endregion
 
     #region Methods
@@ -534,9 +546,10 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
         return _player.transform;
     }
 
-    public Inventory GetPlayerInventory()
+    public InventoryModelOld GetPlayerInventory()
     {
-        return _player.Inventory;
+        return null;
+        //return _player.Inventory;
     }
 
     public ResearchesSO GetPlayerResearches()

@@ -13,7 +13,7 @@ public class PlayerInteractions : MonoBehaviour
     private Drop _dropPrefab;
     [SerializeField]
     private ItemSO _item;
-    private Inventory _inventory;
+    private InventoryModelOld _inventory;
 
     [Header("Interaction area")]
     [SerializeField]
@@ -58,8 +58,8 @@ public class PlayerInteractions : MonoBehaviour
         {
             _player = GetComponent<Player>();
         }
-        _inventory = _player.Inventory;
-        _inventory.OnInventoryFull += HandleThrowItem;
+        //_inventory = _player.Inventory;
+        //_inventory.InventoryOverflowed += HandleThrowItem;
         _checkPlayerBoxCast.OriginOffset = new Vector2(0.5f, 0.5f);
         _checkPlayerBoxCast.Size = new Vector2(1f, 1f);
         _checkPlayerBoxCast.LayerMask = _playerLayerMask;
@@ -113,7 +113,7 @@ public class PlayerInteractions : MonoBehaviour
 
     private void InteractWithItemInHotbar()
     {
-        switch (_inventory.GetSelectedItem().ItemData)
+        switch (_inventory.GetSelectedItem().Data)
         {
             case BlockItemSO blockItem:
                 {
@@ -244,18 +244,18 @@ public class PlayerInteractions : MonoBehaviour
 
     public void TakeDrop(Drop drop)
     {
-        if (drop.Quantity == 0)
-        {
-            return;
-        }
-        int remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Hotbar);
-        drop.Quantity = remainder;
+        //if (drop.Quantity == 0)
+        //{
+        //    return;
+        //}
+        //int remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Hotbar);
+        //drop.Quantity = remainder;
 
-        if (remainder != 0)
-        {
-            remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Storage);
-            drop.Quantity = remainder;
-        }
+        //if (remainder != 0)
+        //{
+        //    remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Storage);
+        //    drop.Quantity = remainder;
+        //}
     }
 
     public bool IsEnoughSpaceToTakeDrop(Drop drop)
@@ -265,12 +265,12 @@ public class PlayerInteractions : MonoBehaviour
 
     public void ThrowSelectedItem()
     {
-        Drop drop = CreateDrop(transform.position, _inventory.GetSelectedItem().ItemData, _inventory.GetSelectedItem().Quantity);
+        Drop drop = CreateDrop(transform.position, _inventory.GetSelectedItem().Data, _inventory.GetSelectedItem().Quantity);
         if (drop != null)
         {
             DropPhysics dropPhysics = drop.GetComponent<DropPhysics>();
             dropPhysics.AddForce();
-            _inventory.RemoveSelectedItem();
+            //_inventory.RemoveSelectedItem();
         }
     }
 

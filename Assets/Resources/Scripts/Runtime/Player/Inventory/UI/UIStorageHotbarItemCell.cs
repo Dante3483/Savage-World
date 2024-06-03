@@ -4,7 +4,8 @@ using UnityEngine;
 public class UIStorageHotbarItemCell : UIStorageItemCell
 {
     #region Private fields
-    [SerializeField] private TMP_Text _hotbarNumberTxt;
+    [SerializeField]
+    private TMP_Text _hotbarNumberTxt;
     #endregion
 
     #region Public fields
@@ -12,23 +13,13 @@ public class UIStorageHotbarItemCell : UIStorageItemCell
     #endregion
 
     #region Properties
-    public TMP_Text HotbarNumberTxt
-    {
-        get
-        {
-            return _hotbarNumberTxt;
-        }
-
-        set
-        {
-            _hotbarNumberTxt = value;
-        }
-    }
-
     public override ItemLocations ItemLocation => ItemLocations.Hotbar;
     #endregion
 
     #region Methods
-
+    public void SetHotbarNumber(string number)
+    {
+        _hotbarNumberTxt.text = number;
+    }
     #endregion
 }
