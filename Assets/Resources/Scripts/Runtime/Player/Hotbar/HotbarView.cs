@@ -36,11 +36,6 @@ public class HotbarView : ViewBase
         }
     }
 
-    public override void ResetView()
-    {
-
-    }
-
     public override void Show()
     {
         UIManager.Instance.HotbarUI.IsActive = true;

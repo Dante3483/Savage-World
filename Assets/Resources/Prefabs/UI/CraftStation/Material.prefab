@@ -360,7 +360,7 @@ GameObject:
   - component: {fileID: 9037814041727412861}
   - component: {fileID: 6299370010933471999}
   m_Layer: 0
-  m_Name: RecipeMaterial
+  m_Name: Material
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

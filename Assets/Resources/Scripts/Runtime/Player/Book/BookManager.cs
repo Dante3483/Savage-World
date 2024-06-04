@@ -16,9 +16,20 @@ public class BookManager : Singleton<BookManager>
     private float _stepToLerpTimeToTakeItem;
     private InventoryPresenter _inventoryPresenter;
 
+    [Header("Hotbar Configuration")]
     [SerializeField]
     private HotbarView _hotbarView;
     private HotbarPresenter _hotbarPresenter;
+
+    [Header("Craft Station Configuration")]
+    [SerializeField]
+    private CraftStationView _craftStationView;
+    private CraftStationPresenter _craftStationPresenter;
+
+    [Header("Researches Configuration")]
+    [SerializeField]
+    private ResearchesView _researchesView;
+    private ResearchesPresenter _researchesPresenter;
 
     private List<PresenterBase> _listOfPresenters;
     #endregion
@@ -29,6 +40,22 @@ public class BookManager : Singleton<BookManager>
         get
         {
             return _inventoryPresenter;
+        }
+    }
+
+    public CraftStationPresenter CraftStationPresenter
+    {
+        get
+        {
+            return _craftStationPresenter;
+        }
+    }
+
+    public ResearchesPresenter ResearchesPresenter
+    {
+        get
+        {
+            return _researchesPresenter;
         }
     }
     #endregion
@@ -47,27 +74,53 @@ public class BookManager : Singleton<BookManager>
     #region Public Methods
     public void InitializeInventory(InventoryModel model)
     {
-        _inventoryPresenter = new(_minTimeToTakeItem, _maxTimeToTakeItem, _stepToLerpTimeToTakeItem, model, _inventoryView);
-        _listOfPresenters.Add(_inventoryPresenter);
+        if (_inventoryPresenter is null)
+        {
+            _inventoryPresenter = new(_minTimeToTakeItem, _maxTimeToTakeItem, _stepToLerpTimeToTakeItem, model, _inventoryView);
+            _listOfPresenters.Add(_inventoryPresenter);
+        }
     }
 
     public void InitializeHotbar(InventoryModel model)
     {
-        _hotbarPresenter = new(model, _hotbarView);
-        _hotbarPresenter.Enable();
+        if (_hotbarPresenter is null)
+        {
+            _hotbarPresenter = new(model, _hotbarView);
+            _hotbarPresenter.Enable();
+        }
     }
 
-    public void TogglePresenter(PresenterBase presenter)
+    public void InitializeCraftStation(CraftStationModelSO model, InventoryModel inventory)
+    {
+        if (_craftStationPresenter is null)
+        {
+            _craftStationPresenter = new(model, _craftStationView, inventory);
+            _listOfPresenters.Add(_craftStationPresenter);
+        }
+    }
+
+    public void InitializeResearches(ResearchesModelSO model, InventoryModel inventory)
+    {
+        if (_researchesPresenter is null)
+        {
+            _researchesPresenter = new(model, _researchesView, inventory);
+            _listOfPresenters.Add(_researchesPresenter);
+        }
+    }
+
+    public bool TogglePresenter(PresenterBase presenter)
     {
         PresenterBase currentActivePresenter = _listOfPresenters.FirstOrDefault(p => p.IsAvtive);
         if (currentActivePresenter == presenter)
         {
             presenter.Disable();
+            return false;
         }
         else
         {
             currentActivePresenter?.Disable();
             presenter.Enable();
+            return true;
         }
     }
     #endregion

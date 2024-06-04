@@ -2,7 +2,6 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 public class UIQuantityInput : MonoBehaviour, IPointerClickHandler
 {
@@ -28,7 +27,7 @@ public class UIQuantityInput : MonoBehaviour, IPointerClickHandler
     #endregion
 
     #region Methods
-    private void Awake()
+    public void Initialize()
     {
         _quantityInputField = GetComponent<TMP_InputField>();
         _quantityBuilder = new StringBuilder();

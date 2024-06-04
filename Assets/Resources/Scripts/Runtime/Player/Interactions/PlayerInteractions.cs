@@ -1,19 +1,14 @@
 using Items;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.InputSystem;
 
 public class PlayerInteractions : MonoBehaviour
 {
-    #region Private fields
+    #region Fields
     [Header("Main")]
     [SerializeField]
-    private Player _player;
-    [SerializeField]
     private Drop _dropPrefab;
-    [SerializeField]
-    private ItemSO _item;
-    private InventoryModelOld _inventory;
 
     [Header("Interaction area")]
     [SerializeField]
@@ -41,79 +36,92 @@ public class PlayerInteractions : MonoBehaviour
     [SerializeField]
     private LayerMask _playerLayerMask;
     private BoxCastUtil _checkPlayerBoxCast;
-    #endregion
 
-    #region Public fields
-
+    private InventoryModel _inventory;
+    private bool _isActive;
+    private bool _isUsingItemFromHotbar;
+    private bool _isBreakingBlock;
+    private bool _isBreakingWall;
     #endregion
 
     #region Properties
 
     #endregion
 
-    #region Methods
+    #region Events / Delegates
+
+    #endregion
+
+    #region Monobehaviour Methods
     private void Awake()
     {
-        if (_player is null)
+        _isActive = false;
+    }
+
+    private void FixedUpdate()
+    {
+        if (!_isActive)
         {
-            _player = GetComponent<Player>();
+            return;
         }
-        //_inventory = _player.Inventory;
-        //_inventory.InventoryOverflowed += HandleThrowItem;
+        MouseInsideAreaCheck();
+        if (_isUsingItemFromHotbar)
+        {
+            UseItemFromHotbar();
+        }
+        if (_isBreakingBlock)
+        {
+            BreakBlock();
+        }
+        if (_isBreakingWall)
+        {
+            BreakWall();
+        }
+        if (_isMouseInsideArea)
+        {
+            CreateWater();
+            CreateTorch();
+        }
+    }
+    #endregion
+
+    #region Public Methods
+    public void Initialize(InventoryModel inventory)
+    {
+        _inventory = inventory;
+        _inventory.InventoryOverflowed += InventoryOverflowedEventHandler;
         _checkPlayerBoxCast.OriginOffset = new Vector2(0.5f, 0.5f);
         _checkPlayerBoxCast.Size = new Vector2(1f, 1f);
         _checkPlayerBoxCast.LayerMask = _playerLayerMask;
         _miningDamageController = MiningDamageController.Instance;
         _isPlacingAllowed = true;
+
+        PlayerInputActions playerInputActions = GameManager.Instance.PlayerInputActions;
+        playerInputActions.Interactions.Enable();
+        playerInputActions.Interactions.UseItemFromHotbar.performed += UseItemFromHotbarPerformed;
+        playerInputActions.Interactions.UseItemFromHotbar.canceled += UseItemFromHotbarCanceled;
+        playerInputActions.Interactions.BreakBlock.performed += BreakBlockPerformed;
+        playerInputActions.Interactions.BreakBlock.canceled += BreakBlockCanceled;
+        playerInputActions.Interactions.ThrowItem.performed += ThrowSelectedItem;
+
+        _isActive = true;
     }
 
-    private void FixedUpdate()
+    public void SetActive(bool value)
     {
-        IsMouseInsideArea();
-        if (GameManager.Instance.IsGameSession)
-        {
-            if (!GameManager.Instance.IsInputTextInFocus && Input.GetMouseButton((int)MouseButton.LeftMouse))
-            {
-                InteractWithItemInHotbar();
-            }
-            if (!GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(KeyCode.T))
-            {
-                ThrowSelectedItem();
-            }
-            if (_isMouseInsideArea && !GameManager.Instance.IsInputTextInFocus)
-            {
-                BreakBlock();
-                BreakWall();
-                CreateWater();
-                CreateTorch();
-            }
-        }
+        _isActive = value;
     }
 
-    private void IsMouseInsideArea()
+    public bool IsEnoughSpaceToTakeDrop(Drop drop)
     {
-        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        float distanceX = Mathf.Abs(mousePosition.x - transform.position.x);
-        float distanceY = Mathf.Abs(mousePosition.y - transform.position.y);
-        _isMouseInsideArea = distanceX < _areaSize.x && distanceY < _areaSize.y;
-        if (_isAreaDrawing)
-        {
-            DebugUtil.DrawBox(transform.position, _areaSize, _isMouseInsideArea ? Color.green : Color.red);
-        }
+        return !_inventory.IsEnoughSpaceForItem(drop.Item, ItemLocations.Hotbar) || !_inventory.IsEnoughSpaceForItem(drop.Item, ItemLocations.Storage);
     }
+    #endregion
 
-    private void UpdateNeighboringBlocks(Vector2Int blockPosition)
+    #region Private Methods
+    private void UseItemFromHotbar()
     {
-        GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x, blockPosition.y));
-        GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x, blockPosition.y + 1));
-        GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x, blockPosition.y - 1));
-        GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x - 1, blockPosition.y));
-        GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x + 1, blockPosition.y));
-    }
-
-    private void InteractWithItemInHotbar()
-    {
-        switch (_inventory.GetSelectedItem().Data)
+        switch (_inventory.GetSelectedItemData())
         {
             case BlockItemSO blockItem:
                 {
@@ -125,155 +133,97 @@ public class PlayerInteractions : MonoBehaviour
         }
     }
 
-    //Change
-    public void PlaceBlock(BlockItemSO blockItem)
+    //MAYBE STRATEGY PATTERN
+    private void PlaceBlock(BlockItemSO block)
     {
         if (!_isMouseInsideArea || !_isPlacingAllowed)
         {
             return;
         }
 
-        Vector3 clickPosition = Input.mousePosition;
-        Vector2Int intPos = Vector2Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
-        _checkPlayerBoxCast.BoxCast(intPos);
+        Vector2Int blockPosition = ClickPositionToWorldPosition();
+        _checkPlayerBoxCast.BoxCast(blockPosition);
         if (_checkPlayerBoxCast.Result)
         {
             return;
         }
-        if (!WorldDataManager.Instance.IsFree(intPos.x, intPos.y))
+        if (!WorldDataManager.Instance.IsFree(blockPosition.x, blockPosition.y))
         {
             return;
         }
-        if (WorldDataManager.Instance.IsEmpty(intPos.x, intPos.y) &&
-            (WorldDataManager.Instance.IsWall(intPos.x, intPos.y) || WorldDataManager.Instance.IsSolidAnyNeighbor(intPos.x, intPos.y)))
+        bool isEmpty = WorldDataManager.Instance.IsEmpty(blockPosition.x, blockPosition.y);
+        bool isWall = WorldDataManager.Instance.IsWall(blockPosition.x, blockPosition.y);
+        bool isAnyNeighborSolid = WorldDataManager.Instance.IsSolidAnyNeighbor(blockPosition.x, blockPosition.y);
+        if (isEmpty && (isWall || isAnyNeighborSolid))
         {
-            WorldDataManager.Instance.SetBlockData(intPos.x, intPos.y, blockItem.BlockToPlace);
-            _inventory.DecreaseSelectedItemQuantity(1);
-            UpdateNeighboringBlocks(intPos);
+            WorldDataManager.Instance.SetBlockData(blockPosition.x, blockPosition.y, block.BlockToPlace);
+            _inventory.RemoveQuantityFromSelectedItem(1);
+            UpdateNeighboringBlocks(blockPosition);
             StartCoroutine(WaitForPlacingCooldown());
         }
     }
 
-    private IEnumerator WaitForPlacingCooldown()
+    //MAYBE STRATEGY PATTERN
+    private void BreakBlock()
     {
-        _isPlacingAllowed = false;
-        yield return new WaitForSeconds(_placingCooldown);
-        _isPlacingAllowed = true;
-    }
-
-    //Change
-    public void BreakBlock()
-    {
-        if (Input.GetMouseButton((int)MouseButton.RightMouse))
+        Vector2Int blockPosition = ClickPositionToWorldPosition();
+        if (!WorldDataManager.Instance.IsBreakable(blockPosition.x, blockPosition.y))
         {
-            Vector3 clickPosition = Input.mousePosition;
-            Vector2Int blockPosition = Vector2Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
-            if (!WorldDataManager.Instance.IsBreakable(blockPosition.x, blockPosition.y))
+            return;
+        }
+        if (!WorldDataManager.Instance.IsEmpty(blockPosition.x, blockPosition.y))
+        {
+            BlockSO data = WorldDataManager.Instance.GetCellBlockData(blockPosition.x, blockPosition.y);
+            _miningDamageController.AddDamageToBlock(blockPosition, _blockDamageMultiplier);
+            if (_miningDamageController.IsBlockDamageReachedMaximum(blockPosition, data.DamageToBreak))
             {
-                return;
-            }
-            if (!WorldDataManager.Instance.IsEmpty(blockPosition.x, blockPosition.y))
-            {
-                ref WorldCellData block = ref WorldDataManager.Instance.GetWorldCellData(blockPosition.x, blockPosition.y);
-                _miningDamageController.AddDamageToBlock(blockPosition, _blockDamageMultiplier);
-                if (_miningDamageController.IsBlockDamageReachedMaximum(blockPosition, block.BlockData.DamageToBreak))
-                {
-                    _miningDamageController.RemoveDamageFromBlocks(blockPosition);
-                    CreateDrop(new Vector3(blockPosition.x + 0.5f, blockPosition.y + 0.5f), block.BlockData.Drop, 1);
-                    WorldDataManager.Instance.SetBlockData(blockPosition.x, blockPosition.y, GameManager.Instance.BlocksAtlas.Air);
-                    UpdateNeighboringBlocks(blockPosition);
-                }
+                _miningDamageController.RemoveDamageFromBlocks(blockPosition);
+                CreateDrop(new Vector3(blockPosition.x + 0.5f, blockPosition.y + 0.5f), data.Drop, 1);
+                WorldDataManager.Instance.SetBlockData(blockPosition.x, blockPosition.y, GameManager.Instance.BlocksAtlas.Air);
+                UpdateNeighboringBlocks(blockPosition);
             }
         }
     }
 
-    //Change
+    //MAYBE STRATEGY PATTERN
     public void BreakWall()
     {
-        if (Input.GetMouseButton((int)MouseButton.MiddleMouse))
+        Vector2Int wallPosition = ClickPositionToWorldPosition();
+        if (!WorldDataManager.Instance.IsBreakable(wallPosition.x, wallPosition.y))
         {
-            Vector3 clickPosition = Input.mousePosition;
-            Vector2Int wallPosition = Vector2Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
-            if (!WorldDataManager.Instance.IsBreakable(wallPosition.x, wallPosition.y))
+            return;
+        }
+        if (WorldDataManager.Instance.IsWall(wallPosition.x, wallPosition.y))
+        {
+            BlockSO data = WorldDataManager.Instance.GetCellWallData(wallPosition.x, wallPosition.y);
+            _miningDamageController.AddDamageToWall(wallPosition, _wallDamageMultiplier);
+            if (_miningDamageController.IsWallDamageReachedMaximum(wallPosition, data.DamageToBreak))
             {
-                return;
-            }
-            if (WorldDataManager.Instance.IsWall(wallPosition.x, wallPosition.y))
-            {
-                ref WorldCellData block = ref WorldDataManager.Instance.GetWorldCellData(wallPosition.x, wallPosition.y);
-                _miningDamageController.AddDamageToWall(wallPosition, _wallDamageMultiplier);
-                if (_miningDamageController.IsWallDamageReachedMaximum(wallPosition, block.WallData.DamageToBreak))
-                {
-                    _miningDamageController.RemoveDamageFromWalls(wallPosition);
-                    CreateDrop(new Vector3(wallPosition.x + 0.5f, wallPosition.y + 0.5f), block.WallData.Drop, 1);
-                    GameManager.Instance.Terrain.CreateWall(wallPosition.x, wallPosition.y, GameManager.Instance.BlocksAtlas.AirWall);
-                }
+                _miningDamageController.RemoveDamageFromWalls(wallPosition);
+                CreateDrop(new Vector3(wallPosition.x + 0.5f, wallPosition.y + 0.5f), data.Drop, 1);
+                GameManager.Instance.Terrain.CreateWall(wallPosition.x, wallPosition.y, GameManager.Instance.BlocksAtlas.AirWall);
             }
         }
     }
 
-    //Delete
-    public void CreateWater()
-    {
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            Vector3 clickPosition = Input.mousePosition;
-
-            Vector3Int intPos = Vector3Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
-
-            GameManager.Instance.Terrain.CreateLiquidBlock((ushort)intPos.x, (ushort)intPos.y, (byte)GameManager.Instance.BlocksAtlas.Water.GetId());
-
-            GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(intPos.x, intPos.y));
-        }
-    }
-
-    //Delete
-    public void CreateTorch()
-    {
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            Vector3 clickPosition = Input.mousePosition;
-
-            Vector2Int intPos = Vector2Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
-
-            WorldDataManager.Instance.SetBlockData((ushort)intPos.x, (ushort)intPos.y, GameManager.Instance.BlocksAtlas.GetBlockById(FurnitureBlocksID.Torch));
-
-            UpdateNeighboringBlocks(intPos);
-        }
-    }
-
+    //MOVE TO DROP MANAGER
     public void TakeDrop(Drop drop)
     {
-        //if (drop.Quantity == 0)
-        //{
-        //    return;
-        //}
-        //int remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Hotbar);
-        //drop.Quantity = remainder;
-
-        //if (remainder != 0)
-        //{
-        //    remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Storage);
-        //    drop.Quantity = remainder;
-        //}
-    }
-
-    public bool IsEnoughSpaceToTakeDrop(Drop drop)
-    {
-        return !_inventory.IsEnoughSpaceForItem(drop.Item, ItemLocations.Hotbar) || !_inventory.IsEnoughSpaceForItem(drop.Item, ItemLocations.Storage);
-    }
-
-    public void ThrowSelectedItem()
-    {
-        Drop drop = CreateDrop(transform.position, _inventory.GetSelectedItem().Data, _inventory.GetSelectedItem().Quantity);
-        if (drop != null)
+        if (drop.Quantity == 0)
         {
-            DropPhysics dropPhysics = drop.GetComponent<DropPhysics>();
-            dropPhysics.AddForce();
-            //_inventory.RemoveSelectedItem();
+            return;
+        }
+        int remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Hotbar);
+        drop.Quantity = remainder;
+
+        if (remainder != 0)
+        {
+            remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Storage);
+            drop.Quantity = remainder;
         }
     }
 
+    //MOVE TO DROP MANAGER
     private Drop CreateDrop(Vector3 position, ItemSO item, int quantity)
     {
         if (item == null)
@@ -286,9 +236,100 @@ public class PlayerInteractions : MonoBehaviour
         return drop;
     }
 
-    public void HandleThrowItem(ItemSO itemData, int quantity)
+    private void ThrowSelectedItem(InputAction.CallbackContext _)
     {
-        CreateDrop(transform.position, itemData, quantity);
+        ItemSO data = _inventory.GetSelectedItemData();
+        int quantity = _inventory.GetSelectedItemQuantity();
+        Drop drop = CreateDrop(transform.position, data, quantity);
+        if (drop != null)
+        {
+            DropPhysics dropPhysics = drop.GetComponent<DropPhysics>();
+            dropPhysics.AddForce();
+            _inventory.RemoveQuantityFromSelectedItem(quantity);
+        }
+    }
+
+    private void MouseInsideAreaCheck()
+    {
+        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        float distanceX = Mathf.Abs(mousePosition.x - transform.position.x);
+        float distanceY = Mathf.Abs(mousePosition.y - transform.position.y);
+        _isMouseInsideArea = distanceX < _areaSize.x && distanceY < _areaSize.y;
+        if (_isAreaDrawing)
+        {
+            DebugUtil.DrawBox(transform.position, _areaSize, _isMouseInsideArea ? Color.green : Color.red);
+        }
+    }
+
+    private IEnumerator WaitForPlacingCooldown()
+    {
+        _isPlacingAllowed = false;
+        yield return new WaitForSeconds(_placingCooldown);
+        _isPlacingAllowed = true;
+    }
+
+    private Vector2Int ClickPositionToWorldPosition()
+    {
+        Vector3 clickPosition = Input.mousePosition;
+        return Vector2Int.FloorToInt(Camera.main.ScreenToWorldPoint(clickPosition));
+    }
+
+    private void InventoryOverflowedEventHandler(ItemSO data, int quantity)
+    {
+        CreateDrop(transform.position, data, quantity);
+    }
+
+    private void UseItemFromHotbarPerformed(InputAction.CallbackContext context)
+    {
+        _isUsingItemFromHotbar = true;
+    }
+
+    private void UseItemFromHotbarCanceled(InputAction.CallbackContext context)
+    {
+        _isUsingItemFromHotbar = false;
+    }
+
+    private void BreakBlockPerformed(InputAction.CallbackContext context)
+    {
+        _isBreakingBlock = true;
+    }
+
+    private void BreakBlockCanceled(InputAction.CallbackContext context)
+    {
+        _isBreakingBlock = false;
+    }
+
+    //REMOVE
+    private void UpdateNeighboringBlocks(Vector2Int blockPosition)
+    {
+        GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x, blockPosition.y));
+        GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x, blockPosition.y + 1));
+        GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x, blockPosition.y - 1));
+        GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x - 1, blockPosition.y));
+        GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x + 1, blockPosition.y));
+    }
+
+    //REMOVE
+    //MAYBE STRATEGY PATTERN
+    private void CreateWater()
+    {
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            Vector2Int waterPosition = ClickPositionToWorldPosition();
+            GameManager.Instance.Terrain.CreateLiquidBlock((ushort)waterPosition.x, (ushort)waterPosition.y, (byte)GameManager.Instance.BlocksAtlas.Water.GetId());
+            GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(waterPosition.x, waterPosition.y));
+        }
+    }
+
+    //REMOVE
+    private void CreateTorch()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            Vector2Int torchPosition = ClickPositionToWorldPosition();
+            WorldDataManager.Instance.SetBlockData((ushort)torchPosition.x, (ushort)torchPosition.y, GameManager.Instance.BlocksAtlas.GetBlockById(FurnitureBlocksID.Torch));
+            UpdateNeighboringBlocks(torchPosition);
+        }
     }
     #endregion
 }

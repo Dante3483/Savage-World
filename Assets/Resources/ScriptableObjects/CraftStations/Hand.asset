@@ -9,18 +9,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee41b269f37009e4598e6f2a771f5cb4, type: 3}
+  m_Script: {fileID: 11500000, guid: 6b178d76a493bdc4ebfdc362ac726200, type: 3}
   m_Name: Hand
   m_EditorClassIdentifier: 
   _name: Hand
-  _recipesSets:
-  - _setName: Blocks
-    _setSprite: {fileID: 21300000, guid: e0c865bc441ac7f4e9f41af4a98d68e9, type: 3}
+  _listOfSets:
+  - _name: Set 1
+    _icon: {fileID: 480572714, guid: cb4e0e5650217bf4b9adfca7943a01ea, type: 3}
     _recipes:
     - {fileID: 11400000, guid: 5db4e509b2223af4c8c0a4486d274bbf, type: 2}
     - {fileID: 11400000, guid: 58fcfceb403d95f4c9ddd430eb2941fe, type: 2}
-  - _setName: Equipment
-    _setSprite: {fileID: 2003883804, guid: cb4e0e5650217bf4b9adfca7943a01ea, type: 3}
+  - _name: Set 2
+    _icon: {fileID: 21300000, guid: e0c865bc441ac7f4e9f41af4a98d68e9, type: 3}
     _recipes:
     - {fileID: 11400000, guid: 35212fe0686f8ec4bbbf489f0021c37d, type: 2}
-  _indexOfCurrentSet: 0
+  _indexOfSelectedSet: 0
+  _indexOfSelectedRecipe: 0

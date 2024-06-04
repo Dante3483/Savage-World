@@ -175,6 +175,16 @@ public class WorldDataManager : MonoBehaviour
         return ref _worldData[x + direction.x, y + direction.y];
     }
 
+    public BlockSO GetCellBlockData(int x, int y)
+    {
+        return _worldData[x, y].BlockData;
+    }
+
+    public BlockSO GetCellWallData(int x, int y)
+    {
+        return _worldData[x, y].WallData;
+    }
+
     public void SetBlockInfoByCoords(Vector2Int position)
     {
         _blockInfo = _worldData[position.x, position.y].ToString();

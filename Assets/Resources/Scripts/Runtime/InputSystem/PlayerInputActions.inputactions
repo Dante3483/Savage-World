@@ -192,6 +192,74 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Interactions",
+            "id": "02ba9d30-a702-4a0b-acb7-88baa49680ec",
+            "actions": [
+                {
+                    "name": "Use Item From Hotbar",
+                    "type": "Button",
+                    "id": "e90f1239-e3c7-4e33-9d67-9857fa39ddd3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Break Block",
+                    "type": "Button",
+                    "id": "62773ad5-67bd-4d50-98b3-82b0406a70ea",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Throw Item",
+                    "type": "Button",
+                    "id": "ec27bea1-8313-49b3-9ff2-49582fcb7655",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "5e154d9b-5992-4f1c-ad61-1ed2c69d4ac5",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Use Item From Hotbar",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cfe3df8f-d4e4-43e3-bac1-82cea1586598",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Break Block",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e2b67a00-43e2-490c-ac0c-aabdad7ff7b2",
+                    "path": "<Keyboard>/t",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Throw Item",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

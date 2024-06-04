@@ -30,11 +30,7 @@ public class InventoryPresenter : PresenterBaseGeneric<InventoryModel, Inventory
 
     public override void ResetPresenter()
     {
-        if (!UIManager.Instance.InventoryUI.ToggleActive())
-        {
-            _view.ResetView();
-            //_model.ClearBuffer();
-        }
+
     }
     #endregion
 

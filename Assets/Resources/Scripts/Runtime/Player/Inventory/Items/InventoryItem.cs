@@ -115,12 +115,6 @@ public class InventoryItem
 
     public void SwapData(InventoryItem item)
     {
-        //ItemSO itemData = item.Data;
-        //int itemQuantity = item.Quantity;
-        //item.Data = _data;
-        //item.Quantity = _quantity;
-        //Data = itemData;
-        //Quantity = itemQuantity;
         (Data, item.Data) = (item.Data, Data);
         (Quantity, item.Quantity) = (item.Quantity, Quantity);
     }

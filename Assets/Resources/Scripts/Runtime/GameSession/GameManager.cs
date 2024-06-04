@@ -37,6 +37,8 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
     private PickUpItemsAtlasSO _pickUpItemsAtlas;
     [SerializeField]
     private ItemsAtlasSO _itemsAtlas;
+    [SerializeField]
+    private RecipesAtlasSO _recipesAtlas;
 
     [Header("Session data")]
     [SerializeField]
@@ -50,7 +52,7 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
     [SerializeField]
     private int _currentTerrainHeight;
     [SerializeField]
-    private ResearchesSO _researches;
+    private ResearchesModelSO _researches;
 
     [Header("Terrain")]
     [SerializeField]
@@ -348,7 +350,7 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
         }
     }
 
-    public ResearchesSO Researches
+    public ResearchesModelSO Researches
     {
         get
         {
@@ -478,6 +480,19 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
             return _playerInputActions;
         }
     }
+
+    public RecipesAtlasSO RecipesAtlas
+    {
+        get
+        {
+            return _recipesAtlas;
+        }
+
+        set
+        {
+            _recipesAtlas = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -486,7 +501,6 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
         ChangeState(_quitGameState);
         _currentGameState = GameState.CloseApplication;
         GetPlayerInventory().IsInitialized = false;
-        GetPlayerResearches().IsInitialized = false;
     }
 
     protected override void Awake()
@@ -546,13 +560,12 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
         return _player.transform;
     }
 
-    public InventoryModelOld GetPlayerInventory()
+    public InventoryModel GetPlayerInventory()
     {
-        return null;
-        //return _player.Inventory;
+        return _player.Inventory;
     }
 
-    public ResearchesSO GetPlayerResearches()
+    public ResearchesModelSO GetResearches()
     {
         return _researches;
     }

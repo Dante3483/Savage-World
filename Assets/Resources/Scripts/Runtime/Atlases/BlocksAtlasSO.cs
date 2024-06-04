@@ -89,7 +89,7 @@ public class BlocksAtlasSO : AtlasSO
     #endregion
 
     #region Methods
-    public void InitializeAtlas()
+    public override void InitializeAtlas()
     {
         InitializeSetBlockByTypeAndId();
         InitializeSetGrassByBiome();

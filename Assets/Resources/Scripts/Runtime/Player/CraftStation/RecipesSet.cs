@@ -1,16 +1,17 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 [Serializable]
 public class RecipesSet
 {
     #region Private fields
-    [SerializeField] private string _setName;
-    [SerializeField] private Sprite _setSprite;
-    [SerializeField] private List<RecipeSO> _recipes;
+    [SerializeField]
+    private string _name;
+    [SerializeField]
+    private Sprite _icon;
+    [SerializeField]
+    private List<RecipeSO> _recipes;
     #endregion
 
     #region Public fields
@@ -26,11 +27,11 @@ public class RecipesSet
         }
     }
 
-    public Sprite SetSprite
+    public Sprite Icon
     {
         get
         {
-            return _setSprite;
+            return _icon;
         }
     }
     #endregion

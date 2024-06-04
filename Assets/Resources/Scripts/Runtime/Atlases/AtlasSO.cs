@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AtlasSO : ScriptableObject
+public abstract class AtlasSO : ScriptableObject
 {
     #region Private fields
     [FolderPath(label: "Path to atlas data", title: "Select atlas data folder", startFolder: "Assets/Resources")]
@@ -22,6 +22,6 @@ public class AtlasSO : ScriptableObject
     #endregion
 
     #region Methods
-
+    public abstract void InitializeAtlas();
     #endregion
 }

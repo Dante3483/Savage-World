@@ -72,6 +72,7 @@ public class InitializationState : GameStateBase
         GameManager.Instance.TreesAtlas.InitializeAtlas();
         GameManager.Instance.PickUpItemsAtlas.InitializeAtlas();
         GameManager.Instance.ItemsAtlas.InitializeAtlas();
+        GameManager.Instance.RecipesAtlas.InitializeAtlas();
     }
 
     private void InitializePlayers()

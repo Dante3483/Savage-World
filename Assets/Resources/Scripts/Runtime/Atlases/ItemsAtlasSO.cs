@@ -21,7 +21,7 @@ public class ItemsAtlasSO : AtlasSO
     #endregion
 
     #region Methods
-    public void InitializeAtlas()
+    public override void InitializeAtlas()
     {
         _itemsByIndex = new();
         foreach (ItemSO item in _items)

@@ -1,16 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using TMPro;
-using System.Text;
-using UnityEngine.EventSystems;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class UIResearchDescription : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     #region Private fields
-    [Header("Main")] 
+    [Header("Main")]
     [SerializeField]
     private TMP_Text _name;
     [SerializeField]
@@ -35,14 +33,15 @@ public class UIResearchDescription : MonoBehaviour, IPointerEnterHandler, IPoint
     [SerializeField]
     private RectTransform _costsPool;
     private List<UIResearchReward> _listOfRewards;
-    private List<UIResearchCost> _listOfCosts; 
+    private List<UIResearchCost> _listOfCosts;
     private List<UIResearchReward> _listOfFreeRewards;
-    private List<UIResearchCost> _listOfFreeCosts; 
+    private List<UIResearchCost> _listOfFreeCosts;
     #endregion
 
     #region Public fields
-    public event Action<int> OnRewardDescriptionRequested, OnCostDescriptionRequested;
-    public event Action OnHideItemDescription;
+    public event Action<int> RewardDescriptionRequested;
+    public event Action<int> CostDescriptionRequested;
+    public event Action HideItemDescriptionRequested;
     #endregion
 
     #region Properties
@@ -66,9 +65,9 @@ public class UIResearchDescription : MonoBehaviour, IPointerEnterHandler, IPoint
             _listOfFreeCosts.Add(InstantiateCost());
         }
     }
-    private void OnDisable() 
+    private void OnDisable()
     {
-        Clear();    
+        Clear();
     }
 
     public void UpdateName(String text)
@@ -163,18 +162,18 @@ public class UIResearchDescription : MonoBehaviour, IPointerEnterHandler, IPoint
     private void HandleRewardDesription(UIResearchReward reward)
     {
         int index = _listOfRewards.IndexOf(reward);
-        OnRewardDescriptionRequested?.Invoke(index);
+        RewardDescriptionRequested?.Invoke(index);
     }
 
     private void HandleCostDesription(UIResearchCost cost)
     {
         int index = _listOfCosts.IndexOf(cost);
-        OnCostDescriptionRequested?.Invoke(index);
+        CostDescriptionRequested?.Invoke(index);
     }
 
     private void HandleHideItemDescription()
     {
-        OnHideItemDescription?.Invoke();
+        HideItemDescriptionRequested?.Invoke();
     }
 
     public void OnPointerEnter(PointerEventData eventData)

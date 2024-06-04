@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public abstract class PresenterBaseGeneric<TModel, TView> : PresenterBase
-    where TModel : ModelBase
+    where TModel : IModel
     where TView : ViewBase
 {
     #region Fields

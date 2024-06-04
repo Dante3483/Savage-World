@@ -67,11 +67,6 @@ public class InventoryView : ViewBase
         InitializeArmor();
     }
 
-    public override void ResetView()
-    {
-        HideTooltip();
-    }
-
     public override void Show()
     {
         UIManager.Instance.InventoryUI.IsActive = true;
@@ -80,6 +75,7 @@ public class InventoryView : ViewBase
     public override void Hide()
     {
         UIManager.Instance.InventoryUI.IsActive = false;
+        HideTooltip();
     }
 
     public void Configure(int storageSize, int hotbarSize, int accessoriesSize)

@@ -18,4 +18,5 @@ MonoBehaviour:
   _result:
     _item: {fileID: 11400000, guid: ab9e3d6148dc51247b0f8b94a8c353a7, type: 2}
     _quantity: 5
-  _isEnoughMaterials: 0
+  _isUnlocked: 0
+  _isUnlockedByDefault: 1

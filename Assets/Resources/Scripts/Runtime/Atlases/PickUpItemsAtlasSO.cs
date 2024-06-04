@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 [CreateAssetMenu(fileName = "PickUpItemsAtlas", menuName = "Atlases/PickUpItemsAtlas")]
 public class PickUpItemsAtlasSO : AtlasSO
@@ -23,7 +21,7 @@ public class PickUpItemsAtlasSO : AtlasSO
     #endregion
 
     #region Methods
-    public void InitializeAtlas()
+    public override void InitializeAtlas()
     {
         InitializeSetPickUpItemById();
         InitializeSetPickUpItemsByBiome();

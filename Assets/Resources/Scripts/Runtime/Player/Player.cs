@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
-    #region Private fields
+    #region Fields
     [SerializeField]
     private string _name;
     [SerializeField]
@@ -11,13 +11,13 @@ public class Player : MonoBehaviour
     [SerializeField]
     private InventoryModel _inventory;
     [SerializeField]
+    private CraftStationModelSO _handCraftStation;
+    [SerializeField]
     private PlayerNetwork _playerNetwork;
     [SerializeField]
+    private PlayerInteractions _playerInteractions;
+    [SerializeField]
     private bool _isOwner;
-    #endregion
-
-    #region Public fields
-
     #endregion
 
     #region Properties
@@ -35,11 +35,6 @@ public class Player : MonoBehaviour
         {
             return _stats;
         }
-
-        set
-        {
-            _stats = value;
-        }
     }
 
     public PlayerNetwork PlayerNetwork
@@ -49,27 +44,21 @@ public class Player : MonoBehaviour
             return _playerNetwork;
         }
     }
-
-    public bool IsOwner
-    {
-        get
-        {
-            return _isOwner;
-        }
-
-        set
-        {
-            _isOwner = value;
-        }
-    }
     #endregion
 
-    #region Methods
+    #region Events / Delegates
+
+    #endregion
+
+    #region Monobehaviour Methods
     private void Awake()
     {
         _playerNetwork = GetComponent<PlayerNetwork>();
+        _playerInteractions = GetComponent<PlayerInteractions>();
     }
+    #endregion
 
+    #region Public Methods
     public void Initialize()
     {
         PlayerInputActions playerInputActions = GameManager.Instance.PlayerInputActions;
@@ -81,6 +70,9 @@ public class Player : MonoBehaviour
         _inventory = new();
         BookManager.Instance.InitializeInventory(_inventory);
         BookManager.Instance.InitializeHotbar(_inventory);
+        BookManager.Instance.InitializeCraftStation(_handCraftStation, _inventory);
+        BookManager.Instance.InitializeResearches(GameManager.Instance.GetResearches(), _inventory);
+        _playerInteractions.Initialize(_inventory);
     }
 
     public void DisableMovement()
@@ -94,20 +86,23 @@ public class Player : MonoBehaviour
         GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
         GetComponent<PlayerMovementNew>().enabled = true;
     }
+    #endregion
 
+    #region Private Methods
     private void ToggleInventoryEventHandler(InputAction.CallbackContext context)
     {
-        BookManager.Instance.TogglePresenter(BookManager.Instance.InventoryPresenter);
+        _playerInteractions.SetActive(BookManager.Instance.TogglePresenter(BookManager.Instance.InventoryPresenter));
     }
 
     private void ToggleCraftStationEventHandler(InputAction.CallbackContext context)
     {
-
+        _handCraftStation.SelectCraftStation();
+        _playerInteractions.SetActive(BookManager.Instance.TogglePresenter(BookManager.Instance.CraftStationPresenter));
     }
 
     private void ToggleResearchEventHandler(InputAction.CallbackContext context)
     {
-
+        _playerInteractions.SetActive(BookManager.Instance.TogglePresenter(BookManager.Instance.ResearchesPresenter));
     }
     #endregion
 }

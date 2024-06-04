@@ -1,18 +1,18 @@
-using Items;
-using System.Collections.Generic;
-using System.Security.Cryptography;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Recipe", menuName = "Player/CraftStation/Recipe")]
 public class RecipeSO : ScriptableObject
 {
-    #region Private fields
-    [SerializeField] private ItemQuantity[] _materials;
-    [SerializeField] private ItemQuantity _result;
-    [SerializeField] private bool _isUnlocked;
-    #endregion
+    #region Fields
+    [SerializeField]
+    private ItemQuantity[] _materials;
+    [SerializeField]
+    private ItemQuantity _result;
+    [SerializeField]
+    private bool _isUnlocked;
+    [SerializeField]
+    private bool _isUnlockedByDefault;
 
-    #region Public fields
     public static RecipeSO SelectedRecipe;
     #endregion
 
@@ -34,12 +34,32 @@ public class RecipeSO : ScriptableObject
     }
 
     public bool IsUnlocked { get => _isUnlocked; set => _isUnlocked = value; }
+
+    public bool IsUnlockedByDefault
+    {
+        get
+        {
+            return _isUnlockedByDefault;
+        }
+    }
     #endregion
 
-    #region Methods
+    #region Events / Delegates
+
+    #endregion
+
+    #region Monobehaviour Methods
+
+    #endregion
+
+    #region Public Methods
     public void SelectRecipe()
     {
         SelectedRecipe = this;
     }
+    #endregion
+
+    #region Private Methods
+
     #endregion
 }

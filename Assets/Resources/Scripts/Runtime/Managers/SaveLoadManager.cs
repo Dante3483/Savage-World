@@ -228,31 +228,32 @@ public class SaveLoadManager : MonoBehaviour
 
     private void SavePlayerInventory(BinaryWriter binaryWriter)
     {
-        InventoryModelOld inventory = GameManager.Instance.GetPlayerInventory();
+        InventoryModel inventory = GameManager.Instance.GetPlayerInventory();
         SavePlayerInventoryPart(binaryWriter, inventory, inventory.HotbarSize, ItemLocations.Hotbar);
         SavePlayerInventoryPart(binaryWriter, inventory, inventory.StorageSize, ItemLocations.Storage);
         SavePlayerInventoryPart(binaryWriter, inventory, inventory.AccessoriesSize, ItemLocations.Accessories);
         SavePlayerInventoryPart(binaryWriter, inventory, inventory.ArmorSize, ItemLocations.Armor);
     }
 
-    private void SavePlayerInventoryPart(BinaryWriter binaryWriter, InventoryModelOld inventory, int size, ItemLocations location)
+    private void SavePlayerInventoryPart(BinaryWriter binaryWriter, InventoryModel inventory, int size, ItemLocations location)
     {
         for (int i = 0; i < size; i++)
         {
-            //InventoryItem inventoryItem = inventory.GetItem(i, location);
-            //bool isEmpty = inventoryItem.IsEmpty;
-            //binaryWriter.Write(isEmpty);
-            //if (!isEmpty)
-            //{
-            //    binaryWriter.Write((ushort)inventoryItem.Data.Id);
-            //    binaryWriter.Write(inventoryItem.Quantity);
-            //}
+            ItemSO data = inventory.GetItemData(i, location);
+            int quantity = inventory.GetItemQuantity(i, location);
+            bool isEmpty = data is null;
+            binaryWriter.Write(isEmpty);
+            if (!isEmpty)
+            {
+                binaryWriter.Write((ushort)data.Id);
+                binaryWriter.Write((ushort)quantity);
+            }
         }
     }
 
     private void SavePlayerResearches(BinaryWriter binaryWriter)
     {
-        ResearchesSO researches = GameManager.Instance.GetPlayerResearches();
+        ResearchesModelSO researches = GameManager.Instance.GetResearches();
         for (int i = 0; i < researches.GetResearchesCount(); i++)
         {
             binaryWriter.Write((byte)researches.GetState(i));
@@ -451,15 +452,14 @@ public class SaveLoadManager : MonoBehaviour
 
     private void LoadPlayerInventory(BinaryReader binaryReader)
     {
-        //InventoryModel inventory = GameManager.Instance.GetPlayerInventory();
-        //inventory.Initialize();
-        //LoadPlayerInventoryPart(binaryReader, inventory, inventory.HotbarSize, ItemLocations.Hotbar);
-        //LoadPlayerInventoryPart(binaryReader, inventory, inventory.StorageSize, ItemLocations.Storage);
-        //LoadPlayerInventoryPart(binaryReader, inventory, inventory.AccessoriesSize, ItemLocations.Accessories);
-        //LoadPlayerInventoryPart(binaryReader, inventory, inventory.ArmorSize, ItemLocations.Armor);
+        InventoryModel inventory = GameManager.Instance.GetPlayerInventory();
+        LoadPlayerInventoryPart(binaryReader, inventory, inventory.HotbarSize, ItemLocations.Hotbar);
+        LoadPlayerInventoryPart(binaryReader, inventory, inventory.StorageSize, ItemLocations.Storage);
+        LoadPlayerInventoryPart(binaryReader, inventory, inventory.AccessoriesSize, ItemLocations.Accessories);
+        LoadPlayerInventoryPart(binaryReader, inventory, inventory.ArmorSize, ItemLocations.Armor);
     }
 
-    private void LoadPlayerInventoryPart(BinaryReader binaryReader, InventoryModelOld inventory, int size, ItemLocations location)
+    private void LoadPlayerInventoryPart(BinaryReader binaryReader, InventoryModel inventory, int size, ItemLocations location)
     {
         for (int i = 0; i < size; i++)
         {
@@ -469,15 +469,14 @@ public class SaveLoadManager : MonoBehaviour
                 ItemsID id = (ItemsID)binaryReader.ReadUInt16();
                 int quantity = binaryReader.ReadInt32();
                 ItemSO itemData = GameManager.Instance.ItemsAtlas.GetItemByID(id);
-                Debug.Log(itemData);
-                inventory.AddItemAtWithoutNotification(itemData, quantity, i, location);
+                inventory.AddItemToEmptyCellByIndex(itemData, quantity, i, location);
             }
         }
     }
 
     private void LoadPlayerResearches(BinaryReader binaryReader)
     {
-        ResearchesSO researches = GameManager.Instance.GetPlayerResearches();
+        ResearchesModelSO researches = GameManager.Instance.GetResearches();
         researches.Initialize();
         for (int i = 0; i < researches.GetResearchesCount(); i++)
         {

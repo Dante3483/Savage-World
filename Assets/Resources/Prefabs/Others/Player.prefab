@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 786310154602479331}
   - component: {fileID: 5913716759420320057}
   - component: {fileID: 4426414403718054618}
-  - component: {fileID: 7923999271663014828}
+  - component: {fileID: -5410989748371277972}
   - component: {fileID: 7534789336813920865}
   - component: {fileID: 2719592972515269785}
   - component: {fileID: 5076226186530884279}
@@ -202,7 +202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3649145745
+  GlobalObjectIdHash: 3437602920
   InScenePlacedSourceGlobalObjectIdHash: 3649145745
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -247,6 +247,7 @@ MonoBehaviour:
     _bufferItem:
       _data: {fileID: 0}
       _quantity: 0
+    _indexOfSelectedItem: 0
     _selectedItem:
       _data: {fileID: 0}
       _quantity: 0
@@ -254,7 +255,9 @@ MonoBehaviour:
     _hotbarFullSize: 10
     _accessoriesSize: 6
     _armorSize: 3
+  _handCraftStation: {fileID: 11400000, guid: a666079fbbc7ae040898ba497ed3a6ad, type: 2}
   _playerNetwork: {fileID: 0}
+  _playerInteractions: {fileID: 0}
   _isOwner: 0
 --- !u!114 &2913288188363348028
 MonoBehaviour:
@@ -273,7 +276,7 @@ MonoBehaviour:
   - {fileID: 786310154602479331}
   - {fileID: 5913716759420320057}
   - {fileID: 4426414403718054618}
-  - {fileID: 7923999271663014828}
+  - {fileID: 0}
   - {fileID: 7534789336813920865}
   - {fileID: 0}
   - {fileID: 0}
@@ -416,28 +419,26 @@ MonoBehaviour:
   _slopeNormalPerpendicular: {x: 0, y: 0}
   _noFriction: {fileID: 6200000, guid: effc25d654d75ac4da8990d7cf05bf96, type: 2}
   _fullFriction: {fileID: 6200000, guid: bd55736fb0ba2874480c595e02c9a5c4, type: 2}
---- !u!114 &7923999271663014828
+--- !u!114 &-5410989748371277972
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 181470870697314535}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ad568d0f09bcb2e4e85940790ee4411d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player: {fileID: 0}
   _dropPrefab: {fileID: 9080023921913248994, guid: 3cafab4b63471bf4b81789ed4f374071, type: 3}
-  _item: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
-  _isAreaDrawing: 1
-  _areaSize: {x: 15, y: 15}
+  _isAreaDrawing: 0
+  _areaSize: {x: 10, y: 10}
   _isMouseInsideArea: 0
   _blockDamageMultiplier: 5
   _wallDamageMultiplier: 5
   _miningDamageController: {fileID: 0}
-  _placingCooldown: 0.2
+  _placingCooldown: 0.5
   _isPlacingAllowed: 0
   _playerLayerMask:
     serializedVersion: 2

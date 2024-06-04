@@ -214,6 +214,74 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Interactions"",
+            ""id"": ""02ba9d30-a702-4a0b-acb7-88baa49680ec"",
+            ""actions"": [
+                {
+                    ""name"": ""Use Item From Hotbar"",
+                    ""type"": ""Button"",
+                    ""id"": ""e90f1239-e3c7-4e33-9d67-9857fa39ddd3"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Break Block"",
+                    ""type"": ""Button"",
+                    ""id"": ""62773ad5-67bd-4d50-98b3-82b0406a70ea"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Throw Item"",
+                    ""type"": ""Button"",
+                    ""id"": ""ec27bea1-8313-49b3-9ff2-49582fcb7655"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""5e154d9b-5992-4f1c-ad61-1ed2c69d4ac5"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Use Item From Hotbar"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cfe3df8f-d4e4-43e3-bac1-82cea1586598"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Break Block"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e2b67a00-43e2-490c-ac0c-aabdad7ff7b2"",
+                    ""path"": ""<Keyboard>/t"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Throw Item"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -227,6 +295,11 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_UI_OpenCloseResearch = m_UI.FindAction("Open/Close Research", throwIfNotFound: true);
         m_UI_SelectHotbarCellByKeyboard = m_UI.FindAction("Select Hotbar Cell By Keyboard", throwIfNotFound: true);
         m_UI_SelectHotbarCellByScrolling = m_UI.FindAction("Select Hotbar Cell By Scrolling", throwIfNotFound: true);
+        // Interactions
+        m_Interactions = asset.FindActionMap("Interactions", throwIfNotFound: true);
+        m_Interactions_UseItemFromHotbar = m_Interactions.FindAction("Use Item From Hotbar", throwIfNotFound: true);
+        m_Interactions_BreakBlock = m_Interactions.FindAction("Break Block", throwIfNotFound: true);
+        m_Interactions_ThrowItem = m_Interactions.FindAction("Throw Item", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -378,6 +451,68 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         }
     }
     public UIActions @UI => new UIActions(this);
+
+    // Interactions
+    private readonly InputActionMap m_Interactions;
+    private List<IInteractionsActions> m_InteractionsActionsCallbackInterfaces = new List<IInteractionsActions>();
+    private readonly InputAction m_Interactions_UseItemFromHotbar;
+    private readonly InputAction m_Interactions_BreakBlock;
+    private readonly InputAction m_Interactions_ThrowItem;
+    public struct InteractionsActions
+    {
+        private @PlayerInputActions m_Wrapper;
+        public InteractionsActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @UseItemFromHotbar => m_Wrapper.m_Interactions_UseItemFromHotbar;
+        public InputAction @BreakBlock => m_Wrapper.m_Interactions_BreakBlock;
+        public InputAction @ThrowItem => m_Wrapper.m_Interactions_ThrowItem;
+        public InputActionMap Get() { return m_Wrapper.m_Interactions; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(InteractionsActions set) { return set.Get(); }
+        public void AddCallbacks(IInteractionsActions instance)
+        {
+            if (instance == null || m_Wrapper.m_InteractionsActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_InteractionsActionsCallbackInterfaces.Add(instance);
+            @UseItemFromHotbar.started += instance.OnUseItemFromHotbar;
+            @UseItemFromHotbar.performed += instance.OnUseItemFromHotbar;
+            @UseItemFromHotbar.canceled += instance.OnUseItemFromHotbar;
+            @BreakBlock.started += instance.OnBreakBlock;
+            @BreakBlock.performed += instance.OnBreakBlock;
+            @BreakBlock.canceled += instance.OnBreakBlock;
+            @ThrowItem.started += instance.OnThrowItem;
+            @ThrowItem.performed += instance.OnThrowItem;
+            @ThrowItem.canceled += instance.OnThrowItem;
+        }
+
+        private void UnregisterCallbacks(IInteractionsActions instance)
+        {
+            @UseItemFromHotbar.started -= instance.OnUseItemFromHotbar;
+            @UseItemFromHotbar.performed -= instance.OnUseItemFromHotbar;
+            @UseItemFromHotbar.canceled -= instance.OnUseItemFromHotbar;
+            @BreakBlock.started -= instance.OnBreakBlock;
+            @BreakBlock.performed -= instance.OnBreakBlock;
+            @BreakBlock.canceled -= instance.OnBreakBlock;
+            @ThrowItem.started -= instance.OnThrowItem;
+            @ThrowItem.performed -= instance.OnThrowItem;
+            @ThrowItem.canceled -= instance.OnThrowItem;
+        }
+
+        public void RemoveCallbacks(IInteractionsActions instance)
+        {
+            if (m_Wrapper.m_InteractionsActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IInteractionsActions instance)
+        {
+            foreach (var item in m_Wrapper.m_InteractionsActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_InteractionsActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public InteractionsActions @Interactions => new InteractionsActions(this);
     public interface IUIActions
     {
         void OnOpenCloseInventory(InputAction.CallbackContext context);
@@ -387,5 +522,11 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnOpenCloseResearch(InputAction.CallbackContext context);
         void OnSelectHotbarCellByKeyboard(InputAction.CallbackContext context);
         void OnSelectHotbarCellByScrolling(InputAction.CallbackContext context);
+    }
+    public interface IInteractionsActions
+    {
+        void OnUseItemFromHotbar(InputAction.CallbackContext context);
+        void OnBreakBlock(InputAction.CallbackContext context);
+        void OnThrowItem(InputAction.CallbackContext context);
     }
 }

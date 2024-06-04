@@ -28,7 +28,7 @@ public class ResearchSO : ScriptableObject
     #endregion
 
     #region Public fields
-    public event Action<ResearchSO> OnStateChanged;
+    public event Action<ResearchSO> StateChanged;
     #endregion
 
     #region Properties
@@ -93,7 +93,7 @@ public class ResearchSO : ScriptableObject
     public void ChangeState(ResearchState state)
     {
         _state = state;
-        OnStateChanged?.Invoke(this);
+        StateChanged?.Invoke(this);
     }
 
     [Button("Update references")]

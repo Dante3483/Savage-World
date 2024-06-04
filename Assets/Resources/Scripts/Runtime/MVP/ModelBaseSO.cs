@@ -1,4 +1,6 @@
-public abstract class ModelBase : IModel
+using UnityEngine;
+
+public abstract class ModelBaseSO : ScriptableObject, IModel
 {
     #region Fields
 
@@ -9,6 +11,10 @@ public abstract class ModelBase : IModel
     #endregion
 
     #region Events / Delegates
+
+    #endregion
+
+    #region Monobehaviour Methods
 
     #endregion
 

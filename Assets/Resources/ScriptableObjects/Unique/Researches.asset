@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d7f50947d5226040a9311ea0c1e690d, type: 3}
+  m_Script: {fileID: 11500000, guid: 7548490eb9b3148419cc0cff836b437f, type: 3}
   m_Name: Researches
   m_EditorClassIdentifier: 
   _listOfReserches:
@@ -20,4 +20,3 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9cef30bd513ba474ba42e5ade82922eb, type: 2}
   - {fileID: 11400000, guid: c681414b1055f404ba9f20e8ef2777e1, type: 2}
   - {fileID: 11400000, guid: c617ebe1514b5ab43ad99f07b3623298, type: 2}
-  _inventoryData: {fileID: 11400000, guid: ddb9f8cda83b055498ce3a67b07c92c7, type: 2}

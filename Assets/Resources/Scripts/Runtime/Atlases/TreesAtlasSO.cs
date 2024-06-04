@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 [CreateAssetMenu(fileName = "TreesAtlas", menuName = "Atlases/TreesAtlas")]
 public class TreesAtlasSO : AtlasSO
@@ -23,7 +21,7 @@ public class TreesAtlasSO : AtlasSO
     #endregion
 
     #region Methods
-    public void InitializeAtlas()
+    public override void InitializeAtlas()
     {
         InitializeSetTreeById();
         InitializeSetTreesByBiome();

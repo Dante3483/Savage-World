@@ -151,6 +151,17 @@ public class InventoryModel : ModelBase
         return quantity;
     }
 
+    public int AddItemToEmptyCellByIndex(ItemSO data, int quantity, int index, ItemLocations location)
+    {
+        InventoryItem item = _itemsByLocation[location][index];
+        if (item.IsEmpty)
+        {
+            item.Update(data, quantity);
+            return 0;
+        }
+        return quantity;
+    }
+
     public void RemoveItem(ItemSO data, int quantity)
     {
         quantity = RemoveItem(data, quantity, ItemLocations.Hotbar);
@@ -175,6 +186,14 @@ public class InventoryModel : ModelBase
             {
                 InventoryOverflowed?.Invoke(data, quantity);
             }
+        }
+    }
+
+    public void RemoveQuantityFromSelectedItem(int quantity)
+    {
+        if (!_selectedItem.IsEmpty)
+        {
+            _selectedItem.UpdateQuantity(_selectedItem.Quantity - quantity);
         }
     }
 
@@ -247,6 +266,26 @@ public class InventoryModel : ModelBase
         return _bufferItem.Data == GetItem(index, location).Data;
     }
 
+    public ItemSO GetItemData(int index, ItemLocations location)
+    {
+        return _itemsByLocation[location][index].Data;
+    }
+
+    public int GetItemQuantity(int index, ItemLocations location)
+    {
+        return _itemsByLocation[location][index].Quantity;
+    }
+
+    public ItemSO GetSelectedItemData()
+    {
+        return _selectedItem.Data;
+    }
+
+    public int GetSelectedItemQuantity()
+    {
+        return _selectedItem.Quantity;
+    }
+
     public StringBuilder GetItemDescription(int index, ItemLocations location)
     {
         if (IsItemInBuffer)
@@ -257,12 +296,29 @@ public class InventoryModel : ModelBase
         return item.Data?.GetFullDescription(item.Quantity);
     }
 
-    public int GetFullQuantity(ItemSO data)
+    public int GetFullItemQuantity(ItemSO data)
     {
         return _itemsByLocation
             .SelectMany(array => array.Value)
             .Where(item => item.Data == data)
             .Sum(item => item.Quantity);
+    }
+
+    public bool IsEnoughSpaceForItem(ItemSO data, ItemLocations location)
+    {
+        if (location == ItemLocations.Hotbar)
+        {
+            return !_itemsByLocation[location]
+                .Where((_, index) => index >= _hotbarStartIndex && index <= _hotbarEndIndex)
+                .Where((item) => item.IsEmpty || (item.Data == data && item.Quantity != item.Data.MaxStackSize))
+                .Any();
+        }
+        else
+        {
+            return !_itemsByLocation[location]
+                .Where((item) => item.IsEmpty || (item.Data == data && item.Quantity != item.Data.MaxStackSize))
+                .Any();
+        }
     }
     #endregion
 
@@ -319,7 +375,7 @@ public class InventoryModel : ModelBase
             InventoryItem item = _itemsByLocation[location][i];
             if (item.IsEmpty)
             {
-                int stackSize = item.StackSize;
+                int stackSize = data.MaxStackSize;
                 if (quantity > stackSize)
                 {
                     item.Update(data, stackSize);
@@ -329,6 +385,10 @@ public class InventoryModel : ModelBase
                 {
                     item.Update(data, quantity);
                     return 0;
+                }
+                if (IsStorageFull(location))
+                {
+                    return quantity;
                 }
             }
         }

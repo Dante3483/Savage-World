@@ -17,8 +17,6 @@ public abstract class ViewBase : MonoBehaviour
     #region Methods
     public abstract void Initialize();
 
-    public abstract void ResetView();
-
     public abstract void Show();
 
     public abstract void Hide();

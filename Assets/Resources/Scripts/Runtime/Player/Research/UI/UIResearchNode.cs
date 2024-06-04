@@ -1,10 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using System;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
+using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -36,9 +35,10 @@ public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     #endregion
 
     #region Public fields
-    public event Action<UIResearchNode> OnMouseEnter, OnFinishResearch;
-
-    public event Action OnMouseLeave, OnRightMouseUp;
+    public event Action<UIResearchNode> MouseEntered;
+    public event Action<UIResearchNode> CompleteResearchReqested;
+    public event Action MouseLeft;
+    public event Action RightMouseUpped;
     #endregion
 
     #region Properties
@@ -52,7 +52,7 @@ public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         _uiFillAmount.OnFrameFilled += HandleFrameFilled;
     }
 
-    private void OnDisable() 
+    private void OnDisable()
     {
         _uiFillAmount.ResetFrame();
     }
@@ -119,17 +119,17 @@ public class UIResearchNode : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private void HandleFrameFilled()
     {
-        OnFinishResearch?.Invoke(this);
+        CompleteResearchReqested?.Invoke(this);
     }
-    
+
     public void OnPointerEnter(PointerEventData pointerData)
     {
-        OnMouseEnter?.Invoke(this);
+        MouseEntered?.Invoke(this);
     }
 
     public void OnPointerExit(PointerEventData pointerData)
     {
-        OnMouseLeave?.Invoke();
+        MouseLeft?.Invoke();
     }
     #endregion
 }
