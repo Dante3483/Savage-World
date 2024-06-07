@@ -53,7 +53,7 @@ public class HostingState : OnlineState
     {
         if (clientId != _connectionManager.NetworkManager.LocalClientId)
         {
-            _connectionManager.StartCoroutine(GameManager.Instance.Player.PlayerNetwork.SendChunks(clientId));
+            EventManager.OnPlayerConnected(clientId);
         }
     }
     #endregion

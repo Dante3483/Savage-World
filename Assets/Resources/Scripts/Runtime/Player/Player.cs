@@ -13,8 +13,6 @@ public class Player : MonoBehaviour
     [SerializeField]
     private CraftStationModelSO _handCraftStation;
     [SerializeField]
-    private PlayerNetwork _playerNetwork;
-    [SerializeField]
     private PlayerInteractions _playerInteractions;
     [SerializeField]
     private bool _isOwner;
@@ -36,14 +34,6 @@ public class Player : MonoBehaviour
             return _stats;
         }
     }
-
-    public PlayerNetwork PlayerNetwork
-    {
-        get
-        {
-            return _playerNetwork;
-        }
-    }
     #endregion
 
     #region Events / Delegates
@@ -53,28 +43,13 @@ public class Player : MonoBehaviour
     #region Monobehaviour Methods
     private void Awake()
     {
-        _playerNetwork = GetComponent<PlayerNetwork>();
         _playerInteractions = GetComponent<PlayerInteractions>();
+        EventManager.PlayerSpawnedAsOwner += InitializeAsOwner;
+        EventManager.PlayerSpawnedAsNotOwner += InitializeAsNowOwner;
     }
     #endregion
 
     #region Public Methods
-    public void Initialize()
-    {
-        PlayerInputActions playerInputActions = GameManager.Instance.PlayerInputActions;
-        playerInputActions.UI.Enable();
-        playerInputActions.UI.OpenCloseInventory.performed += ToggleInventoryEventHandler;
-        playerInputActions.UI.OpenCloseCraftStation.performed += ToggleCraftStationEventHandler;
-        playerInputActions.UI.OpenCloseResearch.performed += ToggleResearchEventHandler;
-        _stats.Reset();
-        _inventory = new();
-        BookManager.Instance.InitializeInventory(_inventory);
-        BookManager.Instance.InitializeHotbar(_inventory);
-        BookManager.Instance.InitializeCraftStation(_handCraftStation, _inventory);
-        BookManager.Instance.InitializeResearches(GameManager.Instance.GetResearches(), _inventory);
-        _playerInteractions.Initialize(_inventory);
-    }
-
     public void DisableMovement()
     {
         GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
@@ -89,20 +64,46 @@ public class Player : MonoBehaviour
     #endregion
 
     #region Private Methods
+    private void InitializeAsOwner()
+    {
+        _stats.Reset();
+        _inventory = new();
+        GameManager.Instance.InitializePlayer(3655, 2200, this);
+
+        PlayerInputActions playerInputActions = GameManager.Instance.PlayerInputActions;
+        playerInputActions.UI.Enable();
+        playerInputActions.UI.OpenCloseInventory.performed += ToggleInventoryEventHandler;
+        playerInputActions.UI.OpenCloseCraftStation.performed += ToggleCraftStationEventHandler;
+        playerInputActions.UI.OpenCloseResearch.performed += ToggleResearchEventHandler;
+
+        BookManager.Instance.InitializeInventory(_inventory);
+        BookManager.Instance.InitializeHotbar(_inventory);
+        BookManager.Instance.InitializeCraftStation(_handCraftStation, _inventory);
+        BookManager.Instance.InitializeResearches(GameManager.Instance.GetResearches(), _inventory);
+        _playerInteractions.Initialize(_inventory);
+
+        DisableMovement();
+    }
+
+    private void InitializeAsNowOwner()
+    {
+        DisableMovement();
+    }
+
     private void ToggleInventoryEventHandler(InputAction.CallbackContext context)
     {
-        _playerInteractions.SetActive(BookManager.Instance.TogglePresenter(BookManager.Instance.InventoryPresenter));
+        BookManager.Instance.TogglePresenter(BookManager.Instance.InventoryPresenter);
     }
 
     private void ToggleCraftStationEventHandler(InputAction.CallbackContext context)
     {
         _handCraftStation.SelectCraftStation();
-        _playerInteractions.SetActive(BookManager.Instance.TogglePresenter(BookManager.Instance.CraftStationPresenter));
+        BookManager.Instance.TogglePresenter(BookManager.Instance.CraftStationPresenter);
     }
 
     private void ToggleResearchEventHandler(InputAction.CallbackContext context)
     {
-        _playerInteractions.SetActive(BookManager.Instance.TogglePresenter(BookManager.Instance.ResearchesPresenter));
+        BookManager.Instance.TogglePresenter(BookManager.Instance.ResearchesPresenter);
     }
     #endregion
 }

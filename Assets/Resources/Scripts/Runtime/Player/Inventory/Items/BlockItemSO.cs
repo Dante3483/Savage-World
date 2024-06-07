@@ -7,7 +7,8 @@ namespace Items
     public class BlockItemSO : ItemSO
     {
         #region Private fields
-        [SerializeField] private BlockSO _blockToPlace;
+        [SerializeField]
+        private BlockSO _blockToPlace;
         #endregion
 
         #region Public fields

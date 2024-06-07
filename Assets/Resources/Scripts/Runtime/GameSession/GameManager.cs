@@ -548,9 +548,9 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
         return x >= 0 && x < _currentTerrainWidth && y >= 0 && y < _currentTerrainHeight;
     }
 
-    public void InitializePlayer(int x, int y)
+    public void InitializePlayer(int x, int y, Player player)
     {
-        _player.Initialize();
+        _player = player;
         Camera.main.GetComponent<FollowObject>().Target = _player.transform;
         SetPlayerPosition(x, y);
     }

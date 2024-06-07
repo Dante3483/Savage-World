@@ -1,5 +1,4 @@
 using Items;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -28,20 +27,21 @@ public class PlayerInteractions : MonoBehaviour
     [SerializeField]
     private MiningDamageController _miningDamageController;
 
-    [Header("Placing")]
+    [Header("Placement")]
     [SerializeField]
-    private float _placingCooldown;
-    [SerializeField]
-    private bool _isPlacingAllowed;
+    private float _placementCooldown;
     [SerializeField]
     private LayerMask _playerLayerMask;
     private BoxCastUtil _checkPlayerBoxCast;
 
     private InventoryModel _inventory;
+    [SerializeField]
     private bool _isActive;
     private bool _isUsingItemFromHotbar;
     private bool _isBreakingBlock;
     private bool _isBreakingWall;
+
+    private PlaceBlockAction _placeBlockAction;
     #endregion
 
     #region Properties
@@ -55,7 +55,9 @@ public class PlayerInteractions : MonoBehaviour
     #region Monobehaviour Methods
     private void Awake()
     {
-        _isActive = false;
+        EventManager.PlayerSpawnedAsNotOwner += Disable;
+        EventManager.BookOpened += Disable;
+        EventManager.BookClosed += Enable;
     }
 
     private void FixedUpdate()
@@ -94,7 +96,7 @@ public class PlayerInteractions : MonoBehaviour
         _checkPlayerBoxCast.Size = new Vector2(1f, 1f);
         _checkPlayerBoxCast.LayerMask = _playerLayerMask;
         _miningDamageController = MiningDamageController.Instance;
-        _isPlacingAllowed = true;
+        _isActive = true;
 
         PlayerInputActions playerInputActions = GameManager.Instance.PlayerInputActions;
         playerInputActions.Interactions.Enable();
@@ -104,12 +106,7 @@ public class PlayerInteractions : MonoBehaviour
         playerInputActions.Interactions.BreakBlock.canceled += BreakBlockCanceled;
         playerInputActions.Interactions.ThrowItem.performed += ThrowSelectedItem;
 
-        _isActive = true;
-    }
-
-    public void SetActive(bool value)
-    {
-        _isActive = value;
+        _placeBlockAction = new(_placementCooldown);
     }
 
     public bool IsEnoughSpaceToTakeDrop(Drop drop)
@@ -119,13 +116,29 @@ public class PlayerInteractions : MonoBehaviour
     #endregion
 
     #region Private Methods
+    private void Disable()
+    {
+        _isActive = false;
+    }
+
+    private void Enable()
+    {
+        _isActive = true;
+    }
+
     private void UseItemFromHotbar()
     {
         switch (_inventory.GetSelectedItemData())
         {
             case BlockItemSO blockItem:
                 {
-                    PlaceBlock(blockItem);
+                    Vector2Int blockPosition = ClickPositionToWorldPosition();
+                    _checkPlayerBoxCast.BoxCast(blockPosition);
+                    if (_isMouseInsideArea && !_checkPlayerBoxCast.Result)
+                    {
+                        _placeBlockAction.Configure(blockItem.BlockToPlace, blockPosition);
+                        _placeBlockAction.Execute();
+                    }
                 }
                 break;
             default:
@@ -133,37 +146,6 @@ public class PlayerInteractions : MonoBehaviour
         }
     }
 
-    //MAYBE STRATEGY PATTERN
-    private void PlaceBlock(BlockItemSO block)
-    {
-        if (!_isMouseInsideArea || !_isPlacingAllowed)
-        {
-            return;
-        }
-
-        Vector2Int blockPosition = ClickPositionToWorldPosition();
-        _checkPlayerBoxCast.BoxCast(blockPosition);
-        if (_checkPlayerBoxCast.Result)
-        {
-            return;
-        }
-        if (!WorldDataManager.Instance.IsFree(blockPosition.x, blockPosition.y))
-        {
-            return;
-        }
-        bool isEmpty = WorldDataManager.Instance.IsEmpty(blockPosition.x, blockPosition.y);
-        bool isWall = WorldDataManager.Instance.IsWall(blockPosition.x, blockPosition.y);
-        bool isAnyNeighborSolid = WorldDataManager.Instance.IsSolidAnyNeighbor(blockPosition.x, blockPosition.y);
-        if (isEmpty && (isWall || isAnyNeighborSolid))
-        {
-            WorldDataManager.Instance.SetBlockData(blockPosition.x, blockPosition.y, block.BlockToPlace);
-            _inventory.RemoveQuantityFromSelectedItem(1);
-            UpdateNeighboringBlocks(blockPosition);
-            StartCoroutine(WaitForPlacingCooldown());
-        }
-    }
-
-    //MAYBE STRATEGY PATTERN
     private void BreakBlock()
     {
         Vector2Int blockPosition = ClickPositionToWorldPosition();
@@ -185,7 +167,6 @@ public class PlayerInteractions : MonoBehaviour
         }
     }
 
-    //MAYBE STRATEGY PATTERN
     public void BreakWall()
     {
         Vector2Int wallPosition = ClickPositionToWorldPosition();
@@ -261,13 +242,6 @@ public class PlayerInteractions : MonoBehaviour
         }
     }
 
-    private IEnumerator WaitForPlacingCooldown()
-    {
-        _isPlacingAllowed = false;
-        yield return new WaitForSeconds(_placingCooldown);
-        _isPlacingAllowed = true;
-    }
-
     private Vector2Int ClickPositionToWorldPosition()
     {
         Vector3 clickPosition = Input.mousePosition;
@@ -310,7 +284,6 @@ public class PlayerInteractions : MonoBehaviour
     }
 
     //REMOVE
-    //MAYBE STRATEGY PATTERN
     private void CreateWater()
     {
         if (Input.GetKeyDown(KeyCode.U))

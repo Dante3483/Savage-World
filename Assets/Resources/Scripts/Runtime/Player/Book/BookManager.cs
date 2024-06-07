@@ -114,12 +114,14 @@ public class BookManager : Singleton<BookManager>
         if (currentActivePresenter == presenter)
         {
             presenter.Disable();
+            EventManager.OnBookClosed();
             return false;
         }
         else
         {
             currentActivePresenter?.Disable();
             presenter.Enable();
+            EventManager.OnBookOpened();
             return true;
         }
     }

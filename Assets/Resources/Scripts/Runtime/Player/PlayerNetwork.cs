@@ -4,44 +4,51 @@ using UnityEngine;
 
 public class PlayerNetwork : NetworkBehaviour
 {
-    #region Private fields
-    [SerializeField]
-    private Player _player;
+    #region Fields
     [SerializeField]
     private MonoBehaviour[] _ownerOnlyComponents;
-    #endregion
-
-    #region Public fields
-
     #endregion
 
     #region Properties
 
     #endregion
 
-    #region Methods
-    private void Awake()
-    {
-        _player = GetComponent<Player>();
-    }
+    #region Events / Delegates
 
+    #endregion
+
+    #region Monobehaviour Methods
+
+    #endregion
+
+    #region Public Methods
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        if (IsServer)
+        {
+            EventManager.PlayerConnectedAsClient += SendDataToClient;
+            WorldDataManager.Instance.OnDataChanged += OnDataChanged;
+            WorldDataManager.Instance.OnColliderChanged += OnColliderIndexChanged;
+        }
         if (IsOwner)
         {
-            if (IsHost)
-            {
-                WorldDataManager.Instance.OnDataChanged += OnDataChanged;
-                WorldDataManager.Instance.OnColliderChanged += OnColliderIndexChanged;
-            }
-            _player.DisableMovement();
-            GameManager.Instance.Player = _player;
-            GameManager.Instance.InitializePlayer(3655, 2200);
+            EventManager.OnPlayerSpawnedAsOwner();
+        }
+        else
+        {
+            EventManager.OnPlayerSpawnedAsNotOwner();
         }
     }
+    #endregion
 
-    public IEnumerator SendChunks(ulong clientId)
+    #region Private Methods
+    private void SendDataToClient(ulong clientId)
+    {
+        StartCoroutine(SendChunks(clientId));
+    }
+
+    private IEnumerator SendChunks(ulong clientId)
     {
         int chunkSize = GameManager.Instance.TerrainConfiguration.ChunkSize;
         Vector2Int defaultClientPosition = new(3655, 2200);
