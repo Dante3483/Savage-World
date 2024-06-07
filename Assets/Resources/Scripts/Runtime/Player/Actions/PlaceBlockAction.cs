@@ -31,15 +31,10 @@ public class PlaceBlockAction : PlayerActionBase
 
     public override void Execute()
     {
-        if (!CanPlaceBlock())
+        if (CanPlaceBlock())
         {
-            return;
+            PlaceBlock();
         }
-        if (PlaceBlock())
-        {
-            _player.StartCoroutine(BlockPlacementCooldownCoroutine());
-        }
-        _block = null;
     }
 
     public void Configure(BlockSO block, Vector2Int position)
@@ -50,25 +45,41 @@ public class PlaceBlockAction : PlayerActionBase
     #endregion
 
     #region Private Methods
-    private bool PlaceBlock()
+    private void PlaceBlock()
     {
         int x = _position.x;
         int y = _position.y;
-        if (!_worldDataManager.IsFree(x, y))
-        {
-            return false;
-        }
-        if (_worldDataManager.IsEmpty(x, y) && (_worldDataManager.IsWall(x, y) || _worldDataManager.IsSolidAnyNeighbor(x, y)))
-        {
-            _worldDataManager.SetBlockData(x, y, _block);
-            _inventory.RemoveQuantityFromSelectedItem(1);
-        }
-        return true;
+        _worldDataManager.SetBlockData(x, y, _block);
+        _inventory.RemoveQuantityFromSelectedItem(1);
+        _player.StartCoroutine(BlockPlacementCooldownCoroutine());
+        _block = null;
     }
 
     private bool CanPlaceBlock()
     {
-        return _isPlacementAllowed && _block != null;
+        int x = _position.x;
+        int y = _position.y;
+        if (!_isPlacementAllowed)
+        {
+            return false;
+        }
+        if (_block is null)
+        {
+            return false;
+        }
+        if (!_worldDataManager.IsFree(x, y))
+        {
+            return false;
+        }
+        if (!_worldDataManager.IsEmpty(x, y))
+        {
+            return false;
+        }
+        if (!_worldDataManager.IsWall(x, y) && !_worldDataManager.IsSolidAnyNeighbor(x, y))
+        {
+            return false;
+        }
+        return true;
     }
 
     private IEnumerator BlockPlacementCooldownCoroutine()

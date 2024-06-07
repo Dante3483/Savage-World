@@ -132,6 +132,15 @@ public class WorldDataManager : MonoBehaviour
         }
     }
 
+    public void SetWallData(int x, int y, BlockSO data)
+    {
+        _worldData[x, y].SetWallData(data);
+        if (GameManager.Instance.IsGameSession && !GameManager.Instance.IsWorldLoading)
+        {
+            _worldData[x, y].SetRandomWallTile(GameManager.Instance.RandomVar);
+        }
+    }
+
     public void LoadData(int x, int y, BlockSO block, BlockSO wall, byte liquidId, float flowValue, byte tileId, byte colliderIndex, byte flags)
     {
         if (block is null || wall is null)

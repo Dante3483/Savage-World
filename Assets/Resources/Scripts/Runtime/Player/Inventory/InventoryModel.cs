@@ -129,7 +129,7 @@ public class InventoryModel : ModelBase
         quantity = AddItem(data, quantity, ItemLocations.Hotbar);
         if (quantity > 0)
         {
-            AddItem(data, quantity, ItemLocations.Storage);
+            quantity = AddItem(data, quantity, ItemLocations.Storage);
         }
         return quantity;
     }
@@ -141,12 +141,12 @@ public class InventoryModel : ModelBase
             quantity = AddQuantityToSameItems(data, quantity, location);
             if (quantity > 0)
             {
-                AddItemToFirstFreeCells(data, quantity, location);
+                quantity = AddItemToFirstFreeCells(data, quantity, location);
             }
         }
         else
         {
-            AddItemToFirstFreeCells(data, quantity, location);
+            quantity = AddItemToFirstFreeCells(data, quantity, location);
         }
         return quantity;
     }
@@ -278,7 +278,7 @@ public class InventoryModel : ModelBase
 
     public ItemSO GetSelectedItemData()
     {
-        return _selectedItem.Data;
+        return _selectedItem?.Data;
     }
 
     public int GetSelectedItemQuantity()

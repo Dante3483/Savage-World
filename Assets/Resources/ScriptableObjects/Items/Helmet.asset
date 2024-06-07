@@ -10,16 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 37f41c3fc409d42499b8733a6bf2a64e, type: 3}
-  m_Name: newArmor
+  m_Name: Helmet
   m_EditorClassIdentifier: 
-  _id: 4
-  _itemType: 3
-  _itemRarity: {fileID: 11400000, guid: 1ab80723928f4cf4f8323c6f1fff4622, type: 2}
-  _isStackable: 0
-  _maxStackSize: 1
-  _name: Helmet 2
+  _id: 2
+  _itemRarity: {fileID: 11400000, guid: ddd32f58fffdb79469e4e8303aa87b40, type: 2}
+  _stackSize: 1
+  _name: Helmet
   _using: Can be equipped
-  _description: Helmet 2
+  _description: Helmet
   _smallItemImage: {fileID: 76345637, guid: cb4e0e5650217bf4b9adfca7943a01ea, type: 3}
   _bigItemImage: {fileID: 76345637, guid: cb4e0e5650217bf4b9adfca7943a01ea, type: 3}
   _armorType: 0

@@ -1,18 +1,15 @@
-using System.Text;
 using UnityEngine;
 
 namespace Items
 {
     [CreateAssetMenu(fileName = "Armor", menuName = "Items/Armor")]
-    public class ArmorItemSO : ItemSO
+    public class ArmorItemSO : NonStackableItemSO
     {
-        #region Private fields
-        [SerializeField] private ArmorTypes _armorType;
-        [SerializeField] private Sprite _playerView;
-        #endregion
-
-        #region Public fields
-
+        #region Fields
+        [SerializeField]
+        private ArmorTypes _armorType;
+        [SerializeField]
+        private Sprite _playerView;
         #endregion
 
         #region Properties
@@ -43,24 +40,24 @@ namespace Items
         }
         #endregion
 
-        #region Methods
+        #region Events / Delegates
+
+        #endregion
+
+        #region Monobehaviour Methods
+
+        #endregion
+
+        #region Public Methods
         public ArmorItemSO()
         {
-            ItemType = ItemTypes.Armor;
-            IsStackable = false;
-            MaxStackSize = 1;
-            Using = "Can be equipped";
+            _itemType = ItemTypes.Armor;
+            _using = "Can be equipped";
         }
+        #endregion
 
-        public override StringBuilder GetFullDescription(int quantity)
-        {
-            _fullDescriptionStringBuilder.Clear();
-            _fullDescriptionStringBuilder.Append(ColoredName).AppendLine();
-            _fullDescriptionStringBuilder.Append(ItemRarity.Name).AppendLine();
-            _fullDescriptionStringBuilder.Append(Using).AppendLine();
-            _fullDescriptionStringBuilder.Append(Description).AppendLine();
-            return _fullDescriptionStringBuilder;
-        }
+        #region Private Methods
+
         #endregion
     }
 }

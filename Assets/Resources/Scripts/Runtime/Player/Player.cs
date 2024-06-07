@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,8 +15,9 @@ public class Player : MonoBehaviour
     private CraftStationModelSO _handCraftStation;
     [SerializeField]
     private PlayerInteractions _playerInteractions;
+    [Header("Debug")]
     [SerializeField]
-    private bool _isOwner;
+    private List<ItemQuantity> _starterItems;
     #endregion
 
     #region Properties
@@ -45,7 +47,7 @@ public class Player : MonoBehaviour
     {
         _playerInteractions = GetComponent<PlayerInteractions>();
         EventManager.PlayerSpawnedAsOwner += InitializeAsOwner;
-        EventManager.PlayerSpawnedAsNotOwner += InitializeAsNowOwner;
+        EventManager.PlayerSpawnedAsNotOwner += InitializeAsNotOwner;
     }
     #endregion
 
@@ -67,7 +69,9 @@ public class Player : MonoBehaviour
     private void InitializeAsOwner()
     {
         _stats.Reset();
+
         _inventory = new();
+
         GameManager.Instance.InitializePlayer(3655, 2200, this);
 
         PlayerInputActions playerInputActions = GameManager.Instance.PlayerInputActions;
@@ -82,10 +86,15 @@ public class Player : MonoBehaviour
         BookManager.Instance.InitializeResearches(GameManager.Instance.GetResearches(), _inventory);
         _playerInteractions.Initialize(_inventory);
 
+        foreach (ItemQuantity item in _starterItems)
+        {
+            _inventory.AddItem(item.Item, item.Quantity);
+        }
+
         DisableMovement();
     }
 
-    private void InitializeAsNowOwner()
+    private void InitializeAsNotOwner()
     {
         DisableMovement();
     }

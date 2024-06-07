@@ -557,11 +557,7 @@ public class Terrain : MonoBehaviour
 
     public void CreateWall(int x, int y, BlockSO block)
     {
-        _worldData[x, y].SetWallData(block);
-        if (GameManager.Instance.IsGameSession && !GameManager.Instance.IsWorldLoading)
-        {
-            _worldData[x, y].SetRandomWallTile(GameManager.Instance.RandomVar);
-        }
+        WorldDataManager.Instance.SetWallData(x, y, block);
     }
 
     public void CreateLiquidBlock(int x, int y, byte id)

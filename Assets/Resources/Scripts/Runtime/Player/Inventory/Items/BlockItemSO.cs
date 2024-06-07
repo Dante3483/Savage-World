@@ -1,18 +1,13 @@
-using System.Text;
 using UnityEngine;
 
 namespace Items
 {
     [CreateAssetMenu(fileName = "Block", menuName = "Items/Block")]
-    public class BlockItemSO : ItemSO
+    public class BlockItemSO : StackableItemSO
     {
-        #region Private fields
+        #region Fields
         [SerializeField]
         private BlockSO _blockToPlace;
-        #endregion
-
-        #region Public fields
-
         #endregion
 
         #region Properties
@@ -30,24 +25,24 @@ namespace Items
         }
         #endregion
 
-        #region Methods
+        #region Events / Delegates
+
+        #endregion
+
+        #region Monobehaviour Methods
+
+        #endregion
+
+        #region Public Methods
         public BlockItemSO()
         {
-            ItemType = ItemTypes.Block;
-            IsStackable = true;
-            MaxStackSize = 9999;
-            Using = "Can be placed";
+            _itemType = ItemTypes.Block;
+            _using = "Can be placed";
         }
+        #endregion
 
-        public override StringBuilder GetFullDescription(int quantity)
-        {
-            _fullDescriptionStringBuilder.Clear();
-            _fullDescriptionStringBuilder.Append(ColoredName).Append($" ({quantity})").AppendLine();
-            _fullDescriptionStringBuilder.Append(ItemRarity.Name).AppendLine();
-            _fullDescriptionStringBuilder.Append(Using).AppendLine();
-            _fullDescriptionStringBuilder.Append(Description).AppendLine();
-            return _fullDescriptionStringBuilder;
-        }
+        #region Private Methods
+
         #endregion
     }
 }

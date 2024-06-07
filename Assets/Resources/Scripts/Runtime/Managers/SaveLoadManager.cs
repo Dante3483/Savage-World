@@ -467,7 +467,7 @@ public class SaveLoadManager : MonoBehaviour
             if (!isEmpty)
             {
                 ItemsID id = (ItemsID)binaryReader.ReadUInt16();
-                int quantity = binaryReader.ReadInt32();
+                int quantity = binaryReader.ReadUInt16();
                 ItemSO itemData = GameManager.Instance.ItemsAtlas.GetItemByID(id);
                 inventory.AddItemToEmptyCellByIndex(itemData, quantity, i, location);
             }
@@ -505,11 +505,11 @@ public class SaveLoadManager : MonoBehaviour
             SavePickUpItems(binaryWriter);
         }
 
-        using (BinaryWriter binaryWriter = new(File.Open(playerFile, FileMode.Create)))
-        {
-            Debug.Log("Save data to: " + playerFile);
-            SavePlayer(binaryWriter);
-        }
+        //using (BinaryWriter binaryWriter = new(File.Open(playerFile, FileMode.Create)))
+        //{
+        //    Debug.Log("Save data to: " + playerFile);
+        //    SavePlayer(binaryWriter);
+        //}
 
         using (BinaryWriter binaryWriter = new(File.Open(worldMetaFile, FileMode.Create)))
         {
@@ -546,13 +546,13 @@ public class SaveLoadManager : MonoBehaviour
             });
         }
 
-        using (BinaryReader binaryReader = new(File.Open(playerFile, FileMode.Open)))
-        {
-            ActionInMainThreadUtil.Instance.Invoke(() =>
-            {
-                LoadPlayer(binaryReader);
-            });
-        }
+        //using (BinaryReader binaryReader = new(File.Open(playerFile, FileMode.Open)))
+        //{
+        //    ActionInMainThreadUtil.Instance.Invoke(() =>
+        //    {
+        //        LoadPlayer(binaryReader);
+        //    });
+        //}
 
         new SetPhysicsShapesPhase().StartPhase();
         Debug.Log("Loading Complete");

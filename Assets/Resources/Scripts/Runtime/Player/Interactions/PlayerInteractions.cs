@@ -5,10 +5,6 @@ using UnityEngine.InputSystem;
 public class PlayerInteractions : MonoBehaviour
 {
     #region Fields
-    [Header("Main")]
-    [SerializeField]
-    private Drop _dropPrefab;
-
     [Header("Interaction area")]
     [SerializeField]
     private bool _isAreaDrawing;
@@ -20,12 +16,7 @@ public class PlayerInteractions : MonoBehaviour
     [Header("Mining")]
     [Min(0.001f)]
     [SerializeField]
-    private float _blockDamageMultiplier;
-    [Min(0.001f)]
-    [SerializeField]
     private float _wallDamageMultiplier;
-    [SerializeField]
-    private MiningDamageController _miningDamageController;
 
     [Header("Placement")]
     [SerializeField]
@@ -38,10 +29,11 @@ public class PlayerInteractions : MonoBehaviour
     [SerializeField]
     private bool _isActive;
     private bool _isUsingItemFromHotbar;
-    private bool _isBreakingBlock;
     private bool _isBreakingWall;
 
     private PlaceBlockAction _placeBlockAction;
+    private BreakBlockAction _breakBlockAction;
+    private BreakWallAction _breakWallAction;
     #endregion
 
     #region Properties
@@ -71,13 +63,10 @@ public class PlayerInteractions : MonoBehaviour
         {
             UseItemFromHotbar();
         }
-        if (_isBreakingBlock)
-        {
-            BreakBlock();
-        }
         if (_isBreakingWall)
         {
-            BreakWall();
+            _breakWallAction.Configure(ClickPositionToWorldPosition(), _wallDamageMultiplier);
+            _breakWallAction.Execute();
         }
         if (_isMouseInsideArea)
         {
@@ -95,18 +84,19 @@ public class PlayerInteractions : MonoBehaviour
         _checkPlayerBoxCast.OriginOffset = new Vector2(0.5f, 0.5f);
         _checkPlayerBoxCast.Size = new Vector2(1f, 1f);
         _checkPlayerBoxCast.LayerMask = _playerLayerMask;
-        _miningDamageController = MiningDamageController.Instance;
         _isActive = true;
 
         PlayerInputActions playerInputActions = GameManager.Instance.PlayerInputActions;
         playerInputActions.Interactions.Enable();
         playerInputActions.Interactions.UseItemFromHotbar.performed += UseItemFromHotbarPerformed;
         playerInputActions.Interactions.UseItemFromHotbar.canceled += UseItemFromHotbarCanceled;
-        playerInputActions.Interactions.BreakBlock.performed += BreakBlockPerformed;
-        playerInputActions.Interactions.BreakBlock.canceled += BreakBlockCanceled;
+        playerInputActions.Interactions.BreakBlock.performed += BreakWallPerformed;
+        playerInputActions.Interactions.BreakBlock.canceled += BreakWallCanceled;
         playerInputActions.Interactions.ThrowItem.performed += ThrowSelectedItem;
 
         _placeBlockAction = new(_placementCooldown);
+        _breakBlockAction = new();
+        _breakWallAction = new();
     }
 
     public bool IsEnoughSpaceToTakeDrop(Drop drop)
@@ -141,49 +131,14 @@ public class PlayerInteractions : MonoBehaviour
                     }
                 }
                 break;
+            case PickaxeItemSO pickaxeItem:
+                {
+                    _breakBlockAction.Configure(ClickPositionToWorldPosition(), pickaxeItem.MiningDamage);
+                    _breakBlockAction.Execute();
+                }
+                break;
             default:
                 break;
-        }
-    }
-
-    private void BreakBlock()
-    {
-        Vector2Int blockPosition = ClickPositionToWorldPosition();
-        if (!WorldDataManager.Instance.IsBreakable(blockPosition.x, blockPosition.y))
-        {
-            return;
-        }
-        if (!WorldDataManager.Instance.IsEmpty(blockPosition.x, blockPosition.y))
-        {
-            BlockSO data = WorldDataManager.Instance.GetCellBlockData(blockPosition.x, blockPosition.y);
-            _miningDamageController.AddDamageToBlock(blockPosition, _blockDamageMultiplier);
-            if (_miningDamageController.IsBlockDamageReachedMaximum(blockPosition, data.DamageToBreak))
-            {
-                _miningDamageController.RemoveDamageFromBlocks(blockPosition);
-                CreateDrop(new Vector3(blockPosition.x + 0.5f, blockPosition.y + 0.5f), data.Drop, 1);
-                WorldDataManager.Instance.SetBlockData(blockPosition.x, blockPosition.y, GameManager.Instance.BlocksAtlas.Air);
-                UpdateNeighboringBlocks(blockPosition);
-            }
-        }
-    }
-
-    public void BreakWall()
-    {
-        Vector2Int wallPosition = ClickPositionToWorldPosition();
-        if (!WorldDataManager.Instance.IsBreakable(wallPosition.x, wallPosition.y))
-        {
-            return;
-        }
-        if (WorldDataManager.Instance.IsWall(wallPosition.x, wallPosition.y))
-        {
-            BlockSO data = WorldDataManager.Instance.GetCellWallData(wallPosition.x, wallPosition.y);
-            _miningDamageController.AddDamageToWall(wallPosition, _wallDamageMultiplier);
-            if (_miningDamageController.IsWallDamageReachedMaximum(wallPosition, data.DamageToBreak))
-            {
-                _miningDamageController.RemoveDamageFromWalls(wallPosition);
-                CreateDrop(new Vector3(wallPosition.x + 0.5f, wallPosition.y + 0.5f), data.Drop, 1);
-                GameManager.Instance.Terrain.CreateWall(wallPosition.x, wallPosition.y, GameManager.Instance.BlocksAtlas.AirWall);
-            }
         }
     }
 
@@ -204,24 +159,11 @@ public class PlayerInteractions : MonoBehaviour
         }
     }
 
-    //MOVE TO DROP MANAGER
-    private Drop CreateDrop(Vector3 position, ItemSO item, int quantity)
-    {
-        if (item == null)
-        {
-            return null;
-        }
-        Drop drop = Instantiate(_dropPrefab, position, Quaternion.identity);
-        drop.Quantity = quantity;
-        drop.Item = item;
-        return drop;
-    }
-
     private void ThrowSelectedItem(InputAction.CallbackContext _)
     {
         ItemSO data = _inventory.GetSelectedItemData();
         int quantity = _inventory.GetSelectedItemQuantity();
-        Drop drop = CreateDrop(transform.position, data, quantity);
+        Drop drop = DropManager.Instance.CreateDrop(transform.position, data, quantity);
         if (drop != null)
         {
             DropPhysics dropPhysics = drop.GetComponent<DropPhysics>();
@@ -250,27 +192,17 @@ public class PlayerInteractions : MonoBehaviour
 
     private void InventoryOverflowedEventHandler(ItemSO data, int quantity)
     {
-        CreateDrop(transform.position, data, quantity);
+        DropManager.Instance.CreateDrop(transform.position, data, quantity);
     }
 
-    private void UseItemFromHotbarPerformed(InputAction.CallbackContext context)
+    private void UseItemFromHotbarPerformed(InputAction.CallbackContext _)
     {
         _isUsingItemFromHotbar = true;
     }
 
-    private void UseItemFromHotbarCanceled(InputAction.CallbackContext context)
+    private void UseItemFromHotbarCanceled(InputAction.CallbackContext _)
     {
         _isUsingItemFromHotbar = false;
-    }
-
-    private void BreakBlockPerformed(InputAction.CallbackContext context)
-    {
-        _isBreakingBlock = true;
-    }
-
-    private void BreakBlockCanceled(InputAction.CallbackContext context)
-    {
-        _isBreakingBlock = false;
     }
 
     //REMOVE
@@ -303,6 +235,18 @@ public class PlayerInteractions : MonoBehaviour
             WorldDataManager.Instance.SetBlockData((ushort)torchPosition.x, (ushort)torchPosition.y, GameManager.Instance.BlocksAtlas.GetBlockById(FurnitureBlocksID.Torch));
             UpdateNeighboringBlocks(torchPosition);
         }
+    }
+
+    //REMOVE
+    private void BreakWallPerformed(InputAction.CallbackContext _)
+    {
+        _isBreakingWall = true;
+    }
+
+    //REMOVE
+    private void BreakWallCanceled(InputAction.CallbackContext _)
+    {
+        _isBreakingWall = false;
     }
     #endregion
 }

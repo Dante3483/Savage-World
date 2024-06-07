@@ -5,25 +5,32 @@ namespace Items
 {
     public abstract class ItemSO : ScriptableObject
     {
-        #region Private fields
-        [SerializeField] private ItemsID _id;
-        [SerializeField] private ItemTypes _itemType;
-        [SerializeField] private ItemRaritySO _itemRarity;
-        [SerializeField] private bool _isStackable;
-        [SerializeField] private int _maxStackSize = 1;
-        [SerializeField] private string _name;
-        [SerializeField] private string _using;
-        [SerializeField][TextArea] private string _description;
-        [SerializeField] private Sprite _smallItemImage;
-        [SerializeField] private Sprite _bigItemImage;
+        #region Fields
+        [SerializeField]
+        private ItemsID _id;
+        protected ItemTypes _itemType;
+        [SerializeField]
+        protected ItemRaritySO _itemRarity;
+        protected bool _isStackable;
+        [SerializeField]
+        protected int _stackSize;
+        [SerializeField]
+        private string _name;
+        [SerializeField]
+        protected string _using;
+        [SerializeField]
+        [TextArea]
+        protected string _description;
+        [SerializeField]
+        private Sprite _smallItemImage;
+        [SerializeField]
+        private Sprite _bigItemImage;
         protected StringBuilder _fullDescriptionStringBuilder;
         #endregion
 
-        #region Public fields
-
-        #endregion
-
         #region Properties
+        public string ColoredName => $"<color=#{ColorUtility.ToHtmlStringRGB(_itemRarity.RarityColor)}>{_name}</color>";
+
         public ItemTypes ItemType
         {
             get
@@ -54,12 +61,12 @@ namespace Items
         {
             get
             {
-                return _maxStackSize;
+                return _stackSize;
             }
 
             set
             {
-                _maxStackSize = value;
+                _stackSize = value;
             }
         }
 
@@ -73,14 +80,6 @@ namespace Items
             set
             {
                 _name = value;
-            }
-        }
-
-        public string ColoredName
-        {
-            get
-            {
-                return $"<color=#{ColorUtility.ToHtmlStringRGB(ItemRarity.RarityColor)}>{_name}</color>";
             }
         }
 
@@ -158,13 +157,25 @@ namespace Items
         }
         #endregion
 
-        #region Methods
+        #region Events / Delegates
+
+        #endregion
+
+        #region Monobehaviour Methods
+
+        #endregion
+
+        #region Public Methods
         public ItemSO()
         {
             _fullDescriptionStringBuilder = new StringBuilder();
         }
 
         public abstract StringBuilder GetFullDescription(int quantity);
+        #endregion
+
+        #region Private Methods
+
         #endregion
     }
 }
