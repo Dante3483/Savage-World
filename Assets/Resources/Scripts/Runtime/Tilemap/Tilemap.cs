@@ -151,8 +151,14 @@ namespace CustomTilemap
             UpdateBlockSprite(ref blockData);
             UpdateWallSprite(ref blockData);
             UpdateLiquidSprite(ref blockData);
-            UpdateBlockDamageSprite(blockData.BlockDamagePercent);
-            UpdateWallDamageSprite(blockData.WallDamagePercent);
+            //UpdateBlockDamageSprite(blockData.BlockDamagePercent);
+            //UpdateWallDamageSprite(blockData.WallDamagePercent);
+            float blockDamage = MiningDamageController.Instance.GetBlockDamage(position);
+            float wallDamage = MiningDamageController.Instance.GetWallDamage(position);
+            byte blockDamageId = (byte)(Mathf.Min(blockDamage / blockData.BlockData.DamageToBreak, 1) * 100);
+            byte wallDamageId = (byte)(Mathf.Min(wallDamage / blockData.WallData.DamageToBreak, 1) * 100);
+            UpdateBlockDamageSprite(blockDamageId);
+            UpdateWallDamageSprite(wallDamageId);
             CreatePlatform(position);
             _tiles[tileX, tileY].UpdateSprites(_tileSprites);
         }
@@ -170,7 +176,7 @@ namespace CustomTilemap
         private void UpdateLiquidSprite(ref WorldCellData data)
         {
             _tileSprites.LiquidSprite = null;
-            if (data.IsEmptyForLiquid() && data.IsLiquid())
+            if (data.IsValidForLiquid && data.IsLiquid)
             {
                 _tileSprites.LiquidSprite = data.GetLiquidSprite();
             }

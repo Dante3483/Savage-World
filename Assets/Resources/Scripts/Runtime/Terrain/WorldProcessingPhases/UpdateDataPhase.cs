@@ -13,7 +13,7 @@ public class UpdateDataPhase : IWorldProcessingPhase
     #endregion
 
     #region Properties
-    public string Name => "Block processing";
+    public string Name => "Update data";
     #endregion
 
     #region Methods
@@ -28,7 +28,7 @@ public class UpdateDataPhase : IWorldProcessingPhase
             {
                 for (int y = 5; y < terrainHeight - 5; y++)
                 {
-                    if (_worldData[index, y].IsDust() && _worldData[index, y - 1].IsEmpty())
+                    if (_worldData[index, y].IsDust && _worldData[index, y - 1].IsEmpty)
                     {
                         lock (this)
                         {
@@ -38,10 +38,10 @@ public class UpdateDataPhase : IWorldProcessingPhase
                 }
             });
 
-            while (_terrain.NeedToUpdate.Count != 0)
-            {
-                _terrain.UpdateWorldData();
-            }
+            //while (_terrain.NeedToUpdate.Count != 0)
+            //{
+            //    //_terrain.UpdateWorldData();
+            //}
         }
         catch (Exception ex)
         {

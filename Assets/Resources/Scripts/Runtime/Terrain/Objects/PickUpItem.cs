@@ -11,7 +11,7 @@ public class PickUpItem : MonoBehaviour
     [SerializeField] private BiomesID[] _biomesToSpawn;
     [SerializeField] private int _chanceToSpawn;
 
-    private Vector2Int _intPosition = new Vector2Int();
+    private Vector2Int _intPosition = new();
     #endregion
 
     #region Public fields
@@ -69,7 +69,7 @@ public class PickUpItem : MonoBehaviour
     {
         _intPosition.x = Mathf.FloorToInt(transform.position.x);
         _intPosition.y = Mathf.FloorToInt(transform.position.y);
-        if (WorldDataManager.Instance.WorldData[_intPosition.x, _intPosition.y - 1].IsEmpty())
+        if (WorldDataManager.Instance.WorldData[_intPosition.x, _intPosition.y - 1].IsEmpty)
         {
             WorldDataManager.Instance.MakeFree(_intPosition.x, _intPosition.y);
             DeleteObject();

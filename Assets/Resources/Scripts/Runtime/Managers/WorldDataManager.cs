@@ -119,10 +119,9 @@ public class WorldDataManager : MonoBehaviour
         _worldData[x, y].SetBlockData(data);
         if (GameManager.Instance.IsGameSession && !GameManager.Instance.IsWorldLoading)
         {
-            Debug.Log("SetData");
             _worldData[x, y].SetRandomBlockTile(GameManager.Instance.RandomVar);
 
-            if (_worldData[x, y].IsEmpty() || _worldData[x, y].IsSolid())
+            if (_worldData[x, y].IsEmpty || _worldData[x, y].IsSolid)
             {
                 _worldData[x, y].ColliderIndex = byte.MaxValue;
                 UpdateCollidersAround(x, y);
@@ -149,7 +148,7 @@ public class WorldDataManager : MonoBehaviour
         }
         _worldData[x, y].SetBlockData(block);
         _worldData[x, y].SetWallData(wall);
-        _worldData[x, y].SetLiquidBlockData(liquidId, flowValue);
+        _worldData[x, y].SetLiquidData(liquidId, flowValue);
         _worldData[x, y].Flags = flags;
         _worldData[x, y].TileId = tileId;
         _worldData[x, y].ColliderIndex = colliderIndex;
@@ -201,93 +200,93 @@ public class WorldDataManager : MonoBehaviour
 
     public void SetBlockDamagePercent(int x, int y, float damage)
     {
-        _worldData[x, y].SetBlockDamagePercent(damage);
+        //_worldData[x, y].SetBlockDamagePercent(damage);
         OnDataChanged?.Invoke(x, y);
     }
 
     public void SetWallDamagePercent(int x, int y, float damage)
     {
-        _worldData[x, y].SetWallDamagePercent(damage);
+        //_worldData[x, y].SetWallDamagePercent(damage);
         OnDataChanged?.Invoke(x, y);
     }
 
     #region Flags
     public void MakeOccupied(int x, int y)
     {
-        _worldData[x, y].MakeOccupied();
+        _worldData[x, y].SetOccupiedFlag(true);
     }
 
     public void MakeFree(int x, int y)
     {
-        _worldData[x, y].MakeFree();
+        _worldData[x, y].SetOccupiedFlag(false);
     }
 
     public void MakeUnbreakable(int x, int y)
     {
-        _worldData[x, y].MakeUnbreakable();
+        _worldData[x, y].SetUnbreakableFlag(true);
     }
 
     public void MakeBreakable(int x, int y)
     {
-        _worldData[x, y].MakeBreakable();
+        _worldData[x, y].SetUnbreakableFlag(false);
     }
 
     public void MakeTree(int x, int y)
     {
-        _worldData[x, y].MakeTree();
+        _worldData[x, y].SetTreeFlag(true);
     }
 
     public void RemoveTree(int x, int y)
     {
-        _worldData[x, y].RemoveTree();
+        _worldData[x, y].SetTreeFlag(true);
     }
 
     public void MakeTreeTrunk(int x, int y)
     {
-        _worldData[x, y].MakeTreeTrunk();
+        _worldData[x, y].SetTreeTrunkFlag(true);
     }
 
     public void RemoveTreeTrunk(int x, int y)
     {
-        _worldData[x, y].RemoveTreeTrunk();
+        _worldData[x, y].SetTreeTrunkFlag(false);
     }
     #endregion
 
     #region Checks
     public bool IsEmpty(int x, int y)
     {
-        return _worldData[x, y].IsEmpty();
+        return _worldData[x, y].IsEmpty;
     }
 
     public bool IsSolid(int x, int y)
     {
-        return _worldData[x, y].IsSolid();
+        return _worldData[x, y].IsSolid;
     }
 
     public bool IsWall(int x, int y)
     {
-        return _worldData[x, y].IsWall();
+        return _worldData[x, y].IsWall;
     }
 
     public bool IsSolidAnyNeighbor(int x, int y)
     {
-        return _worldData[x - 1, y].IsSolid() || _worldData[x + 1, y].IsSolid() ||
-            _worldData[x, y + 1].IsSolid() || _worldData[x, y - 1].IsSolid();
+        return _worldData[x - 1, y].IsSolid || _worldData[x + 1, y].IsSolid ||
+            _worldData[x, y + 1].IsSolid || _worldData[x, y - 1].IsSolid;
     }
 
     public bool IsFree(int x, int y)
     {
-        return _worldData[x, y].IsFree();
+        return _worldData[x, y].IsFree;
     }
 
     public bool IsBreakable(int x, int y)
     {
-        return _worldData[x, y].IsBreakable();
+        return !_worldData[x, y].IsUnbreakable;
     }
 
     public bool IsColliderHorizontalFlipped(int x, int y)
     {
-        return _worldData[x, y].IsColliderHorizontalFlipped();
+        return _worldData[x, y].IsColliderHorizontalFlipped;
     }
     #endregion
 
@@ -300,7 +299,7 @@ public class WorldDataManager : MonoBehaviour
 
     public void UpdateBlockCollider(int x, int y)
     {
-        if (_worldData[x, y].IsSolid())
+        if (_worldData[x, y].IsSolid)
         {
             CheckRules(x, y, _mainRules, out byte i);
             _worldData[x, y].ColliderIndex = i;
@@ -310,7 +309,7 @@ public class WorldDataManager : MonoBehaviour
 
     public void UpdateCornerCollider(int x, int y, bool stopPropagation = false)
     {
-        if (!_worldData[x, y].IsSolid())
+        if (!_worldData[x, y].IsSolid)
         {
             byte prevIndex = _worldData[x, y].ColliderIndex;
             if (CheckRule(x, y, _mainRules.CornerRule))
@@ -352,7 +351,7 @@ public class WorldDataManager : MonoBehaviour
 
     public void UpdateBlockColliderWithoutNotification(int x, int y)
     {
-        if (_worldData[x, y].IsSolid())
+        if (_worldData[x, y].IsSolid)
         {
             CheckRules(x, y, _mainRules, out byte i);
             _worldData[x, y].ColliderIndex = i;
@@ -361,7 +360,7 @@ public class WorldDataManager : MonoBehaviour
 
     public void UpdateCornerColliderWithoutNotification(int x, int y, bool stopPropagation = false)
     {
-        if (!_worldData[x, y].IsSolid())
+        if (!_worldData[x, y].IsSolid)
         {
             byte prevIndex = _worldData[x, y].ColliderIndex;
             if (CheckRule(x, y, _mainRules.CornerRule))
@@ -396,14 +395,7 @@ public class WorldDataManager : MonoBehaviour
 
     public void SetColliderIndex(int x, int y, byte index, bool isHorizontalFlipped)
     {
-        if (isHorizontalFlipped)
-        {
-            _worldData[x, y].MakeColliderHorizontalFlipped();
-        }
-        else
-        {
-            _worldData[x, y].RemoveColliderHorizontalFlipped();
-        }
+        _worldData[x, y].SetColliderHorizontalFlippedFlag(isHorizontalFlipped);
         _worldData[x, y].ColliderIndex = index;
         OnColliderChanged?.Invoke(x, y);
     }
@@ -426,12 +418,12 @@ public class WorldDataManager : MonoBehaviour
     {
         if (CheckRule(x, y, rule, false))
         {
-            _worldData[x, y].RemoveColliderHorizontalFlipped();
+            _worldData[x, y].SetColliderHorizontalFlippedFlag(false);
             return true;
         }
         else if (rule.IsHorizontalFlip && CheckRule(x, y, rule, true))
         {
-            _worldData[x, y].MakeColliderHorizontalFlipped();
+            _worldData[x, y].SetColliderHorizontalFlippedFlag(true);
             return true;
         }
         return false;
@@ -465,9 +457,9 @@ public class WorldDataManager : MonoBehaviour
         int ruleY = y + position.y;
         return ruleType switch
         {
-            ColliderRuleType.Nothing => !_worldData[ruleX, ruleY].IsSolid() && _worldData[ruleX, ruleY].ColliderIndex != 254,
-            ColliderRuleType.Empty => !_worldData[ruleX, ruleY].IsSolid(),
-            ColliderRuleType.Solid => _worldData[ruleX, ruleY].IsSolid(),
+            ColliderRuleType.Nothing => !_worldData[ruleX, ruleY].IsSolid && _worldData[ruleX, ruleY].ColliderIndex != 254,
+            ColliderRuleType.Empty => !_worldData[ruleX, ruleY].IsSolid,
+            ColliderRuleType.Solid => _worldData[ruleX, ruleY].IsSolid,
             ColliderRuleType.Corner => _worldData[ruleX, ruleY].ColliderIndex == 254,
             _ => false
         };

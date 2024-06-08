@@ -23,8 +23,8 @@ public class PickUpItemsGenerationPhase : IWorldProcessingPhase
     {
         //Create surface collected items
         Dictionary<BiomesID, List<PickUpItem>> allPickUpItems = null;
-        List<Vector3> coords = new List<Vector3>();
-        Vector3 vector = new Vector3();
+        List<Vector3> coords = new();
+        Vector3 vector = new();
         ActionInMainThreadUtil.Instance.Invoke(() =>
         {
             allPickUpItems = new Dictionary<BiomesID, List<PickUpItem>>()
@@ -68,11 +68,11 @@ public class PickUpItemsGenerationPhase : IWorldProcessingPhase
                 {
                     for (y = _terrainConfiguration.Equator; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
                     {
-                        if (!_worldData[x, y].IsSolid())
+                        if (!_worldData[x, y].IsSolid)
                         {
                             continue;
                         }
-                        if (!_worldData[x, y + 1].IsEmpty())
+                        if (!_worldData[x, y + 1].IsEmpty)
                         {
                             continue;
                         }
@@ -82,7 +82,7 @@ public class PickUpItemsGenerationPhase : IWorldProcessingPhase
                             vector.x = x;
                             vector.y = y + 1;
                             coords.Add(vector);
-                            _worldData[x, y].MakeOccupied();
+                            _worldData[x, y].SetOccupiedFlag(true);
                         }
                     }
                 }

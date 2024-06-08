@@ -22,7 +22,7 @@ public class GrassSeedingPhase : IWorldProcessingPhase
     {
         TerrainGeneration.SurfaceCoords.Clear();
         BiomesID currentBiomeId;
-        Vector2Int vector = new Vector2Int();
+        Vector2Int vector = new();
         int x;
         int y;
         int terrainWidth = GameManager.Instance.CurrentTerrainWidth;
@@ -32,11 +32,11 @@ public class GrassSeedingPhase : IWorldProcessingPhase
             for (y = _terrainConfiguration.Equator; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
             {
                 currentBiomeId = ChunksManager.Instance.GetChunk(x, y).Biome.Id;
-                if (!_worldData[x, y + 1].IsEmpty())
+                if (!_worldData[x, y + 1].IsEmpty)
                 {
                     continue;
                 }
-                if (_worldData[x, y + 1].IsLiquid())
+                if (_worldData[x, y + 1].IsLiquid)
                 {
                     continue;
                 }

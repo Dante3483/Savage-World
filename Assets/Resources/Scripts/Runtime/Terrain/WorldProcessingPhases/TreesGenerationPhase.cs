@@ -23,7 +23,7 @@ public class TreesGenerationPhase : IWorldProcessingPhase
     {
         //Create surface trees
         Dictionary<BiomesID, List<Tree>> allTrees = null;
-        List<Vector3> coords = new List<Vector3>();
+        List<Vector3> coords = new();
         ActionInMainThreadUtil.Instance.Invoke(() =>
         {
             allTrees = new Dictionary<BiomesID, List<Tree>>()
@@ -77,12 +77,12 @@ public class TreesGenerationPhase : IWorldProcessingPhase
                                 isValidPlace = false;
                                 break;
                             }
-                            if (!_worldData[x + i, y + 1].IsEmptyForTree())
+                            if (!_worldData[x + i, y + 1].IsValidForTree)
                             {
                                 isValidPlace = false;
                                 break;
                             }
-                            if (_worldData[x + i, y + 1].IsLiquid())
+                            if (_worldData[x + i, y + 1].IsLiquid)
                             {
                                 isValidPlace = false;
                                 break;
@@ -126,11 +126,11 @@ public class TreesGenerationPhase : IWorldProcessingPhase
         {
             blockX = x + (int)(vector.x - tree.Start.x);
             blockY = y;
-            if (!_worldData[blockX, blockY].IsEmptyForTree())
+            if (!_worldData[blockX, blockY].IsValidForTree)
             {
                 return false;
             }
-            if (_worldData[blockX, blockY].IsLiquid())
+            if (_worldData[blockX, blockY].IsLiquid)
             {
                 return false;
             }
@@ -139,11 +139,11 @@ public class TreesGenerationPhase : IWorldProcessingPhase
         {
             blockX = x + (int)(vector.x - tree.Start.x);
             blockY = y;
-            if (!_worldData[blockX, blockY].IsEmptyForTree())
+            if (!_worldData[blockX, blockY].IsValidForTree)
             {
                 return false;
             }
-            if (_worldData[blockX, blockY].IsLiquid())
+            if (_worldData[blockX, blockY].IsLiquid)
             {
                 return false;
             }

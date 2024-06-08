@@ -110,7 +110,7 @@ public class PlayerNetwork : NetworkBehaviour
     private void OnColliderIndexChanged(int x, int y)
     {
         ref WorldCellData blockData = ref WorldDataManager.Instance.GetWorldCellData(x, y);
-        SendColliderIndexRpc(blockData.ColliderIndex, blockData.IsColliderHorizontalFlipped(), x, y);
+        SendColliderIndexRpc(blockData.ColliderIndex, blockData.IsColliderHorizontalFlipped, x, y);
     }
 
     [Rpc(SendTo.SpecifiedInParams, AllowTargetOverride = true)]

@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Jobs;
-using UnityEditor;
-using UnityEngine;
 
 namespace LightSystem
 {
@@ -40,7 +36,7 @@ namespace LightSystem
         public void Execute(int index)
         {
             WorldCellData[,] globalWorldData = WorldDataManager.Instance.WorldData;
-            WorldCellDataGPU data = new WorldCellDataGPU();
+            WorldCellDataGPU data = new();
             int x = index % _width;
             int y = index / _width;
             int dx = _startX + x;
@@ -59,15 +55,15 @@ namespace LightSystem
 
             data.Flags = 0;
 
-            if (globalWorldData[dx, dy].IsSolid())
+            if (globalWorldData[dx, dy].IsSolid)
             {
                 data.Flags += 1;
             }
-            if (globalWorldData[dx, dy].IsFullLiquidBlock())
+            if (globalWorldData[dx, dy].IsLiquidFull)
             {
                 data.Flags += 2;
             }
-            if (globalWorldData[dx, dy].IsDayLightBlock())
+            if (globalWorldData[dx, dy].IsDatLightBlock)
             {
                 data.Flags += 4;
             }

@@ -62,6 +62,12 @@ public class MiningDamageData
         _damageByPosition.Remove(position);
     }
 
+    public float GetDamage(Vector2Int position)
+    {
+        _damageByPosition.TryGetValue(position, out float damage);
+        return damage;
+    }
+
     public bool IsDamageReachedValue(Vector2Int position, float value)
     {
         return _damageByPosition[position] >= value;

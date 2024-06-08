@@ -22,7 +22,7 @@ public class PlantsGenerationPhase : IWorldProcessingPhase
     public void StartPhase()
     {
         //Create surface plants
-        List<List<BlockSO>> allPlants = new List<List<BlockSO>>()
+        List<List<BlockSO>> allPlants = new()
         {
             GameManager.Instance.BlocksAtlas.GetPlantsByBiome(BiomesID.NonBiome),
             //GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.Ocean),
@@ -66,11 +66,11 @@ public class PlantsGenerationPhase : IWorldProcessingPhase
                         {
                             if (plant.IsBottomBlockSolid)
                             {
-                                if (!_worldData[x, y + 1].IsEmpty())
+                                if (!_worldData[x, y + 1].IsEmpty)
                                 {
                                     continue;
                                 }
-                                if (_worldData[x, y + 1].IsLiquid())
+                                if (_worldData[x, y + 1].IsLiquid)
                                 {
                                     continue;
                                 }
@@ -78,11 +78,11 @@ public class PlantsGenerationPhase : IWorldProcessingPhase
                             }
                             if (plant.IsTopBlockSolid)
                             {
-                                if (!_worldData[x, y - 1].IsEmpty())
+                                if (!_worldData[x, y - 1].IsEmpty)
                                 {
                                     continue;
                                 }
-                                if (_worldData[x, y - 1].IsLiquid())
+                                if (_worldData[x, y - 1].IsLiquid)
                                 {
                                     continue;
                                 }

@@ -54,6 +54,16 @@ public class MiningDamageController : MonoBehaviour
         _wallsDamageData.RemoveDamage(position);
     }
 
+    public float GetBlockDamage(Vector2Int position)
+    {
+        return _blocksDamageData.GetDamage(position);
+    }
+
+    public float GetWallDamage(Vector2Int position)
+    {
+        return _wallsDamageData.GetDamage(position);
+    }
+
     public bool IsBlockDamageReachedMaximum(Vector2Int position, float maxDamage)
     {
         return _blocksDamageData.IsDamageReachedValue(position, maxDamage);

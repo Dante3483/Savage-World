@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -30,8 +28,8 @@ public class SaveMapToPNG : MonoBehaviour
     {
         int terrainWidth = GameManager.Instance.CurrentTerrainWidth;
         int terrainHeight = GameManager.Instance.CurrentTerrainHeight;
-        Texture2D worldMap = new Texture2D(terrainWidth, terrainHeight);
-        Texture2D biomesMap = new Texture2D(terrainWidth, terrainHeight);
+        Texture2D worldMap = new(terrainWidth, terrainHeight);
+        Texture2D biomesMap = new(terrainWidth, terrainHeight);
         Color cellColor;
         Color biomeColor;
         Color gridColor;
@@ -42,11 +40,11 @@ public class SaveMapToPNG : MonoBehaviour
             for (int y = 0; y < terrainHeight; y++)
             {
                 cellColor = WorldDataManager.Instance.WorldData[x, y].BlockData.ColorOnMap;
-                if (WorldDataManager.Instance.WorldData[x, y].IsEmpty())
+                if (WorldDataManager.Instance.WorldData[x, y].IsEmpty)
                 {
                     cellColor = WorldDataManager.Instance.WorldData[x, y].WallData.ColorOnMap;
                 }
-                if (WorldDataManager.Instance.WorldData[x, y].IsLiquid())
+                if (WorldDataManager.Instance.WorldData[x, y].IsLiquid)
                 {
                     cellColor = GameManager.Instance.BlocksAtlas.GetBlockById(WorldDataManager.Instance.WorldData[x, y].LiquidId).ColorOnMap;
                 }
