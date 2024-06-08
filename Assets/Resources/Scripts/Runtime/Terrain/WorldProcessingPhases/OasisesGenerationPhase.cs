@@ -1,69 +1,59 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = System.Random;
 
-public class OasisesGenerationPhase : IWorldProcessingPhase
+public class OasisesGenerationPhase : WorldProcessingPhaseBase
 {
-    #region Private fields
-    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
-    private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
-    private Terrain _terrain = GameManager.Instance.Terrain;
-    private Random _randomVar = GameManager.Instance.RandomVar;
-    private BlockSO _waterBlock = GameManager.Instance.BlocksAtlas.Water;
-    private BlockSO _airBlock = GameManager.Instance.BlocksAtlas.Air;
-    #endregion
-
-    #region Public fields
+    #region Fields
 
     #endregion
 
     #region Properties
-    public string Name => "Oasises generation";
+    public override string Name => "Oasises generation";
     #endregion
 
-    #region Methods
-    public void StartPhase()
+    #region Events / Delegates
+
+    #endregion
+
+    #region Public Methods
+    public override void StartPhase()
     {
-        int startX = _terrainConfiguration.Desert.StartX + _terrainConfiguration.ChunkSize;
-        int endX = _terrainConfiguration.Desert.EndX - _terrainConfiguration.ChunkSize;
+        int startX = _terrainConfiguration.Desert.StartX + _chunkSize;
+        int endX = _terrainConfiguration.Desert.EndX - _chunkSize;
         int i;
         int j;
         bool isChance = false;
 
-        for (i = startX; i < endX; i += _terrainConfiguration.ChunkSize)
+        for (i = startX; i < endX; i += _chunkSize)
         {
-            if (_randomVar.Next(0, 101) <= _terrainConfiguration.OasisChance || isChance)
+            if (GetNextRandomValue(0, 101) <= _terrainConfiguration.OasisChance || isChance)
             {
-                for (j = i; j < i + _terrainConfiguration.ChunkSize; j++)
+                for (j = i; j < i + _chunkSize; j++)
                 {
                     isChance = true;
-                    if (CreateOasis(TerrainGeneration.SurfaceCoords[j].x, TerrainGeneration.SurfaceCoords[j].y))
+                    if (CreateOasis(_surfaceCoords[j].x, _surfaceCoords[j].y))
                     {
                         isChance = false;
-                        i += (ushort)(_terrainConfiguration.ChunkSize * _terrainConfiguration.OasisDistanceInChunks);
+                        i += (ushort)(_chunkSize * _terrainConfiguration.OasisDistanceInChunks);
                         break;
                     }
                 }
             }
         }
     }
+    #endregion
 
+    #region Private Methods
     private bool CreateOasis(int startX, int startY)
     {
-        double Ellipse(int x, int a, int b)
-        {
-            return Math.Sqrt((1 - Math.Pow(x, 2) / Math.Pow(a, 2)) * Math.Pow(b, 2));
-        }
-
-        List<Vector2Int> coords = new List<Vector2Int>();
-        List<Vector2Int> emptyCoords = new List<Vector2Int>();
-        Vector2Int vector = new Vector2Int();
-        int oasisLength = _randomVar.Next(_terrainConfiguration.MinOasisLength, _terrainConfiguration.MaxOasisLength);
-        int oasisHeight = _randomVar.Next(_terrainConfiguration.MinOasisHeight, _terrainConfiguration.MaxOasisHeight);
+        List<Vector2Int> coords = new();
+        List<Vector2Int> emptyCoords = new();
+        Vector2Int vector = new();
+        int oasisLength = GetNextRandomValue(_terrainConfiguration.MinOasisLength, _terrainConfiguration.MaxOasisLength);
+        int oasisHeight = GetNextRandomValue(_terrainConfiguration.MinOasisHeight, _terrainConfiguration.MaxOasisHeight);
         int x;
         int y;
-        byte waterId = (byte)_waterBlock.GetId();
 
         //Fill list with potential blocks
         for (x = startX; x < startX + oasisLength; x++)
@@ -85,14 +75,14 @@ public class OasisesGenerationPhase : IWorldProcessingPhase
 
         foreach (Vector2Int coord in coords)
         {
-            if (_worldData[coord.x - 1, coord.y].CompareBlock(_airBlock) ||
-                _worldData[coord.x + 1, coord.y].CompareBlock(_airBlock))
+            if (CompareBlock(coord.x - 1, coord.y, _air) ||
+                CompareBlock(coord.x + 1, coord.y, _air))
             {
                 return false;
             }
             for (i = 0; i < 3; i++)
             {
-                if (_worldData[coord.x, coord.y - i].CompareBlock(_airBlock))
+                if (CompareBlock(coord.x, coord.y - i, _air))
                 {
                     return false;
                 }
@@ -104,7 +94,7 @@ public class OasisesGenerationPhase : IWorldProcessingPhase
         {
             for (j = 1; ; j++)
             {
-                if (_worldData[x, startY + j].CompareBlock(_airBlock))
+                if (CompareBlock(x, startY + j, _air))
                 {
                     break;
                 }
@@ -120,14 +110,14 @@ public class OasisesGenerationPhase : IWorldProcessingPhase
 
         for (x = startX + oasisLength; ; x++)
         {
-            if (_worldData[x, startY + smoothStartY].CompareBlock(_airBlock))
+            if (CompareBlock(x, startY + smoothStartY, _air))
             {
                 break;
             }
 
             for (y = startY + smoothStartY; ; y++)
             {
-                if (_worldData[x, y].CompareBlock(_airBlock))
+                if (CompareBlock(x, y, _air))
                 {
                     break;
                 }
@@ -136,7 +126,7 @@ public class OasisesGenerationPhase : IWorldProcessingPhase
                 emptyCoords.Add(vector);
             }
 
-            chanceToMoveUp = _randomVar.Next(0, 3);
+            chanceToMoveUp = GetNextRandomValue(0, 3);
             if (chanceToMoveUp % 2 == 0)
             {
                 smoothStartY++;
@@ -146,17 +136,22 @@ public class OasisesGenerationPhase : IWorldProcessingPhase
         //Create lake
         foreach (Vector2Int coord in coords)
         {
-            _terrain.CreateBlock(coord.x, coord.y, _airBlock);
-            _terrain.CreateLiquidBlock(coord.x, coord.y, waterId);
+            SetBlockData(coord.x, coord.y, _air);
+            SetLiquidData(coord.x, coord.y, _water);
         }
 
         //Create air
         foreach (Vector2Int coord in emptyCoords)
         {
-            _terrain.CreateBlock(coord.x, coord.y, _airBlock);
+            SetBlockData(coord.x, coord.y, _air);
         }
 
         return true;
+    }
+
+    private double Ellipse(int x, int a, int b)
+    {
+        return Math.Sqrt((1 - Math.Pow(x, 2) / Math.Pow(a, 2)) * Math.Pow(b, 2));
     }
     #endregion
 }

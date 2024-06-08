@@ -1,32 +1,33 @@
-using Random = System.Random;
-
-public class SetRandomTilesPhase : IWorldProcessingPhase
+public class SetRandomTilesPhase : WorldProcessingPhaseBase
 {
-    #region Private fields
-    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
-    private Random _randomVar = GameManager.Instance.RandomVar;
-    #endregion
-
-    #region Public fields
+    #region Fields
 
     #endregion
 
     #region Properties
-    public string Name => "Set random tiles";
+    public override string Name => "Set random tiles";
     #endregion
 
-    #region Methods
-    public void StartPhase()
+    #region Events / Delegates
+
+    #endregion
+
+    #region Public Methods
+    public override void StartPhase()
     {
 
-        for (int x = 0; x < GameManager.Instance.CurrentTerrainWidth; x++)
+        for (int x = 0; x < _terrainWidth; x++)
         {
-            for (int y = 0; y < GameManager.Instance.CurrentTerrainHeight; y++)
+            for (int y = 0; y < _terrainHeight; y++)
             {
-                _worldData[x, y].SetRandomBlockTile(_randomVar);
-                _worldData[x, y].SetRandomWallTile(_randomVar);
+                _worldDataManager.SetRandomBlockTile(x, y);
+                _worldDataManager.SetRandomWallTile(x, y);
             }
         }
     }
+    #endregion
+
+    #region Private Methods
+
     #endregion
 }

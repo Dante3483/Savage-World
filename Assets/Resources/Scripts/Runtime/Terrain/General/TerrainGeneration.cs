@@ -4,19 +4,19 @@ using Stopwatch = System.Diagnostics.Stopwatch;
 
 public class TerrainGeneration
 {
-    #region Private fields
+    #region Fields
     private List<IWorldProcessingPhase> _generationPhases;
-    #endregion
-
-    #region Public fields
-    public static List<Vector2Int> SurfaceCoords;
     #endregion
 
     #region Properties
 
     #endregion
 
-    #region Methods
+    #region Events / Delegates
+
+    #endregion
+
+    #region Public Methods
     public TerrainGeneration()
     {
         TerrainConfigurationSO terrainConfiguration = GameManager.Instance.TerrainConfiguration;
@@ -86,7 +86,6 @@ public class TerrainGeneration
             _generationPhases.Clear();
             _generationPhases.Add(new SaveLoadTestPhase());
         }
-        SurfaceCoords = new List<Vector2Int>();
     }
 
     public void StartTerrainGeneration()
@@ -109,5 +108,9 @@ public class TerrainGeneration
         Debug.Log($"Total time: {totalTime}");
         GameManager.Instance.PhasesInfo += $"Total time: {totalTime}\n";
     }
+    #endregion
+
+    #region Private Methods
+
     #endregion
 }

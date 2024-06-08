@@ -147,58 +147,59 @@ namespace CustomTilemap
             int tileX = position.x - _currentPosition.x;
             int tileY = position.y - _currentPosition.y;
 
-            ref WorldCellData blockData = ref WorldDataManager.Instance.GetWorldCellData(position.x, position.y);
-            UpdateBlockSprite(ref blockData);
-            UpdateWallSprite(ref blockData);
-            UpdateLiquidSprite(ref blockData);
-            //UpdateBlockDamageSprite(blockData.BlockDamagePercent);
-            //UpdateWallDamageSprite(blockData.WallDamagePercent);
-            float blockDamage = MiningDamageController.Instance.GetBlockDamage(position);
-            float wallDamage = MiningDamageController.Instance.GetWallDamage(position);
-            byte blockDamageId = (byte)(Mathf.Min(blockDamage / blockData.BlockData.DamageToBreak, 1) * 100);
-            byte wallDamageId = (byte)(Mathf.Min(wallDamage / blockData.WallData.DamageToBreak, 1) * 100);
-            UpdateBlockDamageSprite(blockDamageId);
-            UpdateWallDamageSprite(wallDamageId);
+            UpdateBlockSprite(position);
+            UpdateWallSprite(position);
+            UpdateLiquidSprite(position);
+            UpdateBlockDamageSprite(position);
+            UpdateWallDamageSprite(position);
             CreatePlatform(position);
             _tiles[tileX, tileY].UpdateSprites(_tileSprites);
         }
 
-        private void UpdateBlockSprite(ref WorldCellData data)
+        private void UpdateBlockSprite(Vector2Int position)
         {
-            _tileSprites.BlockSprite = data.GetBlockSprite();
+            _tileSprites.BlockSprite = WorldDataManager.Instance.GetBlockSprite(position.x, position.y);
         }
 
-        private void UpdateWallSprite(ref WorldCellData data)
+        private void UpdateWallSprite(Vector2Int position)
         {
-            _tileSprites.WallSprite = data.GetWallSprite();
+            _tileSprites.WallSprite = WorldDataManager.Instance.GetWallSprite(position.x, position.y);
         }
 
-        private void UpdateLiquidSprite(ref WorldCellData data)
+        private void UpdateLiquidSprite(Vector2Int position)
         {
-            _tileSprites.LiquidSprite = null;
-            if (data.IsValidForLiquid && data.IsLiquid)
-            {
-                _tileSprites.LiquidSprite = data.GetLiquidSprite();
-            }
+            _tileSprites.LiquidSprite = WorldDataManager.Instance.GetLiquidSprite(position.x, position.y);
         }
 
-        private void UpdateBlockDamageSprite(byte damage)
+        private void UpdateBlockDamageSprite(Vector2Int position)
         {
+            float rawDamage = MiningDamageController.Instance.GetBlockDamage(position);
             _tileSprites.BlockDamageSprite = null;
-            if (damage != 0)
+            if (rawDamage > 0)
             {
-                int index = Mathf.CeilToInt(damage / (100f / _blockDamageSprites.Length)) - 1;
-                _tileSprites.BlockDamageSprite = _blockDamageSprites[index];
+                float maxDamage = WorldDataManager.Instance.GetBlockData(position.x, position.y).DamageToBreak;
+                int damage = (int)(Mathf.Min(rawDamage / maxDamage, 1) * 100);
+                if (damage != 0)
+                {
+                    int id = Mathf.CeilToInt(damage / (100f / _blockDamageSprites.Length)) - 1;
+                    _tileSprites.BlockDamageSprite = _blockDamageSprites[id];
+                }
             }
         }
 
-        private void UpdateWallDamageSprite(byte damage)
+        private void UpdateWallDamageSprite(Vector2Int position)
         {
+            float rawDamage = MiningDamageController.Instance.GetWallDamage(position);
             _tileSprites.WallDamageSprite = null;
-            if (damage != 0)
+            if (rawDamage > 0)
             {
-                int index = Mathf.CeilToInt(damage / (100f / _wallDamageSprites.Length)) - 1;
-                _tileSprites.WallDamageSprite = _wallDamageSprites[index];
+                float maxDamage = WorldDataManager.Instance.GetWallData(position.x, position.y).DamageToBreak;
+                int damage = (int)(Mathf.Min(rawDamage / maxDamage, 1) * 100);
+                if (damage != 0)
+                {
+                    int id = Mathf.CeilToInt(damage / (100f / _wallDamageSprites.Length)) - 1;
+                    _tileSprites.WallDamageSprite = _wallDamageSprites[id];
+                }
             }
         }
 

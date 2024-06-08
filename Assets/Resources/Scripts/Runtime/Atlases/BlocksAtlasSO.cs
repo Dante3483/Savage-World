@@ -21,7 +21,13 @@ public class BlocksAtlasSO : AtlasSO
     [SerializeField]
     private FurnitureSO[] _furniture;
 
-    private Dictionary<BlockTypes, Dictionary<ushort, BlockSO>> _blockByTypeAndId;
+    private Dictionary<ushort, BlockSO> _abstractBlocksById;
+    private Dictionary<ushort, BlockSO> _solidBlocksById;
+    private Dictionary<ushort, BlockSO> _dustBlocksById;
+    private Dictionary<ushort, BlockSO> _liquidBlocksById;
+    private Dictionary<ushort, BlockSO> _plantBlocksById;
+    private Dictionary<ushort, BlockSO> _wallsById;
+    private Dictionary<ushort, BlockSO> _furnitureById;
     private Dictionary<BiomesID, BlockSO> _grassByBiome;
     private Dictionary<BiomesID, List<BlockSO>> _plantsByBiome;
     #endregion
@@ -91,36 +97,37 @@ public class BlocksAtlasSO : AtlasSO
     #region Methods
     public override void InitializeAtlas()
     {
-        InitializeSetBlockByTypeAndId();
+        InitializeSetsBlockById();
         InitializeSetGrassByBiome();
         InitializeSetPlantsByBiome();
     }
 
-    private void InitializeSetBlockByTypeAndId()
+    private void SortArrayById(BlockSO[] array, Dictionary<ushort, BlockSO> dictionary)
     {
-        _blockByTypeAndId = new Dictionary<BlockTypes, Dictionary<ushort, BlockSO>>();
-
-        BlockTypes[] blockTypes = (BlockTypes[])Enum.GetValues(typeof(BlockTypes));
-        foreach (BlockTypes blockType in blockTypes)
+        foreach (BlockSO data in array)
         {
-            _blockByTypeAndId.Add(blockType, new Dictionary<ushort, BlockSO>());
+            dictionary.Add(data.GetId(), data);
         }
+        //Array.Sort(array, (block, nextBlock) => block.GetId().CompareTo(nextBlock.GetId()));
+    }
 
-        AddBlocksToSetFromArray(_abstractBlocks);
-        AddBlocksToSetFromArray(_solidBlocks);
-        AddBlocksToSetFromArray(_dustBlocks);
-        AddBlocksToSetFromArray(_liquidBlocks);
-        AddBlocksToSetFromArray(_plantBlocks);
-        AddBlocksToSetFromArray(_walls);
-        AddBlocksToSetFromArray(_furniture);
+    private void InitializeSetsBlockById()
+    {
+        _abstractBlocksById = new();
+        _solidBlocksById = new();
+        _dustBlocksById = new();
+        _liquidBlocksById = new();
+        _plantBlocksById = new();
+        _wallsById = new();
+        _furnitureById = new();
 
-        void AddBlocksToSetFromArray(BlockSO[] _blockArray)
-        {
-            foreach (BlockSO block in _blockArray)
-            {
-                _blockByTypeAndId[block.Type].Add(block.GetId(), block);
-            }
-        }
+        AddBlocksToSetFromArray(_abstractBlocks, _abstractBlocksById);
+        AddBlocksToSetFromArray(_solidBlocks, _solidBlocksById);
+        AddBlocksToSetFromArray(_dustBlocks, _dustBlocksById);
+        AddBlocksToSetFromArray(_liquidBlocks, _liquidBlocksById);
+        AddBlocksToSetFromArray(_plantBlocks, _plantBlocksById);
+        AddBlocksToSetFromArray(_walls, _wallsById);
+        AddBlocksToSetFromArray(_furniture, _furnitureById);
     }
 
     private void InitializeSetGrassByBiome()
@@ -152,49 +159,75 @@ public class BlocksAtlasSO : AtlasSO
         }
     }
 
-    public BlockSO GetBlockByTypeAndId(BlockTypes blockType, object id)
+    private void AddBlocksToSetFromArray(BlockSO[] array, Dictionary<ushort, BlockSO> set)
     {
-        return _blockByTypeAndId[blockType][(ushort)id];
+        foreach (BlockSO data in array)
+        {
+            set.Add(data.GetId(), data);
+        }
+    }
+
+    public BlockSO GetBlockByTypeAndId(BlockTypes type, ushort id)
+    {
+        try
+        {
+            return type switch
+            {
+                BlockTypes.Abstract => _abstractBlocksById[id],
+                BlockTypes.Solid => _solidBlocksById[id],
+                BlockTypes.Dust => _dustBlocksById[id],
+                BlockTypes.Liquid => _liquidBlocksById[id],
+                BlockTypes.Plant => _plantBlocksById[id],
+                BlockTypes.Wall => _wallsById[id],
+                BlockTypes.Furniture => _furnitureById[id],
+                _ => null
+            };
+        }
+        catch (KeyNotFoundException)
+        {
+            Debug.LogError($"Block with type {type} and id {id} not exist");
+            return null;
+        }
     }
 
     public BlockSO GetBlockById(AbstractBlocksID id)
     {
-        return _blockByTypeAndId[BlockTypes.Abstract][(ushort)id];
+        return _abstractBlocksById[(ushort)id];
     }
 
     public BlockSO GetBlockById(SolidBlocksID id)
     {
-        return _blockByTypeAndId[BlockTypes.Solid][(ushort)id];
+        return _solidBlocksById[(ushort)id];
     }
 
     public BlockSO GetBlockById(DustBlocksID id)
     {
-        return _blockByTypeAndId[BlockTypes.Dust][(ushort)id];
+        return _dustBlocksById[(ushort)id];
     }
 
     public BlockSO GetBlockById(byte id)
     {
-        return _blockByTypeAndId[BlockTypes.Liquid][id];
+        return _liquidBlocksById[id];
     }
 
     public BlockSO GetBlockById(LiquidBlocksID id)
     {
-        return _liquidBlocks[(ushort)id];
+        return _liquidBlocksById[(ushort)id];
     }
 
     public BlockSO GetBlockById(PlantsID id)
     {
-        return _blockByTypeAndId[BlockTypes.Plant][(ushort)id];
+        return _plantBlocksById[(ushort)id];
     }
 
     public BlockSO GetBlockById(WallsID id)
     {
-        return _blockByTypeAndId[BlockTypes.Wall][(ushort)id];
+        return _wallsById[(ushort)id];
     }
 
     public BlockSO GetBlockById(FurnitureBlocksID id)
     {
-        return _blockByTypeAndId[BlockTypes.Furniture][(ushort)id];
+        return _furnitureById[(ushort)id];
     }
 
     public BlockSO GetGrassByBiome(BiomesID biomeID)

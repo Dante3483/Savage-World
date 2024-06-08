@@ -1,43 +1,28 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Random = System.Random;
 
-public class TreesGenerationPhase : IWorldProcessingPhase
+public class TreesGenerationPhase : WorldProcessingPhaseBase
 {
-    #region Private fields
-    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
-    private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
-    private Random _randomVar = GameManager.Instance.RandomVar;
-    #endregion
-
-    #region Public fields
+    #region Fields
 
     #endregion
 
     #region Properties
-    public string Name => "Tree generation";
+    public override string Name => "Tree generation";
     #endregion
 
-    #region Methods
-    public void StartPhase()
+    #region Events / Delegates
+
+    #endregion
+
+    #region Public Methods
+    public override void StartPhase()
     {
         //Create surface trees
         Dictionary<BiomesID, List<Tree>> allTrees = null;
         List<Vector3> coords = new();
-        ActionInMainThreadUtil.Instance.Invoke(() =>
-        {
-            allTrees = new Dictionary<BiomesID, List<Tree>>()
-            {
-                //{ BiomesID.NonBiom, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.NonBiom) },
-                //{ BiomesID.Ocean, GameManager.Instance.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Ocean) },
-                { BiomesID.Desert, GameManager.Instance.TreesAtlas.GetTreesByBiome(BiomesID.Desert) },
-                { BiomesID.Savannah, GameManager.Instance.TreesAtlas.GetTreesByBiome(BiomesID.Savannah) },
-                { BiomesID.Meadow, GameManager.Instance.TreesAtlas.GetTreesByBiome(BiomesID.Meadow) },
-                { BiomesID.Forest, GameManager.Instance.TreesAtlas.GetTreesByBiome(BiomesID.Forest) },
-                { BiomesID.Swamp, GameManager.Instance.TreesAtlas.GetTreesByBiome(BiomesID.Swamp) },
-                { BiomesID.ConiferousForest, GameManager.Instance.TreesAtlas.GetTreesByBiome(BiomesID.ConiferousForest) },
-            };
-        });
+
+        GameObject treesSection = _gameManager.Terrain.Trees;
         BiomeSO currentBiome;
         int chance;
         int startX;
@@ -45,9 +30,22 @@ public class TreesGenerationPhase : IWorldProcessingPhase
         int x;
         int y;
         int i;
-        int terrainWidth = GameManager.Instance.CurrentTerrainWidth;
         bool isValidPlace;
-        GameObject treesSection = GameManager.Instance.Terrain.Trees;
+
+        ActionInMainThreadUtil.Instance.Invoke(() =>
+        {
+            allTrees = new Dictionary<BiomesID, List<Tree>>()
+            {
+                //{ BiomesID.NonBiom, _gameManager.ObjectsAtlass.GetAllBiomeTrees(BiomesID.NonBiom) },
+                //{ BiomesID.Ocean, _gameManager.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Ocean) },
+                { BiomesID.Desert, _gameManager.TreesAtlas.GetTreesByBiome(BiomesID.Desert) },
+                { BiomesID.Savannah, _gameManager.TreesAtlas.GetTreesByBiome(BiomesID.Savannah) },
+                { BiomesID.Meadow, _gameManager.TreesAtlas.GetTreesByBiome(BiomesID.Meadow) },
+                { BiomesID.Forest, _gameManager.TreesAtlas.GetTreesByBiome(BiomesID.Forest) },
+                { BiomesID.Swamp, _gameManager.TreesAtlas.GetTreesByBiome(BiomesID.Swamp) },
+                { BiomesID.ConiferousForest, _gameManager.TreesAtlas.GetTreesByBiome(BiomesID.ConiferousForest) },
+            };
+        });
 
         foreach (var trees in allTrees)
         {
@@ -56,7 +54,7 @@ public class TreesGenerationPhase : IWorldProcessingPhase
                 if (trees.Key == BiomesID.NonBiome)
                 {
                     startX = 0;
-                    endX = (ushort)(terrainWidth - 1);
+                    endX = _terrainWidth - 1;
                 }
                 else
                 {
@@ -67,22 +65,22 @@ public class TreesGenerationPhase : IWorldProcessingPhase
 
                 for (x = startX; x <= endX - tree.Width - 5; x++)
                 {
-                    for (y = _terrainConfiguration.Equator; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
+                    for (y = _equator; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
                     {
                         isValidPlace = true;
                         for (i = 0; i < tree.WidthToSpawn; i++)
                         {
-                            if (!tree.AllowedToSpawnOn.Contains(_worldData[x + i, y].BlockData))
+                            if (!tree.AllowedToSpawnOn.Contains(GetBlockData(x + i, y)))
                             {
                                 isValidPlace = false;
                                 break;
                             }
-                            if (!_worldData[x + i, y + 1].IsValidForTree)
+                            if (!IsValidForTree(x + i, y + 1))
                             {
                                 isValidPlace = false;
                                 break;
                             }
-                            if (_worldData[x + i, y + 1].IsLiquid)
+                            if (IsLiquid(x + i, y + 1))
                             {
                                 isValidPlace = false;
                                 break;
@@ -90,7 +88,7 @@ public class TreesGenerationPhase : IWorldProcessingPhase
                         }
                         if (isValidPlace)
                         {
-                            chance = _randomVar.Next(0, 101);
+                            chance = GetNextRandomValue(0, 101);
                             if (chance <= tree.ChanceToSpawn)
                             {
                                 if (CreateTree(x, y + 1, tree, ref coords))
@@ -106,7 +104,7 @@ public class TreesGenerationPhase : IWorldProcessingPhase
                 {
                     foreach (Vector3 coord in coords)
                     {
-                        Tree treeGameObject = GameObject.Instantiate(tree, coord, Quaternion.identity, treesSection.transform);
+                        Tree treeGameObject = Object.Instantiate(tree, coord, Quaternion.identity, treesSection.transform);
                         treeGameObject.name = tree.gameObject.name;
                     }
                 });
@@ -117,7 +115,9 @@ public class TreesGenerationPhase : IWorldProcessingPhase
         allTrees = null;
         coords = null;
     }
+    #endregion
 
+    #region Private Methods
     private bool CreateTree(int x, int y, Tree tree, ref List<Vector3> coords)
     {
         int blockX;
@@ -126,11 +126,11 @@ public class TreesGenerationPhase : IWorldProcessingPhase
         {
             blockX = x + (int)(vector.x - tree.Start.x);
             blockY = y;
-            if (!_worldData[blockX, blockY].IsValidForTree)
+            if (!IsValidForTree(blockX, blockY))
             {
                 return false;
             }
-            if (_worldData[blockX, blockY].IsLiquid)
+            if (IsLiquid(blockX, blockY))
             {
                 return false;
             }
@@ -139,11 +139,11 @@ public class TreesGenerationPhase : IWorldProcessingPhase
         {
             blockX = x + (int)(vector.x - tree.Start.x);
             blockY = y;
-            if (!_worldData[blockX, blockY].IsValidForTree)
+            if (!IsValidForTree(blockX, blockY))
             {
                 return false;
             }
-            if (_worldData[blockX, blockY].IsLiquid)
+            if (IsLiquid(blockX, blockY))
             {
                 return false;
             }

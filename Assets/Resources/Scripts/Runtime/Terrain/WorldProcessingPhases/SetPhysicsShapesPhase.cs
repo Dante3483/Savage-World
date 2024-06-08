@@ -1,43 +1,41 @@
 using System.Threading.Tasks;
 
-public class SetPhysicsShapesPhase : IWorldProcessingPhase
+public class SetPhysicsShapesPhase : WorldProcessingPhaseBase
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
+    #region Fields
 
     #endregion
 
     #region Properties
+    public override string Name => "Set physics shapes";
+    #endregion
+
+    #region Events / Delegates
 
     #endregion
 
-    #region Methods
-
-    #endregion
-    public string Name => "Set physics shapes";
-
-    public void StartPhase()
+    #region Public Methods
+    public override void StartPhase()
     {
-        int terrainWidth = GameManager.Instance.CurrentTerrainWidth;
-        int terrainHeight = GameManager.Instance.CurrentTerrainHeight;
-
-        Parallel.For(5, terrainWidth - 5, x =>
+        Parallel.For(5, _terrainWidth - 5, x =>
         {
-            for (int y = 5; y < terrainHeight - 5; y++)
+            for (int y = 5; y < _terrainHeight - 5; y++)
             {
-                WorldDataManager.Instance.UpdateCornerColliderWithoutNotification(x, y, true);
+                _worldDataManager.UpdateCornerColliderWithoutNotification(x, y, true);
             }
         });
 
-        Parallel.For(5, terrainWidth - 5, x =>
+        Parallel.For(5, _terrainWidth - 5, x =>
         {
-            for (int y = 5; y < terrainHeight - 5; y++)
+            for (int y = 5; y < _terrainHeight - 5; y++)
             {
-                WorldDataManager.Instance.UpdateBlockColliderWithoutNotification(x, y);
+                _worldDataManager.UpdateBlockColliderWithoutNotification(x, y);
             }
         });
     }
+    #endregion
+
+    #region Private Methods
+
+    #endregion
 }

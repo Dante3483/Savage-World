@@ -2,31 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using Random = System.Random;
 
-public class CavesGenerationPhase : IWorldProcessingPhase
+public class CavesGenerationPhase : WorldProcessingPhaseBase
 {
-    #region Private fields
+    #region Fields
     byte[,] _visitedCaveMap;
-    private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
-    private Terrain _terrain = GameManager.Instance.Terrain;
-    private Random _randomVar = GameManager.Instance.RandomVar;
-    private BlockSO _airBlock = GameManager.Instance.BlocksAtlas.Air;
-    #endregion
-
-    #region Public fields
-
     #endregion
 
     #region Properties
-    public string Name => "Caves generation";
+    public override string Name => "Caves generation";
     #endregion
 
-    #region Methods
-    public void StartPhase()
+    #region Events / Delegates
+
+    #endregion
+
+    #region Public Methods
+    public override void StartPhase()
     {
-        int terrainWidth = GameManager.Instance.CurrentTerrainWidth;
-        int terrainHeight = GameManager.Instance.CurrentTerrainHeight;
         int count;
         int octaves = _terrainConfiguration.Octaves;
         float maxNoiseHeight = float.MinValue;
@@ -36,20 +29,20 @@ public class CavesGenerationPhase : IWorldProcessingPhase
         float lacunarity = _terrainConfiguration.Lacunarity;
         bool isNonChunk;
 
-        float[,] caveMap = new float[terrainWidth, terrainHeight];
-        _visitedCaveMap = new byte[terrainWidth, terrainHeight];
+        float[,] caveMap = new float[_terrainWidth, _terrainHeight];
+        _visitedCaveMap = new byte[_terrainWidth, _terrainHeight];
         Vector2[] octaveOffset = new Vector2[octaves];
 
-        List<Vector2Int> caveCoords = new List<Vector2Int>();
+        List<Vector2Int> caveCoords = new();
 
         for (int i = 0; i < octaves; i++)
         {
-            octaveOffset[i].x = _randomVar.Next(-100000, 100000);
-            octaveOffset[i].y = _randomVar.Next(-100000, 100000);
+            octaveOffset[i].x = GetNextRandomValue(-100000, 100000);
+            octaveOffset[i].y = GetNextRandomValue(-100000, 100000);
         }
 
         //Create noise map
-        Parallel.For(0, terrainWidth, (index) =>
+        Parallel.For(0, _terrainWidth, (index) =>
         {
             int x = index;
             float amplitude;
@@ -59,7 +52,7 @@ public class CavesGenerationPhase : IWorldProcessingPhase
             float sampleY;
             float perlinValue;
 
-            for (int y = 0; y < terrainHeight; y++)
+            for (int y = 0; y < _terrainHeight; y++)
             {
                 amplitude = 1;
                 frequency = 1;
@@ -81,12 +74,12 @@ public class CavesGenerationPhase : IWorldProcessingPhase
         });
 
         //Find max and min noise height
-        Parallel.For(0, terrainWidth, (index) =>
+        Parallel.For(0, _terrainWidth, (index) =>
         {
             float localMin = float.MaxValue;
             float localMax = float.MinValue;
 
-            for (int y = 0; y < terrainHeight; y++)
+            for (int y = 0; y < _terrainHeight; y++)
             {
                 float value = caveMap[index, y];
                 localMin = Math.Min(localMin, value);
@@ -101,19 +94,19 @@ public class CavesGenerationPhase : IWorldProcessingPhase
         });
 
         //Lerp noise
-        Parallel.For(0, terrainWidth, (index) =>
+        Parallel.For(0, _terrainWidth, (index) =>
         {
             int x = index;
-            for (int y = 0; y < terrainHeight; y++)
+            for (int y = 0; y < _terrainHeight; y++)
             {
                 caveMap[x, y] = Mathf.InverseLerp(minNoiseHeight, maxNoiseHeight, caveMap[x, y]);
             }
         });
 
         //Create cave in conditions
-        for (int x = 0; x < terrainWidth; x++)
+        for (int x = 0; x < _terrainWidth; x++)
         {
-            for (int y = 0; y < terrainHeight; y++)
+            for (int y = 0; y < _terrainHeight; y++)
             {
                 if (caveMap[x, y] <= _terrainConfiguration.Intensity && _visitedCaveMap[x, y] == 0)
                 {
@@ -126,9 +119,9 @@ public class CavesGenerationPhase : IWorldProcessingPhase
                     if ((count > _terrainConfiguration.MinSmallCaveSize && count < _terrainConfiguration.MaxSmallCaveSize) ||
                         (count > _terrainConfiguration.MinLargeCaveSize && count < _terrainConfiguration.MaxLargeCaveSize))
                     {
-                        foreach (Vector2Int v in caveCoords)
+                        foreach (Vector2Int coord in caveCoords)
                         {
-                            _terrain.CreateBlock(v.x, v.y, _airBlock);
+                            SetBlockData(coord.x, coord.y, _air);
                         }
                     }
                     caveCoords.Clear();
@@ -136,7 +129,9 @@ public class CavesGenerationPhase : IWorldProcessingPhase
             }
         }
     }
+    #endregion
 
+    #region Private Methods
     private (int, bool) FloodFill(int startX, int startY, float[,] map, ref List<Vector2Int> connected)
     {
         try
@@ -147,8 +142,8 @@ public class CavesGenerationPhase : IWorldProcessingPhase
             int x;
             int y;
             bool isNonChunk = true;
-            Queue<(int, int)> queue = new Queue<(int, int)>();
-            Vector2Int vector = new Vector2Int();
+            Queue<(int, int)> queue = new();
+            Vector2Int vector = new();
             queue.Enqueue((startX, startY));
 
             while (queue.Count > 0)
@@ -164,7 +159,7 @@ public class CavesGenerationPhase : IWorldProcessingPhase
                 vector.x = x;
                 vector.y = y;
                 connected.Add(new Vector2Int(x, y));
-                if (ChunksManager.Instance.GetChunk(x, y).Biome.Id != BiomesID.NonBiome)
+                if (_chunksManager.GetChunk(x, y).Biome.Id != BiomesID.NonBiome)
                 {
                     isNonChunk = false;
                 }

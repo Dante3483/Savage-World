@@ -39,14 +39,17 @@ public class SaveMapToPNG : MonoBehaviour
         {
             for (int y = 0; y < terrainHeight; y++)
             {
-                cellColor = WorldDataManager.Instance.WorldData[x, y].BlockData.ColorOnMap;
-                if (WorldDataManager.Instance.WorldData[x, y].IsEmpty)
+                BlockSO data = WorldDataManager.Instance.GetBlockData(x, y);
+                cellColor = data.ColorOnMap;
+                if (WorldDataManager.Instance.IsEmpty(x, y))
                 {
-                    cellColor = WorldDataManager.Instance.WorldData[x, y].WallData.ColorOnMap;
+                    data = WorldDataManager.Instance.GetWallData(x, y);
+                    cellColor = data.ColorOnMap;
                 }
-                if (WorldDataManager.Instance.WorldData[x, y].IsLiquid)
+                if (WorldDataManager.Instance.IsLiquid(x, y))
                 {
-                    cellColor = GameManager.Instance.BlocksAtlas.GetBlockById(WorldDataManager.Instance.WorldData[x, y].LiquidId).ColorOnMap;
+                    data = WorldDataManager.Instance.GetLiquidData(x, y);
+                    cellColor = data.ColorOnMap;
                 }
 
                 gridColor = new Color(cellColor.r - 0.2f, cellColor.g - 0.2f, cellColor.b - 0.2f, 1f);

@@ -1,12 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 
-public class WorldDataManager : MonoBehaviour
+public class WorldDataManager : Singleton<WorldDataManager>
 {
-    #region Private fields
+    #region Fields
+    private GameManager _gameManager;
+    private BlocksAtlasSO _blockAtlas;
+
     [Header("Collider rules")]
     [SerializeField]
     private ColliderRulesSO _mainRules;
@@ -15,25 +21,7 @@ public class WorldDataManager : MonoBehaviour
     private Dictionary<Sprite, List<Vector2>> _physicsShapesBySprite;
     #endregion
 
-    #region Public fields
-    public static WorldDataManager Instance;
-    public event Action<int, int> OnDataChanged, OnColliderChanged;
-    #endregion
-
     #region Properties
-    public WorldCellData[,] WorldData
-    {
-        get
-        {
-            return _worldData;
-        }
-
-        set
-        {
-            _worldData = value;
-        }
-    }
-
     public string BlockInfo
     {
         get
@@ -48,16 +36,23 @@ public class WorldDataManager : MonoBehaviour
     }
     #endregion
 
-    #region Methods
-    private void Awake()
+    #region Events / Delegates
+    public event Action<int, int> OnDataChanged;
+    public event Action<int, int> OnColliderChanged;
+    #endregion
+
+    #region Monobehaviour Methods
+    protected override void Awake()
     {
-        Instance = this;
+        base.Awake();
+        _gameManager = GameManager.Instance;
+        _blockAtlas = _gameManager.BlocksAtlas;
         InitializePhysicsShapes();
     }
 
     private void Update()
     {
-        if (!GameManager.Instance.IsInputTextInFocus && Input.GetMouseButtonDown(2))
+        if (!_gameManager.IsInputTextInFocus && Input.GetMouseButtonDown(2))
         {
             Vector3 clickPosition = Input.mousePosition;
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
@@ -70,60 +65,52 @@ public class WorldDataManager : MonoBehaviour
             Debug.Log($"Is client: {NetworkManager.Singleton.IsClient}");
         }
     }
+    #endregion
 
+    #region Public Methods
     public void Initialize()
     {
-        TerrainConfigurationSO terrainConfiguration = GameManager.Instance.TerrainConfiguration;
+        TerrainConfigurationSO terrainConfiguration = _gameManager.TerrainConfiguration;
         int terrainWidth = terrainConfiguration.TerrainWidth;
         int terrainHeight = terrainConfiguration.TerrainHeight;
-
         _worldData = new WorldCellData[terrainWidth, terrainHeight];
-        BlockSO airBlock = GameManager.Instance.BlocksAtlas.Air;
-        BlockSO airWall = GameManager.Instance.BlocksAtlas.AirWall;
-
+        WorldCellData v = WorldCellData.GetEmpty();
+        Debug.Log(Marshal.SizeOf(v));
         Parallel.For(0, terrainWidth, (index) =>
         {
-            ushort x = (ushort)index;
-            for (ushort y = 0; y < terrainHeight; y++)
+            int x = index;
+            for (int y = 0; y < terrainHeight; y++)
             {
-                _worldData[x, y] = new WorldCellData(x, y, airBlock, airWall);
+                _worldData[x, y] = WorldCellData.GetEmpty();
             }
         });
     }
 
-    private void InitializePhysicsShapes()
+    public void SetFullData(int x, int y, BlockSO block, BlockSO wall, BlockSO liquid, float flowValue, byte colliderIndex, byte tileId, byte flags)
     {
-        _physicsShapesBySprite = new();
-        List<Vector2> physicShape;
-        foreach (ColliderRule rule in _mainRules.Rules)
+        _worldData[x, y].SetBlockData(block);
+        _worldData[x, y].SetWallData(wall);
+        _worldData[x, y].SetLiquidData(liquid, flowValue);
+        _worldData[x, y].ColliderIndex = colliderIndex;
+        _worldData[x, y].TileId = tileId;
+        _worldData[x, y].Flags = flags;
+        if (_gameManager.IsGameSession && !_gameManager.IsWorldLoading)
         {
-            physicShape = new();
-            rule.Sprite.GetPhysicsShape(0, physicShape);
-            _physicsShapesBySprite.Add(rule.Sprite, physicShape);
+            OnColliderChanged?.Invoke(x, y);
+            OnDataChanged?.Invoke(x, y);
         }
-        physicShape = new();
-        _mainRules.CornerRule.Sprite.GetPhysicsShape(0, physicShape);
-        _physicsShapesBySprite.Add(_mainRules.CornerRule.Sprite, physicShape);
     }
 
     public void SetBlockData(int x, int y, BlockSO data)
     {
-        if (GameManager.Instance.IsGameSession && !NetworkManager.Singleton.IsHost)
-        {
-            return;
-        }
-        if (data == null)
-        {
-            return;
-        }
         _worldData[x, y].SetBlockData(data);
-        if (GameManager.Instance.IsGameSession && !GameManager.Instance.IsWorldLoading)
+        if (_gameManager.IsGameSession && !_gameManager.IsWorldLoading)
         {
-            _worldData[x, y].SetRandomBlockTile(GameManager.Instance.RandomVar);
+            SetRandomBlockTile(x, y);
 
-            if (_worldData[x, y].IsEmpty || _worldData[x, y].IsSolid)
+            if (IsEmpty(x, y) || IsSolid(x, y))
             {
-                _worldData[x, y].ColliderIndex = byte.MaxValue;
+                SetColliderIndex(x, y, byte.MaxValue);
                 UpdateCollidersAround(x, y);
                 UpdateCollider(x, y);
             }
@@ -134,29 +121,169 @@ public class WorldDataManager : MonoBehaviour
     public void SetWallData(int x, int y, BlockSO data)
     {
         _worldData[x, y].SetWallData(data);
-        if (GameManager.Instance.IsGameSession && !GameManager.Instance.IsWorldLoading)
+        if (_gameManager.IsGameSession && !_gameManager.IsWorldLoading)
         {
-            _worldData[x, y].SetRandomWallTile(GameManager.Instance.RandomVar);
+            SetRandomWallTile(x, y);
+            OnDataChanged?.Invoke(x, y);
         }
     }
 
-    public void LoadData(int x, int y, BlockSO block, BlockSO wall, byte liquidId, float flowValue, byte tileId, byte colliderIndex, byte flags)
+    public void SetLiquidData(int x, int y, BlockSO data, float flowValue = 100)
     {
-        if (block is null || wall is null)
+        _worldData[x, y].SetLiquidData(data, flowValue);
+        if (_gameManager.IsGameSession && !_gameManager.IsWorldLoading)
         {
-            return;
-        }
-        _worldData[x, y].SetBlockData(block);
-        _worldData[x, y].SetWallData(wall);
-        _worldData[x, y].SetLiquidData(liquidId, flowValue);
-        _worldData[x, y].Flags = flags;
-        _worldData[x, y].TileId = tileId;
-        _worldData[x, y].ColliderIndex = colliderIndex;
-        if (GameManager.Instance.IsGameSession && !GameManager.Instance.IsWorldLoading)
-        {
-            OnColliderChanged?.Invoke(x, y);
             OnDataChanged?.Invoke(x, y);
         }
+    }
+
+    public void SetColliderIndex(int x, int y, byte index)
+    {
+        _worldData[x, y].ColliderIndex = index;
+    }
+
+    public void SetRandomBlockTile(int x, int y)
+    {
+        BlockSO data = GetBlockData(x, y);
+        byte id = (byte)_gameManager.RandomVar.Next(0, data.Sprites.Count);
+        _worldData[x, y].SetBlockTile(id);
+    }
+
+    public void SetRandomWallTile(int x, int y)
+    {
+        BlockSO data = GetBlockData(x, y);
+        byte id = (byte)(_gameManager.RandomVar.Next(0, data.Sprites.Count) << 4);
+        _worldData[x, y].SetWallTile(id);
+    }
+
+    public void SetTileId(int x, int y, byte tileId)
+    {
+        _worldData[x, y].TileId = tileId;
+    }
+
+    public void SetUnbreakableFlag(int x, int y, bool value)
+    {
+        _worldData[x, y].SetUnbreakableFlag(value);
+    }
+
+    public void SetOccupiedFlag(int x, int y, bool value)
+    {
+        _worldData[x, y].SetOccupiedFlag(value);
+    }
+
+    public void SetTreeFlag(int x, int y, bool value)
+    {
+        _worldData[x, y].SetTreeFlag(value);
+    }
+
+    public void SetTreeTrunkFlag(int x, int y, bool value)
+    {
+        _worldData[x, y].SetTreeTrunkFlag(value);
+    }
+
+    public void SetColliderHorizontalFlippedFlag(int x, int y, bool value)
+    {
+        _worldData[x, y].SetColliderHorizontalFlippedFlag(value);
+    }
+
+    public void SetBlockInfoByCoords(Vector2Int position)
+    {
+        StringBuilder builder = new();
+        int x = position.x;
+        int y = position.y;
+        string tab = new(' ', 2);
+        BlockSO block = GetBlockData(x, y);
+        BlockSO wall = GetWallData(x, y);
+        BlockSO liquid = GetLiquidData(x, y);
+        string blockName = block == null ? "Empty" : block.name;
+        string wallName = wall == null ? "Empty" : wall.name;
+        string liquidName = liquid == null ? "Empty" : liquid.name;
+        builder.AppendLine($"X: {x} Y: {y}");
+        builder.AppendLine($"Block:");
+        builder.AppendLine($"{tab}Type: {GetBlockType(x, y)}");
+        builder.AppendLine($"{tab}Id: {GetBlockId(x, y)}");
+        builder.AppendLine($"{tab}Name: {blockName}");
+        builder.AppendLine($"{tab}Tile id: {GetBlockTileId(x, y)}");
+        builder.AppendLine($"Wall:");
+        builder.AppendLine($"{tab}Id: {GetWallId(x, y)}");
+        builder.AppendLine($"{tab}Name: {wallName}");
+        builder.AppendLine($"{tab}Tile id: {GetWallTileId(x, y)}");
+        builder.AppendLine($"Liquid:");
+        builder.AppendLine($"{tab}Id: {GetLiquidId(x, y)}");
+        builder.AppendLine($"{tab}Name: {liquidName}");
+        builder.AppendLine($"{tab}FlowValue: {GetFlowValue(x, y)}");
+        builder.AppendLine($"Collider: {GetColliderIndex(x, y)}");
+        builder.AppendLine($"{tab}Index: {IsUnbreakable(x, y)}");
+        builder.AppendLine($"{tab}Horizontal flipped: {IsUnbreakable(x, y)}");
+        builder.AppendLine($"Flags:");
+        builder.AppendLine($"{tab}Unbreakable: {IsUnbreakable(x, y)}");
+        builder.AppendLine($"{tab}Occupied: {IsOccupied(x, y)}");
+        builder.AppendLine($"{tab}Tree: {IsTree(x, y)}");
+        builder.AppendLine($"{tab}Tree trunk: {IsTreeTrunk(x, y)}");
+        builder.AppendLine($"{tab}Free: {IsFree(x, y)}");
+        _blockInfo = builder.ToString();
+    }
+
+    //REMOVE
+    public void SetBlockDamagePercent(int x, int y, float damage)
+    {
+        OnDataChanged?.Invoke(x, y);
+    }
+
+    //REMOVE
+    public void SetWallDamagePercent(int x, int y, float damage)
+    {
+        OnDataChanged?.Invoke(x, y);
+    }
+
+    public ushort GetBlockId(int x, int y)
+    {
+        return _worldData[x, y].BlockId;
+    }
+
+    public ushort GetWallId(int x, int y)
+    {
+        return _worldData[x, y].WallId;
+    }
+
+    public byte GetLiquidId(int x, int y)
+    {
+        return _worldData[x, y].LiquidId;
+    }
+
+    public BlockTypes GetBlockType(int x, int y)
+    {
+        return _worldData[x, y].BlockType;
+    }
+
+    public float GetFlowValue(int x, int y)
+    {
+        return _worldData[x, y].FlowValue;
+    }
+
+    public byte GetColliderIndex(int x, int y)
+    {
+        return _worldData[x, y].ColliderIndex;
+    }
+
+    public byte GetTileId(int x, int y)
+    {
+        return _worldData[x, y].TileId;
+    }
+
+    public int GetBlockTileId(int x, int y)
+    {
+        return _worldData[x, y].BlockTileId;
+    }
+
+    public int GetWallTileId(int x, int y)
+    {
+        return _worldData[x, y].WallTileId;
+    }
+
+    public byte GetFlags(int x, int y)
+    {
+        return _worldData[x, y].Flags;
     }
 
     public List<Vector2> GetColliderShape(int x, int y)
@@ -173,86 +300,100 @@ public class WorldDataManager : MonoBehaviour
         return _physicsShapesBySprite[_mainRules.Rules[colliderType].Sprite];
     }
 
-    public ref WorldCellData GetWorldCellData(int x, int y)
+    public BlockSO GetBlockData(int x, int y)
     {
-        return ref _worldData[x, y];
+        ushort id = _worldData[x, y].BlockId;
+        BlockTypes type = _worldData[x, y].BlockType;
+        return _blockAtlas.GetBlockByTypeAndId(type, id);
     }
 
-    public ref WorldCellData GetAdjacentWorldCellData(int x, int y, Vector2Int direction)
+    public BlockSO GetWallData(int x, int y)
     {
-        return ref _worldData[x + direction.x, y + direction.y];
+        ushort id = _worldData[x, y].WallId;
+        return _blockAtlas.GetBlockByTypeAndId(BlockTypes.Wall, id);
     }
 
-    public BlockSO GetCellBlockData(int x, int y)
+    public BlockSO GetLiquidData(int x, int y)
     {
-        return _worldData[x, y].BlockData;
+        if (!_worldData[x, y].IsLiquid)
+        {
+            return null;
+        }
+        ushort id = _worldData[x, y].LiquidId;
+        return _blockAtlas.GetBlockByTypeAndId(BlockTypes.Liquid, id);
     }
 
-    public BlockSO GetCellWallData(int x, int y)
+    public float GetBlockLightIntensity(int x, int y)
     {
-        return _worldData[x, y].WallData;
+        return GetBlockData(x, y).LightIntensity;
     }
 
-    public void SetBlockInfoByCoords(Vector2Int position)
+    public float GetWallLightIntensity(int x, int y)
     {
-        _blockInfo = _worldData[position.x, position.y].ToString();
+        return GetWallData(x, y).LightIntensity;
     }
 
-    public void SetBlockDamagePercent(int x, int y, float damage)
+    public Color32 GetBlockLightColor(int x, int y)
     {
-        //_worldData[x, y].SetBlockDamagePercent(damage);
-        OnDataChanged?.Invoke(x, y);
+        return GetBlockData(x, y).LightColor;
     }
 
-    public void SetWallDamagePercent(int x, int y, float damage)
+    public Color32 GetWallLightColor(int x, int y)
     {
-        //_worldData[x, y].SetWallDamagePercent(damage);
-        OnDataChanged?.Invoke(x, y);
+        return GetWallData(x, y).LightColor;
     }
 
-    #region Flags
-    public void MakeOccupied(int x, int y)
+    public Sprite GetBlockSprite(int x, int y)
     {
-        _worldData[x, y].SetOccupiedFlag(true);
+        BlockSO data = GetBlockData(x, y);
+        if (data == null || data.Sprites.Count == 0)
+        {
+            return null;
+        }
+        int id = _worldData[x, y].BlockTileId;
+        return data.Sprites[id];
     }
 
-    public void MakeFree(int x, int y)
+    public Sprite GetWallSprite(int x, int y)
     {
-        _worldData[x, y].SetOccupiedFlag(false);
+        BlockSO data = GetWallData(x, y);
+        if (data == null || data.Sprites.Count == 0)
+        {
+            return null;
+        }
+        int id = _worldData[x, y].WallTileId;
+        return data.Sprites[id];
     }
 
-    public void MakeUnbreakable(int x, int y)
+    public Sprite GetLiquidSprite(int x, int y)
     {
-        _worldData[x, y].SetUnbreakableFlag(true);
+        BlockSO data = GetLiquidData(x, y);
+        float flowValue = GetFlowValue(x, y);
+        if (data == null || data.Sprites.Count == 0)
+        {
+            return null;
+        }
+        if (flowValue == 100)
+        {
+            return data.Sprites.Last();
+        }
+        else
+        {
+            int id = (int)(flowValue / data.Sprites.Count);
+            return data.Sprites[id];
+        }
     }
 
-    public void MakeBreakable(int x, int y)
+    public float GetDustFallingTime(int x, int y)
     {
-        _worldData[x, y].SetUnbreakableFlag(false);
+        return (GetBlockData(x, y) as DustBlockSO).FallingTime;
     }
 
-    public void MakeTree(int x, int y)
+    public float GetLiquidFlowTime(int x, int y)
     {
-        _worldData[x, y].SetTreeFlag(true);
+        return (GetLiquidData(x, y) as LiquidBlockSO).FlowTime;
     }
 
-    public void RemoveTree(int x, int y)
-    {
-        _worldData[x, y].SetTreeFlag(true);
-    }
-
-    public void MakeTreeTrunk(int x, int y)
-    {
-        _worldData[x, y].SetTreeTrunkFlag(true);
-    }
-
-    public void RemoveTreeTrunk(int x, int y)
-    {
-        _worldData[x, y].SetTreeTrunkFlag(false);
-    }
-    #endregion
-
-    #region Checks
     public bool IsEmpty(int x, int y)
     {
         return _worldData[x, y].IsEmpty;
@@ -263,15 +404,54 @@ public class WorldDataManager : MonoBehaviour
         return _worldData[x, y].IsSolid;
     }
 
+    public bool IsDust(int x, int y)
+    {
+        return _worldData[x, y].IsDust;
+    }
+
+    public bool IsLiquid(int x, int y)
+    {
+        return _worldData[x, y].IsLiquid;
+    }
+
+    public bool IsPlant(int x, int y)
+    {
+        return _worldData[x, y].IsPlant;
+    }
+
     public bool IsWall(int x, int y)
     {
         return _worldData[x, y].IsWall;
     }
 
-    public bool IsSolidAnyNeighbor(int x, int y)
+    public bool IsFurniture(int x, int y)
     {
-        return _worldData[x - 1, y].IsSolid || _worldData[x + 1, y].IsSolid ||
-            _worldData[x, y + 1].IsSolid || _worldData[x, y - 1].IsSolid;
+        return _worldData[x, y].IsFurniture;
+    }
+
+    public bool IsUnbreakable(int x, int y)
+    {
+        return _worldData[x, y].IsUnbreakable;
+    }
+
+    public bool IsOccupied(int x, int y)
+    {
+        return _worldData[x, y].IsOccupied;
+    }
+
+    public bool IsTree(int x, int y)
+    {
+        return _worldData[x, y].IsTree;
+    }
+
+    public bool IsTreeTrunk(int x, int y)
+    {
+        return _worldData[x, y].IsTreeTrunk;
+    }
+
+    public bool IsColliderHorizontalFlipped(int x, int y)
+    {
+        return _worldData[x, y].IsColliderHorizontalFlipped;
     }
 
     public bool IsFree(int x, int y)
@@ -279,83 +459,45 @@ public class WorldDataManager : MonoBehaviour
         return _worldData[x, y].IsFree;
     }
 
-    public bool IsBreakable(int x, int y)
+    public bool IsValidForTree(int x, int y)
     {
-        return !_worldData[x, y].IsUnbreakable;
+        return _worldData[x, y].IsValidForTree;
     }
 
-    public bool IsColliderHorizontalFlipped(int x, int y)
+    public bool IsValidForLiquid(int x, int y)
     {
-        return _worldData[x, y].IsColliderHorizontalFlipped;
-    }
-    #endregion
-
-    #region Collider
-    public void UpdateCollider(int x, int y)
-    {
-        UpdateCornerCollider(x, y);
-        UpdateBlockCollider(x, y);
+        return _worldData[x, y].IsValidForLiquid;
     }
 
-    public void UpdateBlockCollider(int x, int y)
+    public bool IsValidForPlant(int x, int y)
     {
-        if (_worldData[x, y].IsSolid)
-        {
-            CheckRules(x, y, _mainRules, out byte i);
-            _worldData[x, y].ColliderIndex = i;
-            OnColliderChanged?.Invoke(x, y);
-        }
+        return _worldData[x, y].IsValidForPlant;
     }
 
-    public void UpdateCornerCollider(int x, int y, bool stopPropagation = false)
+    public bool IsDayLightBlock(int x, int y)
     {
-        if (!_worldData[x, y].IsSolid)
-        {
-            byte prevIndex = _worldData[x, y].ColliderIndex;
-            if (CheckRule(x, y, _mainRules.CornerRule))
-            {
-                _worldData[x, y].ColliderIndex = 254;
-            }
-            else
-            {
-                _worldData[x, y].ColliderIndex = byte.MaxValue;
-            }
-            if (!stopPropagation && _worldData[x, y].ColliderIndex != prevIndex)
-            {
-                UpdateCollidersAround(x, y);
-            }
-            OnColliderChanged?.Invoke(x, y);
-        }
+        return _worldData[x, y].IsDayLightBlock;
     }
 
-    private void UpdateCollidersAround(int x, int y)
+    public bool IsLiquidFull(int x, int y)
     {
-        for (int i = -1; i <= 1; i++)
-        {
-            for (int j = -1; j <= 1; j++)
-            {
-                if (i == 0 && j == 0)
-                {
-                    continue;
-                }
-                UpdateCollider(x + i, y + j);
-            }
-        }
+        return _worldData[x, y].IsLiquidFull;
     }
 
-    public void UpdateColliderWithoutNotification(int x, int y)
+    public bool IsSolidAnyNeighbor(int x, int y)
     {
-        UpdateCornerColliderWithoutNotification(x, y);
-        UpdateBlockColliderWithoutNotification(x, y);
+        return IsSolid(x - 1, y) | IsSolid(x + 1, y) || IsSolid(x, y - 1) || IsSolid(x, y + 1);
     }
 
-    public void UpdateBlockColliderWithoutNotification(int x, int y)
+    public bool IsPhysicallySolidBlock(int x, int y)
     {
-        if (_worldData[x, y].IsSolid)
-        {
-            CheckRules(x, y, _mainRules, out byte i);
-            _worldData[x, y].ColliderIndex = i;
-        }
+        return _worldData[x, y].IsPhysicallySolidBlock;
+    }
+
+    public bool CompareBlock(int x, int y, BlockSO data)
+    {
+        BlockSO block = GetBlockData(x, y);
+        return block.GetId() == data.GetId() && block.Type == data.Type;
     }
 
     public void UpdateCornerColliderWithoutNotification(int x, int y, bool stopPropagation = false)
@@ -378,6 +520,84 @@ public class WorldDataManager : MonoBehaviour
         }
     }
 
+    public void UpdateBlockColliderWithoutNotification(int x, int y)
+    {
+        if (_worldData[x, y].IsSolid)
+        {
+            CheckRules(x, y, _mainRules, out byte i);
+            _worldData[x, y].ColliderIndex = i;
+        }
+    }
+    #endregion
+
+    #region Private Methods
+    private void InitializePhysicsShapes()
+    {
+        _physicsShapesBySprite = new();
+        List<Vector2> physicShape;
+        foreach (ColliderRule rule in _mainRules.Rules)
+        {
+            physicShape = new();
+            rule.Sprite.GetPhysicsShape(0, physicShape);
+            _physicsShapesBySprite.Add(rule.Sprite, physicShape);
+        }
+        physicShape = new();
+        _mainRules.CornerRule.Sprite.GetPhysicsShape(0, physicShape);
+        _physicsShapesBySprite.Add(_mainRules.CornerRule.Sprite, physicShape);
+    }
+
+    private void UpdateCollider(int x, int y)
+    {
+        UpdateCornerCollider(x, y);
+        UpdateBlockCollider(x, y);
+    }
+
+    private void UpdateCornerCollider(int x, int y, bool stopPropagation = false)
+    {
+        if (!_worldData[x, y].IsSolid)
+        {
+            byte prevIndex = _worldData[x, y].ColliderIndex;
+            if (CheckRule(x, y, _mainRules.CornerRule))
+            {
+                _worldData[x, y].ColliderIndex = 254;
+            }
+            else
+            {
+                _worldData[x, y].ColliderIndex = byte.MaxValue;
+            }
+            if (!stopPropagation && _worldData[x, y].ColliderIndex != prevIndex)
+            {
+                UpdateCollidersAround(x, y);
+            }
+            OnColliderChanged?.Invoke(x, y);
+        }
+    }
+
+    private void UpdateBlockCollider(int x, int y)
+    {
+        if (_worldData[x, y].IsSolid)
+        {
+            CheckRules(x, y, _mainRules, out byte i);
+            _worldData[x, y].ColliderIndex = i;
+            OnColliderChanged?.Invoke(x, y);
+        }
+    }
+
+    private void UpdateCollidersAround(int x, int y)
+    {
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int j = -1; j <= 1; j++)
+            {
+                if (i == 0 && j == 0)
+                {
+                    continue;
+                }
+                UpdateCollider(x + i, y + j);
+            }
+        }
+    }
+
     private void UpdateCollidersAroundWithoutNotification(int x, int y)
     {
         for (int i = -1; i <= 1; i++)
@@ -391,13 +611,6 @@ public class WorldDataManager : MonoBehaviour
                 UpdateBlockColliderWithoutNotification(x + i, y + j);
             }
         }
-    }
-
-    public void SetColliderIndex(int x, int y, byte index, bool isHorizontalFlipped)
-    {
-        _worldData[x, y].SetColliderHorizontalFlippedFlag(isHorizontalFlipped);
-        _worldData[x, y].ColliderIndex = index;
-        OnColliderChanged?.Invoke(x, y);
     }
 
     private bool CheckRules(int x, int y, ColliderRulesSO rules, out byte index)
@@ -457,14 +670,12 @@ public class WorldDataManager : MonoBehaviour
         int ruleY = y + position.y;
         return ruleType switch
         {
-            ColliderRuleType.Nothing => !_worldData[ruleX, ruleY].IsSolid && _worldData[ruleX, ruleY].ColliderIndex != 254,
-            ColliderRuleType.Empty => !_worldData[ruleX, ruleY].IsSolid,
-            ColliderRuleType.Solid => _worldData[ruleX, ruleY].IsSolid,
+            ColliderRuleType.Nothing => !_worldData[ruleX, ruleY].IsPhysicallySolidBlock && _worldData[ruleX, ruleY].ColliderIndex != 254,
+            ColliderRuleType.Empty => !_worldData[ruleX, ruleY].IsPhysicallySolidBlock,
+            ColliderRuleType.Solid => _worldData[ruleX, ruleY].IsPhysicallySolidBlock,
             ColliderRuleType.Corner => _worldData[ruleX, ruleY].ColliderIndex == 254,
             _ => false
         };
     }
-    #endregion
-
     #endregion
 }

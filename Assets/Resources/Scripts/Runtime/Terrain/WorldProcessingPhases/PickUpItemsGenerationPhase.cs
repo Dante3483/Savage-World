@@ -1,52 +1,50 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Random = System.Random;
 
-public class PickUpItemsGenerationPhase : IWorldProcessingPhase
+public class PickUpItemsGenerationPhase : WorldProcessingPhaseBase
 {
-    #region Private fields
-    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
-    private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
-    private Random _randomVar = GameManager.Instance.RandomVar;
-    #endregion
-
-    #region Public fields
+    #region Fields
 
     #endregion
 
     #region Properties
-    public string Name => "Pick up items generation";
+    public override string Name => "Pick up items generation";
     #endregion
 
-    #region Methods
-    public void StartPhase()
+    #region Events / Delegates
+
+    #endregion
+
+    #region Public Methods
+    public override void StartPhase()
     {
         //Create surface collected items
         Dictionary<BiomesID, List<PickUpItem>> allPickUpItems = null;
         List<Vector3> coords = new();
         Vector3 vector = new();
-        ActionInMainThreadUtil.Instance.Invoke(() =>
-        {
-            allPickUpItems = new Dictionary<BiomesID, List<PickUpItem>>()
-            {
-                //{ BiomesID.NonBiom, GameManager.Instance.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.NonBiom) },
-                //{ BiomesID.Ocean, GameManager.Instance.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.Ocean) },
-                { BiomesID.Desert, GameManager.Instance.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Desert) },
-                { BiomesID.Savannah, GameManager.Instance.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Savannah) },
-                { BiomesID.Meadow, GameManager.Instance.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Meadow) },
-                { BiomesID.Forest, GameManager.Instance.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Forest) },
-                { BiomesID.Swamp, GameManager.Instance.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Swamp) },
-                { BiomesID.ConiferousForest, GameManager.Instance.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.ConiferousForest) },
-            };
-        });
+
+        GameObject pickUpItemsSection = _gameManager.Terrain.PickUpItems;
         BiomeSO currentBiome;
-        byte chance;
+        int chance;
         int startX;
         int endX;
         int x;
         int y;
-        int terrainWidth = GameManager.Instance.CurrentTerrainWidth;
-        GameObject pickUpItemsSection = GameManager.Instance.Terrain.PickUpItems;
+
+        ActionInMainThreadUtil.Instance.Invoke(() =>
+        {
+            allPickUpItems = new Dictionary<BiomesID, List<PickUpItem>>()
+            {
+                //{ BiomesID.NonBiom, _gameManager.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.NonBiom) },
+                //{ BiomesID.Ocean, _gameManager.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.Ocean) },
+                { BiomesID.Desert, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Desert) },
+                { BiomesID.Savannah, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Savannah) },
+                { BiomesID.Meadow, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Meadow) },
+                { BiomesID.Forest, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Forest) },
+                { BiomesID.Swamp, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Swamp) },
+                { BiomesID.ConiferousForest, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.ConiferousForest) },
+            };
+        });
 
         foreach (var pickUpItems in allPickUpItems)
         {
@@ -55,7 +53,7 @@ public class PickUpItemsGenerationPhase : IWorldProcessingPhase
                 if (pickUpItems.Key == BiomesID.NonBiome)
                 {
                     startX = 0;
-                    endX = (ushort)(terrainWidth - 1);
+                    endX = _terrainWidth - 1;
                 }
                 else
                 {
@@ -66,23 +64,23 @@ public class PickUpItemsGenerationPhase : IWorldProcessingPhase
 
                 for (x = startX; x <= endX; x++)
                 {
-                    for (y = _terrainConfiguration.Equator; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
+                    for (y = _equator; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
                     {
-                        if (!_worldData[x, y].IsSolid)
+                        if (!IsSolid(x, y))
                         {
                             continue;
                         }
-                        if (!_worldData[x, y + 1].IsEmpty)
+                        if (!IsEmpty(x, y + 1))
                         {
                             continue;
                         }
-                        chance = (byte)_randomVar.Next(0, 101);
+                        chance = GetNextRandomValue(0, 101);
                         if (chance <= pickUpItem.ChanceToSpawn)
                         {
                             vector.x = x;
                             vector.y = y + 1;
                             coords.Add(vector);
-                            _worldData[x, y].SetOccupiedFlag(true);
+                            SetOccupied(x, y);
                         }
                     }
                 }
@@ -91,7 +89,7 @@ public class PickUpItemsGenerationPhase : IWorldProcessingPhase
                 {
                     foreach (Vector3 coord in coords)
                     {
-                        GameObject pickUpItemGameObject = GameObject.Instantiate(pickUpItem.gameObject, coord, Quaternion.identity, pickUpItemsSection.transform);
+                        PickUpItem pickUpItemGameObject = Object.Instantiate(pickUpItem, coord, Quaternion.identity, pickUpItemsSection.transform);
                         pickUpItemGameObject.name = pickUpItem.gameObject.name;
                     }
                 });
@@ -99,5 +97,9 @@ public class PickUpItemsGenerationPhase : IWorldProcessingPhase
             }
         }
     }
+    #endregion
+
+    #region Private Methods
+
     #endregion
 }

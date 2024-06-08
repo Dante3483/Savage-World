@@ -1,45 +1,40 @@
 using System.Collections.Generic;
-using Random = System.Random;
 
-public class PlantsGenerationPhase : IWorldProcessingPhase
+public class PlantsGenerationPhase : WorldProcessingPhaseBase
 {
-    #region Private fields
-    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
-    private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
-    private Terrain _terrain = GameManager.Instance.Terrain;
-    private Random _randomVar = GameManager.Instance.RandomVar;
-    #endregion
-
-    #region Public fields
+    #region Fields
 
     #endregion
 
     #region Properties
-    public string Name => "Plants generation";
+    public override string Name => "Plants generation";
     #endregion
 
-    #region Methods
-    public void StartPhase()
+    #region Events / Delegates
+
+    #endregion
+
+    #region Public Methods
+    public override void StartPhase()
     {
-        //Create surface plants
-        List<List<BlockSO>> allPlants = new()
-        {
-            GameManager.Instance.BlocksAtlas.GetPlantsByBiome(BiomesID.NonBiome),
-            //GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.Ocean),
-            GameManager.Instance.BlocksAtlas.GetPlantsByBiome(BiomesID.Desert),
-            GameManager.Instance.BlocksAtlas.GetPlantsByBiome(BiomesID.Savannah),
-            GameManager.Instance.BlocksAtlas.GetPlantsByBiome(BiomesID.Meadow),
-            GameManager.Instance.BlocksAtlas.GetPlantsByBiome(BiomesID.Forest),
-            //GameManager.Instance.ObjectsAtlass.GetAllBiomePlants(BiomesID.Swamp),
-            GameManager.Instance.BlocksAtlas.GetPlantsByBiome(BiomesID.ConiferousForest),
-        };
         BiomeSO currentBiome;
         int chance;
         int startX;
         int endX;
         int x;
         int y;
-        int terrainWidth = GameManager.Instance.CurrentTerrainWidth;
+
+        List<List<BlockSO>> allPlants = new()
+        {
+            _gameManager.BlocksAtlas.GetPlantsByBiome(BiomesID.NonBiome),
+            //_gameManager.ObjectsAtlass.GetAllBiomePlants(BiomesID.Ocean),
+            _gameManager.BlocksAtlas.GetPlantsByBiome(BiomesID.Desert),
+            _gameManager.BlocksAtlas.GetPlantsByBiome(BiomesID.Savannah),
+            _gameManager.BlocksAtlas.GetPlantsByBiome(BiomesID.Meadow),
+            _gameManager.BlocksAtlas.GetPlantsByBiome(BiomesID.Forest),
+            //_gameManager.ObjectsAtlass.GetAllBiomePlants(BiomesID.Swamp),
+            _gameManager.BlocksAtlas.GetPlantsByBiome(BiomesID.ConiferousForest),
+        };
 
         foreach (List<BlockSO> plants in allPlants)
         {
@@ -48,7 +43,7 @@ public class PlantsGenerationPhase : IWorldProcessingPhase
                 if (plant.BiomeId == BiomesID.NonBiome)
                 {
                     startX = 0;
-                    endX = terrainWidth - 1;
+                    endX = _terrainWidth - 1;
                 }
                 else
                 {
@@ -61,32 +56,32 @@ public class PlantsGenerationPhase : IWorldProcessingPhase
                 {
                     for (y = _terrainConfiguration.SurfaceLevel.StartY; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
                     {
-                        chance = _randomVar.Next(0, 101);
-                        if (plant.AllowedToSpawnOn.Contains(_worldData[x, y].BlockData) && chance <= plant.ChanceToSpawn)
+                        chance = GetNextRandomValue(0, 101);
+                        if (plant.AllowedToSpawnOn.Contains(GetBlockData(x, y)) && chance <= plant.ChanceToSpawn)
                         {
                             if (plant.IsBottomBlockSolid)
                             {
-                                if (!_worldData[x, y + 1].IsEmpty)
+                                if (!IsEmpty(x, y + 1))
                                 {
                                     continue;
                                 }
-                                if (_worldData[x, y + 1].IsLiquid)
+                                if (IsLiquid(x, y + 1))
                                 {
                                     continue;
                                 }
-                                _terrain.CreateBlock(x, y + 1, plant);
+                                SetBlockData(x, y + 1, plant);
                             }
                             if (plant.IsTopBlockSolid)
                             {
-                                if (!_worldData[x, y - 1].IsEmpty)
+                                if (!IsEmpty(x, y - 1))
                                 {
                                     continue;
                                 }
-                                if (_worldData[x, y - 1].IsLiquid)
+                                if (IsLiquid(x, y - 1))
                                 {
                                     continue;
                                 }
-                                _terrain.CreateBlock(x, y - 1, plant);
+                                SetBlockData(x, y - 1, plant);
                             }
                         }
                     }
@@ -94,5 +89,9 @@ public class PlantsGenerationPhase : IWorldProcessingPhase
             }
         }
     }
+    #endregion
+
+    #region Private Methods
+
     #endregion
 }

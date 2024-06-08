@@ -1,29 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Random = System.Random;
 
-public class StarterCavesGenerationPhase : IWorldProcessingPhase
+public class StarterCavesGenerationPhase : WorldProcessingPhaseBase
 {
-    #region Private fields
-    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
-    private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
-    private Terrain _terrain = GameManager.Instance.Terrain;
-    private Random _randomVar = GameManager.Instance.RandomVar;
-    private BlockSO _stoneBlock = GameManager.Instance.BlocksAtlas.Stone;
-    private BlockSO _airBlock = GameManager.Instance.BlocksAtlas.Air;
-    private BlockSO _dirtWall = GameManager.Instance.BlocksAtlas.DirtWall;
-    #endregion
-
-    #region Public fields
+    #region Fields
 
     #endregion
 
     #region Properties
-    public string Name => "Starter caves generation";
+    public override string Name => "Starter caves generation";
     #endregion
 
-    #region Methods
-    public void StartPhase()
+    #region Events / Delegates
+
+    #endregion
+
+    #region Public Methods
+    public override void StartPhase()
     {
         int x;
         int startX;
@@ -33,19 +26,19 @@ public class StarterCavesGenerationPhase : IWorldProcessingPhase
         int prevTunnelDirection = 0;
         int countOfRepeats = 0;
 
-        for (x = _terrainConfiguration.Savannah.StartX + _terrainConfiguration.ChunkSize; x < _terrainConfiguration.ConiferousForest.StartX; x += _terrainConfiguration.ChunkSize)
+        for (x = _terrainConfiguration.Savannah.StartX + _chunkSize; x < _terrainConfiguration.ConiferousForest.StartX; x += _chunkSize)
         {
-            chance = _randomVar.Next(0, 101);
+            chance = GetNextRandomValue(0, 101);
             if (chance <= _terrainConfiguration.StarterCaveChance)
             {
-                startX = _randomVar.Next(x + 5, x + _terrainConfiguration.ChunkSize - _terrainConfiguration.MaxStarterCaveLength - 5);
-                startY = _randomVar.Next(_terrainConfiguration.SurfaceLevel.StartY + _terrainConfiguration.ChunkSize + 5, _terrainConfiguration.Equator - _terrainConfiguration.MaxStarterCaveHeight - 10);
-                tunnelDirection = _randomVar.Next(0, 2) == 0 ? -1 : 1;
+                startX = GetNextRandomValue(x + 5, x + _chunkSize - _terrainConfiguration.MaxStarterCaveLength - 5);
+                startY = GetNextRandomValue(_terrainConfiguration.SurfaceLevel.StartY + _chunkSize + 5, _equator - _terrainConfiguration.MaxStarterCaveHeight - 10);
+                tunnelDirection = GetNextRandomValue(0, 2) == 0 ? -1 : 1;
                 tunnelDirection = countOfRepeats == 2 ? tunnelDirection - (tunnelDirection * 2) : tunnelDirection;
 
                 if (CreateStarterCave(startX, startY, tunnelDirection))
                 {
-                    x += _terrainConfiguration.ChunkSize;
+                    x += _chunkSize;
                 }
                 if (tunnelDirection == prevTunnelDirection)
                 {
@@ -59,18 +52,20 @@ public class StarterCavesGenerationPhase : IWorldProcessingPhase
             }
         }
     }
+    #endregion
 
+    #region Private Methods
     private bool CreateStarterCave(int startX, int startY, int tunnelDirection)
     {
         //Define length and height
-        int length = _randomVar.Next(_terrainConfiguration.MinStarterCaveLength, _terrainConfiguration.MaxStarterCaveLength);
-        int height = _randomVar.Next(_terrainConfiguration.MinStarterCaveHeight, _terrainConfiguration.MaxStarterCaveHeight);
+        int length = GetNextRandomValue(_terrainConfiguration.MinStarterCaveLength, _terrainConfiguration.MaxStarterCaveLength);
+        int height = GetNextRandomValue(_terrainConfiguration.MinStarterCaveHeight, _terrainConfiguration.MaxStarterCaveHeight);
 
         //Define list of coords and air block
-        List<Vector2Int> coords = new List<Vector2Int>();
-        List<Vector2Int> stoneCoords = new List<Vector2Int>();
-        List<Vector2Int> wallCoords = new List<Vector2Int>();
-        Vector2Int vector = new Vector2Int();
+        List<Vector2Int> coords = new();
+        List<Vector2Int> stoneCoords = new();
+        List<Vector2Int> wallCoords = new();
+        Vector2Int vector = new();
 
         //Create rectangle
         int y;
@@ -79,7 +74,7 @@ public class StarterCavesGenerationPhase : IWorldProcessingPhase
         {
             for (y = startY; y <= startY + height; y++)
             {
-                if (!_worldData[x, y].CompareBlock(_airBlock))
+                if (!CompareBlock(x, y, _air))
                 {
                     vector.x = x;
                     vector.y = y;
@@ -97,7 +92,7 @@ public class StarterCavesGenerationPhase : IWorldProcessingPhase
         y = startY + height + 1;
         for (x = startX; x <= startX + length; x++)
         {
-            if (_randomVar.Next(0, 2) == 1 || countOfRepeats == 2)
+            if (GetNextRandomValue(0, 2) == 1 || countOfRepeats == 2)
             {
                 vector.x = x;
                 vector.y = y;
@@ -115,7 +110,7 @@ public class StarterCavesGenerationPhase : IWorldProcessingPhase
         countOfRepeats = 0;
         for (x = startX; x <= startX + length; x++)
         {
-            if (_randomVar.Next(0, 2) == 1 || countOfRepeats == 2)
+            if (GetNextRandomValue(0, 2) == 1 || countOfRepeats == 2)
             {
                 vector.x = x;
                 vector.y = y - 1;
@@ -138,7 +133,7 @@ public class StarterCavesGenerationPhase : IWorldProcessingPhase
         x = startX + length + 1;
         for (y = startY; y <= startY + height; y++)
         {
-            if (_randomVar.Next(0, 2) == 1 || countOfRepeats == 2)
+            if (GetNextRandomValue(0, 2) == 1 || countOfRepeats == 2)
             {
                 vector.x = x;
                 vector.y = y;
@@ -155,7 +150,7 @@ public class StarterCavesGenerationPhase : IWorldProcessingPhase
         x = startX - 1;
         for (y = startY; y <= startY + height; y++)
         {
-            if (_randomVar.Next(0, 2) == 1 || countOfRepeats == 2)
+            if (GetNextRandomValue(0, 2) == 1 || countOfRepeats == 2)
             {
                 vector.x = x;
                 vector.y = y;
@@ -171,30 +166,30 @@ public class StarterCavesGenerationPhase : IWorldProcessingPhase
         //Create tunnel
         if (tunnelDirection == -1)
         {
-            CreateTunnel(tunnelDirection, startX, startY, ref coords, ref stoneCoords, ref wallCoords);
+            CreateTunnel(tunnelDirection, startX, startY, coords, stoneCoords, wallCoords);
         }
         else
         {
-            CreateTunnel(tunnelDirection, startX + length, startY, ref coords, ref stoneCoords, ref wallCoords);
+            CreateTunnel(tunnelDirection, startX + length, startY, coords, stoneCoords, wallCoords);
         }
 
 
         //Fill terrain with air blocks
         foreach (Vector2Int coord in coords)
         {
-            _terrain.CreateBlock(coord.x, coord.y, _airBlock);
+            SetBlockData(coord.x, coord.y, _air);
         }
 
         //Fill terrain with stone blocks
         foreach (Vector2Int coord in stoneCoords)
         {
-            _terrain.CreateBlock(coord.x, coord.y, _stoneBlock);
+            SetBlockData(coord.x, coord.y, _stone);
         }
 
         //Fill terrain with dirt wall
         foreach (Vector2Int coord in wallCoords)
         {
-            _terrain.CreateWall(coord.x, coord.y, _dirtWall);
+            SetWallData(coord.x, coord.y, _dirtWall);
         }
 
         coords = null;
@@ -204,7 +199,7 @@ public class StarterCavesGenerationPhase : IWorldProcessingPhase
     }
 
     private void CreateTunnel(int direction, int startX, int startY,
-        ref List<Vector2Int> coords, ref List<Vector2Int> stoneCoords, ref List<Vector2Int> wallCoords)
+        List<Vector2Int> coords, List<Vector2Int> stoneCoords, List<Vector2Int> wallCoords)
     {
         int x = startX;
         int y = startY;
@@ -212,7 +207,7 @@ public class StarterCavesGenerationPhase : IWorldProcessingPhase
         int stepUpWall = 5;
         int i;
         bool decreaseStep = false;
-        Vector2Int vector = new Vector2Int();
+        Vector2Int vector = new();
 
         while (true)
         {
@@ -228,13 +223,13 @@ public class StarterCavesGenerationPhase : IWorldProcessingPhase
                 vector.x = x;
                 vector.y = y + i;
                 wallCoords.Add(vector);
-                if (_worldData[x, y + i + 2].CompareBlock(_airBlock))
+                if (CompareBlock(x, y + i + 2, _air))
                 {
                     decreaseStep = true;
                 }
             }
 
-            if (_randomVar.Next(0, 2) == 1)
+            if (GetNextRandomValue(0, 2) == 1)
             {
                 vector.x = x;
                 vector.y = y - 1;
@@ -242,7 +237,7 @@ public class StarterCavesGenerationPhase : IWorldProcessingPhase
             }
 
             x += direction;
-            if (_randomVar.Next(0, 2) == 1)
+            if (GetNextRandomValue(0, 2) == 1)
             {
                 y++;
                 if (decreaseStep)
@@ -250,7 +245,7 @@ public class StarterCavesGenerationPhase : IWorldProcessingPhase
                     stepUpWall -= 2;
                 }
             }
-            if (_worldData[x, y].CompareBlock(_airBlock))
+            if (CompareBlock(x, y, _air))
             {
                 break;
             }

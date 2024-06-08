@@ -1,31 +1,23 @@
 using UnityEngine;
-using Random = System.Random;
 
-public class LandscapeGenerationPhase : IWorldProcessingPhase
+public class LandscapeGenerationPhase : WorldProcessingPhaseBase
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
+    #region Fields
 
     #endregion
 
     #region Properties
-    public string Name => "Landscape generation";
+    public override string Name => "Landscape generation";
     #endregion
 
-    #region Methods
-    public void StartPhase()
+    #region Events / Delegates
+
+    #endregion
+
+    #region Public Methods
+    public override void StartPhase()
     {
-        TerrainConfigurationSO terrainConfiguration = GameManager.Instance.TerrainConfiguration;
-        Terrain terrain = GameManager.Instance.Terrain;
-        Random randomVar = GameManager.Instance.RandomVar;
-
-        BlockSO dirtBlock = GameManager.Instance.BlocksAtlas.Dirt;
-
-        int startY = terrainConfiguration.Equator + 1;
-        int seed = GameManager.Instance.Seed;
+        int startY = _equator + 1;
         int firstHeight;
         int dif;
         int sign;
@@ -35,9 +27,9 @@ public class LandscapeGenerationPhase : IWorldProcessingPhase
         int x;
         int y;
 
-        Vector2Int vector = new Vector2Int();
+        Vector2Int vector = new();
 
-        foreach (BiomeSO biome in terrainConfiguration.Biomes)
+        foreach (BiomeSO biome in _terrainConfiguration.Biomes)
         {
             //Skip NonBiome
             if (biome.Id == BiomesID.NonBiome)
@@ -45,7 +37,7 @@ public class LandscapeGenerationPhase : IWorldProcessingPhase
                 continue;
             }
             //Calculate difference of height between two biomes
-            firstHeight = (int)(startY + Mathf.PerlinNoise((biome.StartX + seed) / biome.MountainCompression, seed / biome.MountainCompression) * biome.MountainHeight);
+            firstHeight = (int)(startY + Mathf.PerlinNoise((biome.StartX + _seed) / biome.MountainCompression, _seed / biome.MountainCompression) * biome.MountainHeight);
             dif = prevHeight != -1 ? prevHeight - firstHeight : 0;
             sign = dif < 0 ? 1 : -1;
             heightAdder = dif;
@@ -54,24 +46,28 @@ public class LandscapeGenerationPhase : IWorldProcessingPhase
             for (x = biome.StartX; x <= biome.EndX; x++)
             {
                 //Calculate maximum height
-                height = (int)(Mathf.PerlinNoise((x + seed) / biome.MountainCompression, seed / biome.MountainCompression) * biome.MountainHeight);
+                height = (int)(Mathf.PerlinNoise((x + _seed) / biome.MountainCompression, _seed / biome.MountainCompression) * biome.MountainHeight);
                 height += startY + heightAdder;
                 for (y = startY; y <= height; y++)
                 {
-                    terrain.CreateBlock(x, y, dirtBlock);
+                    SetBlockData(x, y, _dirt);
                 }
                 vector.x = x;
                 vector.y = y - 1;
-                TerrainGeneration.SurfaceCoords.Add(vector);
+                _surfaceCoords.Add(vector);
 
                 //Change diference
                 if (heightAdder != 0)
                 {
-                    heightAdder += sign * randomVar.Next(0, 2);
+                    heightAdder += sign * GetNextRandomValue(0, 2);
                 }
             }
             prevHeight = height;
         }
     }
+    #endregion
+
+    #region Private Methods
+
     #endregion
 }

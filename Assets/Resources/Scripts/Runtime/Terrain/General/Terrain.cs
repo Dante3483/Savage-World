@@ -12,8 +12,6 @@ public class Terrain : MonoBehaviour
     [SerializeField]
     private GameObject _pickUpItems;
 
-    private WorldCellData[,] _worldData;
-
     #region World data update
     private HashSet<Vector2Ushort> _needToUpdate;
     private List<Vector2Ushort> vectors = new();
@@ -88,7 +86,7 @@ public class Terrain : MonoBehaviour
 
     public void Initialize()
     {
-        _worldData = WorldDataManager.Instance.WorldData;
+
     }
 
     public void CreateNewWorld()
@@ -550,37 +548,11 @@ public class Terrain : MonoBehaviour
     #endregion
 
     #region Helpful
-    public void CreateBlock(int x, int y, BlockSO block)
-    {
-        WorldDataManager.Instance.SetBlockData(x, y, block);
-    }
 
-    public void CreateWall(int x, int y, BlockSO block)
-    {
-        WorldDataManager.Instance.SetWallData(x, y, block);
-    }
-
-    public void CreateLiquidBlock(int x, int y, byte id)
-    {
-        _worldData[x, y].SetLiquidData(id);
-    }
-
-    public void CreateLiquidBlock(int x, int y, byte id, float flowValue)
-    {
-        _worldData[x, y].SetLiquidData(id, flowValue);
-    }
-
-    public void SetTileId(int x, int y, byte tileId)
-    {
-        _worldData[x, y].TileId = tileId;
-    }
     #endregion
 
     #region Valid
-    public static bool IsInMapRange(int x, int y)
-    {
-        return x >= 0 && x < GameManager.Instance.CurrentTerrainWidth && y >= 0 && y < GameManager.Instance.CurrentTerrainHeight;
-    }
+
     #endregion
 
     #endregion

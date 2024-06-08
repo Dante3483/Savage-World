@@ -1,52 +1,44 @@
-using System;
 using System.Threading.Tasks;
 
-public class UpdateDataPhase : IWorldProcessingPhase
+public class UpdateDataPhase : WorldProcessingPhaseBase
 {
-    #region Private fields
-    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
-    private Terrain _terrain = GameManager.Instance.Terrain;
-    #endregion
-
-    #region Public fields
+    #region Fields
 
     #endregion
 
     #region Properties
-    public string Name => "Update data";
+    public override string Name => "Update data";
     #endregion
 
-    #region Methods
-    public void StartPhase()
-    {
-        try
-        {
-            int terrainWidth = GameManager.Instance.CurrentTerrainWidth;
-            int terrainHeight = GameManager.Instance.CurrentTerrainHeight;
+    #region Events / Delegates
 
-            Parallel.For(5, terrainWidth - 5, (index) =>
+    #endregion
+
+    #region Public Methods
+    public override void StartPhase()
+    {
+        Parallel.For(5, _terrainWidth - 5, (index) =>
+        {
+            for (int y = 5; y < _terrainHeight - 5; y++)
             {
-                for (int y = 5; y < terrainHeight - 5; y++)
+                if (IsDust(index, y) && IsEmpty(index, y - 1))
                 {
-                    if (_worldData[index, y].IsDust && _worldData[index, y - 1].IsEmpty)
+                    lock (this)
                     {
-                        lock (this)
-                        {
-                            _terrain.NeedToUpdate.Add(new Vector2Ushort(index, y));
-                        }
+                        //_terrain.NeedToUpdate.Add(new Vector2Ushort(index, y));
                     }
                 }
-            });
+            }
+        });
 
-            //while (_terrain.NeedToUpdate.Count != 0)
-            //{
-            //    //_terrain.UpdateWorldData();
-            //}
-        }
-        catch (Exception ex)
-        {
-            throw ex;
-        }
+        //while (_terrain.NeedToUpdate.Count != 0)
+        //{
+        //    //_terrain.UpdateWorldData();
+        //}
     }
+    #endregion
+
+    #region Private Methods
+
     #endregion
 }

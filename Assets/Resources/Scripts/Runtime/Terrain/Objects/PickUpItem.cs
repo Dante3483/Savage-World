@@ -69,9 +69,9 @@ public class PickUpItem : MonoBehaviour
     {
         _intPosition.x = Mathf.FloorToInt(transform.position.x);
         _intPosition.y = Mathf.FloorToInt(transform.position.y);
-        if (WorldDataManager.Instance.WorldData[_intPosition.x, _intPosition.y - 1].IsEmpty)
+        if (WorldDataManager.Instance.IsFree(_intPosition.x, _intPosition.y - 1))
         {
-            WorldDataManager.Instance.MakeFree(_intPosition.x, _intPosition.y);
+            WorldDataManager.Instance.SetOccupiedFlag(_intPosition.x, _intPosition.y, false);
             DeleteObject();
         }
     }

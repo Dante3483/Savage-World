@@ -1,54 +1,45 @@
 using System.Threading.Tasks;
 
-public class SaveLoadTestPhase : IWorldProcessingPhase
+public class SaveLoadTestPhase : WorldProcessingPhaseBase
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
+    #region Fields
 
     #endregion
 
     #region Properties
-    public string Name => "Save/Load test";
+    public override string Name => "Save/Load test";
     #endregion
 
-    #region Methods
-    public void StartPhase()
+    #region Events / Delegates
+
+    #endregion
+
+    #region Public Methods
+    public override void StartPhase()
     {
-        TerrainConfigurationSO terrainConfiguration = GameManager.Instance.TerrainConfiguration;
-
-        int terrainWidth = GameManager.Instance.CurrentTerrainWidth;
-        int terrainHeight = GameManager.Instance.CurrentTerrainHeight;
-        int terrainEquator = terrainConfiguration.Equator;
-
-        Terrain terrain = GameManager.Instance.Terrain;
-
-        BlockSO dirtBlock = GameManager.Instance.BlocksAtlas.Dirt;
-        BlockSO stoneBlock = GameManager.Instance.BlocksAtlas.Stone;
-        BlockSO dirtWall = GameManager.Instance.BlocksAtlas.DirtWall;
-        BlockSO waterBlock = GameManager.Instance.BlocksAtlas.Water;
-
-        Parallel.For(0, terrainWidth, (index) =>
+        Parallel.For(0, _terrainWidth, (index) =>
         {
             int x = index;
-            for (int y = 0; y < terrainHeight; y++)
+            for (int y = 0; y < _terrainHeight; y++)
             {
                 if (y % 2 == 0)
                 {
-                    terrain.CreateBlock(x, y, dirtBlock);
-                    terrain.CreateWall(x, y, dirtWall);
-                    terrain.CreateLiquidBlock(x, y, (byte)waterBlock.GetId());
+                    SetBlockData(x, y, _dirt);
+                    SetWallData(x, y, _dirtWall);
+                    SetLiquidData(x, y, _water);
                 }
                 else
                 {
-                    terrain.CreateBlock(x, y, stoneBlock);
-                    terrain.CreateWall(x, y, dirtWall);
-                    terrain.CreateLiquidBlock(x, y, (byte)waterBlock.GetId());
+                    SetBlockData(x, y, _stone);
+                    SetWallData(x, y, _dirtWall);
+                    SetLiquidData(x, y, _water);
                 }
             }
         });
     }
+    #endregion
+
+    #region Private Methods
+
     #endregion
 }

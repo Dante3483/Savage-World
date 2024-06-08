@@ -52,7 +52,7 @@ public abstract class BreakAction : PlayerActionBase
     {
         int x = _position.x;
         int y = _position.y;
-        BlockSO data = _worldDataManager.GetCellBlockData(x, y);
+        BlockSO data = _worldDataManager.GetBlockData(x, y);
         _addDamage?.Invoke(_position, _damage);
         if ((bool)(_checkDamage?.Invoke(_position, data.DamageToBreak)))
         {
@@ -65,7 +65,7 @@ public abstract class BreakAction : PlayerActionBase
 
     protected virtual bool CanBreak(int x, int y)
     {
-        if (!_worldDataManager.IsBreakable(x, y))
+        if (_worldDataManager.IsUnbreakable(x, y))
         {
             return false;
         }

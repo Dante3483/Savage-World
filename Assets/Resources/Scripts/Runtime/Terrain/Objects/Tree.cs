@@ -237,8 +237,8 @@ public class Tree : MonoBehaviour
         {
             for (int y = 0; y <= _height; y++)
             {
-                Vector2 point = new Vector2(x, y);
-                Vector2 pointEnd = new Vector2(x + 1, y + 1);
+                Vector2 point = new(x, y);
+                Vector2 pointEnd = new(x + 1, y + 1);
                 Vector2 newPoint = transform.TransformPoint(point);
                 Vector2 newPointEnd = transform.TransformPoint(pointEnd);
                 Collider2D[] hits = Physics2D.OverlapAreaAll(newPoint, newPointEnd);
@@ -300,13 +300,13 @@ public class Tree : MonoBehaviour
 
     private void VisualizeTree()
     {
-        GameObject visualizer = new GameObject("Visualizer");
+        GameObject visualizer = new("Visualizer");
         visualizer.transform.parent = transform;
         visualizer.transform.position = transform.TransformPoint(new Vector3(0 - Offset.x, 0 - Offset.y, 0));
 
         foreach (var block in TreeBlocks)
         {
-            GameObject treeFoliageGameObject = new GameObject("Tree block", typeof(SpriteRenderer));
+            GameObject treeFoliageGameObject = new("Tree block", typeof(SpriteRenderer));
             treeFoliageGameObject.transform.parent = visualizer.transform;
             treeFoliageGameObject.transform.position = visualizer.transform.TransformPoint(new Vector3(block.x + 0.5f, block.y + 0.5f));
             treeFoliageGameObject.GetComponent<SpriteRenderer>().color = Color.white;
@@ -315,7 +315,7 @@ public class Tree : MonoBehaviour
 
         foreach (var block in TrunkBlocks)
         {
-            GameObject treeTrunkGameObject = new GameObject("Tree trunk", typeof(SpriteRenderer));
+            GameObject treeTrunkGameObject = new("Tree trunk", typeof(SpriteRenderer));
             treeTrunkGameObject.transform.parent = visualizer.transform;
             treeTrunkGameObject.transform.position = visualizer.transform.TransformPoint(new Vector3(block.x + 0.5f, block.y + 0.5f));
             treeTrunkGameObject.GetComponent<SpriteRenderer>().color = Color.green;
@@ -326,17 +326,17 @@ public class Tree : MonoBehaviour
     private void OccupieArea()
     {
         Vector2Int treePosition = Vector2Int.FloorToInt(transform.position);
-        foreach(Vector2Int position in _treeBlocks)
+        foreach (Vector2Int position in _treeBlocks)
         {
-            WorldDataManager.Instance.MakeTree(treePosition.x + position.x, treePosition.y + position.y);
+            WorldDataManager.Instance.SetTreeFlag(treePosition.x + position.x, treePosition.y + position.y, true);
         }
         foreach (Vector2Int position in _trunkBlocks)
         {
-            WorldDataManager.Instance.MakeTreeTrunk(treePosition.x + position.x, treePosition.y + position.y);
+            WorldDataManager.Instance.SetTreeTrunkFlag(treePosition.x + position.x, treePosition.y + position.y, true);
         }
         for (int i = 0; i < _widthToSpawn; i++)
         {
-            WorldDataManager.Instance.MakeUnbreakable(treePosition.x + _start.x + i, treePosition.y + _start.y - 1);
+            WorldDataManager.Instance.SetUnbreakableFlag(treePosition.x + _start.x + i, treePosition.y + _start.y - 1, true);
         }
     }
     #endregion

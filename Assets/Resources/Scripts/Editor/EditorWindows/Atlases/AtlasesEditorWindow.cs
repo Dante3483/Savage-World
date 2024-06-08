@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -512,7 +511,7 @@ public class AtlasesEditorWindow : EditorWindow
             AddCollectionButton(collectionInfo);
         }
 
-        ScrollView atlasScrollView = new ScrollView(ScrollViewMode.Vertical);
+        ScrollView atlasScrollView = new(ScrollViewMode.Vertical);
         atlasScrollView.Add(new InspectorElement(_currentAtlas.Atlas));
         _rightPanelContent.Add(atlasScrollView);
     }
@@ -565,7 +564,7 @@ public class AtlasesEditorWindow : EditorWindow
         ResetRightPanel();
         ShowCreateObjectContent();
 
-        InspectorElement inspectorElement = new InspectorElement(_isTypeScriptableObject ? _newObject : (_newObject as GameObject).GetComponent(_newObjectType));
+        InspectorElement inspectorElement = new(_isTypeScriptableObject ? _newObject : (_newObject as GameObject).GetComponent(_newObjectType));
         _rightPanelContent.Add(inspectorElement);
     }
 
@@ -705,7 +704,7 @@ public class AtlasesEditorWindow : EditorWindow
                 editor = Editor.CreateEditor(_currentObject.Data);
             }
 
-            InspectorElement inspectorElement = new InspectorElement(editor);
+            InspectorElement inspectorElement = new(editor);
             inspectorElement.RegisterCallback<SerializedPropertyChangeEvent>(evt => HandleUpdatePreview(evt));
             _rightPanelContent.Add(inspectorElement);
         }
@@ -860,7 +859,7 @@ public class AtlasesEditorWindow : EditorWindow
     /// <param name="type">The type of the object.</param>
     private void HandleSelectType(Type type)
     {
-        List<int> newSelectedIndices = new List<int>();
+        List<int> newSelectedIndices = new();
         IEnumerable<int> selectedIndices = _listView.selectedIndices;
         IEnumerable<object> selectedItems = _listView.selectedItems;
         for (int i = 0; i < selectedItems.Count(); i++)
@@ -981,7 +980,7 @@ public class AtlasesEditorWindow : EditorWindow
     /// <returns>A new button with a name and style.</returns>
     private Button CreateButton(string name)
     {
-        Button button = new Button();
+        Button button = new();
         button.text = name;
         return button;
     }

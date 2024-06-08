@@ -42,7 +42,6 @@ public class TerrainConfigurationSO : ScriptableObject
 
     [Header("World data")]
     public int Equator;
-    public int DeepOceanY;
     public List<TerrainLevelSO> Levels;
     public List<BiomeSO> Biomes;
     public List<ClusterSO> Clusters;

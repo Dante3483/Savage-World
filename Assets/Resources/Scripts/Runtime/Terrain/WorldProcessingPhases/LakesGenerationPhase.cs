@@ -1,66 +1,62 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Random = System.Random;
 
-public class LakesGenerationPhase : IWorldProcessingPhase
+public class LakesGenerationPhase : WorldProcessingPhaseBase
 {
-    #region Private fields
-    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
-    private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
-    private Terrain _terrain = GameManager.Instance.Terrain;
-    private Random _randomVar = GameManager.Instance.RandomVar;
-    private BlockSO _waterBlock = GameManager.Instance.BlocksAtlas.Water;
-    private BlockSO _airBlock = GameManager.Instance.BlocksAtlas.Air;
-    #endregion
-
-    #region Public fields
+    #region Fields
 
     #endregion
 
     #region Properties
-    public string Name => "Lakes generation";
+    public override string Name => "Lakes generation";
     #endregion
 
-    #region Methods
-    public void StartPhase()
+    #region Events / Delegates
+
+    #endregion
+
+    #region Public Methods
+    public override void StartPhase()
     {
         int i;
         int j;
-        int startX = _terrainConfiguration.Savannah.StartX + _terrainConfiguration.ChunkSize;
-        int endX = _terrainConfiguration.ConiferousForest.EndX - _terrainConfiguration.ChunkSize;
+        int startX = _terrainConfiguration.Savannah.StartX + _chunkSize;
+        int endX = _terrainConfiguration.ConiferousForest.EndX - _chunkSize;
         bool isChance = false;
 
-        for (i = startX; i < endX; i += _terrainConfiguration.ChunkSize)
+        for (i = startX; i < endX; i += _chunkSize)
         {
-            if (_randomVar.Next(0, 101) <= _terrainConfiguration.LakeChance || isChance)
+            if (GetNextRandomValue(0, 101) <= _terrainConfiguration.LakeChance || isChance)
             {
-                for (j = i; j < i + _terrainConfiguration.ChunkSize; j++)
+                for (j = i; j < i + _chunkSize; j++)
                 {
                     isChance = true;
-                    if (CreateLake(TerrainGeneration.SurfaceCoords[j].x, TerrainGeneration.SurfaceCoords[j].y))
+                    Vector2Int surfaceCoord = _surfaceCoords[j];
+                    if (CreateLake(surfaceCoord.x, surfaceCoord.y))
                     {
                         isChance = false;
-                        i += _terrainConfiguration.ChunkSize * _terrainConfiguration.LakeDistanceInChunks;
+                        i += _chunkSize * _terrainConfiguration.LakeDistanceInChunks;
                         break;
                     }
                 }
             }
         }
     }
+    #endregion
 
+    #region Private Methods
     private bool CreateLake(int startX, int startY)
     {
-        List<Vector2Int> coords = new List<Vector2Int>();
-        List<Vector2Int> emptyCoords = new List<Vector2Int>();
-        Vector2Int vector = new Vector2Int();
-        int lakeLength = _randomVar.Next(_terrainConfiguration.MinLakeLength, _terrainConfiguration.MaxLakeLength);
-        int lakeHeight = _randomVar.Next(_terrainConfiguration.MinLakeHeight, _terrainConfiguration.MaxLakeHeight);
+        List<Vector2Int> coords = new();
+        List<Vector2Int> emptyCoords = new();
+        Vector2Int vector = new();
+        int lakeLength = GetNextRandomValue(_terrainConfiguration.MinLakeLength, _terrainConfiguration.MaxLakeLength);
+        int lakeHeight = GetNextRandomValue(_terrainConfiguration.MinLakeHeight, _terrainConfiguration.MaxLakeHeight);
         int currentlakeHeight = 0;
         int startAdder = 0;
         int endAdder = 0;
         int i;
         int j;
-        byte waterId = (byte)_waterBlock.GetId();
 
         //Fill list with potential blocks
         while (currentlakeHeight != lakeHeight)
@@ -76,22 +72,22 @@ public class LakesGenerationPhase : IWorldProcessingPhase
                 vector.y = startY - currentlakeHeight;
                 coords.Add(vector);
             }
-            startAdder += _randomVar.Next(1, 3);
-            endAdder += _randomVar.Next(1, 3);
+            startAdder += GetNextRandomValue(1, 3);
+            endAdder += GetNextRandomValue(1, 3);
             currentlakeHeight++;
         }
 
         //Verify lake conditions
         foreach (Vector2Int coord in coords)
         {
-            if (_worldData[coord.x - 1, coord.y].CompareBlock(_airBlock) ||
-                _worldData[coord.x + 1, coord.y].CompareBlock(_airBlock))
+            if (CompareBlock(coord.x - 1, coord.y, _air) ||
+                CompareBlock(coord.x + 1, coord.y, _air))
             {
                 return false;
             }
             for (i = 0; i < 3; i++)
             {
-                if (_worldData[coord.x, coord.y - i].CompareBlock(_airBlock))
+                if (CompareBlock(coord.x, coord.y - i, _air))
                 {
                     return false;
                 }
@@ -103,7 +99,7 @@ public class LakesGenerationPhase : IWorldProcessingPhase
         {
             for (j = 1; ; j++)
             {
-                if (_worldData[coords[i].x, coords[i].y + j].CompareBlock(_airBlock))
+                if (CompareBlock(coords[i].x, coords[i].y + j, _air))
                 {
                     break;
                 }
@@ -121,14 +117,14 @@ public class LakesGenerationPhase : IWorldProcessingPhase
 
         for (x = startX + lakeLength; ; x++)
         {
-            if (_worldData[x, startY + smoothStartY].CompareBlock(_airBlock))
+            if (CompareBlock(x, startY + smoothStartY, _air))
             {
                 break;
             }
 
             for (y = startY + smoothStartY; ; y++)
             {
-                if (_worldData[x, y].CompareBlock(_airBlock))
+                if (CompareBlock(x, y, _air))
                 {
                     break;
                 }
@@ -137,7 +133,7 @@ public class LakesGenerationPhase : IWorldProcessingPhase
                 emptyCoords.Add(vector);
             }
 
-            chanceToMoveUp = _randomVar.Next(0, 3);
+            chanceToMoveUp = GetNextRandomValue(0, 3);
             if (chanceToMoveUp % 2 == 0)
             {
                 smoothStartY++;
@@ -147,14 +143,14 @@ public class LakesGenerationPhase : IWorldProcessingPhase
         //Create lake
         foreach (Vector2Int coord in coords)
         {
-            _terrain.CreateBlock(coord.x, coord.y, _airBlock);
-            _terrain.CreateLiquidBlock(coord.x, coord.y, waterId);
+            SetBlockData(coord.x, coord.y, _air);
+            SetLiquidData(coord.x, coord.y, _water);
         }
 
         //Create air
         foreach (Vector2Int coord in emptyCoords)
         {
-            _terrain.CreateBlock(coord.x, coord.y, _airBlock);
+            SetBlockData(coord.x, coord.y, _air);
         }
 
         return true;

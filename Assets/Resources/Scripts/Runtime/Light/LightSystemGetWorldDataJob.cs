@@ -35,7 +35,7 @@ namespace LightSystem
 
         public void Execute(int index)
         {
-            WorldCellData[,] globalWorldData = WorldDataManager.Instance.WorldData;
+            WorldDataManager worldDataManager = WorldDataManager.Instance;
             WorldCellDataGPU data = new();
             int x = index % _width;
             int y = index / _width;
@@ -44,26 +44,26 @@ namespace LightSystem
 
             if (_isColoredMode)
             {
-                data.BlockLightColor = globalWorldData[dx, dy].BlockData.LightColor;
-                data.WallLightColor = globalWorldData[dx, dy].WallData.LightColor;
+                data.BlockLightColor = worldDataManager.GetBlockLightColor(dx, dy);
+                data.WallLightColor = worldDataManager.GetWallLightColor(dx, dy);
             }
             else
             {
-                data.BlockLightIntensity = globalWorldData[dx, dy].BlockData.LightIntensity;
-                data.WallLightIntensity = globalWorldData[dx, dy].WallData.LightIntensity;
+                data.BlockLightIntensity = worldDataManager.GetBlockLightIntensity(dx, dy);
+                data.WallLightIntensity = worldDataManager.GetWallLightIntensity(dx, dy);
             }
 
             data.Flags = 0;
 
-            if (globalWorldData[dx, dy].IsSolid)
+            if (worldDataManager.IsPhysicallySolidBlock(dx, dy))
             {
                 data.Flags += 1;
             }
-            if (globalWorldData[dx, dy].IsLiquidFull)
+            if (worldDataManager.IsLiquidFull(dx, dy))
             {
                 data.Flags += 2;
             }
-            if (globalWorldData[dx, dy].IsDatLightBlock)
+            if (worldDataManager.IsDayLightBlock(dx, dy))
             {
                 data.Flags += 4;
             }

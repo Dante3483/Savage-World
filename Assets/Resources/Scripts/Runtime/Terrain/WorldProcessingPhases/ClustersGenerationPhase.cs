@@ -1,37 +1,33 @@
 using System.Threading.Tasks;
 using UnityEngine;
-using Random = System.Random;
 
-public class ClustersGenerationPhase : IWorldProcessingPhase
+public class ClustersGenerationPhase : WorldProcessingPhaseBase
 {
-    #region Private fields
-    private WorldCellData[,] _worldData = WorldDataManager.Instance.WorldData;
-    private TerrainConfigurationSO _terrainConfiguration = GameManager.Instance.TerrainConfiguration;
-    private Terrain _terrain = GameManager.Instance.Terrain;
-    private Random _randomVar = GameManager.Instance.RandomVar;
-    private int _seed = GameManager.Instance.Seed;
-    #endregion
-
-    #region Public fields
+    #region Fields
 
     #endregion
 
     #region Properties
-    public string Name => "Clusters generation";
+    public override string Name => "Clusters generation";
     #endregion
 
-    #region Methods
-    public void StartPhase()
+    #region Events / Delegates
+
+    #endregion
+
+    #region Public Methods
+    public override void StartPhase()
     {
         foreach (ClusterSO cluster in _terrainConfiguration.Clusters)
         {
-            CreateClusterParallel(cluster, _randomVar.Next(0, 1000000));
+            CreateClusterParallel(cluster, GetNextRandomValue(0, 1000000));
         }
     }
+    #endregion
 
+    #region Private Methods
     private void CreateClusterParallel(ClusterSO cluster, int clusterSeed)
     {
-        int terrainWidth = GameManager.Instance.CurrentTerrainWidth;
         //Go throw every terrain level
         foreach (TerrainLevelSO level in _terrainConfiguration.Levels)
         {
@@ -41,17 +37,17 @@ public class ClustersGenerationPhase : IWorldProcessingPhase
             }
             //Get cluster data according to current level
             ClusterSO.ClusterData clusterData = cluster.GetClusterData(level);
-            Parallel.For(0, terrainWidth, (index) =>
+            Parallel.For(0, _terrainWidth, (index) =>
             {
                 int x = index;
                 for (int y = level.StartY; y < level.EndY; y++)
                 {
                     //If we can replace current block with a cluster one
-                    if (!cluster.CompareForbiddenBlock(_worldData[x, y].BlockData))
+                    if (!cluster.CompareForbiddenBlock(GetBlockData(x, y)))
                     {
                         if (GenerateNoise(x, y, clusterData.Scale, clusterData.Amplitude, clusterSeed) >= clusterData.Intensity)
                         {
-                            _terrain.CreateBlock(x, y, cluster.Block);
+                            SetBlockData(x, y, cluster.Block);
                         }
                     }
                 }
@@ -59,9 +55,13 @@ public class ClustersGenerationPhase : IWorldProcessingPhase
         }
     }
 
-    public float GenerateNoise(int x, int y, float scale, float amplitude, int clusterSeed)
+    private float GenerateNoise(int x, int y, float scale, float amplitude, int clusterSeed)
     {
         return Mathf.PerlinNoise((x + _seed + clusterSeed) / scale, (y + _seed + clusterSeed) / scale) * amplitude;
     }
+    #endregion
+
+    #region Methods
+
     #endregion
 }

@@ -1,56 +1,46 @@
 using System.Threading.Tasks;
 
-public class FlatWorldGenerationPhase : IWorldProcessingPhase
+public class FlatWorldGenerationPhase : WorldProcessingPhaseBase
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
+    #region Fields
 
     #endregion
 
     #region Properties
-    public string Name => "Flat world generation";
+    public override string Name => "Flat world generation";
     #endregion
 
-    #region Methods
+    #region Events / Delegates
 
-    public void StartPhase()
+    #endregion
+
+    #region Public Methods
+    public override void StartPhase()
     {
-        TerrainConfigurationSO terrainConfiguration = GameManager.Instance.TerrainConfiguration;
+        TerrainLevelSO airLevel = _terrainConfiguration.AirLevel;
+        TerrainLevelSO surfaceLevel = _terrainConfiguration.SurfaceLevel;
+        TerrainLevelSO preUndergroundLevel = _terrainConfiguration.PreUndergroundLevel;
+        TerrainLevelSO undergroundLevel = _terrainConfiguration.UndergroundLevel;
 
-        TerrainLevelSO airLevel = terrainConfiguration.AirLevel;
-        TerrainLevelSO surfaceLevel = terrainConfiguration.SurfaceLevel;
-        TerrainLevelSO preUndergroundLevel = terrainConfiguration.PreUndergroundLevel;
-        TerrainLevelSO undergroundLevel = terrainConfiguration.UndergroundLevel;
-
-        int terrainWidth = GameManager.Instance.CurrentTerrainWidth;
-        int terrainHeight = GameManager.Instance.CurrentTerrainHeight;
-        int terrainEquator = terrainConfiguration.Equator;
-
-        Terrain terrain = GameManager.Instance.Terrain;
-
-        BlockSO dirtBlock = GameManager.Instance.BlocksAtlas.Dirt;
-        BlockSO airBlock = GameManager.Instance.BlocksAtlas.Air;
-
-        Parallel.For(0, terrainWidth, (index) =>
+        Parallel.For(0, _terrainWidth, (index) =>
         {
             int x = index;
 
-            GenerateLevel(x, undergroundLevel.StartY, undergroundLevel.EndY, dirtBlock, undergroundLevel.DefaultWall);
-            GenerateLevel(x, preUndergroundLevel.StartY, preUndergroundLevel.EndY, dirtBlock, preUndergroundLevel.DefaultWall);
-            GenerateLevel(x, surfaceLevel.StartY, terrainEquator, dirtBlock, surfaceLevel.DefaultWall);
-            GenerateLevel(x, terrainEquator + 1, airLevel.EndY, airBlock, airLevel.DefaultWall);
+            GenerateLevel(x, undergroundLevel.StartY, undergroundLevel.EndY, _dirt, undergroundLevel.DefaultWall);
+            GenerateLevel(x, preUndergroundLevel.StartY, preUndergroundLevel.EndY, _dirt, preUndergroundLevel.DefaultWall);
+            GenerateLevel(x, surfaceLevel.StartY, _equator, _dirt, surfaceLevel.DefaultWall);
+            GenerateLevel(x, _equator + 1, airLevel.EndY, _air, airLevel.DefaultWall);
         });
+    }
+    #endregion
 
-        void GenerateLevel(int x, int startY, int endY, BlockSO block, BlockSO wall)
+    #region Private Methods
+    private void GenerateLevel(int x, int startY, int endY, BlockSO block, BlockSO wall)
+    {
+        for (int y = startY; y <= endY; y++)
         {
-            for (int y = startY; y <= endY; y++)
-            {
-                terrain.CreateBlock(x, y, block);
-                terrain.CreateWall(x, y, wall);
-            }
+            SetBlockData(x, y, block);
+            SetWallData(x, y, wall);
         }
     }
     #endregion

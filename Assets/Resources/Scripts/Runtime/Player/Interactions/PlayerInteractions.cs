@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 public class PlayerInteractions : MonoBehaviour
 {
     #region Fields
+    private GameManager _gameManager;
+    private WorldDataManager _worldDataManager;
     [Header("Interaction area")]
     [SerializeField]
     private bool _isAreaDrawing;
@@ -47,6 +49,8 @@ public class PlayerInteractions : MonoBehaviour
     #region Monobehaviour Methods
     private void Awake()
     {
+        _gameManager = GameManager.Instance;
+        _worldDataManager = WorldDataManager.Instance;
         EventManager.PlayerSpawnedAsNotOwner += Disable;
         EventManager.BookOpened += Disable;
         EventManager.BookClosed += Enable;
@@ -86,7 +90,7 @@ public class PlayerInteractions : MonoBehaviour
         _checkPlayerBoxCast.LayerMask = _playerLayerMask;
         _isActive = true;
 
-        PlayerInputActions playerInputActions = GameManager.Instance.PlayerInputActions;
+        PlayerInputActions playerInputActions = _gameManager.PlayerInputActions;
         playerInputActions.Interactions.Enable();
         playerInputActions.Interactions.UseItemFromHotbar.performed += UseItemFromHotbarPerformed;
         playerInputActions.Interactions.UseItemFromHotbar.canceled += UseItemFromHotbarCanceled;
@@ -208,11 +212,11 @@ public class PlayerInteractions : MonoBehaviour
     //REMOVE
     private void UpdateNeighboringBlocks(Vector2Int blockPosition)
     {
-        GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x, blockPosition.y));
-        GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x, blockPosition.y + 1));
-        GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x, blockPosition.y - 1));
-        GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x - 1, blockPosition.y));
-        GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x + 1, blockPosition.y));
+        //_gameManager.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x, blockPosition.y));
+        //_gameManager.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x, blockPosition.y + 1));
+        //_gameManager.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x, blockPosition.y - 1));
+        //_gameManager.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x - 1, blockPosition.y));
+        //_gameManager.Terrain.NeedToUpdate.Add(new Vector2Ushort(blockPosition.x + 1, blockPosition.y));
     }
 
     //REMOVE
@@ -221,8 +225,7 @@ public class PlayerInteractions : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.U))
         {
             Vector2Int waterPosition = ClickPositionToWorldPosition();
-            GameManager.Instance.Terrain.CreateLiquidBlock((ushort)waterPosition.x, (ushort)waterPosition.y, (byte)GameManager.Instance.BlocksAtlas.Water.GetId());
-            GameManager.Instance.Terrain.NeedToUpdate.Add(new Vector2Ushort(waterPosition.x, waterPosition.y));
+            _worldDataManager.SetLiquidData(waterPosition.x, waterPosition.y, _gameManager.BlocksAtlas.Water);
         }
     }
 
@@ -232,8 +235,7 @@ public class PlayerInteractions : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.L))
         {
             Vector2Int torchPosition = ClickPositionToWorldPosition();
-            WorldDataManager.Instance.SetBlockData((ushort)torchPosition.x, (ushort)torchPosition.y, GameManager.Instance.BlocksAtlas.GetBlockById(FurnitureBlocksID.Torch));
-            UpdateNeighboringBlocks(torchPosition);
+            _worldDataManager.SetBlockData(torchPosition.x, torchPosition.y, _gameManager.BlocksAtlas.GetBlockById(FurnitureBlocksID.Torch));
         }
     }
 
