@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player : MonoBehaviour
+public class Player : NetworkBehaviour
 {
     #region Fields
     [SerializeField]
@@ -18,6 +19,9 @@ public class Player : MonoBehaviour
     [Header("Debug")]
     [SerializeField]
     private List<ItemQuantity> _starterItems;
+
+    private WorldDataManager _worldDataManager;
+    private SenderDataToClient _senderDataToClient;
     #endregion
 
     #region Properties
@@ -45,13 +49,34 @@ public class Player : MonoBehaviour
     #region Monobehaviour Methods
     private void Awake()
     {
+        _senderDataToClient = SenderDataToClient.Instance;
+        _worldDataManager = WorldDataManager.Instance;
         _playerInteractions = GetComponent<PlayerInteractions>();
-        EventManager.PlayerSpawnedAsOwner += InitializeAsOwner;
-        EventManager.PlayerSpawnedAsNotOwner += InitializeAsNotOwner;
     }
     #endregion
 
     #region Public Methods
+    public override void OnNetworkSpawn()
+    {
+        if (IsOwner)
+        {
+            if (IsServer)
+            {
+                EventManager.PlayerConnectedAsClient += _senderDataToClient.SendDataToConnectedClient;
+                _worldDataManager.OnDataChanged += _senderDataToClient.SendBlockData;
+                _worldDataManager.OnColliderChanged += _senderDataToClient.SendBlockColliderData;
+            }
+            InitializeAsOwner();
+            EventManager.OnPlayerSpawnedAsOwner();
+        }
+        else
+        {
+            InitializeAsNotOwner();
+            EventManager.OnPlayerSpawnedAsNotOwner();
+        }
+        base.OnNetworkSpawn();
+    }
+
     public void DisableMovement()
     {
         GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;

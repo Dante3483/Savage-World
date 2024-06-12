@@ -1,6 +1,7 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class Singleton<T> : MonoBehaviour where T : Component
+public class NetworkSingleton<T> : NetworkBehaviour where T : Component
 {
     #region Fields
     private static T _instance;

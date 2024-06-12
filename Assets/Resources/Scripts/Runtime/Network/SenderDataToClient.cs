@@ -2,11 +2,10 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerNetwork : NetworkBehaviour
+public class SenderDataToClient : NetworkSingleton<SenderDataToClient>
 {
     #region Fields
-    [SerializeField]
-    private MonoBehaviour[] _ownerOnlyComponents;
+    private WorldDataManager _worldDataManager;
     #endregion
 
     #region Properties
@@ -18,36 +17,41 @@ public class PlayerNetwork : NetworkBehaviour
     #endregion
 
     #region Monobehaviour Methods
-
-    #endregion
-
-    #region Public Methods
-    public override void OnNetworkSpawn()
+    protected override void Awake()
     {
-        base.OnNetworkSpawn();
-        if (IsServer)
-        {
-            EventManager.PlayerConnectedAsClient += SendDataToClient;
-            WorldDataManager.Instance.OnDataChanged += OnDataChanged;
-            WorldDataManager.Instance.OnColliderChanged += OnColliderIndexChanged;
-        }
-        if (IsOwner)
-        {
-            EventManager.OnPlayerSpawnedAsOwner();
-        }
-        else
-        {
-            EventManager.OnPlayerSpawnedAsNotOwner();
-        }
+        _worldDataManager = WorldDataManager.Instance;
     }
     #endregion
 
-    #region Private Methods
-    private void SendDataToClient(ulong clientId)
+    #region Public Methods
+    public void SendDataToConnectedClient(ulong clientId)
     {
         StartCoroutine(SendChunks(clientId));
     }
 
+    public void SendBlockData(int x, int y)
+    {
+        BlockDataNetwork data = new()
+        {
+            BlockId = _worldDataManager.GetBlockId(x, y),
+            WallId = _worldDataManager.GetWallId(x, y),
+            LiquidId = _worldDataManager.GetLiquidId(x, y),
+            BlockType = _worldDataManager.GetBlockType(x, y),
+            FlowValue = _worldDataManager.GetFlowValue(x, y),
+            ColliderIndex = _worldDataManager.GetColliderIndex(x, y),
+            TileId = _worldDataManager.GetTileId(x, y),
+            Flags = _worldDataManager.GetFlags(x, y)
+        };
+        SendBlockDataRpc(data, x, y, RpcTarget.NotServer);
+    }
+
+    public void SendBlockColliderData(int x, int y)
+    {
+        SendColliderIndexRpc(_worldDataManager.GetColliderIndex(x, y), _worldDataManager.IsColliderHorizontalFlipped(x, y), x, y);
+    }
+    #endregion
+
+    #region Private Methods
     private IEnumerator SendChunks(ulong clientId)
     {
         int chunkSize = GameManager.Instance.TerrainConfiguration.ChunkSize;
@@ -78,37 +82,17 @@ public class PlayerNetwork : NetworkBehaviour
         {
             for (int y = startY; y < endY; y++)
             {
-                data.BlockId = WorldDataManager.Instance.GetBlockId(x, y);
-                data.WallId = WorldDataManager.Instance.GetWallId(x, y);
-                data.LiquidId = WorldDataManager.Instance.GetLiquidId(x, y);
-                data.BlockType = WorldDataManager.Instance.GetBlockType(x, y);
-                data.FlowValue = WorldDataManager.Instance.GetFlowValue(x, y);
-                data.ColliderIndex = WorldDataManager.Instance.GetColliderIndex(x, y);
-                data.TileId = WorldDataManager.Instance.GetTileId(x, y);
-                data.Flags = WorldDataManager.Instance.GetFlags(x, y);
+                data.BlockId = _worldDataManager.GetBlockId(x, y);
+                data.WallId = _worldDataManager.GetWallId(x, y);
+                data.LiquidId = _worldDataManager.GetLiquidId(x, y);
+                data.BlockType = _worldDataManager.GetBlockType(x, y);
+                data.FlowValue = _worldDataManager.GetFlowValue(x, y);
+                data.ColliderIndex = _worldDataManager.GetColliderIndex(x, y);
+                data.TileId = _worldDataManager.GetTileId(x, y);
+                data.Flags = _worldDataManager.GetFlags(x, y);
                 SendBlockDataRpc(data, x, y, RpcTarget.Single(clientId, RpcTargetUse.Persistent));
             }
         }
-    }
-
-    private void OnDataChanged(int x, int y)
-    {
-        BlockDataNetwork data = new();
-        data.BlockId = WorldDataManager.Instance.GetBlockId(x, y);
-        data.WallId = WorldDataManager.Instance.GetWallId(x, y);
-        data.LiquidId = WorldDataManager.Instance.GetLiquidId(x, y);
-        data.BlockType = WorldDataManager.Instance.GetBlockType(x, y);
-        data.FlowValue = WorldDataManager.Instance.GetFlowValue(x, y);
-        data.ColliderIndex = WorldDataManager.Instance.GetColliderIndex(x, y);
-        data.TileId = WorldDataManager.Instance.GetTileId(x, y);
-        data.Flags = WorldDataManager.Instance.GetFlags(x, y);
-        SendBlockDataRpc(data, x, y, RpcTarget.NotServer);
-    }
-
-    private void OnColliderIndexChanged(int x, int y)
-    {
-        WorldDataManager worldDataManager = WorldDataManager.Instance;
-        SendColliderIndexRpc(worldDataManager.GetColliderIndex(x, y), worldDataManager.IsColliderHorizontalFlipped(x, y), x, y);
     }
 
     [Rpc(SendTo.SpecifiedInParams, AllowTargetOverride = true)]
@@ -125,7 +109,7 @@ public class PlayerNetwork : NetworkBehaviour
         BlockSO block = GameManager.Instance.BlocksAtlas.GetBlockByTypeAndId(blockType, blockId);
         BlockSO wall = GameManager.Instance.BlocksAtlas.GetBlockByTypeAndId(BlockTypes.Wall, wallId);
         BlockSO liquid = liquidId == byte.MaxValue ? null : GameManager.Instance.BlocksAtlas.GetBlockById(liquidId);
-        WorldDataManager.Instance.SetFullData(x, y, block, wall, liquid, flowValue, tileId, colliderIndex, flags);
+        _worldDataManager.SetFullData(x, y, block, wall, liquid, flowValue, colliderIndex, tileId, flags);
     }
 
     [Rpc(SendTo.SpecifiedInParams, AllowTargetOverride = true)]
