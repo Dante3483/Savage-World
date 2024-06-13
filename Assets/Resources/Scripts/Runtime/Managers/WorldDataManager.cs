@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 
-public class WorldDataManager : Singleton<WorldDataManager>
+public class WorldDataManager : NetworkSingleton<WorldDataManager>
 {
     #region Fields
     private GameManager _gameManager;
@@ -37,8 +37,8 @@ public class WorldDataManager : Singleton<WorldDataManager>
     #endregion
 
     #region Events / Delegates
-    public event Action<int, int> OnDataChanged;
-    public event Action<int, int> OnColliderChanged;
+    public event Action<int, int> CellDataChanged;
+    public event Action<int, int> CellColliderChanged;
     #endregion
 
     #region Monobehaviour Methods
@@ -94,46 +94,46 @@ public class WorldDataManager : Singleton<WorldDataManager>
         _worldData[x, y].ColliderIndex = colliderIndex;
         _worldData[x, y].TileId = tileId;
         _worldData[x, y].Flags = flags;
-        if (_gameManager.IsGameSession && !_gameManager.IsWorldLoading)
+        if (_gameManager.IsPlayingState)
         {
-            OnColliderChanged?.Invoke(x, y);
-            OnDataChanged?.Invoke(x, y);
+            CellColliderChanged?.Invoke(x, y);
+            CellDataChanged?.Invoke(x, y);
         }
     }
 
     public void SetBlockData(int x, int y, BlockSO data)
     {
-        _worldData[x, y].SetBlockData(data);
-        if (_gameManager.IsGameSession && !_gameManager.IsWorldLoading)
+        if (_gameManager.IsPlayingState)
         {
-            SetRandomBlockTile(x, y);
-
-            if (IsEmpty(x, y) || IsSolid(x, y))
-            {
-                SetColliderIndex(x, y, byte.MaxValue);
-                UpdateCollidersAround(x, y);
-                UpdateCollider(x, y);
-            }
-            OnDataChanged?.Invoke(x, y);
+            SetBlockDataServerRpc(x, y, data.Type, data.GetId());
+        }
+        else
+        {
+            _worldData[x, y].SetBlockData(data);
         }
     }
 
     public void SetWallData(int x, int y, BlockSO data)
     {
-        _worldData[x, y].SetWallData(data);
-        if (_gameManager.IsGameSession && !_gameManager.IsWorldLoading)
+        if (_gameManager.IsPlayingState)
         {
-            SetRandomWallTile(x, y);
-            OnDataChanged?.Invoke(x, y);
+            SetWallDataServerRpc(x, y, data.GetId());
+        }
+        else
+        {
+            _worldData[x, y].SetWallData(data);
         }
     }
 
     public void SetLiquidData(int x, int y, BlockSO data, float flowValue = 100)
     {
-        _worldData[x, y].SetLiquidData(data, flowValue);
-        if (_gameManager.IsGameSession && !_gameManager.IsWorldLoading)
+        if (_gameManager.IsPlayingState)
         {
-            OnDataChanged?.Invoke(x, y);
+            SetLiquidDataServerRpc(x, y, data.GetId(), flowValue);
+        }
+        else
+        {
+            _worldData[x, y].SetLiquidData(data, flowValue);
         }
     }
 
@@ -222,18 +222,6 @@ public class WorldDataManager : Singleton<WorldDataManager>
         builder.AppendLine($"{tab}Tree trunk: {IsTreeTrunk(x, y)}");
         builder.AppendLine($"{tab}Free: {IsFree(x, y)}");
         _blockInfo = builder.ToString();
-    }
-
-    //REMOVE
-    public void SetBlockDamagePercent(int x, int y, float damage)
-    {
-        OnDataChanged?.Invoke(x, y);
-    }
-
-    //REMOVE
-    public void SetWallDamagePercent(int x, int y, float damage)
-    {
-        OnDataChanged?.Invoke(x, y);
     }
 
     public ushort GetBlockId(int x, int y)
@@ -531,6 +519,39 @@ public class WorldDataManager : Singleton<WorldDataManager>
     #endregion
 
     #region Private Methods
+    [Rpc(SendTo.Server, RequireOwnership = false)]
+    private void SetBlockDataServerRpc(int x, int y, BlockTypes type, ushort id)
+    {
+        BlockSO data = _blockAtlas.GetBlockByTypeAndId(type, id);
+        _worldData[x, y].SetBlockData(data);
+        SetRandomBlockTile(x, y);
+
+        if (IsEmpty(x, y) || IsSolid(x, y))
+        {
+            SetColliderIndex(x, y, byte.MaxValue);
+            UpdateCollidersAround(x, y);
+            UpdateCollider(x, y);
+        }
+        CellDataChanged?.Invoke(x, y);
+    }
+
+    [Rpc(SendTo.Server, RequireOwnership = false)]
+    private void SetWallDataServerRpc(int x, int y, ushort id)
+    {
+        BlockSO data = _blockAtlas.GetBlockByTypeAndId(BlockTypes.Wall, id);
+        _worldData[x, y].SetWallData(data);
+        SetRandomWallTile(x, y);
+        CellDataChanged?.Invoke(x, y);
+    }
+
+    [Rpc(SendTo.Server, RequireOwnership = false)]
+    private void SetLiquidDataServerRpc(int x, int y, ushort id, float flowValue)
+    {
+        BlockSO data = _blockAtlas.GetBlockByTypeAndId(BlockTypes.Liquid, id);
+        _worldData[x, y].SetLiquidData(data, flowValue);
+        CellDataChanged?.Invoke(x, y);
+    }
+
     private void InitializePhysicsShapes()
     {
         _physicsShapesBySprite = new();
@@ -569,7 +590,7 @@ public class WorldDataManager : Singleton<WorldDataManager>
             {
                 UpdateCollidersAround(x, y);
             }
-            OnColliderChanged?.Invoke(x, y);
+            CellColliderChanged?.Invoke(x, y);
         }
     }
 
@@ -579,7 +600,7 @@ public class WorldDataManager : Singleton<WorldDataManager>
         {
             CheckRules(x, y, _mainRules, out byte i);
             _worldData[x, y].ColliderIndex = i;
-            OnColliderChanged?.Invoke(x, y);
+            CellColliderChanged?.Invoke(x, y);
         }
     }
 

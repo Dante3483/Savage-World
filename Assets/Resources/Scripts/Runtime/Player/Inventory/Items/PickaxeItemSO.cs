@@ -7,6 +7,9 @@ public class PickaxeItemSO : ToolItemSO
     [SerializeField]
     [Min(1)]
     private float _miningDamage = 1;
+    [SerializeField]
+    [Min(0.01f)]
+    private float _miningSpeed = 0.5f;
     #endregion
 
     #region Properties
@@ -15,6 +18,14 @@ public class PickaxeItemSO : ToolItemSO
         get
         {
             return _miningDamage;
+        }
+    }
+
+    public float MiningSpeed
+    {
+        get
+        {
+            return _miningSpeed;
         }
     }
     #endregion

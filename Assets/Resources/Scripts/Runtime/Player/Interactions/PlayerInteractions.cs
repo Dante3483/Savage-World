@@ -22,7 +22,7 @@ public class PlayerInteractions : MonoBehaviour
 
     [Header("Placement")]
     [SerializeField]
-    private float _placementCooldown;
+    private float _placementSpeed;
     [SerializeField]
     private LayerMask _playerLayerMask;
     private BoxCastUtil _checkPlayerBoxCast;
@@ -51,9 +51,7 @@ public class PlayerInteractions : MonoBehaviour
     {
         _gameManager = GameManager.Instance;
         _worldDataManager = WorldDataManager.Instance;
-        EventManager.PlayerSpawnedAsNotOwner += Disable;
-        EventManager.BookOpened += Disable;
-        EventManager.BookClosed += Enable;
+        _isActive = false;
     }
 
     private void FixedUpdate()
@@ -69,7 +67,7 @@ public class PlayerInteractions : MonoBehaviour
         }
         if (_isBreakingWall)
         {
-            _breakWallAction.Configure(ClickPositionToWorldPosition(), _wallDamageMultiplier);
+            _breakWallAction.Configure(ClickPositionToWorldPosition(), _wallDamageMultiplier, 1);
             _breakWallAction.Execute();
         }
         if (_isMouseInsideArea)
@@ -88,7 +86,6 @@ public class PlayerInteractions : MonoBehaviour
         _checkPlayerBoxCast.OriginOffset = new Vector2(0.5f, 0.5f);
         _checkPlayerBoxCast.Size = new Vector2(1f, 1f);
         _checkPlayerBoxCast.LayerMask = _playerLayerMask;
-        _isActive = true;
 
         PlayerInputActions playerInputActions = _gameManager.PlayerInputActions;
         playerInputActions.Interactions.Enable();
@@ -98,9 +95,13 @@ public class PlayerInteractions : MonoBehaviour
         playerInputActions.Interactions.BreakBlock.canceled += BreakWallCanceled;
         playerInputActions.Interactions.ThrowItem.performed += ThrowSelectedItem;
 
-        _placeBlockAction = new(_placementCooldown);
+        EventManager.BookOpened += Disable;
+        EventManager.BookClosed += Enable;
+
+        _placeBlockAction = new();
         _breakBlockAction = new();
         _breakWallAction = new();
+        _isActive = true;
     }
 
     public bool IsEnoughSpaceToTakeDrop(Drop drop)
@@ -130,14 +131,14 @@ public class PlayerInteractions : MonoBehaviour
                     _checkPlayerBoxCast.BoxCast(blockPosition);
                     if (_isMouseInsideArea && !_checkPlayerBoxCast.Result)
                     {
-                        _placeBlockAction.Configure(blockItem.BlockToPlace, blockPosition);
+                        _placeBlockAction.Configure(blockItem.BlockToPlace, blockPosition, _placementSpeed);
                         _placeBlockAction.Execute();
                     }
                 }
                 break;
             case PickaxeItemSO pickaxeItem:
                 {
-                    _breakBlockAction.Configure(ClickPositionToWorldPosition(), pickaxeItem.MiningDamage);
+                    _breakBlockAction.Configure(ClickPositionToWorldPosition(), pickaxeItem.MiningDamage, pickaxeItem.MiningSpeed);
                     _breakBlockAction.Execute();
                 }
                 break;

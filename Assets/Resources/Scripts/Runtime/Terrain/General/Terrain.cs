@@ -78,7 +78,7 @@ public class Terrain : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (GameManager.Instance.IsGameSession)
+        if (GameManager.Instance.IsPlayingState)
         {
             //UpdateWorldData();
         }

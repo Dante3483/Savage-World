@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace CustomTilemap
@@ -21,11 +19,29 @@ namespace CustomTilemap
         #endregion
 
         #region Methods
-        public void UpdateSprites(TileSprites tileSprites)
+        public void UpdateBlockSprite(Sprite sprite)
         {
-            _blockLayer.UpdateSprite(tileSprites.BlockSprite, tileSprites.BlockDamageSprite);
-            _wallLayer.UpdateSprite(tileSprites.WallSprite, tileSprites.WallDamageSprite);
-            _liquidLayer.UpdateSprite(tileSprites.LiquidSprite);
+            _blockLayer.UpdateSprite(sprite);
+        }
+
+        public void UpdateWallSprite(Sprite sprite)
+        {
+            _wallLayer.UpdateSprite(sprite);
+        }
+
+        public void UpdateLiquidSprite(Sprite sprite)
+        {
+            _liquidLayer.UpdateSprite(sprite);
+        }
+
+        public void UpdateBlockDamage(Sprite sprite)
+        {
+            _blockLayer.UpdateDamage(sprite);
+        }
+
+        public void UpdateWallDamage(Sprite sprite)
+        {
+            _wallLayer.UpdateDamage(sprite);
         }
         #endregion
     }

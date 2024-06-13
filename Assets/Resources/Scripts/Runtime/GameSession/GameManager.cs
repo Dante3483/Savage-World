@@ -261,19 +261,11 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
         }
     }
 
-    public bool IsGameSession
+    public bool IsPlayingState
     {
         get
         {
             return CurrentState == _playingState;
-        }
-    }
-
-    public bool IsWorldLoading
-    {
-        get
-        {
-            return _currentGameState == GameState.LoadGameState;
         }
     }
 
@@ -347,19 +339,6 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
         set
         {
             _itemsAtlas = value;
-        }
-    }
-
-    public ResearchesModelSO Researches
-    {
-        get
-        {
-            return _researches;
-        }
-
-        set
-        {
-            _researches = value;
         }
     }
 

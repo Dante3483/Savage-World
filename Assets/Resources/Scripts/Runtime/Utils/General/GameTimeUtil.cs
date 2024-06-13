@@ -64,7 +64,7 @@ public class GameTimeUtil : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(0.1f);
-            if (!GameManager.Instance.IsGameSession)
+            if (!GameManager.Instance.IsPlayingState)
             {
                 continue;
             }

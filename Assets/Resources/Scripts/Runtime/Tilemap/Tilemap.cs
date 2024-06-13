@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace CustomTilemap
 {
-    public class Tilemap : MonoBehaviour
+    public class Tilemap : Singleton<Tilemap>
     {
-        #region Private fields
+        #region Fields
         [Header("Main")]
         [SerializeField]
         private int _width;
@@ -42,23 +42,25 @@ namespace CustomTilemap
         private Vector3Int _prevPosition;
         private RectInt _currentAreaRect;
         private RectInt _prevAreaRect;
-        private TileSprites _tileSprites;
         private Tile[,] _tiles;
-        #endregion
-
-        #region Public fields
-        public static Tilemap Instance;
+        private WorldDataManager _worldDataManager;
+        private MiningDamageController _miningDamageController;
         #endregion
 
         #region Properties
 
         #endregion
 
-        #region Methods
-        private void Awake()
-        {
-            Instance = this;
+        #region Events / Delegates
 
+        #endregion
+
+        #region Monobehaviour Methods
+        protected override void Awake()
+        {
+            base.Awake();
+            _worldDataManager = WorldDataManager.Instance;
+            _miningDamageController = MiningDamageController.Instance;
             InitializeTiles();
             InitializePlatforms();
             _compositeCollider = _platformsContent.GetComponent<CompositeCollider2D>();
@@ -69,8 +71,6 @@ namespace CustomTilemap
 
         private void Start()
         {
-            WorldDataManager.Instance.OnColliderChanged += HandleColliderChanged;
-            WorldDataManager.Instance.OnDataChanged += HandleDataChanged;
             _needUpdateTiles = true;
         }
 
@@ -82,6 +82,53 @@ namespace CustomTilemap
             _prevPosition = _currentPosition;
         }
 
+        private void OnEnable()
+        {
+            _worldDataManager.CellDataChanged += HandleDataChanged;
+            _worldDataManager.CellColliderChanged += HandleColliderChanged;
+            _miningDamageController.BlockDamageChanged += UpdateBlockDamageSprite;
+            _miningDamageController.WallDamageChanged += UpdateWallDamageSprite;
+        }
+
+        private void OnDisable()
+        {
+            _worldDataManager.CellDataChanged -= HandleDataChanged;
+            _worldDataManager.CellColliderChanged -= HandleColliderChanged;
+            _miningDamageController.BlockDamageChanged -= UpdateBlockDamageSprite;
+            _miningDamageController.WallDamageChanged -= UpdateWallDamageSprite;
+        }
+        #endregion
+
+        #region Public Methods
+        public void CreatePlatform(Vector2Int position)
+        {
+            int x = position.x;
+            int y = position.y;
+            _listOfUsedPlatforms.TryGetValue(position, out SolidPlatform platform);
+            if (platform == null)
+            {
+                platform = GetFirstFreePlatform();
+                platform.SetActive();
+                platform.transform.position = new Vector2(x, y) + _tilesOffset;
+                _listOfUsedPlatforms.Add(position, platform);
+            }
+            platform.SetPolygonColliderPoints(
+                _worldDataManager.GetColliderShape(x, y),
+                _worldDataManager.IsColliderHorizontalFlipped(x, y));
+        }
+
+        public void RemovePlatform(Vector2Int position)
+        {
+            _listOfUsedPlatforms.TryGetValue(position, out SolidPlatform platform);
+            if (platform != null)
+            {
+                _listOfUsedPlatforms.Remove(position);
+                SetPlatformFree(platform);
+            }
+        }
+        #endregion
+
+        #region Private Methods
         private void InitializeTiles()
         {
             _tiles = new Tile[_width, _height];
@@ -144,95 +191,80 @@ namespace CustomTilemap
 
         private void UpdateTileData(Vector2Int position)
         {
-            int tileX = position.x - _currentPosition.x;
-            int tileY = position.y - _currentPosition.y;
-
+            float rawBlockDamage = _miningDamageController.GetBlockDamage(position);
+            float rawWallDamage = _miningDamageController.GetWallDamage(position);
             UpdateBlockSprite(position);
             UpdateWallSprite(position);
             UpdateLiquidSprite(position);
-            UpdateBlockDamageSprite(position);
-            UpdateWallDamageSprite(position);
+            UpdateBlockDamageSprite(position, rawBlockDamage);
+            UpdateWallDamageSprite(position, rawWallDamage);
             CreatePlatform(position);
-            _tiles[tileX, tileY].UpdateSprites(_tileSprites);
         }
 
         private void UpdateBlockSprite(Vector2Int position)
         {
-            _tileSprites.BlockSprite = WorldDataManager.Instance.GetBlockSprite(position.x, position.y);
+            Vector2Int tilePositon = GetLocalTilePosition(position);
+            Sprite sprite = _worldDataManager.GetBlockSprite(position.x, position.y);
+            _tiles[tilePositon.x, tilePositon.y].UpdateBlockSprite(sprite);
         }
 
         private void UpdateWallSprite(Vector2Int position)
         {
-            _tileSprites.WallSprite = WorldDataManager.Instance.GetWallSprite(position.x, position.y);
+            Vector2Int tilePositon = GetLocalTilePosition(position);
+            Sprite sprite = _worldDataManager.GetWallSprite(position.x, position.y);
+            _tiles[tilePositon.x, tilePositon.y].UpdateWallSprite(sprite);
         }
 
         private void UpdateLiquidSprite(Vector2Int position)
         {
-            _tileSprites.LiquidSprite = WorldDataManager.Instance.GetLiquidSprite(position.x, position.y);
+            Vector2Int tilePositon = GetLocalTilePosition(position);
+            Sprite sprite = _worldDataManager.GetLiquidSprite(position.x, position.y);
+            _tiles[tilePositon.x, tilePositon.y].UpdateLiquidSprite(sprite);
         }
 
-        private void UpdateBlockDamageSprite(Vector2Int position)
+        private void UpdateBlockDamageSprite(Vector2Int position, float rawDamage)
         {
-            float rawDamage = MiningDamageController.Instance.GetBlockDamage(position);
-            _tileSprites.BlockDamageSprite = null;
+            Vector2Int tilePositon = GetLocalTilePosition(position);
             if (rawDamage > 0)
             {
-                float maxDamage = WorldDataManager.Instance.GetBlockData(position.x, position.y).DamageToBreak;
+                float maxDamage = _worldDataManager.GetBlockData(position.x, position.y).DamageToBreak;
                 int damage = (int)(Mathf.Min(rawDamage / maxDamage, 1) * 100);
                 if (damage != 0)
                 {
                     int id = Mathf.CeilToInt(damage / (100f / _blockDamageSprites.Length)) - 1;
-                    _tileSprites.BlockDamageSprite = _blockDamageSprites[id];
+                    Sprite sprite = _blockDamageSprites[id];
+                    _tiles[tilePositon.x, tilePositon.y].UpdateBlockDamage(sprite);
                 }
+            }
+            else
+            {
+                _tiles[tilePositon.x, tilePositon.y].UpdateBlockDamage(null);
             }
         }
 
-        private void UpdateWallDamageSprite(Vector2Int position)
+        private void UpdateWallDamageSprite(Vector2Int position, float rawDamage)
         {
-            float rawDamage = MiningDamageController.Instance.GetWallDamage(position);
-            _tileSprites.WallDamageSprite = null;
+            Vector2Int tilePositon = GetLocalTilePosition(position);
             if (rawDamage > 0)
             {
-                float maxDamage = WorldDataManager.Instance.GetWallData(position.x, position.y).DamageToBreak;
+                float maxDamage = _worldDataManager.GetWallData(position.x, position.y).DamageToBreak;
                 int damage = (int)(Mathf.Min(rawDamage / maxDamage, 1) * 100);
                 if (damage != 0)
                 {
                     int id = Mathf.CeilToInt(damage / (100f / _wallDamageSprites.Length)) - 1;
-                    _tileSprites.WallDamageSprite = _wallDamageSprites[id];
+                    Sprite sprite = _wallDamageSprites[id];
+                    _tiles[tilePositon.x, tilePositon.y].UpdateWallDamage(sprite);
                 }
+            }
+            else
+            {
+                _tiles[tilePositon.x, tilePositon.y].UpdateWallDamage(null);
             }
         }
 
         private void UpdateCompositeCollider()
         {
             _compositeCollider.GenerateGeometry();
-        }
-
-        public void CreatePlatform(Vector2Int position)
-        {
-            int x = position.x;
-            int y = position.y;
-            _listOfUsedPlatforms.TryGetValue(position, out SolidPlatform platform);
-            if (platform == null)
-            {
-                platform = GetFirstFreePlatform();
-                platform.SetActive();
-                platform.transform.position = new Vector2(x, y) + _tilesOffset;
-                _listOfUsedPlatforms.Add(position, platform);
-            }
-            platform.SetPolygonColliderPoints(
-                WorldDataManager.Instance.GetColliderShape(x, y),
-                WorldDataManager.Instance.IsColliderHorizontalFlipped(x, y));
-        }
-
-        public void RemovePlatform(Vector2Int position)
-        {
-            _listOfUsedPlatforms.TryGetValue(position, out SolidPlatform platform);
-            if (platform != null)
-            {
-                _listOfUsedPlatforms.Remove(position);
-                SetPlatformFree(platform);
-            }
         }
 
         private SolidPlatform GetFirstFreePlatform()
@@ -245,6 +277,11 @@ namespace CustomTilemap
             _listOfFreePlatforms.Remove(freePlatform);
             freePlatform.SetActive();
             return freePlatform;
+        }
+
+        private Vector2Int GetLocalTilePosition(Vector2Int globalPosition)
+        {
+            return new(globalPosition.x - _currentPosition.x, globalPosition.y - _currentPosition.y);
         }
 
         private void SetPlatformFree(SolidPlatform usedPlatform)
@@ -275,8 +312,8 @@ namespace CustomTilemap
                 if (platform != null)
                 {
                     platform.SetPolygonColliderPoints(
-                        WorldDataManager.Instance.GetColliderShape(x, y),
-                        WorldDataManager.Instance.IsColliderHorizontalFlipped(x, y));
+                        _worldDataManager.GetColliderShape(x, y),
+                        _worldDataManager.IsColliderHorizontalFlipped(x, y));
                     _needUpdateCompositeCollider = true;
                 }
             }

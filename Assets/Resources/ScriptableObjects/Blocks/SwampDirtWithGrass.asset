@@ -20,7 +20,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: e7cd9347ba5a75f438e8202a5d890b8a, type: 3}
   _drop: {fileID: 11400000, guid: 2b8905e99df980045b14442c90fdd47b, type: 2}
   _colorOnMap: {r: 0.5176471, g: 0.5019608, b: 0.15686275, a: 1}
-  _damageToBreak: 1
+  _damageToBreak: 5
   _isSurfaceLight: 0
   _isWaterproof: 1
   _type: 1

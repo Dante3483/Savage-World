@@ -15,10 +15,8 @@ public class BreakWallAction : BreakAction
     #region Public Methods
     public BreakWallAction() : base()
     {
-        _replacment = GameManager.Instance.BlocksAtlas.AirWall;
+        _replacment = _gameManager.BlocksAtlas.AirWall;
         _addDamage += _miningDamageController.AddDamageToWall;
-        _removeDamage += _miningDamageController.RemoveDamageFromWalls;
-        _checkDamage += _miningDamageController.IsWallDamageReachedMaximum;
         _replace += _worldDataManager.SetWallData;
     }
     #endregion

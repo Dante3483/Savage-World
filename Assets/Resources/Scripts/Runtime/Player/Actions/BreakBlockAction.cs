@@ -15,11 +15,10 @@ public class BreakBlockAction : BreakAction
     #region Public Methods
     public BreakBlockAction() : base()
     {
-        _replacment = GameManager.Instance.BlocksAtlas.Air;
+        _replacment = _gameManager.BlocksAtlas.Air;
         _addDamage += _miningDamageController.AddDamageToBlock;
-        _removeDamage += _miningDamageController.RemoveDamageFromBlocks;
-        _checkDamage += _miningDamageController.IsBlockDamageReachedMaximum;
         _replace += _worldDataManager.SetBlockData;
+        _miningDamageController.BlockDamageReachedMaxValue += Break;
     }
     #endregion
 

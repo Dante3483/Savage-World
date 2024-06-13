@@ -6,14 +6,9 @@ using UnityEngine;
 [Serializable]
 public class MiningDamageData
 {
-    #region Private fields
-    [Min(0.001f)][SerializeField] private float _healingMultiplier;
-    private Vector2Int _miningPosition;
+    #region Fields
+    [Min(0.001f)][SerializeField] private float _healingPerSecond;
     private Dictionary<Vector2Int, float> _damageByPosition;
-    #endregion
-
-    #region Public fields
-    public event Action<int, int, float> OnDamageUpdated;
     #endregion
 
     #region Properties
@@ -21,45 +16,56 @@ public class MiningDamageData
     {
         set
         {
-            _healingMultiplier = value;
+            _healingPerSecond = value;
         }
     }
     #endregion
 
-    #region Methods
+    #region Events / Delegates
+    public event Action<Vector2Int, float> DamageChanged;
+    public event Action<Vector2Int> DamageReachedMaxValue;
+    #endregion
+
+    #region Public Methods
     public void Initialize()
     {
         _damageByPosition = new Dictionary<Vector2Int, float>();
     }
 
-    public void UpdateDamage()
+    public float AddDamage(Vector2Int position, float damage)
+    {
+        float maxDamage = WorldDataManager.Instance.GetBlockData(position.x, position.y).DamageToBreak;
+        if (_damageByPosition.TryGetValue(position, out float currentDamage))
+        {
+            currentDamage += damage;
+        }
+        else
+        {
+            currentDamage = damage;
+        }
+        if (currentDamage >= maxDamage)
+        {
+            ClearDamage(position);
+            DamageReachedMaxValue?.Invoke(position);
+            return 0f;
+        }
+        ChangeDamage(position, currentDamage);
+        return currentDamage;
+    }
+
+    public void HealDamage()
     {
         foreach (Vector2Int key in _damageByPosition.Keys.ToList())
         {
-            OnDamageUpdated?.Invoke(key.x, key.y, _damageByPosition[key]);
-            if (key == _miningPosition)
-            {
-                continue;
-            }
-            _damageByPosition[key] -= Time.fixedDeltaTime / _healingMultiplier;
-            if (_damageByPosition[key] <= 0)
-            {
-                _damageByPosition.Remove(key);
-            }
+            float currentDamage = _damageByPosition[key];
+            currentDamage -= Time.fixedDeltaTime * _healingPerSecond;
+            ChangeDamage(key, currentDamage);
         }
     }
 
-    public void AddDamage(Vector2Int position, float damageMultiplier)
+    public void SetDamage(Vector2Int position, float damage)
     {
-        _miningPosition.x = position.x;
-        _miningPosition.y = position.y;
-        _damageByPosition.TryAdd(position, 0f);
-        _damageByPosition[position] += Time.fixedDeltaTime * damageMultiplier;
-    }
-
-    public void RemoveDamage(Vector2Int position)
-    {
-        _damageByPosition.Remove(position);
+        ChangeDamage(position, damage);
     }
 
     public float GetDamage(Vector2Int position)
@@ -67,10 +73,25 @@ public class MiningDamageData
         _damageByPosition.TryGetValue(position, out float damage);
         return damage;
     }
+    #endregion
 
-    public bool IsDamageReachedValue(Vector2Int position, float value)
+    #region Private Methods
+    private void ChangeDamage(Vector2Int position, float newDamage)
     {
-        return _damageByPosition[position] >= value;
+        if (newDamage > 0)
+        {
+            _damageByPosition[position] = newDamage;
+        }
+        else
+        {
+            _damageByPosition.Remove(position);
+        }
+        DamageChanged?.Invoke(position, newDamage);
+    }
+
+    private void ClearDamage(Vector2Int position)
+    {
+        ChangeDamage(position, 0);
     }
     #endregion
 }

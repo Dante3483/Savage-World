@@ -152,7 +152,7 @@ namespace LightSystem
                 }
             }
 
-            if (GameManager.Instance.IsGameSession)
+            if (GameManager.Instance.IsPlayingState)
             {
                 UpdateLight();
             }

@@ -201,7 +201,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1131654402
+  GlobalObjectIdHash: 3649145745
   InScenePlacedSourceGlobalObjectIdHash: 3649145745
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -421,7 +421,7 @@ MonoBehaviour:
   _areaSize: {x: 10, y: 10}
   _isMouseInsideArea: 0
   _wallDamageMultiplier: 1
-  _placementCooldown: 0.5
+  _placementSpeed: 0.25
   _playerLayerMask:
     serializedVersion: 2
     m_Bits: 512

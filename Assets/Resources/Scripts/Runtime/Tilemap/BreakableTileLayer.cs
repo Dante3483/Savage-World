@@ -17,9 +17,8 @@ namespace CustomTilemap
         #endregion
 
         #region Methods
-        public void UpdateSprite(Sprite mainSprite, Sprite damageSprite)
+        public void UpdateDamage(Sprite damageSprite)
         {
-            UpdateSprite(mainSprite);
             _damagerSpriteRenderer.sprite = damageSprite;
         }
         #endregion

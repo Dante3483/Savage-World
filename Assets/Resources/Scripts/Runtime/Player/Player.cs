@@ -63,16 +63,14 @@ public class Player : NetworkBehaviour
             if (IsServer)
             {
                 EventManager.PlayerConnectedAsClient += _senderDataToClient.SendDataToConnectedClient;
-                _worldDataManager.OnDataChanged += _senderDataToClient.SendBlockData;
-                _worldDataManager.OnColliderChanged += _senderDataToClient.SendBlockColliderData;
+                //_worldDataManager.CellDataChanged += _senderDataToClient.SendBlockData;
+                //_worldDataManager.CellColliderChanged += _senderDataToClient.SendBlockColliderData;
             }
             InitializeAsOwner();
-            EventManager.OnPlayerSpawnedAsOwner();
         }
         else
         {
             InitializeAsNotOwner();
-            EventManager.OnPlayerSpawnedAsNotOwner();
         }
         base.OnNetworkSpawn();
     }

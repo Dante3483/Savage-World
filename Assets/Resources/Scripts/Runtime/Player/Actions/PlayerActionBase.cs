@@ -1,6 +1,8 @@
 public abstract class PlayerActionBase : IPlayerAction
 {
     #region Fields
+    protected GameManager _gameManager;
+    protected WorldDataManager _worldDataManager;
     protected Player _player;
     #endregion
 
@@ -15,7 +17,9 @@ public abstract class PlayerActionBase : IPlayerAction
     #region Public Methods
     public PlayerActionBase()
     {
-        _player = GameManager.Instance.Player;
+        _gameManager = GameManager.Instance;
+        _worldDataManager = WorldDataManager.Instance;
+        _player = _gameManager.Player;
     }
 
     public abstract void Execute();

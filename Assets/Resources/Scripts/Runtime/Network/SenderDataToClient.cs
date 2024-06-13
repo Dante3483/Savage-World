@@ -19,6 +19,7 @@ public class SenderDataToClient : NetworkSingleton<SenderDataToClient>
     #region Monobehaviour Methods
     protected override void Awake()
     {
+        base.Awake();
         _worldDataManager = WorldDataManager.Instance;
     }
     #endregion

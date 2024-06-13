@@ -20,4 +20,5 @@ MonoBehaviour:
   _description: Starter pickaxe
   _smallItemImage: {fileID: 21300000, guid: a113bba06ce270e409dbef2ee8b487d5, type: 3}
   _bigItemImage: {fileID: 21300000, guid: a113bba06ce270e409dbef2ee8b487d5, type: 3}
-  _miningDamage: 5
+  _miningDamage: 100
+  _miningSpeed: 0.01

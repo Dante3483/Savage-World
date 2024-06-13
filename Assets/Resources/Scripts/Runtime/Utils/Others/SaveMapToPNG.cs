@@ -18,7 +18,7 @@ public class SaveMapToPNG : MonoBehaviour
     #region Methods
     private void Update()
     {
-        if (GameManager.Instance.IsGameSession && !GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(KeyCode.M))
+        if (GameManager.Instance.IsPlayingState && !GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(KeyCode.M))
         {
             SaveMap();
         }

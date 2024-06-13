@@ -1,18 +1,18 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public abstract class BreakAction : PlayerActionBase
 {
     #region Fields
-    protected BlockSO _replacment;
-    private Vector2Int _position;
-    private float _damage;
-    protected MiningDamageController _miningDamageController;
-    protected WorldDataManager _worldDataManager;
     private DropManager _dropManager;
+    private Vector2Int _position;
+    private float _miningSpeed;
+    private float _damage;
+    private bool _isBreakingAllowed;
+    protected MiningDamageController _miningDamageController;
+    protected BlockSO _replacment;
     protected Action<Vector2Int, float> _addDamage;
-    protected Action<Vector2Int> _removeDamage;
-    protected Func<Vector2Int, float, bool> _checkDamage;
     protected Action<int, int, BlockSO> _replace;
     #endregion
 
@@ -28,39 +28,41 @@ public abstract class BreakAction : PlayerActionBase
     public BreakAction()
     {
         _miningDamageController = MiningDamageController.Instance;
-        _worldDataManager = WorldDataManager.Instance;
         _dropManager = DropManager.Instance;
+        _isBreakingAllowed = true;
     }
 
     public override void Execute()
     {
         if (CanBreak(_position.x, _position.y))
         {
-            Break();
+            AddDamage();
         }
     }
 
-    public void Configure(Vector2Int position, float damage)
+    public void Configure(Vector2Int position, float damage, float miningSpeed)
     {
         _position = position;
         _damage = damage;
+        _miningSpeed = miningSpeed;
     }
     #endregion
 
     #region Private Methods
-    private void Break()
+    private void AddDamage()
     {
-        int x = _position.x;
-        int y = _position.y;
-        BlockSO data = _worldDataManager.GetBlockData(x, y);
         _addDamage?.Invoke(_position, _damage);
-        if ((bool)(_checkDamage?.Invoke(_position, data.DamageToBreak)))
-        {
-            Vector3 dropPosition = new(x + 0.5f, y + 0.5f);
-            _dropManager.CreateDrop(dropPosition, data.Drop, 1);
-            _removeDamage?.Invoke(_position);
-            _replace?.Invoke(x, y, _replacment);
-        }
+        _player.StartCoroutine(BlockBreakingCooldownCoroutine());
+    }
+
+    protected void Break(Vector2Int position)
+    {
+        int x = position.x;
+        int y = position.y;
+        BlockSO data = _worldDataManager.GetBlockData(x, y);
+        Vector3 dropPosition = new(x + 0.5f, y + 0.5f);
+        _dropManager.CreateDrop(dropPosition, data.Drop, 1);
+        _replace?.Invoke(x, y, _replacment);
     }
 
     protected virtual bool CanBreak(int x, int y)
@@ -69,7 +71,18 @@ public abstract class BreakAction : PlayerActionBase
         {
             return false;
         }
+        if (!_isBreakingAllowed)
+        {
+            return false;
+        }
         return true;
+    }
+
+    private IEnumerator BlockBreakingCooldownCoroutine()
+    {
+        _isBreakingAllowed = false;
+        yield return new WaitForSeconds(_miningSpeed);
+        _isBreakingAllowed = true;
     }
     #endregion
 }

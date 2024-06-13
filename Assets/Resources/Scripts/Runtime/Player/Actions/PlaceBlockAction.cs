@@ -6,9 +6,8 @@ public class PlaceBlockAction : PlayerActionBase
     #region Fields
     private BlockSO _block;
     private Vector2Int _position;
+    private float _placementSpeed;
     private bool _isPlacementAllowed;
-    private WaitForSeconds _waitForPlacementCooldown;
-    private WorldDataManager _worldDataManager;
     private InventoryModel _inventory;
     #endregion
 
@@ -21,11 +20,9 @@ public class PlaceBlockAction : PlayerActionBase
     #endregion
 
     #region Public Methods
-    public PlaceBlockAction(float placementCooldown)
+    public PlaceBlockAction()
     {
-        _worldDataManager = WorldDataManager.Instance;
-        _inventory = GameManager.Instance.GetPlayerInventory();
-        _waitForPlacementCooldown = new WaitForSeconds(placementCooldown);
+        _inventory = _gameManager.GetPlayerInventory();
         _isPlacementAllowed = true;
     }
 
@@ -37,10 +34,11 @@ public class PlaceBlockAction : PlayerActionBase
         }
     }
 
-    public void Configure(BlockSO block, Vector2Int position)
+    public void Configure(BlockSO block, Vector2Int position, float placementSpeed)
     {
         _block = block;
         _position = position;
+        _placementSpeed = placementSpeed;
     }
     #endregion
 
@@ -85,7 +83,7 @@ public class PlaceBlockAction : PlayerActionBase
     private IEnumerator BlockPlacementCooldownCoroutine()
     {
         _isPlacementAllowed = false;
-        yield return _waitForPlacementCooldown;
+        yield return new WaitForSeconds(_placementSpeed);
         _isPlacementAllowed = true;
     }
     #endregion

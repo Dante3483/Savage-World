@@ -24,10 +24,10 @@ namespace CustomTilemap
             _defaultLayerMask = LayerMask.NameToLayer("Default");
             _blockLayerMask = LayerMask.NameToLayer("Block");
         }
-        public void UpdateSprite(Sprite mainSprite)
+        public void UpdateSprite(Sprite sprite)
         {
-            gameObject.layer = mainSprite == null ? _defaultLayerMask : _blockLayerMask;
-            _mainSpriteRenderer.sprite = mainSprite;
+            gameObject.layer = sprite == null ? _defaultLayerMask : _blockLayerMask;
+            _mainSpriteRenderer.sprite = sprite;
         }
         #endregion
     }
