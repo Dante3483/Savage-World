@@ -33,7 +33,7 @@ public class CreatingWorldState : GameStateBase
     private void CreateWorld()
     {
         _gameManager.Terrain.CreateNewWorld();
-        ActionInMainThreadUtil.Instance.Invoke(() => ConnectionManager.Instance.StartHostIp(_gameManager.PlayerName));
+        //ActionInMainThreadUtil.Instance.Invoke(() => ConnectionManager.Instance.StartHostIp(_gameManager.PlayerName));
         ActionInMainThreadUtil.Instance.Invoke(() => _gameManager.ChangeState(_gameManager.PlayingState));
     }
     #endregion

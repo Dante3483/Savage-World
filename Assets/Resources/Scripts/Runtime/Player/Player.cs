@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player : NetworkBehaviour
+public class Player : MonoBehaviour
 {
     #region Fields
     [SerializeField]
@@ -52,28 +51,29 @@ public class Player : NetworkBehaviour
         _senderDataToClient = SenderDataToClient.Instance;
         _worldDataManager = WorldDataManager.Instance;
         _playerInteractions = GetComponent<PlayerInteractions>();
+        InitializeAsOwner();
     }
     #endregion
 
     #region Public Methods
-    public override void OnNetworkSpawn()
-    {
-        if (IsOwner)
-        {
-            if (IsServer)
-            {
-                EventManager.PlayerConnectedAsClient += _senderDataToClient.SendDataToConnectedClient;
-                //_worldDataManager.CellDataChanged += _senderDataToClient.SendBlockData;
-                //_worldDataManager.CellColliderChanged += _senderDataToClient.SendBlockColliderData;
-            }
-            InitializeAsOwner();
-        }
-        else
-        {
-            InitializeAsNotOwner();
-        }
-        base.OnNetworkSpawn();
-    }
+    //public override void OnNetworkSpawn()
+    //{
+    //    if (IsOwner)
+    //    {
+    //        if (IsServer)
+    //        {
+    //            //EventManager.PlayerConnectedAsClient += _senderDataToClient.SendDataToConnectedClient;
+    //            //_worldDataManager.CellDataChanged += _senderDataToClient.SendBlockData;
+    //            //_worldDataManager.CellColliderChanged += _senderDataToClient.SendBlockColliderData;
+    //        }
+    //        InitializeAsOwner();
+    //    }
+    //    else
+    //    {
+    //        InitializeAsNotOwner();
+    //    }
+    //    base.OnNetworkSpawn();
+    //}
 
     public void DisableMovement()
     {

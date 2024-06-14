@@ -1,31 +1,34 @@
-public abstract class OnlineState : ConnectionStateBase
+namespace SavageWorld.Runtime.Network.States
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public OnlineState(ConnectionManager connectionManager) : base(connectionManager)
+    public abstract class OnlineState : ConnectionStateBase
     {
+        #region Private fields
 
-    }
+        #endregion
 
-    public override void OnUserRequestedShutdown()
-    {
-        _connectionManager.ChangeState(_connectionManager.OfflineState);
-    }
+        #region Public fields
 
-    public override void OnTransportFailure()
-    {
-        _connectionManager.ChangeState(_connectionManager.OfflineState);
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public OnlineState(NetworkManager connectionManager) : base(connectionManager)
+        {
+
+        }
+
+        public override void OnUserRequestedShutdown()
+        {
+            _connectionManager.ChangeState(_connectionManager.OfflineState);
+        }
+
+        public override void OnTransportFailure()
+        {
+            _connectionManager.ChangeState(_connectionManager.OfflineState);
+        }
+        #endregion
     }
-    #endregion
 }

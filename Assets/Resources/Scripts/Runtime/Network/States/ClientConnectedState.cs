@@ -1,45 +1,48 @@
-public class ClientConnectedState : OnlineState
+namespace SavageWorld.Runtime.Network.States
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public ClientConnectedState(ConnectionManager connectionManager) : base(connectionManager)
+    public class ClientConnectedState : OnlineState
     {
+        #region Private fields
 
-    }
+        #endregion
 
-    public override void Enter()
-    {
+        #region Public fields
 
-    }
+        #endregion
 
-    public override void Exit()
-    {
+        #region Properties
 
-    }
+        #endregion
 
-    public override void OnClientDisconnect(ulong _)
-    {
-        var disconnectReason = _connectionManager.NetworkManager.DisconnectReason;
-        if (string.IsNullOrEmpty(disconnectReason) ||
-            disconnectReason == "Disconnected due to host shutting down.")
+        #region Methods
+        public ClientConnectedState(NetworkManager connectionManager) : base(connectionManager)
         {
-            _connectionManager.ChangeState(_connectionManager.ClientReconnectingState);
+
         }
-        else
+
+        public override void Enter()
         {
-            _connectionManager.ChangeState(_connectionManager.OfflineState);
+
         }
+
+        public override void Exit()
+        {
+
+        }
+
+        public override void OnClientDisconnect(ulong _)
+        {
+            var disconnectReason = _connectionManager.NetworkManagerOld.DisconnectReason;
+            if (string.IsNullOrEmpty(disconnectReason) ||
+                disconnectReason == "Disconnected due to host shutting down.")
+            {
+                _connectionManager.ChangeState(_connectionManager.ClientReconnectingState);
+            }
+            else
+            {
+                _connectionManager.ChangeState(_connectionManager.OfflineState);
+            }
+        }
+        #endregion
     }
-    #endregion
 }

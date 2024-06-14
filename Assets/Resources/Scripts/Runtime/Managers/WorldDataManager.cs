@@ -4,10 +4,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Unity.Netcode;
 using UnityEngine;
 
-public class WorldDataManager : NetworkSingleton<WorldDataManager>
+public class WorldDataManager : Singleton<WorldDataManager>
 {
     #region Fields
     private GameManager _gameManager;
@@ -58,12 +57,6 @@ public class WorldDataManager : NetworkSingleton<WorldDataManager>
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(clickPosition);
             SetBlockInfoByCoords(Vector2Int.FloorToInt(worldPosition));
         }
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            Debug.Log($"Is server: {NetworkManager.Singleton.IsServer}");
-            Debug.Log($"Is host: {NetworkManager.Singleton.IsHost}");
-            Debug.Log($"Is client: {NetworkManager.Singleton.IsClient}");
-        }
     }
     #endregion
 
@@ -103,37 +96,32 @@ public class WorldDataManager : NetworkSingleton<WorldDataManager>
 
     public void SetBlockData(int x, int y, BlockSO data)
     {
+        _worldData[x, y].SetBlockData(data);
         if (_gameManager.IsPlayingState)
         {
-            SetBlockDataServerRpc(x, y, data.Type, data.GetId());
-        }
-        else
-        {
-            _worldData[x, y].SetBlockData(data);
+            //SetBlockDataServerRpc(x, y, data.Type, data.GetId());
+            SetUpBlockData(x, y);
+            CellDataChanged?.Invoke(x, y);
         }
     }
 
     public void SetWallData(int x, int y, BlockSO data)
     {
+        _worldData[x, y].SetWallData(data);
         if (_gameManager.IsPlayingState)
         {
-            SetWallDataServerRpc(x, y, data.GetId());
-        }
-        else
-        {
-            _worldData[x, y].SetWallData(data);
+            //SetWallDataServerRpc(x, y, data.GetId());
+            SetUpWallData(x, y);
         }
     }
 
     public void SetLiquidData(int x, int y, BlockSO data, float flowValue = 100)
     {
+        _worldData[x, y].SetLiquidData(data, flowValue);
         if (_gameManager.IsPlayingState)
         {
-            SetLiquidDataServerRpc(x, y, data.GetId(), flowValue);
-        }
-        else
-        {
-            _worldData[x, y].SetLiquidData(data, flowValue);
+            //SetLiquidDataServerRpc(x, y, data.GetId(), flowValue);
+            SetUpLiquidData(x, y);
         }
     }
 
@@ -525,44 +513,25 @@ public class WorldDataManager : NetworkSingleton<WorldDataManager>
     #endregion
 
     #region Private Methods
-    [Rpc(SendTo.Server, RequireOwnership = false)]
-    private void SetBlockDataServerRpc(int x, int y, BlockTypes type, ushort id)
+    private void SetUpBlockData(int x, int y)
     {
-        BlockSO data = _blockAtlas.GetBlockByTypeAndId(type, id);
-        SetRandomBlockTile(x, y, data);
-        SetBlockDataClientRpc(x, y, type, id, _worldData[x, y].TileId);
-    }
-
-    [Rpc(SendTo.Server, RequireOwnership = false)]
-    private void SetWallDataServerRpc(int x, int y, ushort id)
-    {
-        BlockSO data = _blockAtlas.GetBlockByTypeAndId(BlockTypes.Wall, id);
-        _worldData[x, y].SetWallData(data);
-        SetRandomWallTile(x, y);
-        CellDataChanged?.Invoke(x, y);
-    }
-
-    [Rpc(SendTo.Server, RequireOwnership = false)]
-    private void SetLiquidDataServerRpc(int x, int y, ushort id, float flowValue)
-    {
-        BlockSO data = _blockAtlas.GetBlockByTypeAndId(BlockTypes.Liquid, id);
-        _worldData[x, y].SetLiquidData(data, flowValue);
-        CellDataChanged?.Invoke(x, y);
-    }
-
-    [ClientRpc]
-    private void SetBlockDataClientRpc(int x, int y, BlockTypes type, ushort id, byte tileId)
-    {
-        BlockSO data = _blockAtlas.GetBlockByTypeAndId(type, id);
-        _worldData[x, y].SetBlockData(data);
-        _worldData[x, y].TileId = tileId;
+        SetRandomBlockTile(x, y);
         if (IsEmpty(x, y) || IsSolid(x, y))
         {
             SetColliderIndex(x, y, byte.MaxValue);
             UpdateCollidersAround(x, y);
             UpdateCollider(x, y);
         }
-        CellDataChanged?.Invoke(x, y);
+    }
+
+    private void SetUpWallData(int x, int y)
+    {
+        SetRandomWallTile(x, y);
+    }
+
+    private void SetUpLiquidData(int x, int y)
+    {
+
     }
 
     private void InitializePhysicsShapes()

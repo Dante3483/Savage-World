@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
 public class MiningDamageController : NetworkSingleton<MiningDamageController>
@@ -46,16 +45,18 @@ public class MiningDamageController : NetworkSingleton<MiningDamageController>
     #region Public Methods
     public void AddDamageToBlock(Vector2Int position, float damage)
     {
-        if (!_blockedPositions.Contains(position))
-        {
-            AddDamageToBlockRpc(position, damage);
-            _blockedPositions.Add(position);
-        }
+        //if (!_blockedPositions.Contains(position))
+        //{
+        //    AddDamageToBlockRpc(position, damage);
+        //    _blockedPositions.Add(position);
+        //}
+        _blocksDamageData.AddDamage(position, damage);
     }
 
     public void AddDamageToWall(Vector2Int position, float damage)
     {
-        AddDamageToWallRpc(position, damage);
+        //AddDamageToWallRpc(position, damage);
+        _wallsDamageData.AddDamage(position, damage);
     }
 
     public float GetBlockDamage(Vector2Int position)
@@ -70,35 +71,6 @@ public class MiningDamageController : NetworkSingleton<MiningDamageController>
     #endregion
 
     #region Private Methods
-    [Rpc(SendTo.Server, RequireOwnership = false)]
-    private void AddDamageToBlockRpc(Vector2Int position, float damageMultiplier)
-    {
-        float damage = _blocksDamageData.AddDamage(position, damageMultiplier);
-        _blockedPositions.Remove(position);
-        SetDamageToBlockRpc(position, damage);
-    }
-
-    [Rpc(SendTo.Server, RequireOwnership = false)]
-    public void AddDamageToWallRpc(Vector2Int position, float damageMultiplier)
-    {
-        _wallsDamageData.AddDamage(position, damageMultiplier);
-        float damage = GetWallDamage(position);
-        SetDamageToWallRpc(position, damage);
-    }
-
-    [Rpc(SendTo.NotServer, RequireOwnership = false)]
-    private void SetDamageToBlockRpc(Vector2Int position, float damage)
-    {
-        _blocksDamageData.SetDamage(position, damage);
-        _blockedPositions.Remove(position);
-    }
-
-    [Rpc(SendTo.NotServer, RequireOwnership = false)]
-    private void SetDamageToWallRpc(Vector2Int position, float damage)
-    {
-        _wallsDamageData.SetDamage(position, damage);
-    }
-
     private void OnBlockDamageChanged(Vector2Int position, float damage)
     {
         BlockDamageChanged?.Invoke(position, damage);

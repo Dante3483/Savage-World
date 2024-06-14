@@ -31,7 +31,7 @@ public class LoadingWorldState : GameStateBase
 
     private void LoadWorld()
     {
-        ActionInMainThreadUtil.Instance.Invoke(() => ConnectionManager.Instance.StartHostIp(_gameManager.PlayerName));
+        //ActionInMainThreadUtil.Instance.Invoke(() => ConnectionManager.Instance.StartHostIp(_gameManager.PlayerName));
         _gameManager.Terrain.LoadWorld();
         ActionInMainThreadUtil.Instance.Invoke(() => _gameManager.ChangeState(_gameManager.PlayingState));
     }

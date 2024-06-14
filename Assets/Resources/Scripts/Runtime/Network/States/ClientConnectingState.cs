@@ -1,76 +1,80 @@
+using SavageWorld.Runtime.Network.Methods;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class ClientConnectingState : OnlineState
+namespace SavageWorld.Runtime.Network.States
 {
-    #region Private fields
-    protected ConnectionMethodBase _connectionMethod;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public ClientConnectingState(ConnectionManager connectionManager) : base(connectionManager)
+    public class ClientConnectingState : OnlineState
     {
+        #region Private fields
+        protected ConnectionMethodBase _connectionMethod;
+        #endregion
 
-    }
+        #region Public fields
 
-    public override void Enter()
-    {
-        ConnectClientAsync();
-    }
+        #endregion
 
-    public override void Exit()
-    {
+        #region Properties
 
-    }
+        #endregion
 
-    public ClientConnectingState Configure(ConnectionMethodBase baseConnectionMethod)
-    {
-        _connectionMethod = baseConnectionMethod;
-        return this;
-    }
-
-    public override void OnClientConnected(ulong _)
-    {
-        _connectionManager.ChangeState(_connectionManager.ClientConnectedState);
-    }
-
-    public override void OnClientDisconnect(ulong _)
-    {
-        StartingClientFailed();
-    }
-
-    protected async Task ConnectClientAsync()
-    {
-        try
+        #region Methods
+        public ClientConnectingState(NetworkManager connectionManager) : base(connectionManager)
         {
-            await _connectionMethod.SetupClientConnectionAsync();
 
-            if (!_connectionManager.NetworkManager.StartClient())
+        }
+
+        public override void Enter()
+        {
+            ConnectClientAsync();
+        }
+
+        public override void Exit()
+        {
+
+        }
+
+        public ClientConnectingState Configure(ConnectionMethodBase baseConnectionMethod)
+        {
+            _connectionMethod = baseConnectionMethod;
+            return this;
+        }
+
+        public override void OnClientConnected(ulong _)
+        {
+            _connectionManager.ChangeState(_connectionManager.ClientConnectedState);
+        }
+
+        public override void OnClientDisconnect(ulong _)
+        {
+            StartingClientFailed();
+        }
+
+        protected async Task ConnectClientAsync()
+        {
+            try
             {
-                throw new("NetworkManager StartClient failed");
+                await _connectionMethod.SetupClientConnectionAsync();
+
+                if (!_connectionManager.NetworkManagerOld.StartClient())
+                {
+                    throw new("NetworkManager StartClient failed");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error connecting client, see following exception");
+                Debug.LogException(e);
+                StartingClientFailed();
+                throw;
             }
         }
-        catch (Exception e)
-        {
-            Debug.LogError("Error connecting client, see following exception");
-            Debug.LogException(e);
-            StartingClientFailed();
-            throw;
-        }
-    }
 
-    private void StartingClientFailed()
-    {
-        _connectionManager.ChangeState(_connectionManager.OfflineState);
+        private void StartingClientFailed()
+        {
+            _connectionManager.ChangeState(_connectionManager.OfflineState);
+        }
+        #endregion
     }
-    #endregion
 }

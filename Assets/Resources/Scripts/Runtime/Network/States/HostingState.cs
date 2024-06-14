@@ -1,60 +1,63 @@
 using UnityEngine;
 
-public class HostingState : OnlineState
+namespace SavageWorld.Runtime.Network.States
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public HostingState(ConnectionManager connectionManager) : base(connectionManager)
+    public class HostingState : OnlineState
     {
+        #region Private fields
 
-    }
+        #endregion
 
-    public override void Enter()
-    {
+        #region Public fields
 
-    }
+        #endregion
 
-    public override void Exit()
-    {
+        #region Properties
 
-    }
+        #endregion
 
-    public override void OnUserRequestedShutdown()
-    {
-        var reason = JsonUtility.ToJson(ConnectStatus.HostEndedSession);
-        for (var i = _connectionManager.NetworkManager.ConnectedClientsIds.Count - 1; i >= 0; i--)
+        #region Methods
+        public HostingState(NetworkManager connectionManager) : base(connectionManager)
         {
-            var id = _connectionManager.NetworkManager.ConnectedClientsIds[i];
-            if (id != _connectionManager.NetworkManager.LocalClientId)
+
+        }
+
+        public override void Enter()
+        {
+
+        }
+
+        public override void Exit()
+        {
+
+        }
+
+        public override void OnUserRequestedShutdown()
+        {
+            var reason = JsonUtility.ToJson(ConnectStatus.HostEndedSession);
+            for (var i = _connectionManager.NetworkManagerOld.ConnectedClientsIds.Count - 1; i >= 0; i--)
             {
-                _connectionManager.NetworkManager.DisconnectClient(id, reason);
+                var id = _connectionManager.NetworkManagerOld.ConnectedClientsIds[i];
+                if (id != _connectionManager.NetworkManagerOld.LocalClientId)
+                {
+                    _connectionManager.NetworkManagerOld.DisconnectClient(id, reason);
+                }
+            }
+            _connectionManager.ChangeState(_connectionManager.OfflineState);
+        }
+
+        public override void OnServerStopped()
+        {
+            _connectionManager.ChangeState(_connectionManager.OfflineState);
+        }
+
+        public override void OnClientConnected(ulong clientId)
+        {
+            if (clientId != _connectionManager.NetworkManagerOld.LocalClientId)
+            {
+                EventManager.OnPlayerConnected(clientId);
             }
         }
-        _connectionManager.ChangeState(_connectionManager.OfflineState);
+        #endregion
     }
-
-    public override void OnServerStopped()
-    {
-        _connectionManager.ChangeState(_connectionManager.OfflineState);
-    }
-
-    public override void OnClientConnected(ulong clientId)
-    {
-        if (clientId != _connectionManager.NetworkManager.LocalClientId)
-        {
-            EventManager.OnPlayerConnected(clientId);
-        }
-    }
-    #endregion
 }

@@ -6,7 +6,7 @@ public class Provider : MonoBehaviour
     #region Private fields
     [SerializeField]
     [Provide]
-    private NetworkManager _networkManager;
+    private Unity.Netcode.NetworkManager _networkManager;
     #endregion
 
     #region Public fields
