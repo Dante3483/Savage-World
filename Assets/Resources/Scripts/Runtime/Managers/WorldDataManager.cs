@@ -149,6 +149,12 @@ public class WorldDataManager : NetworkSingleton<WorldDataManager>
         _worldData[x, y].SetBlockTile(id);
     }
 
+    public void SetRandomBlockTile(int x, int y, BlockSO data)
+    {
+        byte id = (byte)_gameManager.RandomVar.Next(0, data.Sprites.Count);
+        _worldData[x, y].SetBlockTile(id);
+    }
+
     public void SetRandomWallTile(int x, int y)
     {
         BlockSO data = GetBlockData(x, y);
@@ -523,16 +529,8 @@ public class WorldDataManager : NetworkSingleton<WorldDataManager>
     private void SetBlockDataServerRpc(int x, int y, BlockTypes type, ushort id)
     {
         BlockSO data = _blockAtlas.GetBlockByTypeAndId(type, id);
-        _worldData[x, y].SetBlockData(data);
-        SetRandomBlockTile(x, y);
-
-        if (IsEmpty(x, y) || IsSolid(x, y))
-        {
-            SetColliderIndex(x, y, byte.MaxValue);
-            UpdateCollidersAround(x, y);
-            UpdateCollider(x, y);
-        }
-        CellDataChanged?.Invoke(x, y);
+        SetRandomBlockTile(x, y, data);
+        SetBlockDataClientRpc(x, y, type, id, _worldData[x, y].TileId);
     }
 
     [Rpc(SendTo.Server, RequireOwnership = false)]
@@ -549,6 +547,21 @@ public class WorldDataManager : NetworkSingleton<WorldDataManager>
     {
         BlockSO data = _blockAtlas.GetBlockByTypeAndId(BlockTypes.Liquid, id);
         _worldData[x, y].SetLiquidData(data, flowValue);
+        CellDataChanged?.Invoke(x, y);
+    }
+
+    [ClientRpc]
+    private void SetBlockDataClientRpc(int x, int y, BlockTypes type, ushort id, byte tileId)
+    {
+        BlockSO data = _blockAtlas.GetBlockByTypeAndId(type, id);
+        _worldData[x, y].SetBlockData(data);
+        _worldData[x, y].TileId = tileId;
+        if (IsEmpty(x, y) || IsSolid(x, y))
+        {
+            SetColliderIndex(x, y, byte.MaxValue);
+            UpdateCollidersAround(x, y);
+            UpdateCollider(x, y);
+        }
         CellDataChanged?.Invoke(x, y);
     }
 

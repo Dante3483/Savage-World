@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -84,16 +85,16 @@ namespace CustomTilemap
 
         private void OnEnable()
         {
-            _worldDataManager.CellDataChanged += HandleDataChanged;
-            _worldDataManager.CellColliderChanged += HandleColliderChanged;
-            _miningDamageController.BlockDamageChanged += UpdateBlockDamageSprite;
-            _miningDamageController.WallDamageChanged += UpdateWallDamageSprite;
+            _worldDataManager.CellDataChanged += CellDataChangedEventHandler;
+            _worldDataManager.CellColliderChanged += CellColliderChangedEventHandler;
+            _miningDamageController.BlockDamageChanged += BlockDamageChangedEventHandler;
+            _miningDamageController.WallDamageChanged += WallDamageChangedEventHandler;
         }
 
         private void OnDisable()
         {
-            _worldDataManager.CellDataChanged -= HandleDataChanged;
-            _worldDataManager.CellColliderChanged -= HandleColliderChanged;
+            _worldDataManager.CellDataChanged -= CellDataChangedEventHandler;
+            _worldDataManager.CellColliderChanged -= CellColliderChangedEventHandler;
             _miningDamageController.BlockDamageChanged -= UpdateBlockDamageSprite;
             _miningDamageController.WallDamageChanged -= UpdateWallDamageSprite;
         }
@@ -204,61 +205,96 @@ namespace CustomTilemap
         private void UpdateBlockSprite(Vector2Int position)
         {
             Vector2Int tilePositon = GetLocalTilePosition(position);
-            Sprite sprite = _worldDataManager.GetBlockSprite(position.x, position.y);
-            _tiles[tilePositon.x, tilePositon.y].UpdateBlockSprite(sprite);
+            try
+            {
+                Sprite sprite = _worldDataManager.GetBlockSprite(position.x, position.y);
+                _tiles[tilePositon.x, tilePositon.y].UpdateBlockSprite(sprite);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Debug.LogError(tilePositon.ToString());
+            }
         }
 
         private void UpdateWallSprite(Vector2Int position)
         {
             Vector2Int tilePositon = GetLocalTilePosition(position);
-            Sprite sprite = _worldDataManager.GetWallSprite(position.x, position.y);
-            _tiles[tilePositon.x, tilePositon.y].UpdateWallSprite(sprite);
+            try
+            {
+                Sprite sprite = _worldDataManager.GetWallSprite(position.x, position.y);
+                _tiles[tilePositon.x, tilePositon.y].UpdateWallSprite(sprite);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Debug.LogError(tilePositon.ToString());
+            }
         }
 
         private void UpdateLiquidSprite(Vector2Int position)
         {
             Vector2Int tilePositon = GetLocalTilePosition(position);
-            Sprite sprite = _worldDataManager.GetLiquidSprite(position.x, position.y);
-            _tiles[tilePositon.x, tilePositon.y].UpdateLiquidSprite(sprite);
+            try
+            {
+                Sprite sprite = _worldDataManager.GetLiquidSprite(position.x, position.y);
+                _tiles[tilePositon.x, tilePositon.y].UpdateLiquidSprite(sprite);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Debug.LogError(tilePositon.ToString());
+            }
         }
 
         private void UpdateBlockDamageSprite(Vector2Int position, float rawDamage)
         {
             Vector2Int tilePositon = GetLocalTilePosition(position);
-            if (rawDamage > 0)
+            try
             {
-                float maxDamage = _worldDataManager.GetBlockData(position.x, position.y).DamageToBreak;
-                int damage = (int)(Mathf.Min(rawDamage / maxDamage, 1) * 100);
-                if (damage != 0)
+                if (rawDamage > 0)
                 {
-                    int id = Mathf.CeilToInt(damage / (100f / _blockDamageSprites.Length)) - 1;
-                    Sprite sprite = _blockDamageSprites[id];
-                    _tiles[tilePositon.x, tilePositon.y].UpdateBlockDamage(sprite);
+                    float maxDamage = _worldDataManager.GetBlockData(position.x, position.y).DamageToBreak;
+                    int damage = (int)(Mathf.Min(rawDamage / maxDamage, 1) * 100);
+                    if (damage != 0)
+                    {
+                        int id = Mathf.CeilToInt(damage / (100f / _blockDamageSprites.Length)) - 1;
+                        Sprite sprite = _blockDamageSprites[id];
+                        _tiles[tilePositon.x, tilePositon.y].UpdateBlockDamage(sprite);
+                    }
+                }
+                else
+                {
+                    _tiles[tilePositon.x, tilePositon.y].UpdateBlockDamage(null);
                 }
             }
-            else
+            catch (IndexOutOfRangeException)
             {
-                _tiles[tilePositon.x, tilePositon.y].UpdateBlockDamage(null);
+                Debug.LogError(tilePositon.ToString());
             }
         }
 
         private void UpdateWallDamageSprite(Vector2Int position, float rawDamage)
         {
             Vector2Int tilePositon = GetLocalTilePosition(position);
-            if (rawDamage > 0)
+            try
             {
-                float maxDamage = _worldDataManager.GetWallData(position.x, position.y).DamageToBreak;
-                int damage = (int)(Mathf.Min(rawDamage / maxDamage, 1) * 100);
-                if (damage != 0)
+                if (rawDamage > 0)
                 {
-                    int id = Mathf.CeilToInt(damage / (100f / _wallDamageSprites.Length)) - 1;
-                    Sprite sprite = _wallDamageSprites[id];
-                    _tiles[tilePositon.x, tilePositon.y].UpdateWallDamage(sprite);
+                    float maxDamage = _worldDataManager.GetWallData(position.x, position.y).DamageToBreak;
+                    int damage = (int)(Mathf.Min(rawDamage / maxDamage, 1) * 100);
+                    if (damage != 0)
+                    {
+                        int id = Mathf.CeilToInt(damage / (100f / _wallDamageSprites.Length)) - 1;
+                        Sprite sprite = _wallDamageSprites[id];
+                        _tiles[tilePositon.x, tilePositon.y].UpdateWallDamage(sprite);
+                    }
+                }
+                else
+                {
+                    _tiles[tilePositon.x, tilePositon.y].UpdateWallDamage(null);
                 }
             }
-            else
+            catch (IndexOutOfRangeException)
             {
-                _tiles[tilePositon.x, tilePositon.y].UpdateWallDamage(null);
+                Debug.LogError(tilePositon.ToString());
             }
         }
 
@@ -296,7 +332,7 @@ namespace CustomTilemap
             return _currentAreaRect.Contains(new(x, y));
         }
 
-        private void HandleDataChanged(int x, int y)
+        private void CellDataChangedEventHandler(int x, int y)
         {
             if (IsInRenderArea(x, y))
             {
@@ -304,7 +340,7 @@ namespace CustomTilemap
             }
         }
 
-        private void HandleColliderChanged(int x, int y)
+        private void CellColliderChangedEventHandler(int x, int y)
         {
             if (IsInRenderArea(x, y))
             {
@@ -316,6 +352,22 @@ namespace CustomTilemap
                         _worldDataManager.IsColliderHorizontalFlipped(x, y));
                     _needUpdateCompositeCollider = true;
                 }
+            }
+        }
+
+        private void BlockDamageChangedEventHandler(Vector2Int position, float damage)
+        {
+            if (IsInRenderArea(position.x, position.y))
+            {
+                UpdateBlockDamageSprite(position, damage);
+            }
+        }
+
+        private void WallDamageChangedEventHandler(Vector2Int position, float damage)
+        {
+            if (IsInRenderArea(position.x, position.y))
+            {
+                UpdateWallDamageSprite(position, damage);
             }
         }
         #endregion
