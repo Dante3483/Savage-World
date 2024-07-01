@@ -9,10 +9,35 @@ namespace SavageWorld.Runtime.Network
         private string _ipAddress;
         [SerializeField]
         private ushort _port;
+        [SerializeField]
+        [Min(1)]
+        private int _maxClients;
         #endregion
 
         #region Properties
+        public string IpAddress
+        {
+            get
+            {
+                return _ipAddress;
+            }
+        }
 
+        public ushort Port
+        {
+            get
+            {
+                return _port;
+            }
+        }
+
+        public int MaxClients
+        {
+            get
+            {
+                return _maxClients;
+            }
+        }
         #endregion
 
         #region Events / Delegates
@@ -28,6 +53,13 @@ namespace SavageWorld.Runtime.Network
         {
             _ipAddress = "127.0.0.1";
             _port = 7777;
+            _maxClients = 1;
+        }
+
+        public void Configure(string ipAddress, ushort port)
+        {
+            _ipAddress = ipAddress;
+            _port = port;
         }
         #endregion
 

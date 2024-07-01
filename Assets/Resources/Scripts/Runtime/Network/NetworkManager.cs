@@ -1,108 +1,54 @@
-using SavageWorld.Runtime.Network.States;
+using SavageWorld.Runtime.Network.Connection;
+using SavageWorld.Runtime.Network.Messages;
 using System;
 using UnityEngine;
 
 namespace SavageWorld.Runtime.Network
 {
     [RequireComponent(typeof(NetworkConfiguration))]
-    public class NetworkManager : Singleton<NetworkManager>, IStateMachine<ConnectionStateBase>
+    public class NetworkManager : Singleton<NetworkManager>
     {
         #region Fields
         [SerializeField]
         private NetworkConfiguration _networkConfiguration;
-        [SerializeField]
-        private Unity.Netcode.NetworkManager _networkManager;
-        [SerializeField]
-        private int _numberOfReconnectAttempts = 2;
-
-        private StateMachine<ConnectionStateBase> _stateMachine;
-        private OfflineState _offlineState;
-        private ClientConnectingState _clientConnectingState;
-        private ClientConnectedState _clientConnectedState;
-        private ClientReconnectingState _clientReconnectingState;
-        private StartingHostState _startingHostState;
-        private HostingState _hostingState;
+        private NetworkServer _server;
+        private NetworkClient _client;
+        private NetworkMessanger _messanger;
         #endregion
 
         #region Properties
-        public Unity.Netcode.NetworkManager NetworkManagerOld
+        public NetworkMessanger Messanger
         {
             get
             {
-                return _networkManager;
+                return _messanger;
             }
         }
 
-        public OfflineState OfflineState
+        public NetworkServer Server
         {
             get
             {
-                return _offlineState;
-            }
-
-            set
-            {
-                _offlineState = value;
+                return _server;
             }
         }
 
-        public StartingHostState StartingHostState
+        public NetworkClient Client
         {
             get
             {
-                return _startingHostState;
+                return _client;
             }
         }
-
-        public HostingState HostingState
-        {
-            get
-            {
-                return _hostingState;
-            }
-        }
-
-        public ClientConnectingState ClientConnectingState
-        {
-            get
-            {
-                return _clientConnectingState;
-            }
-        }
-
-        public ClientConnectedState ClientConnectedState
-        {
-            get
-            {
-                return _clientConnectedState;
-            }
-        }
-
-        public ClientReconnectingState ClientReconnectingState
-        {
-            get
-            {
-                return _clientReconnectingState;
-            }
-        }
-
-        public int NumberOfReconnectAttempts
-        {
-            get
-            {
-                return _numberOfReconnectAttempts;
-            }
-        }
-
-        public StateMachine<ConnectionStateBase> StateMachine => _stateMachine;
-
-        public ConnectionStateBase CurrentState => _stateMachine.CurrentState;
-
-        public ConnectionStateBase PrevState => _stateMachine.PrevState;
         #endregion
 
         #region Events / Delegates
-        public event Action
+        public event Action<INetworkConnection> ServerStarted;
+        public event Action<INetworkConnection> ServerStopped;
+        public event Action<int> ClientConnected;
+        public event Action<int> ClientDisconnected;
+        public event Action<INetworkConnection> Connected;
+        public event Action<INetworkConnection> Disconnected;
         #endregion
 
         #region Monobehaviour Methods
@@ -110,80 +56,112 @@ namespace SavageWorld.Runtime.Network
         {
             base.Awake();
             _networkConfiguration = GetComponent<NetworkConfiguration>();
-            _networkManager = GetComponent<Unity.Netcode.NetworkManager>();
-            _stateMachine = new(GetType().Name);
-            _offlineState = new(this);
-            _clientConnectingState = new(this);
-            _clientConnectedState = new(this);
-            _clientReconnectingState = new(this);
-            _startingHostState = new(this);
-            _hostingState = new(this);
+            _messanger = new();
+            _server = new();
+            _client = new();
         }
 
-        private void Start()
+        private void OnApplicationQuit()
         {
-            ChangeState(OfflineState);
-
-            NetworkManagerOld.OnClientConnectedCallback += OnClientConnectedCallback;
-            NetworkManagerOld.OnClientDisconnectCallback += OnClientDisconnectCallback;
-            NetworkManagerOld.OnServerStarted += OnServerStarted;
-            NetworkManagerOld.ConnectionApprovalCallback += ApprovalCheck;
-            NetworkManagerOld.OnTransportFailure += OnTransportFailure;
-            NetworkManagerOld.OnServerStopped += OnServerStopped;
+            if (_server.IsActive)
+            {
+                _server.Stop();
+                _server = null;
+            }
+            if (_client.IsActive)
+            {
+                _client.Disconnect();
+                _client = null;
+            }
         }
         #endregion
 
         #region Public Methods
-        public void ChangeState(ConnectionStateBase nextState)
+        public void ConfigureNetwork(string ipAddress, ushort port)
         {
-            StateMachine.ChangeState(nextState);
+            _networkConfiguration.Configure(ipAddress, port);
         }
 
-        public void StartClientIp(string playerName, string address = "127.0.0.1", ushort port = 7777)
+        public void StartServer()
         {
-            CurrentState.StartClientIP(playerName, address, port);
+            if (!_server.IsActive)
+            {
+                TCPNetworkConnection connection = new();
+                connection.ServerStarted += ServerStartedEventHandler;
+                connection.ServerStopped += ServerStoppedEventHandler;
+                connection.ClientConnected += ClientConnectedEventHandler;
+                connection.ClientDisconnected += ClientDisconnectedEventHandler;
+                _server.SetConnection(connection, _networkConfiguration.MaxClients);
+                _server.Start(_networkConfiguration.IpAddress, _networkConfiguration.Port);
+            }
         }
 
-        public void StartHostIp(string playerName, string address = "127.0.0.1", ushort port = 7777)
+        public void StopServer()
         {
-            CurrentState.StartHostIP(playerName, address, port);
+            if (_server.IsActive)
+            {
+                _server.Stop();
+            }
         }
 
-        public void RequestShutdown()
+        public void Connect()
         {
-            CurrentState.OnUserRequestedShutdown();
+            if (!_client.IsActive)
+            {
+                TCPNetworkConnection connection = new();
+                connection.Connected += ConnectedEventHandler;
+                connection.Disconnected += DisconnectedEventHandler;
+                _client.SetConnection(connection);
+                _client.Connect(_networkConfiguration.IpAddress, _networkConfiguration.Port);
+            }
+        }
+
+        public void Disconnect()
+        {
+            if (_client is not null)
+            {
+                _client.Disconnect();
+            }
         }
         #endregion
 
         #region Private Methods
-        private void OnClientDisconnectCallback(ulong clientId)
+        private void ServerStartedEventHandler(INetworkConnection connection)
         {
-            CurrentState.OnClientDisconnect(clientId);
+            ServerStarted?.Invoke(connection);
         }
 
-        private void OnClientConnectedCallback(ulong clientId)
+        private void ServerStoppedEventHandler(INetworkConnection connection)
         {
-            CurrentState.OnClientConnected(clientId);
+            ServerStopped?.Invoke(connection);
         }
 
-        private void OnServerStarted()
+        private void ClientConnectedEventHandler(INetworkConnection connection)
         {
-            CurrentState.OnServerStarted();
+            int id = _server.AddClient(connection);
+            Debug.Log($"Client {id} connected");
+            _messanger.Write(Enums.Network.NetworkMessageTypes.SendId, id);
+            _server.WriteMessageTo(id, _messanger.WriteBuffer);
+            ClientConnected?.Invoke(id);
         }
 
-        private void ApprovalCheck(Unity.Netcode.NetworkManager.ConnectionApprovalRequest request, Unity.Netcode.NetworkManager.ConnectionApprovalResponse response)
+        private void ClientDisconnectedEventHandler(INetworkConnection connection)
         {
-            CurrentState.ApprovalCheck(request, response);
+            ClientDisconnected?.Invoke(0);
         }
 
-        private void OnTransportFailure()
+        private void ConnectedEventHandler(INetworkConnection connection)
         {
-            CurrentState.OnTransportFailure();
+            Connected?.Invoke(connection);
         }
 
-        private void OnServerStopped(bool _)
+        private void DisconnectedEventHandler(INetworkConnection connection)
         {
-            CurrentState.OnServerStopped();
+            int id = _client.Id;
+            _messanger.Write(Enums.Network.NetworkMessageTypes.Disconnect, id);
+            _client.WriteMessage(_messanger.WriteBuffer);
+            Debug.Log("Disconnected");
+            Disconnected?.Invoke(connection);
         }
         #endregion
     }

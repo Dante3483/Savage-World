@@ -14596,7 +14596,20 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1222118175}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1275708698}
+        m_TargetAssemblyTypeName: SavageWorld.Runtime.Network.ConnectionManager,
+          SavageWorld.Runtime
+        m_MethodName: StartClientIp
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1222118175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14871,8 +14884,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1275708696}
-  - component: {fileID: 1275708698}
+  - component: {fileID: 1275708699}
   - component: {fileID: 1275708697}
+  - component: {fileID: 1275708698}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -14888,8 +14902,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1275708695}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.00007998943, y: -0.000095427036, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14909,6 +14923,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _ipAddress: 127.0.0.1
   _port: 7777
+  _numberOfReconnectAttempts: 2
 --- !u!114 &1275708698
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14921,8 +14936,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91ee75be89b138542814ea90f28f7ebd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _networkManager: {fileID: 0}
-  _numberOfReconnectAttempts: 2
+  _networkManager: {fileID: 1275708699}
+--- !u!114 &1275708699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1275708695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 865c893fafdf1d24eb63ca20d6c05a5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _networkConfiguration: {fileID: 1275708697}
 --- !u!1 &1278595433
 GameObject:
   m_ObjectHideFlags: 0
@@ -17775,7 +17802,20 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1451972901}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1275708698}
+        m_TargetAssemblyTypeName: SavageWorld.Runtime.Network.ConnectionManager,
+          SavageWorld.Runtime
+        m_MethodName: StartServerIp
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1451972901
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21271,6 +21311,19 @@ MonoBehaviour:
       - m_Target: {fileID: 65123857}
         m_TargetAssemblyTypeName: MainMenuManager, SavageWorld.Runtime
         m_MethodName: BackToPrevState
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1275708698}
+        m_TargetAssemblyTypeName: SavageWorld.Runtime.Network.ConnectionManager,
+          SavageWorld.Runtime
+        m_MethodName: RequestShutdown
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

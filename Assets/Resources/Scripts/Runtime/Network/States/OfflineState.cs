@@ -1,14 +1,8 @@
-using SavageWorld.Runtime.Network.Methods;
-
 namespace SavageWorld.Runtime.Network.States
 {
     public class OfflineState : ConnectionStateBase
     {
-        #region Private fields
-
-        #endregion
-
-        #region Public fields
+        #region Fields
 
         #endregion
 
@@ -16,15 +10,23 @@ namespace SavageWorld.Runtime.Network.States
 
         #endregion
 
-        #region Method
-        public OfflineState(NetworkManager connectionManager) : base(connectionManager)
+        #region Events / Delegates
+
+        #endregion
+
+        #region Monobehaviour Methods
+
+        #endregion
+
+        #region Public Methods
+        public OfflineState(ConnectionManager connectionManager) : base(connectionManager)
         {
 
         }
 
         public override void Enter()
         {
-            _connectionManager.NetworkManagerOld.Shutdown();
+
         }
 
         public override void Exit()
@@ -32,18 +34,22 @@ namespace SavageWorld.Runtime.Network.States
 
         }
 
-        public override void StartClientIP(string playerName, string address, ushort port)
+        public override void StartClientIP(string address, ushort port)
         {
-            ConnectionMethodIP connectionMethod = new(address, port, _connectionManager, playerName);
-            _connectionManager.ClientReconnectingState.Configure(connectionMethod);
-            _connectionManager.ChangeState(_connectionManager.ClientConnectingState.Configure(connectionMethod));
+            _connectionManager.NetworkManager.ConfigureNetwork(address, port);
+            _connectionManager.ChangeState(_connectionManager.ClientConnectingState);
+
         }
 
-        public override void StartHostIP(string playerName, string address, ushort port)
+        public override void StartServerIp(string address, ushort port)
         {
-            ConnectionMethodIP connectionMethod = new(address, port, _connectionManager, playerName);
-            _connectionManager.ChangeState(_connectionManager.StartingHostState.Configure(connectionMethod));
+            _connectionManager.NetworkManager.ConfigureNetwork(address, port);
+            _connectionManager.ChangeState(_connectionManager.StartingServerState);
         }
+        #endregion
+
+        #region Private Methods
+
         #endregion
     }
 }

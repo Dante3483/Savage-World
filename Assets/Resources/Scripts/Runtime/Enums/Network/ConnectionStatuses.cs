@@ -1,4 +1,4 @@
-public enum ConnectStatus
+public enum ConnectionStatuses
 {
     Undefined,
     Success,                  //client successfully connected. This may also be a successful reconnect.
@@ -8,7 +8,7 @@ public enum ConnectStatus
     GenericDisconnect,        //server disconnected, but no specific reason given.
     Reconnecting,             //client lost connection and is attempting to reconnect.
     IncompatibleBuildType,    //client build type is incompatible with server.
-    HostEndedSession,         //host intentionally ended the session.
-    StartHostFailed,          // server failed to bind
-    StartClientFailed         // failed to connect to server and/or invalid network endpoint
+    ServerEndedSession,       //server intentionally ended the session.
+    StartServerFailed,        //server failed to bind
+    StartClientFailed         //failed to connect to server and/or invalid network endpoint
 }

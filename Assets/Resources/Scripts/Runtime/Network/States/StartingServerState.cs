@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SavageWorld.Runtime.Network.States
 {
-    public class ClientConnectingState : OnlineState
+    public class StartingServerState : OnlineState
     {
         #region Fields
 
@@ -22,14 +22,14 @@ namespace SavageWorld.Runtime.Network.States
         #endregion
 
         #region Public Methods
-        public ClientConnectingState(ConnectionManager connectionManager) : base(connectionManager)
+        public StartingServerState(ConnectionManager connectionManager) : base(connectionManager)
         {
 
         }
 
         public override void Enter()
         {
-            ConnectClientAsync();
+            StartHost();
         }
 
         public override void Exit()
@@ -37,32 +37,32 @@ namespace SavageWorld.Runtime.Network.States
 
         }
 
-        public override void OnConnected()
+        public override void OnServerStarted()
         {
-            _connectionManager.ChangeState(_connectionManager.ClientConnectedState);
+            _connectionManager.ChangeState(_connectionManager.ServerStartedState);
         }
 
-        public override void OnDisconnected()
+        public override void OnServerStopped()
         {
-            StartingClientFailed();
+            StartServerFailed();
         }
         #endregion
 
         #region Private Methods
-        private void ConnectClientAsync()
+        private void StartHost()
         {
             try
             {
-                _connectionManager.NetworkManager.Connect();
+                _connectionManager.NetworkManager.StartServer();
             }
             catch (Exception e)
             {
                 Debug.LogException(e);
-                StartingClientFailed();
+                StartServerFailed();
             }
         }
 
-        private void StartingClientFailed()
+        private void StartServerFailed()
         {
             _connectionManager.ChangeState(_connectionManager.OfflineState);
         }

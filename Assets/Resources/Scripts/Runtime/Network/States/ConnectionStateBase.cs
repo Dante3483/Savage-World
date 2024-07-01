@@ -3,7 +3,7 @@ namespace SavageWorld.Runtime.Network.States
     public abstract class ConnectionStateBase : StateBase
     {
         #region Private fields
-        protected NetworkManager _connectionManager;
+        protected ConnectionManager _connectionManager;
         #endregion
 
         #region Public fields
@@ -15,28 +15,28 @@ namespace SavageWorld.Runtime.Network.States
         #endregion
 
         #region Methods
-        public ConnectionStateBase(NetworkManager connectionManager)
+        public ConnectionStateBase(ConnectionManager connectionManager)
         {
             _connectionManager = connectionManager;
         }
 
-        public virtual void OnClientConnected(ulong clientId) { }
-
-        public virtual void OnClientDisconnect(ulong clientId) { }
-
         public virtual void OnServerStarted() { }
 
-        public virtual void StartClientIP(string playerName, string address, ushort port) { }
+        public virtual void OnServerStopped() { }
 
-        public virtual void StartHostIP(string playerName, string address, ushort port) { }
+        public virtual void OnClientConnected(int clientId) { }
+
+        public virtual void OnClientDisconnected(int clientId) { }
+
+        public virtual void OnConnected() { }
+
+        public virtual void OnDisconnected() { }
 
         public virtual void OnUserRequestedShutdown() { }
 
-        public virtual void ApprovalCheck(Unity.Netcode.NetworkManager.ConnectionApprovalRequest request, Unity.Netcode.NetworkManager.ConnectionApprovalResponse response) { }
+        public virtual void StartClientIP(string address, ushort port) { }
 
-        public virtual void OnTransportFailure() { }
-
-        public virtual void OnServerStopped() { }
+        public virtual void StartServerIp(string address, ushort port) { }
         #endregion
     }
 }

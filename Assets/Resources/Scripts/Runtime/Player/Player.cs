@@ -20,7 +20,6 @@ public class Player : MonoBehaviour
     private List<ItemQuantity> _starterItems;
 
     private WorldDataManager _worldDataManager;
-    private SenderDataToClient _senderDataToClient;
     #endregion
 
     #region Properties
@@ -48,7 +47,6 @@ public class Player : MonoBehaviour
     #region Monobehaviour Methods
     private void Awake()
     {
-        _senderDataToClient = SenderDataToClient.Instance;
         _worldDataManager = WorldDataManager.Instance;
         _playerInteractions = GetComponent<PlayerInteractions>();
         InitializeAsOwner();

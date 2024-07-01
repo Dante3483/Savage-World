@@ -2,11 +2,7 @@ namespace SavageWorld.Runtime.Network.States
 {
     public abstract class OnlineState : ConnectionStateBase
     {
-        #region Private fields
-
-        #endregion
-
-        #region Public fields
+        #region Fields
 
         #endregion
 
@@ -14,8 +10,16 @@ namespace SavageWorld.Runtime.Network.States
 
         #endregion
 
-        #region Methods
-        public OnlineState(NetworkManager connectionManager) : base(connectionManager)
+        #region Events / Delegates
+
+        #endregion
+
+        #region Monobehaviour Methods
+
+        #endregion
+
+        #region Public Methods
+        public OnlineState(ConnectionManager connectionManager) : base(connectionManager)
         {
 
         }
@@ -24,11 +28,10 @@ namespace SavageWorld.Runtime.Network.States
         {
             _connectionManager.ChangeState(_connectionManager.OfflineState);
         }
+        #endregion
 
-        public override void OnTransportFailure()
-        {
-            _connectionManager.ChangeState(_connectionManager.OfflineState);
-        }
+        #region Private Methods
+
         #endregion
     }
 }

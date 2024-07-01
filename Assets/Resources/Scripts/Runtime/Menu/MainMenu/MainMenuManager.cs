@@ -1,4 +1,3 @@
-using SavageWorld.Runtime.Network;
 using System.IO;
 
 public class MainMenuManager : Singleton<MainMenuManager>, IStateMachine<MainMenuStateBase>
@@ -140,7 +139,7 @@ public class MainMenuManager : Singleton<MainMenuManager>, IStateMachine<MainMen
         GameManager.Instance.PlayerName = playerName;
         if (GameManager.Instance.IsMultiplayer && GameManager.Instance.IsClient)
         {
-            NetworkManager.Instance.StartClientIp(playerName);
+            //ConnectionManager.Instance.StartClientIp(playerName);
             ChangeState(null);
             GameManager.Instance.ChangeState(GameManager.Instance.LoadingDataFromHostState);
         }

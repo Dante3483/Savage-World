@@ -1,27 +1,30 @@
-using System.Collections;
 using UnityEngine;
 
 namespace SavageWorld.Runtime.Network.States
 {
     public class ClientReconnectingState : ClientConnectingState
     {
-        #region Private fields
+        #region Fields
         private Coroutine _reconnectCoroutine;
         private int _numberOfAttempts;
         private const float _timeBeforeFirstAttempt = 1;
         private const float _timeBetweenAttempts = 5;
         #endregion
 
-        #region Public fields
-
-        #endregion
-
         #region Properties
 
         #endregion
 
-        #region Methods
-        public ClientReconnectingState(NetworkManager connectionManager) : base(connectionManager)
+        #region Events / Delegates
+
+        #endregion
+
+        #region Monobehaviour Methods
+
+        #endregion
+
+        #region Public Methods
+        public ClientReconnectingState(ConnectionManager connectionManager) : base(connectionManager)
         {
 
         }
@@ -29,7 +32,7 @@ namespace SavageWorld.Runtime.Network.States
         public override void Enter()
         {
             _numberOfAttempts = 0;
-            _reconnectCoroutine = _connectionManager.StartCoroutine(ReconnectCoroutine());
+            //_reconnectCoroutine = _connectionManager.StartCoroutine(ReconnectCoroutine());
         }
 
         public override void Exit()
@@ -41,80 +44,82 @@ namespace SavageWorld.Runtime.Network.States
             }
         }
 
-        public override void OnClientConnected(ulong _)
+        public override void OnConnected()
         {
             _connectionManager.ChangeState(_connectionManager.ClientConnectedState);
         }
 
-        public override void OnClientDisconnect(ulong _)
+        public override void OnDisconnected()
         {
-            var disconnectReason = _connectionManager.NetworkManagerOld.DisconnectReason;
-            if (_numberOfAttempts < _connectionManager.NumberOfReconnectAttempts)
-            {
-                if (string.IsNullOrEmpty(disconnectReason))
-                {
-                    _reconnectCoroutine = _connectionManager.StartCoroutine(ReconnectCoroutine());
-                }
-                else
-                {
-                    var connectStatus = JsonUtility.FromJson<ConnectStatus>(disconnectReason);
-                    switch (connectStatus)
-                    {
-                        case ConnectStatus.UserRequestedDisconnect:
-                        case ConnectStatus.HostEndedSession:
-                        case ConnectStatus.ServerFull:
-                        case ConnectStatus.IncompatibleBuildType:
-                            _connectionManager.ChangeState(_connectionManager.OfflineState);
-                            break;
-                        default:
-                            _reconnectCoroutine = _connectionManager.StartCoroutine(ReconnectCoroutine());
-                            break;
-                    }
-                }
-            }
-            else
-            {
-                _connectionManager.ChangeState(_connectionManager.OfflineState);
-            }
+            //var disconnectReason = _connectionManager.NetworkManagerOld.DisconnectReason;
+            //if (_numberOfAttempts < _connectionManager.NumberOfReconnectAttempts)
+            //{
+            //    if (string.IsNullOrEmpty(disconnectReason))
+            //    {
+            //        _reconnectCoroutine = _connectionManager.StartCoroutine(ReconnectCoroutine());
+            //    }
+            //    else
+            //    {
+            //        var connectStatus = JsonUtility.FromJson<ConnectStatus>(disconnectReason);
+            //        switch (connectStatus)
+            //        {
+            //            case ConnectStatus.UserRequestedDisconnect:
+            //            case ConnectStatus.HostEndedSession:
+            //            case ConnectStatus.ServerFull:
+            //            case ConnectStatus.IncompatibleBuildType:
+            //                _connectionManager.ChangeState(_connectionManager.OfflineState);
+            //                break;
+            //            default:
+            //                _reconnectCoroutine = _connectionManager.StartCoroutine(ReconnectCoroutine());
+            //                break;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    _connectionManager.ChangeState(_connectionManager.OfflineState);
+            //}
         }
+        #endregion
 
-        private IEnumerator ReconnectCoroutine()
-        {
-            if (_numberOfAttempts > 0)
-            {
-                yield return new WaitForSeconds(_timeBetweenAttempts);
-            }
+        #region Private Methods
+        //private IEnumerator ReconnectCoroutine()
+        //{
+        //    //if (_numberOfAttempts > 0)
+        //    //{
+        //    //    yield return new WaitForSeconds(_timeBetweenAttempts);
+        //    //}
 
-            Debug.Log("Lost connection to host, trying to reconnect...");
+        //    //Debug.Log("Lost connection to host, trying to reconnect...");
 
-            _connectionManager.NetworkManagerOld.Shutdown();
+        //    //_connectionManager.NetworkManagerOld.Shutdown();
 
-            yield return new WaitWhile(() => _connectionManager.NetworkManagerOld.ShutdownInProgress);
-            Debug.Log($"Reconnecting attempt {_numberOfAttempts + 1}/{_connectionManager.NumberOfReconnectAttempts}...");
+        //    //yield return new WaitWhile(() => _connectionManager.NetworkManagerOld.ShutdownInProgress);
+        //    //Debug.Log($"Reconnecting attempt {_numberOfAttempts + 1}/{_connectionManager.NumberOfReconnectAttempts}...");
 
-            if (_numberOfAttempts == 0)
-            {
-                yield return new WaitForSeconds(_timeBeforeFirstAttempt);
-            }
+        //    //if (_numberOfAttempts == 0)
+        //    //{
+        //    //    yield return new WaitForSeconds(_timeBeforeFirstAttempt);
+        //    //}
 
-            _numberOfAttempts++;
-            var reconnectingSetupTask = _connectionMethod.SetupClientReconnectionAsync();
-            yield return new WaitUntil(() => reconnectingSetupTask.IsCompleted);
+        //    //_numberOfAttempts++;
+        //    //var reconnectingSetupTask = _connectionMethod.SetupClientReconnectionAsync();
+        //    //yield return new WaitUntil(() => reconnectingSetupTask.IsCompleted);
 
-            if (!reconnectingSetupTask.IsFaulted && reconnectingSetupTask.Result.success)
-            {
-                var connectingTask = ConnectClientAsync();
-                yield return new WaitUntil(() => connectingTask.IsCompleted);
-            }
-            else
-            {
-                if (!reconnectingSetupTask.Result.shouldTryAgain)
-                {
-                    _numberOfAttempts = _connectionManager.NumberOfReconnectAttempts;
-                }
-                OnClientDisconnect(0);
-            }
-        }
+        //    //if (!reconnectingSetupTask.IsFaulted && reconnectingSetupTask.Result.success)
+        //    //{
+        //    //    var connectingTask = ConnectClientAsync();
+        //    //    yield return new WaitUntil(() => connectingTask.IsCompleted);
+        //    //}
+        //    //else
+        //    //{
+        //    //    if (!reconnectingSetupTask.Result.shouldTryAgain)
+        //    //    {
+        //    //        _numberOfAttempts = _connectionManager.NumberOfReconnectAttempts;
+        //    //    }
+        //    //    OnClientDisconnect(0);
+        //    //}
+        //}
         #endregion
     }
 }

@@ -11,13 +11,13 @@ public static class EventManager
     #endregion
 
     #region Events / Delegates
-    public static Action<ulong> PlayerConnectedAsClient;
+    public static Action<int> PlayerConnectedAsClient;
     public static Action BookOpened;
     public static Action BookClosed;
     #endregion
 
     #region Public Methods
-    public static void OnPlayerConnected(ulong clientId) => PlayerConnectedAsClient?.Invoke(clientId);
+    public static void OnPlayerConnected(int clientId) => PlayerConnectedAsClient?.Invoke(clientId);
 
     public static void OnBookOpened() => BookOpened?.Invoke();
 
