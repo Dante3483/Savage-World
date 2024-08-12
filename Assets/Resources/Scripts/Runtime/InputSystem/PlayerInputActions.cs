@@ -89,6 +89,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Toggle Developer Console"",
+                    ""type"": ""Button"",
+                    ""id"": ""516ed990-a0fc-442f-8f0e-5ec4bfa4f0be"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -212,6 +221,28 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Select Hotbar Cell By Scrolling"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9a749093-c225-47bf-82cd-e0ffa4a3af64"",
+                    ""path"": ""<Keyboard>/backquote"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale"",
+                    ""groups"": """",
+                    ""action"": ""Toggle Developer Console"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b50a87ca-600e-4704-9f5f-6cdf0a4f8327"",
+                    ""path"": ""<Keyboard>/slash"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=2)"",
+                    ""groups"": """",
+                    ""action"": ""Toggle Developer Console"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -295,6 +326,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_UI_OpenCloseResearch = m_UI.FindAction("Open/Close Research", throwIfNotFound: true);
         m_UI_SelectHotbarCellByKeyboard = m_UI.FindAction("Select Hotbar Cell By Keyboard", throwIfNotFound: true);
         m_UI_SelectHotbarCellByScrolling = m_UI.FindAction("Select Hotbar Cell By Scrolling", throwIfNotFound: true);
+        m_UI_ToggleDeveloperConsole = m_UI.FindAction("Toggle Developer Console", throwIfNotFound: true);
         // Interactions
         m_Interactions = asset.FindActionMap("Interactions", throwIfNotFound: true);
         m_Interactions_UseItemFromHotbar = m_Interactions.FindAction("Use Item From Hotbar", throwIfNotFound: true);
@@ -368,6 +400,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_OpenCloseResearch;
     private readonly InputAction m_UI_SelectHotbarCellByKeyboard;
     private readonly InputAction m_UI_SelectHotbarCellByScrolling;
+    private readonly InputAction m_UI_ToggleDeveloperConsole;
     public struct UIActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -379,6 +412,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @OpenCloseResearch => m_Wrapper.m_UI_OpenCloseResearch;
         public InputAction @SelectHotbarCellByKeyboard => m_Wrapper.m_UI_SelectHotbarCellByKeyboard;
         public InputAction @SelectHotbarCellByScrolling => m_Wrapper.m_UI_SelectHotbarCellByScrolling;
+        public InputAction @ToggleDeveloperConsole => m_Wrapper.m_UI_ToggleDeveloperConsole;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -409,6 +443,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @SelectHotbarCellByScrolling.started += instance.OnSelectHotbarCellByScrolling;
             @SelectHotbarCellByScrolling.performed += instance.OnSelectHotbarCellByScrolling;
             @SelectHotbarCellByScrolling.canceled += instance.OnSelectHotbarCellByScrolling;
+            @ToggleDeveloperConsole.started += instance.OnToggleDeveloperConsole;
+            @ToggleDeveloperConsole.performed += instance.OnToggleDeveloperConsole;
+            @ToggleDeveloperConsole.canceled += instance.OnToggleDeveloperConsole;
         }
 
         private void UnregisterCallbacks(IUIActions instance)
@@ -434,6 +471,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @SelectHotbarCellByScrolling.started -= instance.OnSelectHotbarCellByScrolling;
             @SelectHotbarCellByScrolling.performed -= instance.OnSelectHotbarCellByScrolling;
             @SelectHotbarCellByScrolling.canceled -= instance.OnSelectHotbarCellByScrolling;
+            @ToggleDeveloperConsole.started -= instance.OnToggleDeveloperConsole;
+            @ToggleDeveloperConsole.performed -= instance.OnToggleDeveloperConsole;
+            @ToggleDeveloperConsole.canceled -= instance.OnToggleDeveloperConsole;
         }
 
         public void RemoveCallbacks(IUIActions instance)
@@ -522,6 +562,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnOpenCloseResearch(InputAction.CallbackContext context);
         void OnSelectHotbarCellByKeyboard(InputAction.CallbackContext context);
         void OnSelectHotbarCellByScrolling(InputAction.CallbackContext context);
+        void OnToggleDeveloperConsole(InputAction.CallbackContext context);
     }
     public interface IInteractionsActions
     {

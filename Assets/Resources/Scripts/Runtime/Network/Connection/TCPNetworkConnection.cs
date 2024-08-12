@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -78,7 +79,7 @@ namespace SavageWorld.Runtime.Network.Connection
                 _port = port;
                 _server = new(_ipAddress, _port);
                 _server.Start();
-                _serverLoopTask = Task.Run(ServerLoop);
+                _serverLoopTask = Task.Run(ListenerLoop);
                 ServerStarted?.Invoke(this);
             }
             catch (Exception e)
@@ -153,14 +154,22 @@ namespace SavageWorld.Runtime.Network.Connection
         {
             if (!_isReading && _client.Connected && _client.GetStream().DataAvailable)
             {
-                _client.GetStream().BeginRead(buffer, 0, buffer.Length, ReadMessageCallback, callback);
                 _isReading = true;
+                _client.GetStream().BeginRead(buffer, 0, buffer.Length, ReadMessageCallback, callback);
             }
         }
 
         public void Write(byte[] buffer, Action callback = null)
         {
             _client.GetStream().BeginWrite(buffer, 0, buffer.Length, WriteMessageCallback, callback);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder strinBuilder = new();
+            strinBuilder.Append("Ip address: ").Append(_ipAddress).AppendLine();
+            strinBuilder.Append("Port: ").Append(_port);
+            return strinBuilder.ToString();
         }
         #endregion
 
@@ -180,7 +189,7 @@ namespace SavageWorld.Runtime.Network.Connection
             _isReading = false;
         }
 
-        private async Task ServerLoop()
+        private async Task ListenerLoop()
         {
             try
             {

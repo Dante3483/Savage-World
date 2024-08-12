@@ -1,4 +1,6 @@
+using SavageWorld.Runtime.Console;
 using SavageWorld.Runtime.Enums.Network;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -52,8 +54,8 @@ namespace SavageWorld.Runtime.Network.Messages
         #region Public Methods
         public NetworkMessanger()
         {
-            _writeBuffer = new byte[1024];
-            _readBuffer = new byte[1024];
+            _writeBuffer = new byte[32];
+            _readBuffer = new byte[32];
             _writeMemoryStream = new(_writeBuffer);
             _readMemoryStream = new(_readBuffer);
             _binaryWriter = new(_writeMemoryStream);
@@ -61,23 +63,42 @@ namespace SavageWorld.Runtime.Network.Messages
             InitializeMessages();
         }
 
-        public void Write(NetworkMessageTypes messageType, int number1 = 0)
+        public void Write(NetworkMessageTypes messageType, MessageData messageData)
         {
             if (_messageByType.TryGetValue(messageType, out NetworkMessageBase message))
             {
                 _binaryWriter.BaseStream.Position = 0;
-                message.Write(number1);
+                message.Write(messageData);
+                if (messageType != NetworkMessageTypes.SendPosition)
+                {
+                    GameConsole.LogText(messageType.ToString(), Color.yellow);
+                }
             }
+        }
+
+        public bool TryRead()
+        {
+            try
+            {
+                Read();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.Message);
+                return false;
+            }
+            return true;
         }
 
         public void Read()
         {
             _binaryReader.BaseStream.Position = 0;
             NetworkMessageTypes messageType = (NetworkMessageTypes)_binaryReader.ReadByte();
-            Debug.Log($"Read message: {messageType}");
-            if (_messageByType.TryGetValue(messageType, out NetworkMessageBase message))
+            NetworkMessageBase message = _messageByType[messageType];
+            message.Read();
+            if (messageType != NetworkMessageTypes.SendPosition)
             {
-                message.Read();
+                GameConsole.LogText(messageType.ToString(), Color.yellow);
             }
         }
         #endregion
@@ -87,8 +108,10 @@ namespace SavageWorld.Runtime.Network.Messages
         {
             _messageByType = new()
             {
-                { NetworkMessageTypes.SendId, new SendIdMessage(_binaryWriter, _binaryReader) },
-                { NetworkMessageTypes.Disconnect, new DisconnectMessage(_binaryWriter, _binaryReader) }
+                { NetworkMessageTypes.SendClientId, new SendClientIdMessage(_binaryWriter, _binaryReader) },
+                { NetworkMessageTypes.CreatePlayer, new CreatePlayerMessage(_binaryWriter, _binaryReader) },
+                { NetworkMessageTypes.Disconnect, new DisconnectMessage(_binaryWriter, _binaryReader) },
+                { NetworkMessageTypes.SendPosition, new SendPositionMessage(_binaryWriter, _binaryReader) },
             };
         }
         #endregion

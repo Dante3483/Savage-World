@@ -3,7 +3,7 @@ using System.IO;
 
 namespace SavageWorld.Runtime.Network.Messages
 {
-    public class DisconnectMessage : NetworkMessageBase
+    public class SendClientIdMessage : NetworkMessageBase
     {
         #region Fields
 
@@ -14,7 +14,7 @@ namespace SavageWorld.Runtime.Network.Messages
         {
             get
             {
-                return NetworkMessageTypes.Disconnect;
+                return NetworkMessageTypes.SendClientId;
             }
         }
         #endregion
@@ -24,7 +24,7 @@ namespace SavageWorld.Runtime.Network.Messages
         #endregion
 
         #region Public Methods
-        public DisconnectMessage(BinaryWriter writer, BinaryReader reader) : base(writer, reader)
+        public SendClientIdMessage(BinaryWriter writer, BinaryReader reader) : base(writer, reader)
         {
 
         }
@@ -32,18 +32,18 @@ namespace SavageWorld.Runtime.Network.Messages
 
         #region Private Methods
         /// <summary>
-        /// Server read client's id and disconnect it
+        /// Client set its id
         /// </summary>
         protected override void ReadData()
         {
             int id = _reader.ReadInt32();
-            NetworkManager.Instance.Server.DisconnectClient(id);
+            NetworkManager.Instance.Client.SetId(id);
         }
 
         /// <summary>
-        /// Client send id to server
+        /// Server writes client's id
         /// </summary>
-        /// <param name="messageData">Client's id</param>
+        /// <param name="messageData">client id</param>
         protected override void WriteData(MessageData messageData)
         {
             _writer.Write(messageData.IntNumber1);

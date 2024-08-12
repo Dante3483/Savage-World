@@ -2,7 +2,9 @@ namespace SavageWorld.Runtime.Enums.Network
 {
     public enum NetworkMessageTypes : byte
     {
-        SendId,
+        SendClientId,
+        CreatePlayer,
         Disconnect,
+        SendPosition,
     }
 }

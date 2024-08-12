@@ -53,7 +53,7 @@ namespace SavageWorld.Runtime.Network.States
         {
             try
             {
-                _connectionManager.NetworkManager.Connect();
+                _connectionManager.NetworkManager.ConnectToServer();
             }
             catch (Exception e)
             {

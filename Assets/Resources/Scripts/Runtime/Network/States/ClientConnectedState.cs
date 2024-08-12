@@ -41,7 +41,7 @@ namespace SavageWorld.Runtime.Network.States
 
         public override void OnUserRequestedShutdown()
         {
-            _connectionManager.NetworkManager.Disconnect();
+            _connectionManager.NetworkManager.DisconnectFromServer();
             _connectionManager.ChangeState(_connectionManager.OfflineState);
         }
         #endregion

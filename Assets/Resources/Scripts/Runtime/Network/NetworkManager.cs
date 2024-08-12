@@ -1,6 +1,9 @@
+using SavageWorld.Runtime.Console;
+using SavageWorld.Runtime.Enums.Network;
 using SavageWorld.Runtime.Network.Connection;
 using SavageWorld.Runtime.Network.Messages;
 using System;
+using TMPro;
 using UnityEngine;
 
 namespace SavageWorld.Runtime.Network
@@ -11,6 +14,10 @@ namespace SavageWorld.Runtime.Network
         #region Fields
         [SerializeField]
         private NetworkConfiguration _networkConfiguration;
+        [SerializeField]
+        private NetworkObjects _networkObjects;
+        [SerializeField]
+        private TMP_InputField _ipAddressInputField;
         private NetworkServer _server;
         private NetworkClient _client;
         private NetworkMessanger _messanger;
@@ -40,6 +47,12 @@ namespace SavageWorld.Runtime.Network
                 return _client;
             }
         }
+
+        public bool IsServer => _server.IsActive;
+
+        public bool IsHost => _server.IsActive && _client.IsActive;
+
+        public bool IsClient => _client.IsActive;
         #endregion
 
         #region Events / Delegates
@@ -70,7 +83,7 @@ namespace SavageWorld.Runtime.Network
             }
             if (_client.IsActive)
             {
-                _client.Disconnect();
+                DisconnectFromServer();
                 _client = null;
             }
         }
@@ -80,6 +93,18 @@ namespace SavageWorld.Runtime.Network
         public void ConfigureNetwork(string ipAddress, ushort port)
         {
             _networkConfiguration.Configure(ipAddress, port);
+        }
+
+        public void StartHost()
+        {
+            StartServer();
+            GameConsole.LogText("Server started", Color.green);
+        }
+
+        public void StopHost()
+        {
+            StopServer();
+            GameConsole.LogText("Server stopped", Color.green);
         }
 
         public void StartServer()
@@ -92,7 +117,7 @@ namespace SavageWorld.Runtime.Network
                 connection.ClientConnected += ClientConnectedEventHandler;
                 connection.ClientDisconnected += ClientDisconnectedEventHandler;
                 _server.SetConnection(connection, _networkConfiguration.MaxClients);
-                _server.Start(_networkConfiguration.IpAddress, _networkConfiguration.Port);
+                _server.Start(_ipAddressInputField.text, _networkConfiguration.Port);
             }
         }
 
@@ -104,7 +129,7 @@ namespace SavageWorld.Runtime.Network
             }
         }
 
-        public void Connect()
+        public void ConnectToServer()
         {
             if (!_client.IsActive)
             {
@@ -112,16 +137,62 @@ namespace SavageWorld.Runtime.Network
                 connection.Connected += ConnectedEventHandler;
                 connection.Disconnected += DisconnectedEventHandler;
                 _client.SetConnection(connection);
-                _client.Connect(_networkConfiguration.IpAddress, _networkConfiguration.Port);
+                _client.Connect(_ipAddressInputField.text, _networkConfiguration.Port);
             }
         }
 
-        public void Disconnect()
+        public void DisconnectFromServer()
         {
             if (_client is not null)
             {
-                _client.Disconnect();
+                _messanger.Write(NetworkMessageTypes.Disconnect, new MessageData { IntNumber1 = _client.Id });
+                _client.WriteMessage(_messanger.WriteBuffer, _client.Disconnect);
             }
+        }
+
+        public void Broadcast(NetworkMessageTypes messageType, int ignoreClientId = -1)
+        {
+            if (IsHost)
+            {
+                _server.Broadcast(_messanger.WriteBuffer, ignoreClientId);
+            }
+        }
+
+        public void SendMessageToClient(int clientId, NetworkMessageTypes messageType, MessageData messageData)
+        {
+            if (IsClient)
+            {
+                return;
+            }
+        }
+
+        public void SendMessageToServer(NetworkMessageTypes messageType, MessageData messageData)
+        {
+            if (IsServer)
+            {
+                return;
+            }
+            _messanger.Write(messageType, messageData);
+            _client.WriteMessage(_messanger.WriteBuffer);
+        }
+
+        public void CreatePlayer(long id, bool isOwner)
+        {
+            _networkObjects.CreatePlayerClient(id, isOwner);
+        }
+
+        public void UpdateObjectPosition(long id, float x, float y)
+        {
+            _networkObjects.UpdatePosition(id, x, y);
+        }
+
+        public string GetServerInfo()
+        {
+            if (_server.IsActive)
+            {
+                return _server.GetInfo();
+            }
+            return "Server is not started";
         }
         #endregion
 
@@ -138,11 +209,21 @@ namespace SavageWorld.Runtime.Network
 
         private void ClientConnectedEventHandler(INetworkConnection connection)
         {
-            int id = _server.AddClient(connection);
-            Debug.Log($"Client {id} connected");
-            _messanger.Write(Enums.Network.NetworkMessageTypes.SendId, id);
-            _server.WriteMessageTo(id, _messanger.WriteBuffer);
-            ClientConnected?.Invoke(id);
+            int clientId = _server.AddClient(connection);
+            _messanger.Write(NetworkMessageTypes.SendClientId, new MessageData { IntNumber1 = clientId });
+            connection.Write(_messanger.WriteBuffer);
+            if (clientId == -1)
+            {
+                connection.Disconnect();
+            }
+            else
+            {
+                long playerId = _networkObjects.CreatePlayerServer();
+                _messanger.Write(NetworkMessageTypes.CreatePlayer, new MessageData { LongNumber1 = playerId, Bool1 = true });
+                connection.Write(_messanger.WriteBuffer);
+                GameConsole.LogText($"Client {clientId} connected");
+                ClientConnected?.Invoke(clientId);
+            }
         }
 
         private void ClientDisconnectedEventHandler(INetworkConnection connection)
@@ -157,10 +238,6 @@ namespace SavageWorld.Runtime.Network
 
         private void DisconnectedEventHandler(INetworkConnection connection)
         {
-            int id = _client.Id;
-            _messanger.Write(Enums.Network.NetworkMessageTypes.Disconnect, id);
-            _client.WriteMessage(_messanger.WriteBuffer);
-            Debug.Log("Disconnected");
             Disconnected?.Invoke(connection);
         }
         #endregion

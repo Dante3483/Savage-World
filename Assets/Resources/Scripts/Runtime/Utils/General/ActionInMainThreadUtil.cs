@@ -1,28 +1,29 @@
 using System;
-using UnityEngine;
+using System.Threading;
 
-public class ActionInMainThreadUtil : MonoBehaviour
+public class ActionInMainThreadUtil : Singleton<ActionInMainThreadUtil>
 {
-    #region Private fields
+    #region Fields
     private Action _action;
     private bool _isActionComplete;
-    #endregion
-
-    #region Public fields
-    public static ActionInMainThreadUtil Instance;
+    private Thread _mainThread;
     #endregion
 
     #region Properties
 
     #endregion
 
-    #region Methods
-    private void Awake()
+    #region Events / Delegates
+
+    #endregion
+
+    #region Monobehaviour Methods
+    private void Start()
     {
-        Instance = this;
+        _mainThread = Thread.CurrentThread;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (_action != null)
         {
@@ -34,13 +35,28 @@ public class ActionInMainThreadUtil : MonoBehaviour
             }
         }
     }
-    
+    #endregion
+
+    #region Public Methods
     public void Invoke(Action action)
     {
-        _isActionComplete = false;
-        _action = action;
-        while (!_isActionComplete) ;
+        if (IsMainThread())
+        {
+            action?.Invoke();
+        }
+        else
+        {
+            _isActionComplete = false;
+            _action = action;
+            while (!_isActionComplete) ;
+        }
     }
     #endregion
 
+    #region Private Methods
+    private bool IsMainThread()
+    {
+        return _mainThread.Equals(Thread.CurrentThread);
+    }
+    #endregion
 }

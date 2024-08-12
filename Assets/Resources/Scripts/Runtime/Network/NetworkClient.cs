@@ -1,5 +1,6 @@
 using SavageWorld.Runtime.Network.Connection;
 using SavageWorld.Runtime.Network.Messages;
+using SavageWorld.Runtime.Network.Objects;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -12,6 +13,7 @@ namespace SavageWorld.Runtime.Network
         private NetworkMessanger _messanger;
         private INetworkConnection _connection;
         private int _id;
+        private GameObject _player;
         #endregion
 
         #region Properties
@@ -24,6 +26,20 @@ namespace SavageWorld.Runtime.Network
                 return _id;
             }
         }
+        public GameObject Player
+        {
+            get
+            {
+                return _player;
+            }
+
+            set
+            {
+                _player = value;
+            }
+        }
+
+        public NetworkTransform _playerNetworkTransform;
         #endregion
 
         #region Events / Delegates
@@ -51,7 +67,6 @@ namespace SavageWorld.Runtime.Network
             {
                 _id = id;
             }
-            Debug.Log(id);
         }
 
         public void Connect(string ipAddress, int port)
@@ -80,14 +95,15 @@ namespace SavageWorld.Runtime.Network
         #region Private Methods
         private void Loop()
         {
+            Action action = () =>
+            {
+                _messanger.TryRead();
+            };
             try
             {
                 while (IsActive)
                 {
-                    ReadMessage(_messanger.ReadBuffer, () =>
-                    {
-                        _messanger.Read();
-                    });
+                    ReadMessage(_messanger.ReadBuffer, action);
                 }
             }
             catch (Exception e)

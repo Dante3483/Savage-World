@@ -43,7 +43,7 @@ namespace SavageWorld.Runtime.Network
         public void Start(string ipAddress, int port)
         {
             _connection.Start(ipAddress, port);
-            Task.Run(Loop);
+            Task.Run(ReadMessageLoop);
         }
 
         public void Stop()
@@ -80,10 +80,14 @@ namespace SavageWorld.Runtime.Network
             return -1;
         }
 
-        public void Broadcast(byte[] buffer, Action callback = null)
+        public void Broadcast(byte[] buffer, int ignoreClientId = -1, Action callback = null)
         {
             for (int i = 0; i < _maxClients; i++)
             {
+                if (ignoreClientId == i)
+                {
+                    continue;
+                }
                 WriteMessageTo(i, buffer, callback);
             }
         }
@@ -113,19 +117,25 @@ namespace SavageWorld.Runtime.Network
                 client.WriteMessage(buffer, callback);
             }
         }
+
+        public string GetInfo()
+        {
+            return _connection.ToString();
+        }
         #endregion
 
         #region Private Methods
-        private void Loop()
+        private void ReadMessageLoop()
         {
+            Action action = () =>
+            {
+                _messanger.TryRead();
+            };
             try
             {
                 while (IsActive)
                 {
-                    ReadMessageFromAll(_messanger.ReadBuffer, () =>
-                    {
-                        _messanger.Read();
-                    });
+                    ReadMessageFromAll(_messanger.ReadBuffer, action);
                 }
             }
             catch (Exception e)

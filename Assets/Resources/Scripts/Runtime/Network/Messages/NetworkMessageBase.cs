@@ -1,5 +1,7 @@
 using SavageWorld.Runtime.Enums.Network;
+using System;
 using System.IO;
+using UnityEngine;
 
 namespace SavageWorld.Runtime.Network.Messages
 {
@@ -25,37 +27,44 @@ namespace SavageWorld.Runtime.Network.Messages
             _reader = reader;
         }
 
-        public bool Write(int number1)
+        public bool Write(MessageData messageData)
         {
-            if (!WriteType())
+            try
             {
+                WriteType();
+                WriteData(messageData);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.Log($"ERROR: {e.Message}");
                 return false;
             }
-            return WriteData(number1);
         }
 
         public bool Read()
         {
-            return ReadData();
+            try
+            {
+                ReadData();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.Log($"ERROR: {e.Message}");
+                return false;
+            }
         }
         #endregion
 
         #region Private Methods
-        protected abstract bool WriteData(int number1);
+        protected abstract void WriteData(MessageData messageData);
 
-        protected abstract bool ReadData();
+        protected abstract void ReadData();
 
-        protected bool WriteType()
+        protected void WriteType()
         {
-            try
-            {
-                _writer.Write((byte)MessageType);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            _writer.Write((byte)MessageType);
         }
         #endregion
     }
