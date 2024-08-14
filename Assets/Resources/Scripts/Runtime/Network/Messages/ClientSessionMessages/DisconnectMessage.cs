@@ -37,7 +37,7 @@ namespace SavageWorld.Runtime.Network.Messages
         protected override void ReadData()
         {
             int id = _reader.ReadInt32();
-            NetworkManager.Instance.Server.DisconnectClient(id);
+            ActionInMainThreadUtil.Instance.Invoke(() => NetworkManager.Instance.DisconnectClient(id));
         }
 
         /// <summary>

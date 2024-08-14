@@ -14,6 +14,7 @@ namespace SavageWorld.Runtime.Network.Connection
         private TcpClient _client;
         private IPAddress _ipAddress;
         private int _port;
+        private bool _isWriting;
         private bool _isReading;
         private Task _serverLoopTask;
         #endregion
@@ -155,13 +156,15 @@ namespace SavageWorld.Runtime.Network.Connection
             if (!_isReading && _client.Connected && _client.GetStream().DataAvailable)
             {
                 _isReading = true;
-                _client.GetStream().BeginRead(buffer, 0, buffer.Length, ReadMessageCallback, callback);
+                _client.GetStream().Read(buffer, 0, buffer.Length);
+                _isReading = false;
+                callback();
             }
         }
 
-        public void Write(byte[] buffer, Action callback = null)
+        public void Write(byte[] buffer)
         {
-            _client.GetStream().BeginWrite(buffer, 0, buffer.Length, WriteMessageCallback, callback);
+            _client.GetStream().Write(buffer, 0, buffer.Length);
         }
 
         public override string ToString()
@@ -174,21 +177,6 @@ namespace SavageWorld.Runtime.Network.Connection
         #endregion
 
         #region Private Methods
-        private void WriteMessageCallback(IAsyncResult result)
-        {
-            Action callback = (Action)result.AsyncState;
-            _client.GetStream().EndWrite(result);
-            callback?.Invoke();
-        }
-
-        private void ReadMessageCallback(IAsyncResult result)
-        {
-            Action callback = (Action)result.AsyncState;
-            _client.GetStream().EndRead(result);
-            callback?.Invoke();
-            _isReading = false;
-        }
-
         private async Task ListenerLoop()
         {
             try

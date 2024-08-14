@@ -1934,8 +1934,6 @@ MonoBehaviour:
     _playerPrefab: {fileID: 5733020239419572106, guid: 8f294ee6cd31cab458cbf7db900af696, type: 3}
     _listOfNetworkObjects: []
     _objectsParent: {fileID: 972452265}
-  _player: {fileID: 4066138669493907250, guid: 8f294ee6cd31cab458cbf7db900af696, type: 3}
-  _listOfNetworkObjects: []
   _ipAddressInputField: {fileID: 1703429891}
 --- !u!114 &972452264
 MonoBehaviour:
@@ -1959,7 +1957,7 @@ Transform:
   m_GameObject: {fileID: 972452261}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 363.47806, y: 762.06805, z: -2.6859636}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

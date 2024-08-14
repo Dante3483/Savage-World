@@ -8,19 +8,15 @@ namespace SavageWorld.Runtime.Network.Objects
         [SerializeField]
         private long _id;
         [SerializeField]
+        private NetworkObjectTypes _type;
+        [SerializeField]
+        private Vector2 _position;
+        [SerializeField]
         private bool _isOwner = false;
         private NetworkTransform _networkTransform;
         #endregion
 
         #region Properties
-        public bool IsOwner
-        {
-            get
-            {
-                return _isOwner;
-            }
-        }
-
         public long Id
         {
             get
@@ -31,6 +27,45 @@ namespace SavageWorld.Runtime.Network.Objects
             set
             {
                 _id = value;
+            }
+        }
+
+        public NetworkObjectTypes Type
+        {
+            get
+            {
+                return _type;
+            }
+
+            set
+            {
+                _type = value;
+            }
+        }
+
+        public bool IsOwner
+        {
+            get
+            {
+                return _isOwner;
+            }
+
+            set
+            {
+                _isOwner = value;
+            }
+        }
+
+        public Vector2 Position
+        {
+            get
+            {
+                return _position;
+            }
+
+            set
+            {
+                _position = value;
             }
         }
         #endregion
@@ -49,16 +84,32 @@ namespace SavageWorld.Runtime.Network.Objects
             _networkTransform = GetComponent<NetworkTransform>();
         }
 
-        public void SetOwner(bool value)
+        private void Update()
         {
-            _isOwner = value;
+            _position = transform.position;
         }
 
         public void UpdatePosition(float x, float y)
         {
             if (_networkTransform != null)
             {
-                _networkTransform.NextPosition = new(x, y);
+                _networkTransform.NetworkPosition = new(x, y);
+            }
+        }
+
+        public void UpdateRotation(float x, float y)
+        {
+            if (_networkTransform != null)
+            {
+                _networkTransform.NetworkRotation = new(x, y);
+            }
+        }
+
+        public void UpdateScale(float x, float y)
+        {
+            if (_networkTransform != null)
+            {
+                _networkTransform.NetworkScale = new(x, y);
             }
         }
         #endregion

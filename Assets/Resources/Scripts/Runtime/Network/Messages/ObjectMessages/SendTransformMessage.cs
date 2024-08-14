@@ -3,7 +3,7 @@ using System.IO;
 
 namespace SavageWorld.Runtime.Network.Messages
 {
-    public class SendPositionMessage : NetworkMessageBase
+    public class SendTransformMessage : NetworkMessageBase
     {
         #region Fields
         private NetworkManager _networkManager;
@@ -14,7 +14,7 @@ namespace SavageWorld.Runtime.Network.Messages
         {
             get
             {
-                return NetworkMessageTypes.SendPosition;
+                return NetworkMessageTypes.SendTransform;
             }
         }
         #endregion
@@ -24,7 +24,7 @@ namespace SavageWorld.Runtime.Network.Messages
         #endregion
 
         #region Public Methods
-        public SendPositionMessage(BinaryWriter writer, BinaryReader reader) : base(writer, reader)
+        public SendTransformMessage(BinaryWriter writer, BinaryReader reader) : base(writer, reader)
         {
             _networkManager = NetworkManager.Instance;
         }
@@ -33,14 +33,35 @@ namespace SavageWorld.Runtime.Network.Messages
         #region Private Methods
         protected override void ReadData()
         {
+            byte transformType = _reader.ReadByte();
             long id = _reader.ReadInt64();
             float x = _reader.ReadSingle();
             float y = _reader.ReadSingle();
-            _networkManager.UpdateObjectPosition(id, x, y);
+            switch (transformType)
+            {
+                case 1:
+                    {
+                        _networkManager.NetworkObjects.UpdatePosition(id, x, y);
+                    }
+                    break;
+                case 2:
+                    {
+                        _networkManager.NetworkObjects.UpdateRotation(id, x, y);
+                    }
+                    break;
+                case 3:
+                    {
+                        _networkManager.NetworkObjects.UpdateScale(id, x, y);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
         protected override void WriteData(MessageData messageData)
         {
+            _writer.Write((byte)messageData.IntNumber1);
             _writer.Write(messageData.LongNumber1);
             _writer.Write(messageData.FloatNumber1);
             _writer.Write(messageData.FloatNumber2);

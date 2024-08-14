@@ -20,9 +20,9 @@ namespace SavageWorld.Runtime.Network.States
             _connectionManager = connectionManager;
         }
 
-        public virtual void OnHostStarted() { }
+        public virtual void OnServerStarted() { }
 
-        public virtual void OnHostStopped() { }
+        public virtual void OnServerStopped() { }
 
         public virtual void OnClientConnected(int clientId) { }
 

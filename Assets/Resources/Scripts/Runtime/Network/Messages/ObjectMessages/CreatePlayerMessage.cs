@@ -3,7 +3,7 @@ using System.IO;
 
 namespace SavageWorld.Runtime.Network.Messages
 {
-    public class CreatePlayerMessage : NetworkMessageBase
+    public class CreatePlayerMessage : CreateObjectMessageBase
     {
         #region Fields
 
@@ -26,6 +26,7 @@ namespace SavageWorld.Runtime.Network.Messages
         #region Public Methods
         public CreatePlayerMessage(BinaryWriter writer, BinaryReader reader) : base(writer, reader)
         {
+
         }
         #endregion
 
@@ -37,7 +38,9 @@ namespace SavageWorld.Runtime.Network.Messages
         {
             long id = _reader.ReadInt64();
             bool isOwner = _reader.ReadBoolean();
-            NetworkManager.Instance.CreatePlayer(id, isOwner);
+            float x = _reader.ReadSingle();
+            float y = _reader.ReadSingle();
+            NetworkManager.Instance.NetworkObjects.CreatePlayerClient(id, new(x, y), isOwner);
         }
 
         /// <summary>
@@ -48,6 +51,8 @@ namespace SavageWorld.Runtime.Network.Messages
         {
             _writer.Write(messageData.LongNumber1);
             _writer.Write(messageData.Bool1);
+            _writer.Write(messageData.FloatNumber1);
+            _writer.Write(messageData.FloatNumber2);
         }
         #endregion
     }

@@ -5,6 +5,7 @@ namespace SavageWorld.Runtime.Enums.Network
         SendClientId,
         CreatePlayer,
         Disconnect,
-        SendPosition,
+
+        SendTransform
     }
 }

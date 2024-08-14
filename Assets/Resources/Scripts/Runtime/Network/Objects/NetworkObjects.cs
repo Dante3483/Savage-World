@@ -21,11 +21,11 @@ namespace SavageWorld.Runtime.Network
         #endregion
 
         #region Properties
-        public List<NetworkObject> ListOfNetworkObjects
+        public Dictionary<long, NetworkObject> ObjectsById
         {
             get
             {
-                return _listOfNetworkObjects;
+                return _objectsById;
             }
         }
         #endregion
@@ -41,20 +41,39 @@ namespace SavageWorld.Runtime.Network
             _objectIDGenerator = new();
         }
 
-        public long CreatePlayerServer()
+        public void Reset()
         {
-            NetworkObject player = CreatePlayer(false);
-            long id = GetRandomId(player);
+            foreach (NetworkObject obj in _objectsById.Values)
+            {
+                GameObject.Destroy(obj.gameObject);
+            }
+            _objectsById.Clear();
+            _objectIDGenerator = new();
+        }
+
+        public long CreatePlayerServer(bool isOwner = false)
+        {
+            NetworkObject player = CreatePlayer(Vector2.zero, isOwner);
+            long id = GetObjectId(player);
             player.Id = id;
             _objectsById[id] = player;
             return id;
         }
 
-        public void CreatePlayerClient(long id, bool isOwner = false)
+        public void CreatePlayerClient(long id, Vector2 position, bool isOwner = false)
         {
-            NetworkObject player = CreatePlayer(isOwner);
+            NetworkObject player = CreatePlayer(position, isOwner);
             player.Id = id;
             _objectsById[id] = player;
+        }
+
+        public void DestroyPlayer(long id)
+        {
+            if (_objectsById.TryGetValue(id, out NetworkObject palyer))
+            {
+                GameObject.Destroy(palyer.gameObject);
+                _objectsById.Remove(id);
+            }
         }
 
         public void UpdatePosition(long id, float x, float y)
@@ -64,22 +83,40 @@ namespace SavageWorld.Runtime.Network
                 obj.UpdatePosition(x, y);
             }
         }
+
+        public void UpdateRotation(long id, float x, float y)
+        {
+            if (_objectsById.TryGetValue(id, out NetworkObject obj))
+            {
+                obj.UpdateRotation(x, y);
+            }
+        }
+
+        public void UpdateScale(long id, float x, float y)
+        {
+            if (_objectsById.TryGetValue(id, out NetworkObject obj))
+            {
+                obj.UpdateScale(x, y);
+            }
+        }
         #endregion
 
         #region Private Methods
-        private NetworkObject CreatePlayer(bool isOwner = false)
+        private NetworkObject CreatePlayer(Vector2 position, bool isOwner = false)
         {
             NetworkObject player = null;
             ActionInMainThreadUtil.Instance.Invoke(() =>
             {
-                player = GameObject.Instantiate(_playerPrefab, Vector3.zero, Quaternion.identity);
+                player = GameObject.Instantiate(_playerPrefab, position, Quaternion.identity);
                 player.transform.SetParent(_objectsParent);
+                player.UpdatePosition(position.x, position.y);
             });
-            player.SetOwner(isOwner);
+            player.IsOwner = isOwner;
+            player.Type = NetworkObjectTypes.Player;
             return player;
         }
 
-        private long GetRandomId(object obj)
+        private long GetObjectId(object obj)
         {
             return _objectIDGenerator.GetId(obj, out bool firstTime);
         }

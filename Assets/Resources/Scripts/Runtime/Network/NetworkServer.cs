@@ -80,7 +80,12 @@ namespace SavageWorld.Runtime.Network
             return -1;
         }
 
-        public void Broadcast(byte[] buffer, int ignoreClientId = -1, Action callback = null)
+        public NetworkClient GetClient(int id)
+        {
+            return _clients[id];
+        }
+
+        public void Broadcast(byte[] buffer, int ignoreClientId = -1)
         {
             for (int i = 0; i < _maxClients; i++)
             {
@@ -88,33 +93,16 @@ namespace SavageWorld.Runtime.Network
                 {
                     continue;
                 }
-                WriteMessageTo(i, buffer, callback);
+                WriteMessageTo(i, buffer);
             }
         }
 
-        public void ReadMessageFromAll(byte[] buffer, Action callback = null)
-        {
-            for (int i = 0; i < _maxClients; i++)
-            {
-                ReadMessageFrom(i, buffer, callback);
-            }
-        }
-
-        public void ReadMessageFrom(int clientId, byte[] buffer, Action callback = null)
+        public void WriteMessageTo(int clientId, byte[] buffer)
         {
             NetworkClient client = _clients[clientId];
             if (client.IsActive)
             {
-                client.ReadMessage(buffer, callback);
-            }
-        }
-
-        public void WriteMessageTo(int clientId, byte[] buffer, Action callback = null)
-        {
-            NetworkClient client = _clients[clientId];
-            if (client.IsActive)
-            {
-                client.WriteMessage(buffer, callback);
+                client.WriteMessage(buffer);
             }
         }
 
@@ -127,10 +115,7 @@ namespace SavageWorld.Runtime.Network
         #region Private Methods
         private void ReadMessageLoop()
         {
-            Action action = () =>
-            {
-                _messanger.TryRead();
-            };
+            Action action = () => _messanger.TryRead();
             try
             {
                 while (IsActive)
@@ -141,6 +126,23 @@ namespace SavageWorld.Runtime.Network
             catch (Exception e)
             {
                 Debug.Log($"SERVER LOOP ERROR: {e.Message}");
+            }
+        }
+
+        private void ReadMessageFromAll(byte[] buffer, Action callback = null)
+        {
+            for (int i = 0; i < _maxClients; i++)
+            {
+                ReadMessageFrom(i, buffer, callback);
+            }
+        }
+
+        private void ReadMessageFrom(int clientId, byte[] buffer, Action callback = null)
+        {
+            NetworkClient client = _clients[clientId];
+            if (client.IsActive)
+            {
+                client.ReadMessage(buffer, callback);
             }
         }
         #endregion

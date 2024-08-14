@@ -1,5 +1,4 @@
 using SavageWorld.Runtime.Enums.Network;
-using System;
 using UnityEngine;
 
 namespace SavageWorld.Runtime.Network.Objects
@@ -27,13 +26,13 @@ namespace SavageWorld.Runtime.Network.Objects
         [SerializeField]
         private bool _syncScale;
         private Vector3 _prevScale;
-        private Vector2 _networkScale;
+        private Vector2 _networkScale = Vector2.one;
 
         private NetworkObject _networkObject;
         #endregion
 
         #region Properties
-        public Vector2 NextPosition
+        public Vector2 NetworkPosition
         {
             get
             {
@@ -74,7 +73,7 @@ namespace SavageWorld.Runtime.Network.Objects
         #endregion
 
         #region Events / Delegates
-        public event Action<float, float> TransformChanged;
+
         #endregion
 
         #region Monobehaviour Methods
@@ -92,11 +91,14 @@ namespace SavageWorld.Runtime.Network.Objects
                     SyncPosition();
                     SyncRotation();
                     SyncScale();
+                    transform.hasChanged = false;
                 }
             }
             else
             {
                 transform.position = _networkPosition;
+                transform.rotation = Quaternion.Euler(_networkRotation);
+                transform.localScale = _networkScale;
             }
         }
         #endregion
@@ -118,7 +120,7 @@ namespace SavageWorld.Runtime.Network.Objects
                 float difference = Vector2.Distance(position, _prevPosition);
                 if (difference >= _positionThreshold)
                 {
-                    NetworkManager.Instance.SendMessageToServer(NetworkMessageTypes.SendPosition, new MessageData { LongNumber1 = _networkObject.Id, FloatNumber1 = position.x, FloatNumber2 = position.y });
+                    NetworkManager.Instance.SendMessage(NetworkMessageTypes.SendTransform, new MessageData { IntNumber1 = 1, LongNumber1 = _networkObject.Id, FloatNumber1 = position.x, FloatNumber2 = position.y }, isBroadcast: true);
                     _prevPosition = position;
                 }
             }
@@ -126,38 +128,30 @@ namespace SavageWorld.Runtime.Network.Objects
 
         private void SyncRotation()
         {
-            //if (!_syncRotation)
-            //{
-            //    return;
-            //}
-            //if (_prevRotation != transform.rotation.eulerAngles)
-            //{
-            //    Vector2 position = transform.position;
-            //    float difference = Vector2.Distance(position, _prevPosition);
-            //    if (difference >= _positionThreshold)
-            //    {
-            //        TransformChanged?.Invoke(position.x, position.y);
-            //        _prevPosition = position;
-            //    }
-            //}
+            if (!_syncRotation)
+            {
+                return;
+            }
+            if (_prevRotation != transform.rotation.eulerAngles)
+            {
+                Vector2 rotation = transform.rotation.eulerAngles;
+                NetworkManager.Instance.SendMessage(NetworkMessageTypes.SendTransform, new MessageData { IntNumber1 = 2, LongNumber1 = _networkObject.Id, FloatNumber1 = rotation.x, FloatNumber2 = rotation.y }, isBroadcast: true);
+                _prevPosition = rotation;
+            }
         }
 
         private void SyncScale()
         {
-            //if (!_syncScale)
-            //{
-            //    return;
-            //}
-            //if (_prevPosition != transform.position)
-            //{
-            //    Vector2 position = transform.position;
-            //    float difference = Vector2.Distance(position, _prevPosition);
-            //    if (difference >= _positionThreshold)
-            //    {
-            //        TransformChanged?.Invoke(position.x, position.y);
-            //        _prevPosition = position;
-            //    }
-            //}
+            if (!_syncScale)
+            {
+                return;
+            }
+            if (_prevScale != transform.localScale)
+            {
+                Vector2 scale = transform.localScale;
+                NetworkManager.Instance.SendMessage(NetworkMessageTypes.SendTransform, new MessageData { IntNumber1 = 3, LongNumber1 = _networkObject.Id, FloatNumber1 = scale.x, FloatNumber2 = scale.y }, isBroadcast: true);
+                _prevPosition = scale;
+            }
         }
         #endregion
     }

@@ -12,8 +12,8 @@ namespace SavageWorld.Runtime.Network
 
         private StateMachine<ConnectionStateBase> _stateMachine;
         private OfflineState _offlineState;
-        private StartingHostState _startingServerState;
-        private HostStartedState _serverStartedState;
+        private StartingServerState _startingServerState;
+        private ServerStartedState _serverStartedState;
         private ClientConnectingState _clientConnectingState;
         private ClientConnectedState _clientConnectedState;
         private ClientReconnectingState _clientReconnectingState;
@@ -42,7 +42,7 @@ namespace SavageWorld.Runtime.Network
             }
         }
 
-        public StartingHostState StartingServerState
+        public StartingServerState StartingServerState
         {
             get
             {
@@ -50,7 +50,7 @@ namespace SavageWorld.Runtime.Network
             }
         }
 
-        public HostStartedState ServerStartedState
+        public ServerStartedState ServerStartedState
         {
             get
             {
@@ -138,12 +138,12 @@ namespace SavageWorld.Runtime.Network
         #region Private Methods
         private void ServerStartedEventHandler(INetworkConnection _)
         {
-            CurrentState.OnHostStarted();
+            CurrentState.OnServerStarted();
         }
 
         private void ServerStoppedEventHandler(INetworkConnection _)
         {
-            CurrentState.OnHostStopped();
+            CurrentState.OnServerStopped();
         }
 
         private void ClientConnectedEventHandler(int clientId)

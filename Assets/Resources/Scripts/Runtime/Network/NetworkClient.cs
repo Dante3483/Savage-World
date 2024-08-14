@@ -1,6 +1,5 @@
 using SavageWorld.Runtime.Network.Connection;
 using SavageWorld.Runtime.Network.Messages;
-using SavageWorld.Runtime.Network.Objects;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -13,12 +12,15 @@ namespace SavageWorld.Runtime.Network
         private NetworkMessanger _messanger;
         private INetworkConnection _connection;
         private int _id;
-        private GameObject _player;
+        private long _playerId;
+        private int _state;
         #endregion
 
         #region Properties
         public bool IsActive => _connection != null && _connection.IsClientActive;
+
         public bool IsReading => _connection.IsReading;
+
         public int Id
         {
             get
@@ -26,20 +28,32 @@ namespace SavageWorld.Runtime.Network
                 return _id;
             }
         }
-        public GameObject Player
+
+        public long PlayerId
         {
             get
             {
-                return _player;
+                return _playerId;
             }
 
             set
             {
-                _player = value;
+                _playerId = value;
             }
         }
 
-        public NetworkTransform _playerNetworkTransform;
+        public int State
+        {
+            get
+            {
+                return _state;
+            }
+
+            set
+            {
+                _state = value;
+            }
+        }
         #endregion
 
         #region Events / Delegates
@@ -81,9 +95,9 @@ namespace SavageWorld.Runtime.Network
             _connection = null;
         }
 
-        public void WriteMessage(byte[] buffer, Action callback = null)
+        public void WriteMessage(byte[] buffer)
         {
-            _connection?.Write(buffer, callback);
+            _connection?.Write(buffer);
         }
 
         public void ReadMessage(byte[] buffer, Action callback = null)

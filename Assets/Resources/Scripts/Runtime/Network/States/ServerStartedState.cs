@@ -1,6 +1,6 @@
 namespace SavageWorld.Runtime.Network.States
 {
-    public class HostStartedState : OnlineState
+    public class ServerStartedState : OnlineState
     {
         #region Fields
 
@@ -19,7 +19,7 @@ namespace SavageWorld.Runtime.Network.States
         #endregion
 
         #region Public Methods
-        public HostStartedState(ConnectionManager connectionManager) : base(connectionManager)
+        public ServerStartedState(ConnectionManager connectionManager) : base(connectionManager)
         {
 
         }
@@ -34,7 +34,7 @@ namespace SavageWorld.Runtime.Network.States
 
         }
 
-        public override void OnHostStopped()
+        public override void OnServerStopped()
         {
             _connectionManager.ChangeState(_connectionManager.OfflineState);
         }
@@ -46,7 +46,7 @@ namespace SavageWorld.Runtime.Network.States
 
         public override void OnUserRequestedShutdown()
         {
-            _connectionManager.NetworkManager.StopHost();
+            _connectionManager.NetworkManager.StopServer();
             _connectionManager.ChangeState(_connectionManager.OfflineState);
         }
         #endregion

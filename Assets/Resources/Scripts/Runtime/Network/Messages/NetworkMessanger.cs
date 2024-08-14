@@ -17,6 +17,7 @@ namespace SavageWorld.Runtime.Network.Messages
         private BinaryWriter _binaryWriter;
         private BinaryReader _binaryReader;
         private Dictionary<NetworkMessageTypes, NetworkMessageBase> _messageByType;
+        private bool _isBlocked;
         #endregion
 
         #region Properties
@@ -45,6 +46,19 @@ namespace SavageWorld.Runtime.Network.Messages
                 _readBuffer = value;
             }
         }
+
+        public bool IsBlocked
+        {
+            get
+            {
+                return _isBlocked;
+            }
+
+            set
+            {
+                _isBlocked = value;
+            }
+        }
         #endregion
 
         #region Events / Delegates
@@ -67,9 +81,10 @@ namespace SavageWorld.Runtime.Network.Messages
         {
             if (_messageByType.TryGetValue(messageType, out NetworkMessageBase message))
             {
+                _isBlocked = true;
                 _binaryWriter.BaseStream.Position = 0;
                 message.Write(messageData);
-                if (messageType != NetworkMessageTypes.SendPosition)
+                if (messageType != NetworkMessageTypes.SendTransform)
                 {
                     GameConsole.LogText(messageType.ToString(), Color.yellow);
                 }
@@ -96,7 +111,7 @@ namespace SavageWorld.Runtime.Network.Messages
             NetworkMessageTypes messageType = (NetworkMessageTypes)_binaryReader.ReadByte();
             NetworkMessageBase message = _messageByType[messageType];
             message.Read();
-            if (messageType != NetworkMessageTypes.SendPosition)
+            if (messageType != NetworkMessageTypes.SendTransform)
             {
                 GameConsole.LogText(messageType.ToString(), Color.yellow);
             }
@@ -111,7 +126,7 @@ namespace SavageWorld.Runtime.Network.Messages
                 { NetworkMessageTypes.SendClientId, new SendClientIdMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.CreatePlayer, new CreatePlayerMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.Disconnect, new DisconnectMessage(_binaryWriter, _binaryReader) },
-                { NetworkMessageTypes.SendPosition, new SendPositionMessage(_binaryWriter, _binaryReader) },
+                { NetworkMessageTypes.SendTransform, new SendTransformMessage(_binaryWriter, _binaryReader) },
             };
         }
         #endregion

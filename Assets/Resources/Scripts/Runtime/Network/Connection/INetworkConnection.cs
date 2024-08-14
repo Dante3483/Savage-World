@@ -21,11 +21,16 @@ namespace SavageWorld.Runtime.Network.Connection
 
         #region Public Methods
         public void Start(string ipAddress, int port);
+
         public void Stop();
+
         public void Connect(string ipAddress, int port);
+
         public void Disconnect();
+
         public void Read(byte[] buffer, Action callback = null);
-        public void Write(byte[] buffer, Action callback = null);
+
+        public void Write(byte[] buffer);
         #endregion
     }
 }
