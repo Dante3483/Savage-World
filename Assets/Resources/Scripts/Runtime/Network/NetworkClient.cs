@@ -95,12 +95,12 @@ namespace SavageWorld.Runtime.Network
             _connection = null;
         }
 
-        public void WriteMessage(byte[] buffer)
+        public void WriteMessage(byte[] buffer, long size)
         {
-            _connection?.Write(buffer);
+            _connection?.Write(buffer, size);
         }
 
-        public void ReadMessage(byte[] buffer, Action callback = null)
+        public void ReadMessage(byte[] buffer, Action<object> callback = null)
         {
             _connection?.Read(buffer, callback);
         }
@@ -109,9 +109,9 @@ namespace SavageWorld.Runtime.Network
         #region Private Methods
         private void Loop()
         {
-            Action action = () =>
+            Action<object> action = (size) =>
             {
-                _messanger.TryRead();
+                _messanger.TryRead((int)size);
             };
             try
             {

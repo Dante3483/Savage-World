@@ -1,21 +1,24 @@
-public abstract class GameStateBase : StateBase
+namespace SavageWorld.Runtime.GameSession.States
 {
-    #region Private fields
-    protected GameManager _gameManager;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public GameStateBase()
+    public abstract class GameStateBase : StateBase
     {
-        _gameManager = GameManager.Instance;
+        #region Private fields
+        protected GameManager _gameManager;
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public GameStateBase()
+        {
+            _gameManager = GameManager.Instance;
+        }
+        #endregion
     }
-    #endregion
 }

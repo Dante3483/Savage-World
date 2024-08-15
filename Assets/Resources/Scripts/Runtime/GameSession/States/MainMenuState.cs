@@ -1,31 +1,34 @@
-public class MainMenuState : GameStateBase
+namespace SavageWorld.Runtime.GameSession.States
 {
-    #region Private fields
-    private MainMenuManager _mainMenuManager;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public MainMenuState() : base()
+    public class MainMenuState : GameStateBase
     {
-        _mainMenuManager = MainMenuManager.Instance;
-    }
+        #region Private fields
+        private MainMenuManager _mainMenuManager;
+        #endregion
 
-    public override void Enter()
-    {
-        _mainMenuManager.ChangeState(_mainMenuManager.StarterMenuState);
-    }
+        #region Public fields
 
-    public override void Exit()
-    {
+        #endregion
 
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public MainMenuState() : base()
+        {
+            _mainMenuManager = MainMenuManager.Instance;
+        }
+
+        public override void Enter()
+        {
+            _mainMenuManager.ChangeState(_mainMenuManager.StarterMenuState);
+        }
+
+        public override void Exit()
+        {
+
+        }
+        #endregion
     }
-    #endregion
 }

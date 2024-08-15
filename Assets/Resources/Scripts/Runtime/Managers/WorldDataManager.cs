@@ -97,7 +97,7 @@ public class WorldDataManager : Singleton<WorldDataManager>
     public void SetBlockData(int x, int y, BlockSO data)
     {
         _worldData[x, y].SetBlockData(data);
-        if (_gameManager.IsPlayingState)
+        if (_gameManager.IsPlayingState && !_gameManager.IsClient)
         {
             //SetBlockDataServerRpc(x, y, data.Type, data.GetId());
             SetUpBlockData(x, y);
@@ -108,7 +108,7 @@ public class WorldDataManager : Singleton<WorldDataManager>
     public void SetWallData(int x, int y, BlockSO data)
     {
         _worldData[x, y].SetWallData(data);
-        if (_gameManager.IsPlayingState)
+        if (_gameManager.IsPlayingState && !_gameManager.IsClient)
         {
             //SetWallDataServerRpc(x, y, data.GetId());
             SetUpWallData(x, y);
@@ -118,7 +118,7 @@ public class WorldDataManager : Singleton<WorldDataManager>
     public void SetLiquidData(int x, int y, BlockSO data, float flowValue = 100)
     {
         _worldData[x, y].SetLiquidData(data, flowValue);
-        if (_gameManager.IsPlayingState)
+        if (_gameManager.IsPlayingState && !_gameManager.IsClient)
         {
             //SetLiquidDataServerRpc(x, y, data.GetId(), flowValue);
             SetUpLiquidData(x, y);

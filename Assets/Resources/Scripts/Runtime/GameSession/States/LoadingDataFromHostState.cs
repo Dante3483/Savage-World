@@ -1,26 +1,29 @@
-public class LoadingDataFromHostState : GameStateBase
+namespace SavageWorld.Runtime.GameSession.States
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public override void Enter()
+    public class LoadingDataFromHostState : GameStateBase
     {
-        UIManager.Instance.MainMenuProgressBarUI.IsActive = true;
-    }
+        #region Private fields
 
-    public override void Exit()
-    {
-        UIManager.Instance.MainMenuProgressBarUI.IsActive = false;
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public override void Enter()
+        {
+            UIManager.Instance.MainMenuProgressBarUI.IsActive = true;
+        }
+
+        public override void Exit()
+        {
+            UIManager.Instance.MainMenuProgressBarUI.IsActive = false;
+        }
+        #endregion
     }
-    #endregion
 }

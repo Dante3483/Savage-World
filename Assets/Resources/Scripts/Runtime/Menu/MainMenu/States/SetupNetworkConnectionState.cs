@@ -26,6 +26,7 @@ public class SetupNetworkConnectionState : MainMenuStateBase
 
     public override void Back()
     {
+        GameManager.Instance.IsClient = false;
         _mainMenuManager.ChangeState(_mainMenuManager.MultiplayerModeSelectionState);
     }
     #endregion

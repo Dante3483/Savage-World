@@ -1,3 +1,4 @@
+using SavageWorld.Runtime.Network.Objects;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -15,6 +16,8 @@ public class Player : MonoBehaviour
     private CraftStationModelSO _handCraftStation;
     [SerializeField]
     private PlayerInteractions _playerInteractions;
+    [SerializeField]
+    private NetworkObject _networkObject;
     [Header("Debug")]
     [SerializeField]
     private List<ItemQuantity> _starterItems;
@@ -38,6 +41,14 @@ public class Player : MonoBehaviour
             return _stats;
         }
     }
+
+    public NetworkObject NetworkObject
+    {
+        get
+        {
+            return _networkObject;
+        }
+    }
     #endregion
 
     #region Events / Delegates
@@ -49,29 +60,30 @@ public class Player : MonoBehaviour
     {
         _worldDataManager = WorldDataManager.Instance;
         _playerInteractions = GetComponent<PlayerInteractions>();
-        InitializeAsOwner();
+        _networkObject = GetComponent<NetworkObject>();
     }
     #endregion
 
     #region Public Methods
-    //public override void OnNetworkSpawn()
-    //{
-    //    if (IsOwner)
-    //    {
-    //        if (IsServer)
-    //        {
-    //            //EventManager.PlayerConnectedAsClient += _senderDataToClient.SendDataToConnectedClient;
-    //            //_worldDataManager.CellDataChanged += _senderDataToClient.SendBlockData;
-    //            //_worldDataManager.CellColliderChanged += _senderDataToClient.SendBlockColliderData;
-    //        }
-    //        InitializeAsOwner();
-    //    }
-    //    else
-    //    {
-    //        InitializeAsNotOwner();
-    //    }
-    //    base.OnNetworkSpawn();
-    //}
+    public void Initialize(bool isMultiplayer, bool isOwner)
+    {
+        if (isMultiplayer)
+        {
+            _networkObject.IsOwner = isOwner;
+            if (isOwner)
+            {
+                InitializeAsOwner();
+            }
+            else
+            {
+                InitializeAsNotOwner();
+            }
+        }
+        else
+        {
+            InitializeAsOwner();
+        }
+    }
 
     public void DisableMovement()
     {
@@ -90,28 +102,21 @@ public class Player : MonoBehaviour
     private void InitializeAsOwner()
     {
         _stats.Reset();
-
         _inventory = new();
-
-        GameManager.Instance.InitializePlayer(3655, 2200, this);
-
         PlayerInputActions playerInputActions = GameManager.Instance.PlayerInputActions;
         playerInputActions.UI.Enable();
         playerInputActions.UI.OpenCloseInventory.performed += ToggleInventoryEventHandler;
         playerInputActions.UI.OpenCloseCraftStation.performed += ToggleCraftStationEventHandler;
         playerInputActions.UI.OpenCloseResearch.performed += ToggleResearchEventHandler;
-
         BookManager.Instance.InitializeInventory(_inventory);
         BookManager.Instance.InitializeHotbar(_inventory);
         BookManager.Instance.InitializeCraftStation(_handCraftStation, _inventory);
         BookManager.Instance.InitializeResearches(GameManager.Instance.GetResearches(), _inventory);
         _playerInteractions.Initialize(_inventory);
-
         foreach (ItemQuantity item in _starterItems)
         {
             _inventory.AddItem(item.Item, item.Quantity);
         }
-
         DisableMovement();
     }
 

@@ -1,3 +1,4 @@
+using SavageWorld.Runtime.GameSession.States;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -68,11 +69,19 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
     [SerializeField]
     private bool _isInputTextInFocus;
 
+    [Header("Network")]
+    [SerializeField]
+    private bool _isMultiplayer;
+    [SerializeField]
+    private bool _isClient;
+
     private StateMachine<GameStateBase> _stateMachine;
     private InitializationState _initializationState;
     private MainMenuState _mainMenuState;
     private CreatingWorldState _creatingWorldState;
     private LoadingWorldState _loadingWorldState;
+    private CreatingPlayerState _creatingPlayerState;
+    private LoadingPlayerState _loadingPlayerState;
     private LoadingDataFromHostState _loadingDataFromHostState;
     private PlayingState _playingState;
     private QuitGameState _quitGameState;
@@ -83,8 +92,6 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
     private Terrain _terrain;
     private float _loadingValue;
     private string _phasesInfo;
-    private bool _isMultiplayer;
-    private bool _isClient;
     #endregion
 
     #region Public fields
@@ -472,6 +479,32 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
             _recipesAtlas = value;
         }
     }
+
+    public CreatingPlayerState CreatingPlayerState
+    {
+        get
+        {
+            return _creatingPlayerState;
+        }
+
+        set
+        {
+            _creatingPlayerState = value;
+        }
+    }
+
+    public LoadingPlayerState LoadingPlayerState
+    {
+        get
+        {
+            return _loadingPlayerState;
+        }
+
+        set
+        {
+            _loadingPlayerState = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -490,6 +523,8 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
         _mainMenuState = new();
         _creatingWorldState = new();
         _loadingWorldState = new();
+        _creatingPlayerState = new();
+        _loadingPlayerState = new();
         _loadingDataFromHostState = new();
         _playingState = new();
         _terrain = _terrainGameObject.GetComponent<Terrain>();
@@ -527,11 +562,16 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
         return x >= 0 && x < _currentTerrainWidth && y >= 0 && y < _currentTerrainHeight;
     }
 
-    public void InitializePlayer(int x, int y, Player player)
+    public Player CreatePlayer(Vector2 position, bool isOwner = true)
     {
-        _player = player;
-        Camera.main.GetComponent<FollowObject>().Target = _player.transform;
-        SetPlayerPosition(x, y);
+        Player player = Instantiate(_playerPrefab, position, Quaternion.identity);
+        if (isOwner)
+        {
+            _player = player;
+            Camera.main.GetComponent<FollowObject>().Target = _player.transform;
+        }
+        player.Initialize(_isMultiplayer, isOwner);
+        return player;
     }
 
     public Transform GetPlayerTransform()

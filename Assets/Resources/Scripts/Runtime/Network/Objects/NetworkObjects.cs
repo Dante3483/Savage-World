@@ -53,7 +53,7 @@ namespace SavageWorld.Runtime.Network
 
         public long CreatePlayerServer(bool isOwner = false)
         {
-            NetworkObject player = CreatePlayer(Vector2.zero, isOwner);
+            NetworkObject player = CreatePlayer(new(3655, 2200), isOwner);
             long id = GetObjectId(player);
             player.Id = id;
             _objectsById[id] = player;
@@ -107,11 +107,11 @@ namespace SavageWorld.Runtime.Network
             NetworkObject player = null;
             ActionInMainThreadUtil.Instance.Invoke(() =>
             {
-                player = GameObject.Instantiate(_playerPrefab, position, Quaternion.identity);
-                player.transform.SetParent(_objectsParent);
+                player = GameManager.Instance.CreatePlayer(position, isOwner).NetworkObject;
                 player.UpdatePosition(position.x, position.y);
+                //player = GameObject.Instantiate(_playerPrefab, position, Quaternion.identity);
+                //player.transform.SetParent(_objectsParent);
             });
-            player.IsOwner = isOwner;
             player.Type = NetworkObjectTypes.Player;
             return player;
         }

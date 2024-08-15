@@ -19,8 +19,8 @@ GameObject:
   - component: {fileID: 4426414403718054618}
   - component: {fileID: -5410989748371277972}
   - component: {fileID: 7534789336813920865}
-  - component: {fileID: 4485372917691198708}
-  - component: {fileID: -5676878949644319893}
+  - component: {fileID: 1832234326415365086}
+  - component: {fileID: -7556431832742604357}
   m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
@@ -234,6 +234,7 @@ MonoBehaviour:
     _armorSize: 3
   _handCraftStation: {fileID: 11400000, guid: a666079fbbc7ae040898ba497ed3a6ad, type: 2}
   _playerInteractions: {fileID: 0}
+  _networkObject: {fileID: 0}
   _starterItems:
   - _item: {fileID: 11400000, guid: 50073aedebcc11b4c9f60545afac46fb, type: 2}
     _quantity: 1
@@ -431,7 +432,7 @@ MonoBehaviour:
     _hitColor: {r: 0.85609794, g: 1, b: 0, a: 1}
     _notHitColor: {r: 1, g: 0.465245, b: 0, a: 1}
   _playerInteractions: {fileID: 0}
---- !u!114 &4485372917691198708
+--- !u!114 &1832234326415365086
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -444,8 +445,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _id: 0
+  _type: 0
+  _position: {x: 0, y: 0}
   _isOwner: 0
---- !u!114 &-5676878949644319893
+--- !u!114 &-7556431832742604357
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -457,7 +460,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 836f221b2101bb543916912d47b81da3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _syncPosition: 0
-  _positionThreshold: 0
-  _syncRotation: 0
-  _syncScale: 0
+  _syncPosition: 1
+  _positionThreshold: 0.1
+  _syncRotation: 1
+  _syncScale: 1

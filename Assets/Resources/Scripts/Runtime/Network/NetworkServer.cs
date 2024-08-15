@@ -42,8 +42,11 @@ namespace SavageWorld.Runtime.Network
 
         public void Start(string ipAddress, int port)
         {
-            _connection.Start(ipAddress, port);
-            Task.Run(ReadMessageLoop);
+            if (_connection != null)
+            {
+                _connection.Start(ipAddress, port);
+                Task.Run(ReadMessageLoop);
+            }
         }
 
         public void Stop()
@@ -52,20 +55,12 @@ namespace SavageWorld.Runtime.Network
             {
                 DisconnectClient(i);
             }
-            _clients = null;
             _connection.Stop();
+            _connection = null;
+            _clients = null;
         }
 
-        public void DisconnectClient(int clientId)
-        {
-            NetworkClient client = _clients[clientId];
-            if (client.IsActive)
-            {
-                client.Disconnect();
-            }
-        }
-
-        public int AddClient(INetworkConnection connection)
+        public int AddClientToArray(INetworkConnection connection)
         {
             for (int i = 0; i < _maxClients; i++)
             {
@@ -80,12 +75,21 @@ namespace SavageWorld.Runtime.Network
             return -1;
         }
 
+        public void DisconnectClient(int clientId)
+        {
+            NetworkClient client = _clients[clientId];
+            if (client.IsActive)
+            {
+                client.Disconnect();
+            }
+        }
+
         public NetworkClient GetClient(int id)
         {
             return _clients[id];
         }
 
-        public void Broadcast(byte[] buffer, int ignoreClientId = -1)
+        public void Broadcast(byte[] buffer, long size, int ignoreClientId = -1)
         {
             for (int i = 0; i < _maxClients; i++)
             {
@@ -93,16 +97,16 @@ namespace SavageWorld.Runtime.Network
                 {
                     continue;
                 }
-                WriteMessageTo(i, buffer);
+                WriteMessageTo(i, buffer, size);
             }
         }
 
-        public void WriteMessageTo(int clientId, byte[] buffer)
+        public void WriteMessageTo(int clientId, byte[] buffer, long size)
         {
             NetworkClient client = _clients[clientId];
             if (client.IsActive)
             {
-                client.WriteMessage(buffer);
+                client.WriteMessage(buffer, size);
             }
         }
 
@@ -115,7 +119,7 @@ namespace SavageWorld.Runtime.Network
         #region Private Methods
         private void ReadMessageLoop()
         {
-            Action action = () => _messanger.TryRead();
+            Action<object> action = (size) => _messanger.TryRead((int)size);
             try
             {
                 while (IsActive)
@@ -129,7 +133,7 @@ namespace SavageWorld.Runtime.Network
             }
         }
 
-        private void ReadMessageFromAll(byte[] buffer, Action callback = null)
+        private void ReadMessageFromAll(byte[] buffer, Action<object> callback = null)
         {
             for (int i = 0; i < _maxClients; i++)
             {
@@ -137,7 +141,7 @@ namespace SavageWorld.Runtime.Network
             }
         }
 
-        private void ReadMessageFrom(int clientId, byte[] buffer, Action callback = null)
+        private void ReadMessageFrom(int clientId, byte[] buffer, Action<object> callback = null)
         {
             NetworkClient client = _clients[clientId];
             if (client.IsActive)

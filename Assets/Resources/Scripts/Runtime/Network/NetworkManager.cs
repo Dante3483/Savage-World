@@ -108,7 +108,8 @@ namespace SavageWorld.Runtime.Network
             if (!_server.IsActive)
             {
                 SetServerConnection();
-                _server.Start(_ipAddressInputField.text, _networkConfiguration.Port);
+                string ipAddress = string.IsNullOrEmpty(_ipAddressInputField.text) ? _networkConfiguration.IpAddress : _ipAddressInputField.text;
+                _server.Start(ipAddress, _networkConfiguration.Port);
                 _networkObjects.CreatePlayerServer(true);
             }
             GameConsole.LogText("Server started", Color.green);
@@ -131,13 +132,14 @@ namespace SavageWorld.Runtime.Network
                 connection.Connected += ConnectedEventHandler;
                 connection.Disconnected += DisconnectedEventHandler;
                 _client.SetConnection(connection);
-                _client.Connect(_ipAddressInputField.text, _networkConfiguration.Port);
+                string ipAddress = string.IsNullOrEmpty(_ipAddressInputField.text) ? _networkConfiguration.IpAddress : _ipAddressInputField.text;
+                _client.Connect(ipAddress, _networkConfiguration.Port);
             }
         }
 
         public void DisconnectFromServer()
         {
-            if (_client is not null)
+            if (IsClient)
             {
                 SendMessage(NetworkMessageTypes.Disconnect, new MessageData { IntNumber1 = _client.Id }, callback: _client.Disconnect);
                 _networkObjects.Reset();
@@ -203,6 +205,20 @@ namespace SavageWorld.Runtime.Network
                         break;
                     case 1:
                         {
+                            int chunkX = 36;
+                            int chunkY = 22;
+                            for (int x = chunkX - 1; x <= chunkX + 1; x++)
+                            {
+                                for (int y = chunkY - 1; y <= chunkY + 1; y++)
+                                {
+                                    await SendMessageAsync(NetworkMessageTypes.SendChunkData, new MessageData { IntNumber1 = x, IntNumber2 = y }, clientId: id);
+                                }
+                            }
+                            client.State = 2;
+                        }
+                        break;
+                    case 2:
+                        {
                             foreach (NetworkObject networkObject in _networkObjects.ObjectsById.Values)
                             {
                                 switch (networkObject.Type)
@@ -228,22 +244,22 @@ namespace SavageWorld.Runtime.Network
                                         break;
                                 }
                             }
-                            client.State = 2;
+                            client.State = 3;
                         }
                         break;
-                    case 2:
+                    case 3:
                         {
                             long playerId = _networkObjects.CreatePlayerServer();
                             MessageData data = new()
                             {
                                 LongNumber1 = playerId,
-                                Bool1 = false,
-                                FloatNumber1 = 0,
-                                FloatNumber2 = 0,
+                                Bool1 = true,
+                                FloatNumber1 = 3655,
+                                FloatNumber2 = 2200,
                             };
                             await SendMessageAsync(NetworkMessageTypes.CreatePlayer, data, clientId: id);
                             client.PlayerId = playerId;
-                            client.State = 3;
+                            client.State = 4;
                         }
                         break;
                     default:
@@ -261,15 +277,15 @@ namespace SavageWorld.Runtime.Network
         {
             lock (_messanger.WriteBuffer)
             {
-                _messanger.Write(messageType, messageData);
+                long size = _messanger.Write(messageType, messageData);
                 if (isBroadcast)
                 {
-                    _server.Broadcast(_messanger.WriteBuffer);
+                    _server.Broadcast(_messanger.WriteBuffer, size);
                     callback?.Invoke();
                 }
                 else
                 {
-                    _server.WriteMessageTo(clientId, _messanger.WriteBuffer);
+                    _server.WriteMessageTo(clientId, _messanger.WriteBuffer, size);
                     callback?.Invoke();
                 }
             }
@@ -279,8 +295,8 @@ namespace SavageWorld.Runtime.Network
         {
             lock (_messanger.WriteBuffer)
             {
-                _messanger.Write(messageType, messageData);
-                _client.WriteMessage(_messanger.WriteBuffer);
+                long size = _messanger.Write(messageType, messageData);
+                _client.WriteMessage(_messanger.WriteBuffer, size);
                 callback?.Invoke();
             }
         }
@@ -307,7 +323,7 @@ namespace SavageWorld.Runtime.Network
 
         private void ClientConnectedEventHandler(INetworkConnection connection)
         {
-            int id = _server.AddClient(connection);
+            int id = _server.AddClientToArray(connection);
             if (id != -1)
             {
                 InitializeClient(id);

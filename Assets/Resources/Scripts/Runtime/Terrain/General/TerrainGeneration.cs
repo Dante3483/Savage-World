@@ -1,3 +1,4 @@
+using SavageWorld.Runtime.Console;
 using System.Collections.Generic;
 using UnityEngine;
 using Stopwatch = System.Diagnostics.Stopwatch;
@@ -92,21 +93,17 @@ public class TerrainGeneration
     {
         double totalTime = 0f;
         float step = 100f / _generationPhases.Count;
-
         Stopwatch watch = Stopwatch.StartNew();
         foreach (IWorldProcessingPhase generationPhase in _generationPhases)
         {
             watch.Restart();
             generationPhase.StartPhase();
             watch.Stop();
-            Debug.Log($"{generationPhase.Name}: {watch.Elapsed.TotalSeconds}");
-            GameManager.Instance.PhasesInfo += $"{generationPhase.Name}: {watch.Elapsed.TotalSeconds}\n";
+            GameConsole.LogText($"{generationPhase.Name}: {watch.Elapsed.TotalSeconds}", Color.green);
             totalTime += watch.Elapsed.TotalSeconds;
             GameManager.Instance.LoadingValue += step;
         }
-
-        Debug.Log($"Total time: {totalTime}");
-        GameManager.Instance.PhasesInfo += $"Total time: {totalTime}\n";
+        GameConsole.LogText($"Total time: {totalTime}", Color.green);
     }
     #endregion
 

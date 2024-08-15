@@ -28,9 +28,9 @@ namespace SavageWorld.Runtime.Network.Connection
 
         public void Disconnect();
 
-        public void Read(byte[] buffer, Action callback = null);
+        public void Read(byte[] buffer, Action<object> callback = null);
 
-        public void Write(byte[] buffer);
+        public void Write(byte[] buffer, long size);
         #endregion
     }
 }

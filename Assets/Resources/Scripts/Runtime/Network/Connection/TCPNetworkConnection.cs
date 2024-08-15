@@ -151,20 +151,21 @@ namespace SavageWorld.Runtime.Network.Connection
             }
         }
 
-        public void Read(byte[] buffer, Action callback = null)
+        public void Read(byte[] buffer, Action<object> callback = null)
         {
             if (!_isReading && _client.Connected && _client.GetStream().DataAvailable)
             {
                 _isReading = true;
-                _client.GetStream().Read(buffer, 0, buffer.Length);
+                int size = _client.GetStream().Read(buffer, 0, buffer.Length);
+                Debug.Log(size);
+                callback?.Invoke(size);
                 _isReading = false;
-                callback();
             }
         }
 
-        public void Write(byte[] buffer)
+        public void Write(byte[] buffer, long size)
         {
-            _client.GetStream().Write(buffer, 0, buffer.Length);
+            _client.GetStream().Write(buffer, 0, (int)size);
         }
 
         public override string ToString()

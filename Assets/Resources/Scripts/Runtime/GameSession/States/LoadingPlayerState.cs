@@ -1,12 +1,8 @@
 namespace SavageWorld.Runtime.GameSession.States
 {
-    public class PlayingState : GameStateBase
+    public class LoadingPlayerState : GameStateBase
     {
-        #region Private fields
-
-        #endregion
-
-        #region Public fields
+        #region Fields
 
         #endregion
 
@@ -14,7 +10,11 @@ namespace SavageWorld.Runtime.GameSession.States
 
         #endregion
 
-        #region Methods
+        #region Events / Delegates
+
+        #endregion
+
+        #region Public Methods
         public override void Enter()
         {
 
@@ -24,6 +24,10 @@ namespace SavageWorld.Runtime.GameSession.States
         {
 
         }
+        #endregion
+
+        #region Private Methods
+
         #endregion
     }
 }

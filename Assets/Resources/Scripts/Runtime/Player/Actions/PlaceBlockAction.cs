@@ -20,9 +20,9 @@ public class PlaceBlockAction : PlayerActionBase
     #endregion
 
     #region Public Methods
-    public PlaceBlockAction()
+    public PlaceBlockAction() : base()
     {
-        _inventory = _gameManager.GetPlayerInventory();
+        _inventory = GameManager.Instance.GetPlayerInventory();
         _isPlacementAllowed = true;
     }
 

@@ -37,6 +37,7 @@ namespace SavageWorld.Runtime.Network.Messages
             }
             catch (Exception e)
             {
+                Debug.LogException(e);
                 Debug.Log($"ERROR: {e.Message}");
                 return false;
             }
@@ -51,6 +52,7 @@ namespace SavageWorld.Runtime.Network.Messages
             }
             catch (Exception e)
             {
+                Debug.LogException(e);
                 Debug.Log($"ERROR: {e.Message}");
                 return false;
             }

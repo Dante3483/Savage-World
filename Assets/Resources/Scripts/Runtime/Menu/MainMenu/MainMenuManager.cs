@@ -1,5 +1,6 @@
 using System.IO;
 
+//TODO: USE QUEUE for states history
 public class MainMenuManager : Singleton<MainMenuManager>, IStateMachine<MainMenuStateBase>
 {
     #region Private fields
@@ -139,9 +140,8 @@ public class MainMenuManager : Singleton<MainMenuManager>, IStateMachine<MainMen
         GameManager.Instance.PlayerName = playerName;
         if (GameManager.Instance.IsMultiplayer && GameManager.Instance.IsClient)
         {
-            //ConnectionManager.Instance.StartClientIp(playerName);
             ChangeState(null);
-            GameManager.Instance.ChangeState(GameManager.Instance.LoadingDataFromHostState);
+            GameManager.Instance.ChangeState(GameManager.Instance.CreatingPlayerState);
         }
         else
         {

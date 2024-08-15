@@ -87,7 +87,7 @@ public class PlayerInteractions : MonoBehaviour
         _checkPlayerBoxCast.Size = new Vector2(1f, 1f);
         _checkPlayerBoxCast.LayerMask = _playerLayerMask;
 
-        PlayerInputActions playerInputActions = _gameManager.PlayerInputActions;
+        PlayerInputActions playerInputActions = GameManager.Instance.PlayerInputActions;
         playerInputActions.Interactions.Enable();
         playerInputActions.Interactions.UseItemFromHotbar.performed += UseItemFromHotbarPerformed;
         playerInputActions.Interactions.UseItemFromHotbar.canceled += UseItemFromHotbarCanceled;

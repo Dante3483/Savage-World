@@ -1,39 +1,41 @@
 using System.Threading.Tasks;
 
-public class LoadingWorldState : GameStateBase
+namespace SavageWorld.Runtime.GameSession.States
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public override void Enter()
+    public class LoadingWorldState : GameStateBase
     {
-        UIManager.Instance.MainMenuProgressBarUI.IsActive = true;
-        _gameManager.ResetLoadingValue();
-        _gameManager.TerrainGameObject.SetActive(true);
-        _gameManager.Terrain.StartCoroutinesAndThreads();
-        Task.Run(LoadWorld);
-    }
+        #region Private fields
 
-    public override void Exit()
-    {
-        UIManager.Instance.MainMenuProgressBarUI.IsActive = false;
-    }
+        #endregion
 
-    private void LoadWorld()
-    {
-        //ActionInMainThreadUtil.Instance.Invoke(() => ConnectionManager.Instance.StartHostIp(_gameManager.PlayerName));
-        _gameManager.Terrain.LoadWorld();
-        ActionInMainThreadUtil.Instance.Invoke(() => _gameManager.ChangeState(_gameManager.PlayingState));
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public override void Enter()
+        {
+            UIManager.Instance.MainMenuProgressBarUI.IsActive = true;
+            _gameManager.ResetLoadingValue();
+            _gameManager.TerrainGameObject.SetActive(true);
+            _gameManager.Terrain.StartCoroutinesAndThreads();
+            Task.Run(LoadWorld);
+        }
+
+        public override void Exit()
+        {
+            UIManager.Instance.MainMenuProgressBarUI.IsActive = false;
+        }
+
+        private void LoadWorld()
+        {
+            _gameManager.Terrain.LoadWorld();
+            ActionInMainThreadUtil.Instance.Invoke(() => _gameManager.ChangeState(_gameManager.CreatingPlayerState));
+        }
+        #endregion
     }
-    #endregion
 }
