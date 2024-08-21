@@ -34,7 +34,7 @@ public class SaveLoadManager : Singleton<SaveLoadManager>
 
     private void Update()
     {
-        if (!_gameManager.IsInputTextInFocus && Input.GetKeyDown(KeyCode.V))
+        if (!_gameManager.IsInputTextInFocus && Input.GetKeyDown(KeyCode.U))
         {
             ExecutionTimeCalculator.Instance.Execute(() => Save());
         }
@@ -96,7 +96,7 @@ public class SaveLoadManager : Singleton<SaveLoadManager>
         {
             LoadChunks(binaryReader);
             LoadWorldData(binaryReader);
-            ActionInMainThreadUtil.Instance.Invoke(() =>
+            ActionInMainThreadUtil.Instance.InvokeAndWait(() =>
             {
                 LoadTrees(binaryReader);
                 LoadPickUpItems(binaryReader);
@@ -194,10 +194,10 @@ public class SaveLoadManager : Singleton<SaveLoadManager>
                 {
                     ushort nextBlockId = _worldDataManager.GetBlockId(x, y + iterator);
                     ushort nextWallId = _worldDataManager.GetWallId(x, y + iterator);
-                    byte nextLiquidId = _worldDataManager.GetLiquidId(x, y);
+                    byte nextLiquidId = _worldDataManager.GetLiquidId(x, y + iterator);
                     float nextFlowValue = _worldDataManager.GetFlowValue(x, y + iterator);
-                    byte nextTileId = _worldDataManager.GetTileId(x, y);
-                    BlockTypes nextType = _worldDataManager.GetBlockType(x, y);
+                    byte nextTileId = _worldDataManager.GetTileId(x, y + iterator);
+                    BlockTypes nextType = _worldDataManager.GetBlockType(x, y + iterator);
 
                     if (blockId != nextBlockId)
                     {

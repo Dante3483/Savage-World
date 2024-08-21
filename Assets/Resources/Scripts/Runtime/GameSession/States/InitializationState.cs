@@ -60,7 +60,7 @@ namespace SavageWorld.Runtime.GameSession.States
                 Debug.Log($"Game initialization: {watch.Elapsed.TotalSeconds}");
                 _gameManager.PhasesInfo += $"Game initialization: {watch.Elapsed.TotalSeconds}\n";
 
-                ActionInMainThreadUtil.Instance.Invoke(() => _gameManager.ChangeState(_gameManager.MainMenuState));
+                ActionInMainThreadUtil.Instance.InvokeAndWait(() => _gameManager.ChangeState(_gameManager.MainMenuState));
             }
             catch (Exception e)
             {

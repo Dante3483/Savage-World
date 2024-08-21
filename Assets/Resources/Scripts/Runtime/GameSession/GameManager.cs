@@ -246,6 +246,10 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
     {
         get
         {
+            if (_randomVar is null)
+            {
+                _randomVar = new(_seed);
+            }
             return _randomVar;
         }
 

@@ -1,3 +1,6 @@
+using SavageWorld.Runtime.Enums.Network;
+using SavageWorld.Runtime.Network;
+using SavageWorld.Runtime.Network.Messages;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -61,8 +64,23 @@ public abstract class BreakAction : PlayerActionBase
         int y = position.y;
         BlockSO data = _worldDataManager.GetBlockData(x, y);
         Vector3 dropPosition = new(x + 0.5f, y + 0.5f);
-        _dropManager.CreateDrop(dropPosition, data.Drop, 1);
-        _replace?.Invoke(x, y, _replacment);
+
+        if (NetworkManager.Instance.IsClient)
+        {
+            MessageData messageData = new()
+            {
+                IntNumber1 = x,
+                IntNumber2 = y,
+                IntNumber3 = (int)_replacment.Type,
+                IntNumber4 = _replacment.GetId()
+            };
+            NetworkManager.Instance.SendMessage(NetworkMessageTypes.SendWorldCellData, messageData);
+        }
+        else
+        {
+            _dropManager.CreateDrop(dropPosition, data.Drop, 1);
+            _replace?.Invoke(x, y, _replacment);
+        }
     }
 
     protected virtual bool CanBreak(int x, int y)

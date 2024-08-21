@@ -105,7 +105,7 @@ namespace SavageWorld.Runtime.Network
         private NetworkObject CreatePlayer(Vector2 position, bool isOwner = false)
         {
             NetworkObject player = null;
-            ActionInMainThreadUtil.Instance.Invoke(() =>
+            ActionInMainThreadUtil.Instance.InvokeAndWait(() =>
             {
                 player = GameManager.Instance.CreatePlayer(position, isOwner).NetworkObject;
                 player.UpdatePosition(position.x, position.y);

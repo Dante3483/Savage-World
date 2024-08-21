@@ -7,6 +7,8 @@ namespace SavageWorld.Runtime.Enums.Network
         CreatePlayer,
         Disconnect,
 
-        SendTransform
+        SendTransform,
+        SendWorldCellData,
+        SendEntityAnimation
     }
 }

@@ -1,3 +1,5 @@
+using SavageWorld.Runtime.Console;
+using SavageWorld.Runtime.Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +20,7 @@ public class WorldDataManager : Singleton<WorldDataManager>
     private WorldCellData[,] _worldData;
     private string _blockInfo;
     private Dictionary<Sprite, List<Vector2>> _physicsShapesBySprite;
+    private HashSet<Vector2Int> _hashSetOfCollidersPositions;
     #endregion
 
     #region Properties
@@ -63,12 +66,13 @@ public class WorldDataManager : Singleton<WorldDataManager>
     #region Public Methods
     public void Initialize()
     {
+        _hashSetOfCollidersPositions = new();
         TerrainConfigurationSO terrainConfiguration = _gameManager.TerrainConfiguration;
         int terrainWidth = terrainConfiguration.TerrainWidth;
         int terrainHeight = terrainConfiguration.TerrainHeight;
         _worldData = new WorldCellData[terrainWidth, terrainHeight];
-        WorldCellData v = WorldCellData.GetEmpty();
-        Debug.Log(Marshal.SizeOf(v));
+        WorldCellData emptyData = WorldCellData.GetEmpty();
+        GameConsole.Log($"Size of world cell data: {Marshal.SizeOf(emptyData)}");
         Parallel.For(0, terrainWidth, (index) =>
         {
             int x = index;
@@ -97,9 +101,8 @@ public class WorldDataManager : Singleton<WorldDataManager>
     public void SetBlockData(int x, int y, BlockSO data)
     {
         _worldData[x, y].SetBlockData(data);
-        if (_gameManager.IsPlayingState && !_gameManager.IsClient)
+        if (_gameManager.IsPlayingState)
         {
-            //SetBlockDataServerRpc(x, y, data.Type, data.GetId());
             SetUpBlockData(x, y);
             CellDataChanged?.Invoke(x, y);
         }
@@ -108,9 +111,8 @@ public class WorldDataManager : Singleton<WorldDataManager>
     public void SetWallData(int x, int y, BlockSO data)
     {
         _worldData[x, y].SetWallData(data);
-        if (_gameManager.IsPlayingState && !_gameManager.IsClient)
+        if (_gameManager.IsPlayingState)
         {
-            //SetWallDataServerRpc(x, y, data.GetId());
             SetUpWallData(x, y);
         }
     }
@@ -118,10 +120,23 @@ public class WorldDataManager : Singleton<WorldDataManager>
     public void SetLiquidData(int x, int y, BlockSO data, float flowValue = 100)
     {
         _worldData[x, y].SetLiquidData(data, flowValue);
-        if (_gameManager.IsPlayingState && !_gameManager.IsClient)
+        if (_gameManager.IsPlayingState)
         {
-            //SetLiquidDataServerRpc(x, y, data.GetId(), flowValue);
             SetUpLiquidData(x, y);
+        }
+    }
+
+    public void SetUpBlockData(int x, int y)
+    {
+        if (!NetworkManager.Instance.IsClient)
+        {
+            SetRandomBlockTile(x, y);
+        }
+        if (IsEmpty(x, y) || IsSolid(x, y))
+        {
+            SetColliderIndex(x, y, byte.MaxValue);
+            UpdateCollidersAround(x, y);
+            UpdateCollider(x, y);
         }
     }
 
@@ -510,20 +525,14 @@ public class WorldDataManager : Singleton<WorldDataManager>
             _worldData[x, y].ColliderIndex = i;
         }
     }
+
+    public void OnColliderChanged(int x, int y)
+    {
+        CellColliderChanged?.Invoke(x, y);
+    }
     #endregion
 
     #region Private Methods
-    private void SetUpBlockData(int x, int y)
-    {
-        SetRandomBlockTile(x, y);
-        if (IsEmpty(x, y) || IsSolid(x, y))
-        {
-            SetColliderIndex(x, y, byte.MaxValue);
-            UpdateCollidersAround(x, y);
-            UpdateCollider(x, y);
-        }
-    }
-
     private void SetUpWallData(int x, int y)
     {
         SetRandomWallTile(x, y);

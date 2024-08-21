@@ -110,7 +110,7 @@ namespace SavageWorld.Runtime.Console
             }
         }
 
-        public static void LogText(string text)
+        public static void Log(string text)
         {
             lock (Instance._logsStringBuilder)
             {
@@ -119,14 +119,14 @@ namespace SavageWorld.Runtime.Console
             }
         }
 
-        public static void LogText(string text, Color color)
+        public static void Log(string text, Color color)
         {
-            LogText($"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{text}</color>");
+            Log($"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{text}</color>");
         }
 
         public static void LogError(string text)
         {
-            LogText(text, Color.yellow);
+            Log(text, Color.yellow);
         }
 
         public static void ClearText()
@@ -153,7 +153,7 @@ namespace SavageWorld.Runtime.Console
         {
             if (!inputValue.StartsWith(_prefix))
             {
-                LogText(inputValue);
+                Log(inputValue);
                 return;
             }
             string inputValueWithoutPrefix = inputValue.Remove(0, _prefix.Length);

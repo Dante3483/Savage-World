@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace SavageWorld.Runtime
+namespace SavageWorld.Runtime.Network.Messages
 {
     public struct MessageData
     {

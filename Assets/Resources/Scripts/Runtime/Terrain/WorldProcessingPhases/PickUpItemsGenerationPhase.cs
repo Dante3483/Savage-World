@@ -31,7 +31,7 @@ public class PickUpItemsGenerationPhase : WorldProcessingPhaseBase
         int x;
         int y;
 
-        ActionInMainThreadUtil.Instance.Invoke(() =>
+        ActionInMainThreadUtil.Instance.InvokeAndWait(() =>
         {
             allPickUpItems = new Dictionary<BiomesID, List<PickUpItem>>()
             {
@@ -85,7 +85,7 @@ public class PickUpItemsGenerationPhase : WorldProcessingPhaseBase
                     }
                 }
 
-                ActionInMainThreadUtil.Instance.Invoke(() =>
+                ActionInMainThreadUtil.Instance.InvokeAndWait(() =>
                 {
                     foreach (Vector3 coord in coords)
                     {

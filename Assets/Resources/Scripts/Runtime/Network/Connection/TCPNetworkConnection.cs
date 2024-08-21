@@ -120,6 +120,7 @@ namespace SavageWorld.Runtime.Network.Connection
                     return;
                 }
                 _client = new();
+                _client.NoDelay = true;
                 _client.Connect(ipAddress, port);
                 Connected?.Invoke(this);
             }
@@ -156,8 +157,15 @@ namespace SavageWorld.Runtime.Network.Connection
             if (!_isReading && _client.Connected && _client.GetStream().DataAvailable)
             {
                 _isReading = true;
-                int size = _client.GetStream().Read(buffer, 0, buffer.Length);
-                Debug.Log(size);
+                int size = 0;
+                size += _client.GetStream().Read(buffer, 0, 2);
+                ushort messageLength = buffer[0];
+                messageLength = (ushort)(messageLength | buffer[1] << 8);
+                while (size != messageLength)
+                {
+                    int bytesToRead = messageLength - size;
+                    size += _client.GetStream().Read(buffer, size, bytesToRead);
+                }
                 callback?.Invoke(size);
                 _isReading = false;
             }
@@ -184,7 +192,8 @@ namespace SavageWorld.Runtime.Network.Connection
             {
                 while (IsServerActive)
                 {
-                    INetworkConnection client = new TCPNetworkConnection(await _server.AcceptTcpClientAsync());
+                    TCPNetworkConnection client = new(await _server.AcceptTcpClientAsync());
+                    client._client.NoDelay = true;
                     ClientConnected?.Invoke(client);
                 }
             }

@@ -1,4 +1,5 @@
 using SavageWorld.Runtime.Enums.Network;
+using SavageWorld.Runtime.Network.Messages;
 using UnityEngine;
 
 namespace SavageWorld.Runtime.Network.Objects

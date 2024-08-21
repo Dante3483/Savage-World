@@ -87,9 +87,9 @@ namespace SavageWorld.Runtime.Network.Messages
                 long packetSize = _binaryWriter.BaseStream.Position;
                 _binaryWriter.BaseStream.Position = 0;
                 _binaryWriter.Write((ushort)packetSize);
-                if (messageType != NetworkMessageTypes.SendTransform)
+                if (messageType != NetworkMessageTypes.SendTransform && messageType != NetworkMessageTypes.SendWorldCellData)
                 {
-                    GameConsole.LogText(messageType.ToString() + $" {packetSize}", Color.yellow);
+                    GameConsole.Log(messageType.ToString() + $" {packetSize}", Color.yellow);
                 }
                 return packetSize;
             }
@@ -116,22 +116,15 @@ namespace SavageWorld.Runtime.Network.Messages
             while (size > 0)
             {
                 ushort packetSize = _binaryReader.ReadUInt16();
-                Debug.Log($"Packet size: {packetSize}");
-                Debug.Log($"Position: {_binaryReader.BaseStream.Position}");
                 NetworkMessageTypes messageType = (NetworkMessageTypes)_binaryReader.ReadByte();
-                Debug.Log($"Message type: {messageType}");
-                Debug.Log($"Position: {_binaryReader.BaseStream.Position}");
                 NetworkMessageBase message = _messageByType[messageType];
                 message.Read();
-                Debug.Log($"Position: {_binaryReader.BaseStream.Position}");
                 if (messageType != NetworkMessageTypes.SendTransform)
                 {
-                    GameConsole.LogText(messageType.ToString() + $" {packetSize}", Color.yellow);
+                    GameConsole.Log(messageType.ToString() + $" {packetSize}", Color.yellow);
                 }
                 size -= packetSize;
-                Debug.Log($"Current size: {size}");
             }
-            //long size = _binaryReader.BaseStream.Position - 1;
         }
         #endregion
 
@@ -145,6 +138,7 @@ namespace SavageWorld.Runtime.Network.Messages
                 { NetworkMessageTypes.CreatePlayer, new CreatePlayerMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.Disconnect, new DisconnectMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.SendTransform, new SendTransformMessage(_binaryWriter, _binaryReader) },
+                { NetworkMessageTypes.SendWorldCellData, new SendWorldCellDataMessage(_binaryWriter, _binaryReader) },
             };
         }
         #endregion

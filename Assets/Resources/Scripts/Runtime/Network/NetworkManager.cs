@@ -109,10 +109,10 @@ namespace SavageWorld.Runtime.Network
             {
                 SetServerConnection();
                 string ipAddress = string.IsNullOrEmpty(_ipAddressInputField.text) ? _networkConfiguration.IpAddress : _ipAddressInputField.text;
-                _server.Start(ipAddress, _networkConfiguration.Port);
+                _server.Start(_ipAddressInputField.text, _networkConfiguration.Port);
                 _networkObjects.CreatePlayerServer(true);
             }
-            GameConsole.LogText("Server started", Color.green);
+            GameConsole.Log("Server started", Color.green);
         }
 
         public void StopServer()
@@ -121,7 +121,7 @@ namespace SavageWorld.Runtime.Network
             {
                 _server.Stop();
             }
-            GameConsole.LogText("Server stopped", Color.green);
+            GameConsole.Log("Server stopped", Color.green);
         }
 
         public void ConnectToServer()
@@ -133,7 +133,7 @@ namespace SavageWorld.Runtime.Network
                 connection.Disconnected += DisconnectedEventHandler;
                 _client.SetConnection(connection);
                 string ipAddress = string.IsNullOrEmpty(_ipAddressInputField.text) ? _networkConfiguration.IpAddress : _ipAddressInputField.text;
-                _client.Connect(ipAddress, _networkConfiguration.Port);
+                _client.Connect(_ipAddressInputField.text, _networkConfiguration.Port);
             }
         }
 
@@ -265,7 +265,7 @@ namespace SavageWorld.Runtime.Network
                     default:
                         {
                             clientConnected = true;
-                            GameConsole.LogText($"Client {id} connected");
+                            GameConsole.Log($"Client {id} connected");
                             ClientConnected?.Invoke(id);
                         }
                         break;
@@ -313,6 +313,15 @@ namespace SavageWorld.Runtime.Network
 
         private void ServerStartedEventHandler(INetworkConnection connection)
         {
+            WorldDataManager.Instance.CellDataChanged += (x, y) =>
+            {
+                MessageData messageData = new()
+                {
+                    IntNumber1 = x,
+                    IntNumber2 = y,
+                };
+                SendMessage(NetworkMessageTypes.SendWorldCellData, messageData, isBroadcast: true);
+            };
             ServerStarted?.Invoke(connection);
         }
 

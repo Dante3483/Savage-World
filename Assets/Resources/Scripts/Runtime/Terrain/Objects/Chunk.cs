@@ -3,7 +3,7 @@ public struct Chunk
     #region Private fields
     private BiomeSO _biome;
     private Vector2Byte _coords;
-    private bool _activity;
+    private bool _loaded;
     #endregion
 
     #region Public fields
@@ -37,16 +37,16 @@ public struct Chunk
         }
     }
 
-    public bool Activity
+    public bool Loaded
     {
         get
         {
-            return _activity;
+            return _loaded;
         }
 
         set
         {
-            _activity = value;
+            _loaded = value;
         }
     }
     #endregion
@@ -57,7 +57,7 @@ public struct Chunk
         _biome = GameManager.Instance.TerrainConfiguration.Biomes[0];
         _coords.x = x;
         _coords.y = y;
-        _activity = false;
+        _loaded = false;
     }
 
     public override string ToString()

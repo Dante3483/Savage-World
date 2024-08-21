@@ -1,3 +1,4 @@
+using SavageWorld.Runtime.Console;
 using SavageWorld.Runtime.Enums.Network;
 using System;
 using System.IO;
@@ -10,6 +11,7 @@ namespace SavageWorld.Runtime.Network.Messages
         #region Fields
         protected BinaryWriter _writer;
         protected BinaryReader _reader;
+        protected NetworkManager _networkManager;
         #endregion
 
         #region Properties
@@ -25,6 +27,7 @@ namespace SavageWorld.Runtime.Network.Messages
         {
             _writer = writer;
             _reader = reader;
+            _networkManager = NetworkManager.Instance;
         }
 
         public bool Write(MessageData messageData)
@@ -37,6 +40,7 @@ namespace SavageWorld.Runtime.Network.Messages
             }
             catch (Exception e)
             {
+                GameConsole.LogError(e.Message);
                 Debug.LogException(e);
                 Debug.Log($"ERROR: {e.Message}");
                 return false;
@@ -52,6 +56,7 @@ namespace SavageWorld.Runtime.Network.Messages
             }
             catch (Exception e)
             {
+                GameConsole.LogError(e.Message);
                 Debug.LogException(e);
                 Debug.Log($"ERROR: {e.Message}");
                 return false;

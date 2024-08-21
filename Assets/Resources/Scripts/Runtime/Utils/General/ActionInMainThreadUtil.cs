@@ -5,6 +5,7 @@ public class ActionInMainThreadUtil : Singleton<ActionInMainThreadUtil>
 {
     #region Fields
     private Action _action;
+    private Action _updateAction;
     private bool _isActionComplete;
     private Thread _mainThread;
     #endregion
@@ -23,6 +24,12 @@ public class ActionInMainThreadUtil : Singleton<ActionInMainThreadUtil>
         _mainThread = Thread.CurrentThread;
     }
 
+    private void Update()
+    {
+        _updateAction?.Invoke();
+        _updateAction = null;
+    }
+
     private void FixedUpdate()
     {
         if (_action != null)
@@ -38,7 +45,7 @@ public class ActionInMainThreadUtil : Singleton<ActionInMainThreadUtil>
     #endregion
 
     #region Public Methods
-    public void Invoke(Action action)
+    public void InvokeAndWait(Action action)
     {
         if (IsMainThread())
         {
@@ -50,6 +57,11 @@ public class ActionInMainThreadUtil : Singleton<ActionInMainThreadUtil>
             _action = action;
             while (!_isActionComplete) ;
         }
+    }
+
+    public void InvokeInNextUpdate(Action action)
+    {
+        _updateAction += action;
     }
     #endregion
 

@@ -1,3 +1,6 @@
+using SavageWorld.Runtime.Enums.Network;
+using SavageWorld.Runtime.Network;
+using SavageWorld.Runtime.Network.Messages;
 using SavageWorld.Runtime.Network.Objects;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,6 +21,8 @@ public class Player : MonoBehaviour
     private PlayerInteractions _playerInteractions;
     [SerializeField]
     private NetworkObject _networkObject;
+    [SerializeField]
+    private Vector2Int _currentChunk;
     [Header("Debug")]
     [SerializeField]
     private List<ItemQuantity> _starterItems;
@@ -61,6 +66,35 @@ public class Player : MonoBehaviour
         _worldDataManager = WorldDataManager.Instance;
         _playerInteractions = GetComponent<PlayerInteractions>();
         _networkObject = GetComponent<NetworkObject>();
+    }
+
+    private void FixedUpdate()
+    {
+        if (NetworkManager.Instance.IsClient && transform.hasChanged)
+        {
+            Vector2Int chunkPosition = ChunksManager.Instance.GetChunkPositionByWorldPosition((int)transform.position.x, (int)transform.position.y);
+            if (chunkPosition != _currentChunk)
+            {
+                for (int x = chunkPosition.x - 1; x <= chunkPosition.x + 1; x++)
+                {
+                    for (int y = chunkPosition.y - 1; y <= chunkPosition.y + 1; y++)
+                    {
+                        if (!ChunksManager.Instance.IsChunkLoaded(new(x, y)))
+                        {
+                            MessageData messageData = new()
+                            {
+                                IntNumber1 = NetworkManager.Instance.Client.Id,
+                                IntNumber2 = x,
+                                IntNumber3 = y,
+                            };
+                            NetworkManager.Instance.SendMessage(NetworkMessageTypes.SendChunkData, messageData);
+                        }
+                    }
+                }
+                _currentChunk = chunkPosition;
+            }
+            transform.hasChanged = false;
+        }
     }
     #endregion
 

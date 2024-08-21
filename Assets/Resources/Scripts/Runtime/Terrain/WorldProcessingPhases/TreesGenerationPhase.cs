@@ -32,7 +32,7 @@ public class TreesGenerationPhase : WorldProcessingPhaseBase
         int i;
         bool isValidPlace;
 
-        ActionInMainThreadUtil.Instance.Invoke(() =>
+        ActionInMainThreadUtil.Instance.InvokeAndWait(() =>
         {
             allTrees = new Dictionary<BiomesID, List<Tree>>()
             {
@@ -100,7 +100,7 @@ public class TreesGenerationPhase : WorldProcessingPhaseBase
                     }
                 }
 
-                ActionInMainThreadUtil.Instance.Invoke(() =>
+                ActionInMainThreadUtil.Instance.InvokeAndWait(() =>
                 {
                     foreach (Vector3 coord in coords)
                     {

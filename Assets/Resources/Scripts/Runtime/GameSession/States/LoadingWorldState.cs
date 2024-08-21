@@ -34,7 +34,7 @@ namespace SavageWorld.Runtime.GameSession.States
         private void LoadWorld()
         {
             _gameManager.Terrain.LoadWorld();
-            ActionInMainThreadUtil.Instance.Invoke(() => _gameManager.ChangeState(_gameManager.CreatingPlayerState));
+            ActionInMainThreadUtil.Instance.InvokeAndWait(() => _gameManager.ChangeState(_gameManager.CreatingPlayerState));
         }
         #endregion
     }

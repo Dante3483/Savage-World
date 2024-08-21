@@ -99,11 +99,11 @@ public class TerrainGeneration
             watch.Restart();
             generationPhase.StartPhase();
             watch.Stop();
-            GameConsole.LogText($"{generationPhase.Name}: {watch.Elapsed.TotalSeconds}", Color.green);
+            GameConsole.Log($"{generationPhase.Name}: {watch.Elapsed.TotalSeconds}", Color.green);
             totalTime += watch.Elapsed.TotalSeconds;
             GameManager.Instance.LoadingValue += step;
         }
-        GameConsole.LogText($"Total time: {totalTime}", Color.green);
+        GameConsole.Log($"Total time: {totalTime}", Color.green);
     }
     #endregion
 

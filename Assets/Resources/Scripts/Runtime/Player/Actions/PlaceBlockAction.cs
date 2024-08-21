@@ -1,3 +1,6 @@
+using SavageWorld.Runtime.Enums.Network;
+using SavageWorld.Runtime.Network;
+using SavageWorld.Runtime.Network.Messages;
 using System.Collections;
 using UnityEngine;
 
@@ -47,7 +50,22 @@ public class PlaceBlockAction : PlayerActionBase
     {
         int x = _position.x;
         int y = _position.y;
-        _worldDataManager.SetBlockData(x, y, _block);
+        if (NetworkManager.Instance.IsClient)
+        {
+            MessageData messageData = new()
+            {
+                IntNumber1 = x,
+                IntNumber2 = y,
+                IntNumber3 = (int)_block.Type,
+                IntNumber4 = _block.GetId()
+            };
+            NetworkManager.Instance.SendMessage(NetworkMessageTypes.SendWorldCellData, messageData);
+        }
+        else
+        {
+            _worldDataManager.SetBlockData(x, y, _block);
+        }
+        //TODO: SYNC INVENTORY
         _inventory.RemoveQuantityFromSelectedItem(1);
         _player.StartCoroutine(BlockPlacementCooldownCoroutine());
         _block = null;

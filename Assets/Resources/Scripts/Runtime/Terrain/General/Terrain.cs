@@ -93,7 +93,7 @@ public class Terrain : MonoBehaviour
     {
         try
         {
-            ActionInMainThreadUtil.Instance.Invoke(() => GameManager.Instance.Seed = GameManager.Instance.IsStaticSeed ? GameManager.Instance.Seed : UnityEngine.Random.Range(-1000000, 1000000));
+            ActionInMainThreadUtil.Instance.InvokeAndWait(() => GameManager.Instance.Seed = GameManager.Instance.IsStaticSeed ? GameManager.Instance.Seed : UnityEngine.Random.Range(-1000000, 1000000));
             GameManager.Instance.RandomVar = new System.Random(GameManager.Instance.Seed);
             TerrainGeneration terrainGeneration = new();
             terrainGeneration.StartTerrainGeneration();

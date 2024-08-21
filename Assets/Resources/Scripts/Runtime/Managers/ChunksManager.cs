@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ChunksManager : MonoBehaviour
+public class ChunksManager : Singleton<ChunksManager>
 {
     #region Private fields
     private int _chunkSize;
@@ -8,7 +8,7 @@ public class ChunksManager : MonoBehaviour
     #endregion
 
     #region Public fields
-    public static ChunksManager Instance;
+
     #endregion
 
     #region Properties
@@ -27,11 +27,6 @@ public class ChunksManager : MonoBehaviour
     #endregion
 
     #region Methods
-    private void Awake()
-    {
-        Instance = this;
-    }
-
     public void Initialize()
     {
         TerrainConfigurationSO terrainConfiguration = GameManager.Instance.TerrainConfiguration;
@@ -55,6 +50,11 @@ public class ChunksManager : MonoBehaviour
         return Chunks[x / _chunkSize, y / _chunkSize];
     }
 
+    public Vector2Int GetChunkPositionByWorldPosition(int x, int y)
+    {
+        return new(x / _chunkSize, y / _chunkSize);
+    }
+
     public void SetChunkBiome(int x, int y, BiomeSO biome)
     {
         Chunk chunk = GetChunk(x, y);
@@ -70,6 +70,16 @@ public class ChunksManager : MonoBehaviour
         {
             _chunks[chunk.Coords.x, chunk.Coords.y].Biome = biome;
         }
+    }
+
+    public void SetChunkLoaded(int x, int y)
+    {
+        _chunks[x / _chunkSize, y / _chunkSize].Loaded = true;
+    }
+
+    public bool IsChunkLoaded(Vector2Int chunkPosition)
+    {
+        return _chunks[chunkPosition.x, chunkPosition.y].Loaded;
     }
     #endregion
 }
