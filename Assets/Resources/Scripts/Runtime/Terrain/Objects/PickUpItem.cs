@@ -65,13 +65,14 @@ public class PickUpItem : GameObjectBase
     private void Awake()
     {
         GetComponent<SpriteRenderer>().enabled = false;
+        _intPosition.x = Mathf.FloorToInt(transform.position.x);
+        _intPosition.y = Mathf.FloorToInt(transform.position.y);
+        WorldDataManager.Instance.SetOccupiedFlag(_intPosition.x, _intPosition.y, true);
     }
 
     private void Update()
     {
-        _intPosition.x = Mathf.FloorToInt(transform.position.x);
-        _intPosition.y = Mathf.FloorToInt(transform.position.y);
-        if (WorldDataManager.Instance.IsFree(_intPosition.x, _intPosition.y - 1))
+        if (WorldDataManager.Instance.IsEmpty(_intPosition.x, _intPosition.y - 1))
         {
             WorldDataManager.Instance.SetOccupiedFlag(_intPosition.x, _intPosition.y, false);
             DeleteObject();

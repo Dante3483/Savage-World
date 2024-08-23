@@ -87,6 +87,7 @@ namespace SavageWorld.Runtime.Console
             if (_isLogsUpdated)
             {
                 Instance._logs.SetText(Instance._logsStringBuilder);
+                _isLogsUpdated = false;
             }
         }
         #endregion
@@ -131,6 +132,7 @@ namespace SavageWorld.Runtime.Console
 
         public static void ClearText()
         {
+            Instance._isLogsUpdated = true;
             Instance._logsStringBuilder.Clear();
         }
         #endregion

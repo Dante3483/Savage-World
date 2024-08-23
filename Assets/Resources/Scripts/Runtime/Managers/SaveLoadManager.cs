@@ -1,4 +1,5 @@
 using Items;
+using SavageWorld.Runtime.Console;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -294,13 +295,16 @@ public class SaveLoadManager : Singleton<SaveLoadManager>
     {
         Debug.Log("Save pickup items");
         binaryWriter.Write(_gameManager.Terrain.PickUpItems.transform.childCount);
+        int count = 0;
         foreach (Transform pickUpItemTransform in _gameManager.Terrain.PickUpItems.transform)
         {
             PickUpItem pickUpItem = pickUpItemTransform.GetComponent<PickUpItem>();
             binaryWriter.Write((byte)pickUpItem.Id);
             binaryWriter.Write((ushort)pickUpItemTransform.position.x);
             binaryWriter.Write((ushort)pickUpItemTransform.position.y);
+            count++;
         }
+        GameConsole.Log($"Pickup items saved: {count}");
     }
 
     private void SavePlayer(BinaryWriter binaryWriter)
@@ -490,7 +494,6 @@ public class SaveLoadManager : Singleton<SaveLoadManager>
             TreesID treeId = (TreesID)binaryReader.ReadByte();
             position.x = binaryReader.ReadUInt16();
             position.y = binaryReader.ReadUInt16();
-
             _gameManager.TreesAtlas.GetTreeById(treeId).CreateInstance(position);
         }
         _gameManager.LoadingValue += _loadingStep;
@@ -512,12 +515,7 @@ public class SaveLoadManager : Singleton<SaveLoadManager>
             PickUpItemsID pickUpItemId = (PickUpItemsID)binaryReader.ReadByte();
             position.x = binaryReader.ReadUInt16();
             position.y = binaryReader.ReadUInt16();
-
-            PickUpItem pickUpItem = _gameManager.PickUpItemsAtlas.GetPickUpItemById(pickUpItemId);
-
-            GameObject pickUpItemGameObject = Instantiate(pickUpItem.gameObject, position, Quaternion.identity, _gameManager.Terrain.PickUpItems.transform);
-            pickUpItemGameObject.name = pickUpItem.gameObject.name;
-            _worldDataManager.SetOccupiedFlag(position.x, position.y, true);
+            _gameManager.PickUpItemsAtlas.GetPickUpItemById(pickUpItemId).CreateInstance(position);
         }
         _gameManager.LoadingValue += _loadingStep;
     }

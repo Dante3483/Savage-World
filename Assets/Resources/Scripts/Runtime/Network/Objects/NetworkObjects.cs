@@ -1,3 +1,4 @@
+using SavageWorld.Runtime.Console;
 using SavageWorld.Runtime.Network.Objects;
 using System;
 using System.Collections.Generic;
@@ -48,9 +49,11 @@ namespace SavageWorld.Runtime.Network
 
         public void Initialize()
         {
+            InitializeArrayOfObjects(Resources.LoadAll<NetworkObject>("Prefabs"));
             for (int i = 0; i < _arrayOfNetworkObjects.Length; i++)
             {
                 _arrayOfNetworkObjects[i].GlobalId = i;
+                GameConsole.Log($"{_arrayOfNetworkObjects[i].name} - {i}");
             }
         }
 
