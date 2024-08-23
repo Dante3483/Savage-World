@@ -69,12 +69,6 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
     [SerializeField]
     private bool _isInputTextInFocus;
 
-    [Header("Network")]
-    [SerializeField]
-    private bool _isMultiplayer;
-    [SerializeField]
-    private bool _isClient;
-
     private StateMachine<GameStateBase> _stateMachine;
     private InitializationState _initializationState;
     private MainMenuState _mainMenuState;
@@ -92,6 +86,9 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
     private Terrain _terrain;
     private float _loadingValue;
     private string _phasesInfo;
+
+    //TODO:REMOVE
+    public bool IsClient;
     #endregion
 
     #region Public fields
@@ -353,19 +350,6 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
         }
     }
 
-    public bool IsMultiplayer
-    {
-        get
-        {
-            return _isMultiplayer;
-        }
-
-        set
-        {
-            _isMultiplayer = value;
-        }
-    }
-
     public Player Player
     {
         get
@@ -433,19 +417,6 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
         }
     }
 
-    public bool IsClient
-    {
-        get
-        {
-            return _isClient;
-        }
-
-        set
-        {
-            _isClient = value;
-        }
-    }
-
     public LoadingDataFromHostState LoadingDataFromHostState
     {
         get
@@ -509,6 +480,19 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
             _loadingPlayerState = value;
         }
     }
+
+    public Player PlayerPrefab
+    {
+        get
+        {
+            return _playerPrefab;
+        }
+
+        set
+        {
+            _playerPrefab = value;
+        }
+    }
     #endregion
 
     #region Methods
@@ -564,18 +548,6 @@ public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
     public bool IsInMapRange(int x, int y)
     {
         return x >= 0 && x < _currentTerrainWidth && y >= 0 && y < _currentTerrainHeight;
-    }
-
-    public Player CreatePlayer(Vector2 position, bool isOwner = true)
-    {
-        Player player = Instantiate(_playerPrefab, position, Quaternion.identity);
-        if (isOwner)
-        {
-            _player = player;
-            Camera.main.GetComponent<FollowObject>().Target = _player.transform;
-        }
-        player.Initialize(_isMultiplayer, isOwner);
-        return player;
     }
 
     public Transform GetPlayerTransform()

@@ -1,9 +1,11 @@
+using SavageWorld.Runtime;
+using SavageWorld.Runtime.Enums.Network;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
-public class PickUpItem : MonoBehaviour
+public class PickUpItem : GameObjectBase
 {
-    #region Private fields
+    #region Fields
     [Header("Main Properties")]
     [SerializeField] private PickUpItemsID _id;
 
@@ -12,10 +14,6 @@ public class PickUpItem : MonoBehaviour
     [SerializeField] private int _chanceToSpawn;
 
     private Vector2Int _intPosition = new();
-    #endregion
-
-    #region Public fields
-
     #endregion
 
     #region Properties
@@ -59,7 +57,11 @@ public class PickUpItem : MonoBehaviour
     }
     #endregion
 
-    #region Methods
+    #region Events / Delegates
+
+    #endregion
+
+    #region Monobehaviour Methods
     private void Awake()
     {
         GetComponent<SpriteRenderer>().enabled = false;
@@ -75,7 +77,20 @@ public class PickUpItem : MonoBehaviour
             DeleteObject();
         }
     }
+    #endregion
 
+    #region Public Methods
+    public override GameObjectBase CreateInstance(Vector3 position, bool isOwner = true)
+    {
+        PickUpItem pickUpItemGameObject = Instantiate(this, position, Quaternion.identity, GameManager.Instance.Terrain.PickUpItems.transform);
+        pickUpItemGameObject.name = gameObject.name;
+        NetworkObject.IsOwner = isOwner;
+        NetworkObject.Type = NetworkObjectTypes.Environment;
+        return pickUpItemGameObject;
+    }
+    #endregion
+
+    #region Private Methods
     private void DeleteObject()
     {
         Destroy(gameObject);

@@ -41,7 +41,6 @@ namespace SavageWorld.Runtime.Network.Messages
             }
             if (_networkManager.IsServer)
             {
-                byte clientId = _reader.ReadByte();
                 int chunkX = _reader.ReadInt32();
                 int chunkY = _reader.ReadInt32();
                 MessageData messageData = new()
@@ -49,7 +48,7 @@ namespace SavageWorld.Runtime.Network.Messages
                     IntNumber1 = chunkX,
                     IntNumber2 = chunkY
                 };
-                _networkManager.SendMessage(NetworkMessageTypes.SendChunkData, messageData, clientId: clientId);
+                _networkManager.SendMessageTo(NetworkMessageTypes.SendChunkData, messageData, _senderId);
             }
         }
 
@@ -57,9 +56,8 @@ namespace SavageWorld.Runtime.Network.Messages
         {
             if (_networkManager.IsClient)
             {
-                _writer.Write((byte)messageData.IntNumber1);
+                _writer.Write(messageData.IntNumber1);
                 _writer.Write(messageData.IntNumber2);
-                _writer.Write(messageData.IntNumber3);
             }
             if (_networkManager.IsServer)
             {

@@ -36,8 +36,7 @@ namespace SavageWorld.Runtime.Network.Messages
         /// </summary>
         protected override void ReadData()
         {
-            int id = _reader.ReadInt32();
-            ActionInMainThreadUtil.Instance.InvokeAndWait(() => NetworkManager.Instance.DisconnectClient(id));
+            ActionInMainThreadUtil.Instance.InvokeAndWait(() => NetworkManager.Instance.DisconnectClient(_senderId));
         }
 
         /// <summary>
@@ -46,7 +45,7 @@ namespace SavageWorld.Runtime.Network.Messages
         /// <param name="messageData">Client's id</param>
         protected override void WriteData(MessageData messageData)
         {
-            _writer.Write(messageData.IntNumber1);
+
         }
         #endregion
     }

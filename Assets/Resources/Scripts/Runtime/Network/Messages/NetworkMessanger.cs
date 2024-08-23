@@ -93,6 +93,10 @@ namespace SavageWorld.Runtime.Network.Messages
                 }
                 return packetSize;
             }
+            else
+            {
+                GameConsole.Log($"Message {messageType} not found in dictionary");
+            }
             return 0L;
         }
 
@@ -135,10 +139,12 @@ namespace SavageWorld.Runtime.Network.Messages
             {
                 { NetworkMessageTypes.SendClientId, new SendClientIdMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.SendChunkData, new SendChunkDataMessage(_binaryWriter, _binaryReader) },
-                { NetworkMessageTypes.CreatePlayer, new CreatePlayerMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.Disconnect, new DisconnectMessage(_binaryWriter, _binaryReader) },
+                { NetworkMessageTypes.CreatePlayer, new CreatePlayerMessage(_binaryWriter, _binaryReader) },
+                { NetworkMessageTypes.CreateEnvironment, new CreateEnvironmentMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.SendTransform, new SendTransformMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.SendWorldCellData, new SendWorldCellDataMessage(_binaryWriter, _binaryReader) },
+                { NetworkMessageTypes.SendEntityAnimation, new SendEntityAnimationMessage(_binaryWriter, _binaryReader) },
             };
         }
         #endregion

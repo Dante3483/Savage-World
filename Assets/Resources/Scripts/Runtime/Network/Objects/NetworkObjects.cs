@@ -13,7 +13,7 @@ namespace SavageWorld.Runtime.Network
         [SerializeField]
         private NetworkObject _playerPrefab;
         [SerializeField]
-        private List<NetworkObject> _listOfNetworkObjects;
+        private NetworkObject[] _arrayOfNetworkObjects;
         [SerializeField]
         private Transform _objectsParent;
         private Dictionary<long, NetworkObject> _objectsById;
@@ -41,6 +41,19 @@ namespace SavageWorld.Runtime.Network
             _objectIDGenerator = new();
         }
 
+        public void InitializeArrayOfObjects(NetworkObject[] objects)
+        {
+            _arrayOfNetworkObjects = objects;
+        }
+
+        public void Initialize()
+        {
+            for (int i = 0; i < _arrayOfNetworkObjects.Length; i++)
+            {
+                _arrayOfNetworkObjects[i].GlobalId = i;
+            }
+        }
+
         public void Reset()
         {
             foreach (NetworkObject obj in _objectsById.Values)
@@ -51,20 +64,28 @@ namespace SavageWorld.Runtime.Network
             _objectIDGenerator = new();
         }
 
-        public long CreatePlayerServer(bool isOwner = false)
+        public long AddObjectToDictionary(NetworkObject obj)
         {
-            NetworkObject player = CreatePlayer(new(3655, 2200), isOwner);
-            long id = GetObjectId(player);
-            player.Id = id;
-            _objectsById[id] = player;
-            return id;
+            if (!NetworkManager.Instance.IsClient)
+            {
+                long id = _objectIDGenerator.GetId(obj, out bool firstTime);
+                _objectsById[id] = obj;
+                return id;
+            }
+            else
+            {
+                return obj.Id;
+            }
         }
 
-        public void CreatePlayerClient(long id, Vector2 position, bool isOwner = false)
+        public void CreatePlayer(long objectId, Vector2 position, bool isOwner = false)
         {
-            NetworkObject player = CreatePlayer(position, isOwner);
-            player.Id = id;
-            _objectsById[id] = player;
+            CreateObject(_playerPrefab.GlobalId, position, objectId, isOwner);
+        }
+
+        public void CreateEnvironment(long globalId, long objectId, Vector2 position, bool isOwner = false)
+        {
+            CreateObject(globalId, position, objectId, isOwner);
         }
 
         public void DestroyPlayer(long id)
@@ -76,49 +97,28 @@ namespace SavageWorld.Runtime.Network
             }
         }
 
-        public void UpdatePosition(long id, float x, float y)
+        public NetworkObject GetObjectById(long id)
         {
-            if (_objectsById.TryGetValue(id, out NetworkObject obj))
-            {
-                obj.UpdatePosition(x, y);
-            }
-        }
-
-        public void UpdateRotation(long id, float x, float y)
-        {
-            if (_objectsById.TryGetValue(id, out NetworkObject obj))
-            {
-                obj.UpdateRotation(x, y);
-            }
-        }
-
-        public void UpdateScale(long id, float x, float y)
-        {
-            if (_objectsById.TryGetValue(id, out NetworkObject obj))
-            {
-                obj.UpdateScale(x, y);
-            }
+            _objectsById.TryGetValue(id, out NetworkObject obj);
+            return obj;
         }
         #endregion
 
         #region Private Methods
-        private NetworkObject CreatePlayer(Vector2 position, bool isOwner = false)
+        private void CreateObject(long globalId, Vector2 position, long objectId = -1, bool isOwner = false)
         {
-            NetworkObject player = null;
-            ActionInMainThreadUtil.Instance.InvokeAndWait(() =>
+            NetworkObject newObject = null;
+            ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() =>
             {
-                player = GameManager.Instance.CreatePlayer(position, isOwner).NetworkObject;
-                player.UpdatePosition(position.x, position.y);
-                //player = GameObject.Instantiate(_playerPrefab, position, Quaternion.identity);
-                //player.transform.SetParent(_objectsParent);
+                GameObjectBase prefab = _arrayOfNetworkObjects[globalId].GetComponent<GameObjectBase>();
+                newObject = prefab.CreateInstance(position, isOwner).NetworkObject;
+                newObject.UpdatePosition(position.x, position.y);
+                if (NetworkManager.Instance.IsClient)
+                {
+                    newObject.Id = objectId;
+                    _objectsById[objectId] = newObject;
+                }
             });
-            player.Type = NetworkObjectTypes.Player;
-            return player;
-        }
-
-        private long GetObjectId(object obj)
-        {
-            return _objectIDGenerator.GetId(obj, out bool firstTime);
         }
         #endregion
     }

@@ -1,11 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
+using UnityEngine;
 
 public class ActionInMainThreadUtil : Singleton<ActionInMainThreadUtil>
 {
     #region Fields
+    [SerializeField]
+    private int _maxCountOfActionsPerUpdate = 20;
+    [SerializeField]
+    private int _currentCountOfActions;
+    private Queue<Action> _updateActionQueue;
     private Action _action;
-    private Action _updateAction;
     private bool _isActionComplete;
     private Thread _mainThread;
     #endregion
@@ -22,16 +28,19 @@ public class ActionInMainThreadUtil : Singleton<ActionInMainThreadUtil>
     private void Start()
     {
         _mainThread = Thread.CurrentThread;
+        _updateActionQueue = new();
     }
 
     private void Update()
     {
-        _updateAction?.Invoke();
-        _updateAction = null;
-    }
-
-    private void FixedUpdate()
-    {
+        int count = 0;
+        _currentCountOfActions = _updateActionQueue.Count;
+        while (_updateActionQueue.Count > 0 && count < _maxCountOfActionsPerUpdate)
+        {
+            Action action = _updateActionQueue.Dequeue();
+            action.Invoke();
+            count++;
+        }
         if (_action != null)
         {
             lock (_action)
@@ -61,7 +70,7 @@ public class ActionInMainThreadUtil : Singleton<ActionInMainThreadUtil>
 
     public void InvokeInNextUpdate(Action action)
     {
-        _updateAction += action;
+        _updateActionQueue.Enqueue(action);
     }
     #endregion
 

@@ -74,7 +74,7 @@ public abstract class BreakAction : PlayerActionBase
                 IntNumber3 = (int)_replacment.Type,
                 IntNumber4 = _replacment.GetId()
             };
-            NetworkManager.Instance.SendMessage(NetworkMessageTypes.SendWorldCellData, messageData);
+            NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.SendWorldCellData, messageData);
         }
         else
         {

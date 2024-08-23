@@ -19,9 +19,9 @@ namespace SavageWorld.Runtime.GameSession.States
         #region Public Methods
         public override void Enter()
         {
-            if (_gameManager.IsMultiplayer)
+            if (NetworkManager.Instance.IsMultiplayer)
             {
-                if (_gameManager.IsClient)
+                if (GameManager.Instance.IsClient)
                 {
                     NetworkManager.Instance.ConnectToServer();
                 }
@@ -32,7 +32,7 @@ namespace SavageWorld.Runtime.GameSession.States
             }
             else
             {
-                _gameManager.CreatePlayer(new(3655, 2200));
+                _gameManager.PlayerPrefab.CreateInstance(new(3655, 2200));
             }
             _gameManager.ChangeState(_gameManager.PlayingState);
         }

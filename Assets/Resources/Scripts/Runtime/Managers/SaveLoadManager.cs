@@ -491,10 +491,7 @@ public class SaveLoadManager : Singleton<SaveLoadManager>
             position.x = binaryReader.ReadUInt16();
             position.y = binaryReader.ReadUInt16();
 
-            Tree tree = _gameManager.TreesAtlas.GetTreeById(treeId);
-
-            GameObject treeGameObject = Instantiate(tree.gameObject, position, Quaternion.identity, _gameManager.Terrain.Trees.transform);
-            treeGameObject.name = tree.gameObject.name;
+            _gameManager.TreesAtlas.GetTreeById(treeId).CreateInstance(position);
         }
         _gameManager.LoadingValue += _loadingStep;
     }

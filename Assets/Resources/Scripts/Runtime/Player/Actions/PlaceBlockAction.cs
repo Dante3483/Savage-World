@@ -59,7 +59,7 @@ public class PlaceBlockAction : PlayerActionBase
                 IntNumber3 = (int)_block.Type,
                 IntNumber4 = _block.GetId()
             };
-            NetworkManager.Instance.SendMessage(NetworkMessageTypes.SendWorldCellData, messageData);
+            NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.SendWorldCellData, messageData);
         }
         else
         {

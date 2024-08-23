@@ -1,3 +1,5 @@
+using SavageWorld.Runtime.Network;
+
 public class PlayerSelectionState : MainMenuStateBase
 {
     #region Private fields
@@ -32,7 +34,7 @@ public class PlayerSelectionState : MainMenuStateBase
 
     public override void Back()
     {
-        if (GameManager.Instance.IsMultiplayer)
+        if (NetworkManager.Instance.IsMultiplayer)
         {
             if (GameManager.Instance.IsClient)
             {

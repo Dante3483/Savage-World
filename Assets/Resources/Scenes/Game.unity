@@ -8673,8 +8673,7 @@ MonoBehaviour:
   _isMenuActive: 0
   _isLoadingProgressActive: 0
   _isInputTextInFocus: 0
-  _isMultiplayer: 0
-  _isClient: 0
+  IsClient: 0
 --- !u!28 &758104367
 Texture2D:
   m_ObjectHideFlags: 0
@@ -15867,10 +15866,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _networkConfiguration: {fileID: 1275708697}
   _networkObjects:
-    _playerPrefab: {fileID: 5733020239419572106, guid: 8f294ee6cd31cab458cbf7db900af696, type: 3}
-    _listOfNetworkObjects: []
+    _playerPrefab: {fileID: 1832234326415365086, guid: 8f9689393ca9cab418bc256ec4c7f067, type: 3}
+    _arrayOfNetworkObjects:
+    - {fileID: 1832234326415365086, guid: 8f9689393ca9cab418bc256ec4c7f067, type: 3}
+    - {fileID: 1732900005312465524, guid: 40f63a090e2903c40984a91305c99f80, type: 3}
+    - {fileID: 3834015491224742088, guid: bcc829edaefc1f444bfeec893ca33e6b, type: 3}
     _objectsParent: {fileID: 1956171276}
   _ipAddressInputField: {fileID: 786600744}
+  _isMultiplayer: 0
 --- !u!1 &1278595433
 GameObject:
   m_ObjectHideFlags: 0

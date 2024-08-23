@@ -34,28 +34,39 @@ namespace SavageWorld.Runtime.Network.Messages
         protected override void ReadData()
         {
             byte transformType = _reader.ReadByte();
-            long id = _reader.ReadInt64();
+            long objectId = _reader.ReadInt64();
             float x = _reader.ReadSingle();
             float y = _reader.ReadSingle();
             switch (transformType)
             {
                 case 1:
                     {
-                        _networkManager.NetworkObjects.UpdatePosition(id, x, y);
+                        _networkManager.NetworkObjects.GetObjectById(objectId).UpdatePosition(x, y);
                     }
                     break;
                 case 2:
                     {
-                        _networkManager.NetworkObjects.UpdateRotation(id, x, y);
+                        _networkManager.NetworkObjects.GetObjectById(objectId).UpdateRotation(x, y);
                     }
                     break;
                 case 3:
                     {
-                        _networkManager.NetworkObjects.UpdateScale(id, x, y);
+                        _networkManager.NetworkObjects.GetObjectById(objectId).UpdateScale(x, y);
                     }
                     break;
                 default:
                     break;
+            }
+            if (_networkManager.IsServer)
+            {
+                MessageData messageData = new()
+                {
+                    IntNumber1 = transformType,
+                    LongNumber1 = objectId,
+                    FloatNumber1 = x,
+                    FloatNumber2 = y
+                };
+                _networkManager.BroadcastMessage(NetworkMessageTypes.SendTransform, messageData, _senderId);
             }
         }
 

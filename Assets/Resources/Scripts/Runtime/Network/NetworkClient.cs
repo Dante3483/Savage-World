@@ -11,7 +11,7 @@ namespace SavageWorld.Runtime.Network
         #region Fields
         private NetworkMessanger _messanger;
         private INetworkConnection _connection;
-        private int _id;
+        private byte _id;
         private long _playerId;
         private int _state;
         #endregion
@@ -21,7 +21,7 @@ namespace SavageWorld.Runtime.Network
 
         public bool IsReading => _connection.IsReading;
 
-        public int Id
+        public byte Id
         {
             get
             {
@@ -71,9 +71,9 @@ namespace SavageWorld.Runtime.Network
             _connection = connection;
         }
 
-        public void SetId(int id)
+        public void SetId(byte id)
         {
-            if (id == -1)
+            if (id == byte.MaxValue)
             {
                 _connection.Disconnect();
             }

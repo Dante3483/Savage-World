@@ -89,8 +89,7 @@ public class PickUpItemsGenerationPhase : WorldProcessingPhaseBase
                 {
                     foreach (Vector3 coord in coords)
                     {
-                        PickUpItem pickUpItemGameObject = Object.Instantiate(pickUpItem, coord, Quaternion.identity, pickUpItemsSection.transform);
-                        pickUpItemGameObject.name = pickUpItem.gameObject.name;
+                        pickUpItem.CreateInstance(coord);
                     }
                 });
                 coords.Clear();

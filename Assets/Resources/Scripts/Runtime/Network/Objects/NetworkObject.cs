@@ -1,3 +1,4 @@
+using SavageWorld.Runtime.Enums.Network;
 using UnityEngine;
 
 namespace SavageWorld.Runtime.Network.Objects
@@ -5,6 +6,8 @@ namespace SavageWorld.Runtime.Network.Objects
     public class NetworkObject : MonoBehaviour
     {
         #region Fields
+        [SerializeField]
+        private long _globalId;
         [SerializeField]
         private long _id;
         [SerializeField]
@@ -14,9 +17,23 @@ namespace SavageWorld.Runtime.Network.Objects
         [SerializeField]
         private bool _isOwner = false;
         private NetworkTransform _networkTransform;
+        private NetworkAnimator _networkAnimator;
         #endregion
 
         #region Properties
+        public long GlobalId
+        {
+            get
+            {
+                return _globalId;
+            }
+
+            set
+            {
+                _globalId = value;
+            }
+        }
+
         public long Id
         {
             get
@@ -81,7 +98,12 @@ namespace SavageWorld.Runtime.Network.Objects
         #region Public Methods
         private void Awake()
         {
-            _networkTransform = GetComponent<NetworkTransform>();
+            if (NetworkManager.Instance.IsMultiplayer)
+            {
+                _id = NetworkManager.Instance.NetworkObjects.AddObjectToDictionary(this);
+                _networkTransform = GetComponent<NetworkTransform>();
+                _networkAnimator = GetComponent<NetworkAnimator>();
+            }
         }
 
         private void Update()
@@ -110,6 +132,14 @@ namespace SavageWorld.Runtime.Network.Objects
             if (_networkTransform != null)
             {
                 _networkTransform.NetworkScale = new(x, y);
+            }
+        }
+
+        public void UpdateAnimation(int animationHash)
+        {
+            if (_networkAnimator != null)
+            {
+                _networkAnimator.SetNewAnimation(animationHash);
             }
         }
         #endregion

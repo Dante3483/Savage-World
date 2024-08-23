@@ -1,11 +1,14 @@
+using SavageWorld.Runtime;
+using SavageWorld.Runtime.Enums.Network;
+using SavageWorld.Runtime.Network.Objects;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
-public class Tree : MonoBehaviour
+public class Tree : GameObjectBase
 {
-    #region Private fields
+    #region Fields
     [Header("Main Properties")]
     [SerializeField] private bool _updateFields;
     [SerializeField] private bool _visualize;
@@ -26,10 +29,6 @@ public class Tree : MonoBehaviour
     [SerializeField] private List<Vector2Int> _treeBlocks;
     [SerializeField] private List<Vector2Int> _trunkBlocks;
     [SerializeField] private List<BlockSO> _allowedToSpawnOn;
-    #endregion
-
-    #region Public fields
-
     #endregion
 
     #region Properties
@@ -190,7 +189,11 @@ public class Tree : MonoBehaviour
     }
     #endregion
 
-    #region Methods
+    #region Events / Delegates
+
+    #endregion
+
+    #region Monobehaviour Methods
     private void Awake()
     {
         GetComponent<SpriteRenderer>().enabled = false;
@@ -210,7 +213,20 @@ public class Tree : MonoBehaviour
             _visualize = !_visualize;
         }
     }
+    #endregion
 
+    #region Public Methods
+    public override GameObjectBase CreateInstance(Vector3 position, bool isOwner = true)
+    {
+        Tree treeGameObject = Instantiate(this, position, Quaternion.identity, GameManager.Instance.Terrain.Trees.transform);
+        treeGameObject.name = gameObject.name;
+        NetworkObject.IsOwner = isOwner;
+        NetworkObject.Type = NetworkObjectTypes.Environment;
+        return treeGameObject;
+    }
+    #endregion
+
+    #region Private Methods
     private void UpdateInfo()
     {
         PolygonCollider2D polygonCollider = gameObject.AddComponent<PolygonCollider2D>();

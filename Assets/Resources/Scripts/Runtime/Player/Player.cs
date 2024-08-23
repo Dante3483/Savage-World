@@ -1,12 +1,12 @@
+using SavageWorld.Runtime;
 using SavageWorld.Runtime.Enums.Network;
 using SavageWorld.Runtime.Network;
 using SavageWorld.Runtime.Network.Messages;
-using SavageWorld.Runtime.Network.Objects;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player : MonoBehaviour
+public class Player : GameObjectBase
 {
     #region Fields
     [SerializeField]
@@ -19,8 +19,6 @@ public class Player : MonoBehaviour
     private CraftStationModelSO _handCraftStation;
     [SerializeField]
     private PlayerInteractions _playerInteractions;
-    [SerializeField]
-    private NetworkObject _networkObject;
     [SerializeField]
     private Vector2Int _currentChunk;
     [Header("Debug")]
@@ -46,14 +44,6 @@ public class Player : MonoBehaviour
             return _stats;
         }
     }
-
-    public NetworkObject NetworkObject
-    {
-        get
-        {
-            return _networkObject;
-        }
-    }
     #endregion
 
     #region Events / Delegates
@@ -65,7 +55,6 @@ public class Player : MonoBehaviour
     {
         _worldDataManager = WorldDataManager.Instance;
         _playerInteractions = GetComponent<PlayerInteractions>();
-        _networkObject = GetComponent<NetworkObject>();
     }
 
     private void FixedUpdate()
@@ -83,11 +72,10 @@ public class Player : MonoBehaviour
                         {
                             MessageData messageData = new()
                             {
-                                IntNumber1 = NetworkManager.Instance.Client.Id,
-                                IntNumber2 = x,
-                                IntNumber3 = y,
+                                IntNumber1 = x,
+                                IntNumber2 = y,
                             };
-                            NetworkManager.Instance.SendMessage(NetworkMessageTypes.SendChunkData, messageData);
+                            NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.SendChunkData, messageData);
                         }
                     }
                 }
@@ -99,12 +87,29 @@ public class Player : MonoBehaviour
     #endregion
 
     #region Public Methods
-    public void Initialize(bool isMultiplayer, bool isOwner)
+    public static Player CreatePlayer(Vector3 position, bool isOwner = true)
     {
-        if (isMultiplayer)
+        return (Player)GameManager.Instance.PlayerPrefab.CreateInstance(position, isOwner);
+    }
+    public override GameObjectBase CreateInstance(Vector3 position, bool isOwner = true)
+    {
+        Player player = Instantiate(this, position, Quaternion.identity);
+        if (isOwner)
         {
-            _networkObject.IsOwner = isOwner;
-            if (isOwner)
+            GameManager.Instance.Player = player;
+            Camera.main.GetComponent<FollowObject>().Target = player.transform;
+        }
+        player.NetworkObject.Type = NetworkObjectTypes.Player;
+        player.NetworkObject.IsOwner = isOwner;
+        player.Initialize();
+        return player;
+    }
+
+    public void Initialize()
+    {
+        if (NetworkManager.Instance.IsMultiplayer)
+        {
+            if (NetworkObject.IsOwner)
             {
                 InitializeAsOwner();
             }

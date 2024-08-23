@@ -1,3 +1,4 @@
+using SavageWorld.Runtime.Network;
 using System.IO;
 
 //TODO: USE QUEUE for states history
@@ -89,13 +90,13 @@ public class MainMenuManager : Singleton<MainMenuManager>, IStateMachine<MainMen
 
     public void SelectSingleplayerMode()
     {
-        GameManager.Instance.IsMultiplayer = false;
+        NetworkManager.Instance.IsMultiplayer = false;
         StartPlayerSelection();
     }
 
     public void SelectMultiplayerMode()
     {
-        GameManager.Instance.IsMultiplayer = true;
+        NetworkManager.Instance.IsMultiplayer = true;
         GameManager.Instance.IsClient = false;
         ChangeState(_multiplayerModeSelectionState);
     }
@@ -138,7 +139,7 @@ public class MainMenuManager : Singleton<MainMenuManager>, IStateMachine<MainMen
     public void SelectPlayer(string playerName)
     {
         GameManager.Instance.PlayerName = playerName;
-        if (GameManager.Instance.IsMultiplayer && GameManager.Instance.IsClient)
+        if (NetworkManager.Instance.IsMultiplayer && GameManager.Instance.IsClient)
         {
             ChangeState(null);
             GameManager.Instance.ChangeState(GameManager.Instance.CreatingPlayerState);

@@ -4,8 +4,10 @@ namespace SavageWorld.Runtime.Enums.Network
     {
         SendClientId,
         SendChunkData,
-        CreatePlayer,
         Disconnect,
+
+        CreatePlayer,
+        CreateEnvironment,
 
         SendTransform,
         SendWorldCellData,

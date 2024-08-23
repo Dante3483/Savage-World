@@ -20,6 +20,8 @@ namespace SavageWorld.Runtime.Network
         private NetworkObjects _networkObjects;
         [SerializeField]
         private TMP_InputField _ipAddressInputField;
+        [SerializeField]
+        private bool _isMultiplayer;
         private NetworkServer _server;
         private NetworkClient _client;
         private NetworkMessanger _messanger;
@@ -61,6 +63,19 @@ namespace SavageWorld.Runtime.Network
                 return _networkObjects;
             }
         }
+
+        public bool IsMultiplayer
+        {
+            get
+            {
+                return _isMultiplayer;
+            }
+
+            set
+            {
+                _isMultiplayer = value;
+            }
+        }
         #endregion
 
         #region Events / Delegates
@@ -77,6 +92,7 @@ namespace SavageWorld.Runtime.Network
         {
             base.Awake();
             _networkConfiguration = GetComponent<NetworkConfiguration>();
+            _networkObjects.Initialize();
             _messanger = new();
             _server = new();
             _client = new();
@@ -110,7 +126,7 @@ namespace SavageWorld.Runtime.Network
                 SetServerConnection();
                 string ipAddress = string.IsNullOrEmpty(_ipAddressInputField.text) ? _networkConfiguration.IpAddress : _ipAddressInputField.text;
                 _server.Start(_ipAddressInputField.text, _networkConfiguration.Port);
-                _networkObjects.CreatePlayerServer(true);
+                Player.CreatePlayer(new(3655, 2200));
             }
             GameConsole.Log("Server started", Color.green);
         }
@@ -141,7 +157,7 @@ namespace SavageWorld.Runtime.Network
         {
             if (IsClient)
             {
-                SendMessage(NetworkMessageTypes.Disconnect, new MessageData { IntNumber1 = _client.Id }, callback: _client.Disconnect);
+                BroadcastMessage(NetworkMessageTypes.Disconnect, new(), callback: _client.Disconnect);
                 _networkObjects.Reset();
             }
         }
@@ -153,27 +169,43 @@ namespace SavageWorld.Runtime.Network
             client.Disconnect();
         }
 
-        public async Task SendMessageAsync(NetworkMessageTypes messageType, MessageData messageData, Action callback = null, bool isBroadcast = false, int clientId = -1)
+        public async Task SendMessageToAsync(NetworkMessageTypes messageType, MessageData messageData, int clientId, Action callback = null)
         {
             if (IsServer)
             {
-                await Task.Run(() => SendMessageToClients(messageType, messageData, callback, isBroadcast, clientId));
-            }
-            if (IsClient)
-            {
-                await Task.Run(() => SendMessageToServer(messageType, messageData, callback));
+                await Task.Run(() => SendToClient(messageType, messageData, clientId, callback));
             }
         }
 
-        public void SendMessage(NetworkMessageTypes messageType, MessageData messageData, Action callback = null, bool isBroadcast = false, int clientId = -1)
+        public void SendMessageTo(NetworkMessageTypes messageType, MessageData messageData, int clientId, Action callback = null)
         {
             if (IsServer)
             {
-                Task.Run(() => SendMessageToClients(messageType, messageData, callback, isBroadcast, clientId));
+                Task.Run(() => SendToClient(messageType, messageData, clientId, callback));
+            }
+        }
+
+        public async Task BroadcastMessageAsync(NetworkMessageTypes messageType, MessageData messageData, int ignoreClientId = -1, Action callback = null)
+        {
+            if (IsServer)
+            {
+                await Task.Run(() => Broadcast(messageType, messageData, ignoreClientId, callback));
             }
             if (IsClient)
             {
-                Task.Run(() => SendMessageToServer(messageType, messageData, callback));
+                await Task.Run(() => SendToServer(messageType, messageData, callback));
+            }
+        }
+
+        public void BroadcastMessage(NetworkMessageTypes messageType, MessageData messageData, int ignoreClientId = -1, Action callback = null)
+        {
+            if (IsServer)
+            {
+                Task.Run(() => Broadcast(messageType, messageData, ignoreClientId, callback));
+            }
+            if (IsClient)
+            {
+                Task.Run(() => SendToServer(messageType, messageData, callback));
             }
         }
 
@@ -188,6 +220,52 @@ namespace SavageWorld.Runtime.Network
         #endregion
 
         #region Private Methods
+        [Button("Load all network objects")]
+        private void FindAllNetworkObjects()
+        {
+            _networkObjects.InitializeArrayOfObjects(Resources.LoadAll<NetworkObject>("Prefabs"));
+        }
+
+        private void SendToClient(NetworkMessageTypes messageType, MessageData messageData, int clientId, Action callback)
+        {
+            lock (_messanger.WriteBuffer)
+            {
+                long size = _messanger.Write(messageType, messageData);
+                _server.WriteMessageTo(clientId, _messanger.WriteBuffer, size);
+                callback?.Invoke();
+            }
+        }
+
+        private void SendToServer(NetworkMessageTypes messageType, MessageData messageData, Action callback)
+        {
+            lock (_messanger.WriteBuffer)
+            {
+                long size = _messanger.Write(messageType, messageData);
+                _client.WriteMessage(_messanger.WriteBuffer, size);
+                callback?.Invoke();
+            }
+        }
+
+        private void Broadcast(NetworkMessageTypes messageType, MessageData messageData, int ignoreClientId, Action callback)
+        {
+            lock (_messanger.WriteBuffer)
+            {
+                long size = _messanger.Write(messageType, messageData);
+                _server.Broadcast(_messanger.WriteBuffer, size, ignoreClientId: ignoreClientId);
+                callback?.Invoke();
+            }
+        }
+
+        private void SetServerConnection()
+        {
+            TCPNetworkConnection connection = new();
+            connection.ServerStarted += ServerStartedEventHandler;
+            connection.ServerStopped += ServerStoppedEventHandler;
+            connection.ClientConnected += ClientConnectedEventHandler;
+            connection.ClientDisconnected += ClientDisconnectedEventHandler;
+            _server.SetConnection(connection, _networkConfiguration.MaxClients);
+        }
+
         private async void InitializeClient(int id)
         {
             NetworkClient client = _server.GetClient(id);
@@ -199,7 +277,7 @@ namespace SavageWorld.Runtime.Network
                 {
                     case 0:
                         {
-                            await SendMessageAsync(NetworkMessageTypes.SendClientId, new MessageData { IntNumber1 = id }, clientId: id);
+                            await SendMessageToAsync(NetworkMessageTypes.SendClientId, new MessageData { IntNumber1 = id }, id);
                             client.State = 1;
                         }
                         break;
@@ -211,7 +289,7 @@ namespace SavageWorld.Runtime.Network
                             {
                                 for (int y = chunkY - 1; y <= chunkY + 1; y++)
                                 {
-                                    await SendMessageAsync(NetworkMessageTypes.SendChunkData, new MessageData { IntNumber1 = x, IntNumber2 = y }, clientId: id);
+                                    await SendMessageToAsync(NetworkMessageTypes.SendChunkData, new MessageData { IntNumber1 = x, IntNumber2 = y }, id);
                                 }
                             }
                             client.State = 2;
@@ -225,14 +303,27 @@ namespace SavageWorld.Runtime.Network
                                 {
                                     case NetworkObjectTypes.Player:
                                         {
-                                            MessageData data = new()
+                                            MessageData messageData = new()
                                             {
                                                 LongNumber1 = networkObject.Id,
                                                 Bool1 = false,
                                                 FloatNumber1 = networkObject.Position.x,
                                                 FloatNumber2 = networkObject.Position.y,
                                             };
-                                            await SendMessageAsync(NetworkMessageTypes.CreatePlayer, data, clientId: id);
+                                            await SendMessageToAsync(NetworkMessageTypes.CreatePlayer, messageData, id);
+                                        }
+                                        break;
+                                    case NetworkObjectTypes.Environment:
+                                        {
+                                            MessageData messageData = new()
+                                            {
+                                                LongNumber1 = networkObject.GlobalId,
+                                                LongNumber2 = networkObject.Id,
+                                                Bool1 = false,
+                                                FloatNumber1 = networkObject.Position.x,
+                                                FloatNumber2 = networkObject.Position.y,
+                                            };
+                                            await SendMessageToAsync(NetworkMessageTypes.CreateEnvironment, messageData, id);
                                         }
                                         break;
                                     case NetworkObjectTypes.Drop:
@@ -249,15 +340,18 @@ namespace SavageWorld.Runtime.Network
                         break;
                     case 3:
                         {
-                            long playerId = _networkObjects.CreatePlayerServer();
-                            MessageData data = new()
+                            long playerId = -1;
+                            ActionInMainThreadUtil.Instance.InvokeAndWait(() => playerId = Player.CreatePlayer(new(3655, 2200), false).NetworkObject.Id);
+                            MessageData messageData = new()
                             {
                                 LongNumber1 = playerId,
                                 Bool1 = true,
                                 FloatNumber1 = 3655,
                                 FloatNumber2 = 2200,
                             };
-                            await SendMessageAsync(NetworkMessageTypes.CreatePlayer, data, clientId: id);
+                            await SendMessageToAsync(NetworkMessageTypes.CreatePlayer, messageData, id);
+                            messageData.Bool1 = false;
+                            await BroadcastMessageAsync(NetworkMessageTypes.CreatePlayer, messageData, id);
                             client.PlayerId = playerId;
                             client.State = 4;
                         }
@@ -273,44 +367,6 @@ namespace SavageWorld.Runtime.Network
             }
         }
 
-        private void SendMessageToClients(NetworkMessageTypes messageType, MessageData messageData, Action callback, bool isBroadcast, int clientId)
-        {
-            lock (_messanger.WriteBuffer)
-            {
-                long size = _messanger.Write(messageType, messageData);
-                if (isBroadcast)
-                {
-                    _server.Broadcast(_messanger.WriteBuffer, size);
-                    callback?.Invoke();
-                }
-                else
-                {
-                    _server.WriteMessageTo(clientId, _messanger.WriteBuffer, size);
-                    callback?.Invoke();
-                }
-            }
-        }
-
-        private void SendMessageToServer(NetworkMessageTypes messageType, MessageData messageData, Action callback)
-        {
-            lock (_messanger.WriteBuffer)
-            {
-                long size = _messanger.Write(messageType, messageData);
-                _client.WriteMessage(_messanger.WriteBuffer, size);
-                callback?.Invoke();
-            }
-        }
-
-        private void SetServerConnection()
-        {
-            TCPNetworkConnection connection = new();
-            connection.ServerStarted += ServerStartedEventHandler;
-            connection.ServerStopped += ServerStoppedEventHandler;
-            connection.ClientConnected += ClientConnectedEventHandler;
-            connection.ClientDisconnected += ClientDisconnectedEventHandler;
-            _server.SetConnection(connection, _networkConfiguration.MaxClients);
-        }
-
         private void ServerStartedEventHandler(INetworkConnection connection)
         {
             WorldDataManager.Instance.CellDataChanged += (x, y) =>
@@ -320,7 +376,7 @@ namespace SavageWorld.Runtime.Network
                     IntNumber1 = x,
                     IntNumber2 = y,
                 };
-                SendMessage(NetworkMessageTypes.SendWorldCellData, messageData, isBroadcast: true);
+                BroadcastMessage(NetworkMessageTypes.SendWorldCellData, messageData);
             };
             ServerStarted?.Invoke(connection);
         }
@@ -333,7 +389,7 @@ namespace SavageWorld.Runtime.Network
         private void ClientConnectedEventHandler(INetworkConnection connection)
         {
             int id = _server.AddClientToArray(connection);
-            if (id != -1)
+            if (id != byte.MaxValue)
             {
                 InitializeClient(id);
             }

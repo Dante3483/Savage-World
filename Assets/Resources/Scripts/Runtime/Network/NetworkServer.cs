@@ -26,6 +26,10 @@ namespace SavageWorld.Runtime.Network
         #region Public Methods
         public NetworkServer()
         {
+            if (_maxClients > byte.MaxValue - 1)
+            {
+                throw new ArgumentException("Max clients count is greater than 254");
+            }
             _messanger = NetworkManager.Instance.Messanger;
         }
 
@@ -72,7 +76,7 @@ namespace SavageWorld.Runtime.Network
                 }
             }
             connection.Disconnect();
-            return -1;
+            return byte.MaxValue;
         }
 
         public void DisconnectClient(int clientId)
@@ -89,7 +93,7 @@ namespace SavageWorld.Runtime.Network
             return _clients[id];
         }
 
-        public void Broadcast(byte[] buffer, long size, int ignoreClientId = -1)
+        public void Broadcast(byte[] buffer, long size, int ignoreClientId)
         {
             for (int i = 0; i < _maxClients; i++)
             {

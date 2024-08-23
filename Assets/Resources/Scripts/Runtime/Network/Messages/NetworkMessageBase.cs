@@ -2,7 +2,6 @@ using SavageWorld.Runtime.Console;
 using SavageWorld.Runtime.Enums.Network;
 using System;
 using System.IO;
-using UnityEngine;
 
 namespace SavageWorld.Runtime.Network.Messages
 {
@@ -12,6 +11,7 @@ namespace SavageWorld.Runtime.Network.Messages
         protected BinaryWriter _writer;
         protected BinaryReader _reader;
         protected NetworkManager _networkManager;
+        protected byte _senderId;
         #endregion
 
         #region Properties
@@ -35,14 +35,13 @@ namespace SavageWorld.Runtime.Network.Messages
             try
             {
                 WriteType();
+                WriteId();
                 WriteData(messageData);
                 return true;
             }
             catch (Exception e)
             {
                 GameConsole.LogError(e.Message);
-                Debug.LogException(e);
-                Debug.Log($"ERROR: {e.Message}");
                 return false;
             }
         }
@@ -51,14 +50,17 @@ namespace SavageWorld.Runtime.Network.Messages
         {
             try
             {
+                _senderId = byte.MaxValue;
+                if (_networkManager.IsServer)
+                {
+                    _senderId = _reader.ReadByte();
+                }
                 ReadData();
                 return true;
             }
             catch (Exception e)
             {
                 GameConsole.LogError(e.Message);
-                Debug.LogException(e);
-                Debug.Log($"ERROR: {e.Message}");
                 return false;
             }
         }
@@ -69,9 +71,17 @@ namespace SavageWorld.Runtime.Network.Messages
 
         protected abstract void ReadData();
 
-        protected void WriteType()
+        private void WriteType()
         {
             _writer.Write((byte)MessageType);
+        }
+
+        private void WriteId()
+        {
+            if (_networkManager.IsClient)
+            {
+                _writer.Write(_networkManager.Client.Id);
+            }
         }
         #endregion
     }

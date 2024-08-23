@@ -104,8 +104,7 @@ public class TreesGenerationPhase : WorldProcessingPhaseBase
                 {
                     foreach (Vector3 coord in coords)
                     {
-                        Tree treeGameObject = Object.Instantiate(tree, coord, Quaternion.identity, treesSection.transform);
-                        treeGameObject.name = tree.gameObject.name;
+                        tree.CreateInstance(coord);
                     }
                 });
                 coords.Clear();
