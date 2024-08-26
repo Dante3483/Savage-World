@@ -1,8 +1,7 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class MiningDamageController : NetworkSingleton<MiningDamageController>
+public class MiningDamageController : Singleton<MiningDamageController>
 {
     #region Fields
     [Header("Main")]
@@ -10,7 +9,6 @@ public class MiningDamageController : NetworkSingleton<MiningDamageController>
     private MiningDamageData _blocksDamageData;
     [SerializeField]
     private MiningDamageData _wallsDamageData;
-    private HashSet<Vector2Int> _blockedPositions;
     #endregion
 
     #region Properties
@@ -27,7 +25,6 @@ public class MiningDamageController : NetworkSingleton<MiningDamageController>
     protected override void Awake()
     {
         base.Awake();
-        _blockedPositions = new();
         _blocksDamageData.Initialize();
         _wallsDamageData.Initialize();
         _blocksDamageData.DamageChanged += OnBlockDamageChanged;
@@ -45,17 +42,11 @@ public class MiningDamageController : NetworkSingleton<MiningDamageController>
     #region Public Methods
     public void AddDamageToBlock(Vector2Int position, float damage)
     {
-        //if (!_blockedPositions.Contains(position))
-        //{
-        //    AddDamageToBlockRpc(position, damage);
-        //    _blockedPositions.Add(position);
-        //}
         _blocksDamageData.AddDamage(position, damage);
     }
 
     public void AddDamageToWall(Vector2Int position, float damage)
     {
-        //AddDamageToWallRpc(position, damage);
         _wallsDamageData.AddDamage(position, damage);
     }
 

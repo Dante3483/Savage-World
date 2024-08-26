@@ -54,7 +54,20 @@ public abstract class BreakAction : PlayerActionBase
     #region Private Methods
     private void AddDamage()
     {
-        _addDamage?.Invoke(_position, _damage);
+        if (NetworkManager.Instance.IsMultiplayer)
+        {
+            MessageData messageData = new()
+            {
+                IntNumber1 = _position.x,
+                IntNumber2 = _position.y,
+                FloatNumber1 = _damage
+            };
+            NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.AddDamageToTile, messageData);
+        }
+        if (!NetworkManager.Instance.IsClient)
+        {
+            _addDamage?.Invoke(_position, _damage);
+        }
         _player.StartCoroutine(BlockBreakingCooldownCoroutine());
     }
 
@@ -65,18 +78,7 @@ public abstract class BreakAction : PlayerActionBase
         BlockSO data = _worldDataManager.GetBlockData(x, y);
         Vector3 dropPosition = new(x + 0.5f, y + 0.5f);
 
-        if (NetworkManager.Instance.IsClient)
-        {
-            MessageData messageData = new()
-            {
-                IntNumber1 = x,
-                IntNumber2 = y,
-                IntNumber3 = (int)_replacment.Type,
-                IntNumber4 = _replacment.GetId()
-            };
-            NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.SendWorldCellData, messageData);
-        }
-        else
+        if (!NetworkManager.Instance.IsClient)
         {
             _dropManager.CreateDrop(dropPosition, data.Drop, 1);
             _replace?.Invoke(x, y, _replacment);

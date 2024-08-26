@@ -35,24 +35,6 @@ namespace SavageWorld.Runtime.Network.Messages
             WorldDataManager worldDataManager = WorldDataManager.Instance;
             GameManager gameManager = GameManager.Instance;
             BlocksAtlasSO blockAtlas = gameManager.BlocksAtlas;
-            if (_networkManager.IsClient)
-            {
-                int x = _reader.ReadInt32();
-                int y = _reader.ReadInt32();
-                ushort blockId = _reader.ReadUInt16();
-                ushort wallId = _reader.ReadUInt16();
-                byte liquidId = _reader.ReadByte();
-                float flowValue = _reader.ReadSingle();
-                byte colliderIndex = _reader.ReadByte();
-                byte tileId = _reader.ReadByte();
-                byte blockFlags = _reader.ReadByte();
-                BlockTypes blockType = (BlockTypes)_reader.ReadByte();
-                BlockSO block = blockAtlas.GetBlockByTypeAndId(blockType, blockId);
-                BlockSO wall = blockAtlas.GetBlockByTypeAndId(BlockTypes.Wall, wallId);
-                BlockSO liquid = liquidId == byte.MaxValue ? null : blockAtlas.GetBlockById(liquidId);
-                ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() => worldDataManager.SetFullData(x, y, block, wall, liquid, flowValue, colliderIndex, tileId, blockFlags));
-                ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() => worldDataManager.SetUpBlockData(x, y));
-            }
             if (_networkManager.IsServer)
             {
                 int x = _reader.ReadInt32();
@@ -86,6 +68,27 @@ namespace SavageWorld.Runtime.Network.Messages
                     default:
                         break;
                 }
+            }
+            else if (_networkManager.IsClient)
+            {
+                int x = _reader.ReadInt32();
+                int y = _reader.ReadInt32();
+                ushort blockId = _reader.ReadUInt16();
+                ushort wallId = _reader.ReadUInt16();
+                byte liquidId = _reader.ReadByte();
+                float flowValue = _reader.ReadSingle();
+                byte colliderIndex = _reader.ReadByte();
+                byte tileId = _reader.ReadByte();
+                byte blockFlags = _reader.ReadByte();
+                BlockTypes blockType = (BlockTypes)_reader.ReadByte();
+                BlockSO block = blockAtlas.GetBlockByTypeAndId(blockType, blockId);
+                BlockSO wall = blockAtlas.GetBlockByTypeAndId(BlockTypes.Wall, wallId);
+                BlockSO liquid = liquidId == byte.MaxValue ? null : blockAtlas.GetBlockById(liquidId);
+                ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() =>
+                {
+                    worldDataManager.SetFullData(x, y, block, wall, liquid, flowValue, colliderIndex, tileId, blockFlags);
+                    worldDataManager.SetUpBlockData(x, y);
+                });
             }
         }
 

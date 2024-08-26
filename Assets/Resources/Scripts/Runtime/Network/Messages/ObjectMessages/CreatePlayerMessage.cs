@@ -36,6 +36,7 @@ namespace SavageWorld.Runtime.Network.Messages
         /// </summary>
         protected override void ReadData()
         {
+            long _ = _reader.ReadInt64();
             long objectId = _reader.ReadInt64();
             bool isOwner = _reader.ReadBoolean();
             float x = _reader.ReadSingle();
@@ -49,10 +50,7 @@ namespace SavageWorld.Runtime.Network.Messages
         /// <param name="messageData">player id</param>
         protected override void WriteData(MessageData messageData)
         {
-            _writer.Write(messageData.LongNumber1);
-            _writer.Write(messageData.Bool1);
-            _writer.Write(messageData.FloatNumber1);
-            _writer.Write(messageData.FloatNumber2);
+            base.WriteData(messageData);
         }
         #endregion
     }

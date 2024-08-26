@@ -67,18 +67,24 @@ namespace SavageWorld.Runtime.Network
             _objectIDGenerator = new();
         }
 
-        public long AddObjectToDictionary(NetworkObject obj)
+        public void AddObjectToDictionary(NetworkObject obj)
         {
             if (!NetworkManager.Instance.IsClient)
             {
                 long id = _objectIDGenerator.GetId(obj, out bool firstTime);
                 _objectsById[id] = obj;
-                return id;
+                obj.Id = id;
             }
-            else
+        }
+
+        public long AddObjectToDictionary(long id, NetworkObject obj)
+        {
+            if (NetworkManager.Instance.IsClient)
             {
-                return obj.Id;
+                _objectsById[id] = obj;
+                obj.Id = id;
             }
+            return id;
         }
 
         public void CreatePlayer(long objectId, Vector2 position, bool isOwner = false)
@@ -91,13 +97,20 @@ namespace SavageWorld.Runtime.Network
             CreateObject(globalId, position, objectId, isOwner);
         }
 
-        public void DestroyPlayer(long id)
+        public void DestroyObject(long id)
         {
-            if (_objectsById.TryGetValue(id, out NetworkObject palyer))
+            ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() =>
             {
-                GameObject.Destroy(palyer.gameObject);
-                _objectsById.Remove(id);
-            }
+                if (_objectsById.TryGetValue(id, out NetworkObject obj))
+                {
+                    GameObject.Destroy(obj.gameObject);
+                    _objectsById.Remove(id);
+                }
+                else
+                {
+                    Debug.Log($"Object with id {id} not found");
+                }
+            });
         }
 
         public NetworkObject GetObjectById(long id)
@@ -114,7 +127,7 @@ namespace SavageWorld.Runtime.Network
             ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() =>
             {
                 GameObjectBase prefab = _arrayOfNetworkObjects[globalId].GetComponent<GameObjectBase>();
-                newObject = prefab.CreateInstance(position, isOwner).NetworkObject;
+                newObject = prefab.CreateInstance(position, isOwner: isOwner).NetworkObject;
                 newObject.UpdatePosition(position.x, position.y);
                 if (NetworkManager.Instance.IsClient)
                 {

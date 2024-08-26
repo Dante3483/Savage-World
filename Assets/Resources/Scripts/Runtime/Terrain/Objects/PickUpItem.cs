@@ -1,5 +1,6 @@
 using SavageWorld.Runtime;
 using SavageWorld.Runtime.Enums.Network;
+using SavageWorld.Runtime.Network.Objects;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
@@ -65,6 +66,7 @@ public class PickUpItem : GameObjectBase
     private void Awake()
     {
         GetComponent<SpriteRenderer>().enabled = false;
+        NetworkObject.Type = NetworkObjectTypes.Environment;
         _intPosition.x = Mathf.FloorToInt(transform.position.x);
         _intPosition.y = Mathf.FloorToInt(transform.position.y);
         WorldDataManager.Instance.SetOccupiedFlag(_intPosition.x, _intPosition.y, true);
@@ -81,13 +83,9 @@ public class PickUpItem : GameObjectBase
     #endregion
 
     #region Public Methods
-    public override GameObjectBase CreateInstance(Vector3 position, bool isOwner = true)
+    public override GameObjectBase CreateInstance(Vector3 position, Transform parent = null, bool isOwner = true)
     {
-        PickUpItem pickUpItemGameObject = Instantiate(this, position, Quaternion.identity, GameManager.Instance.Terrain.PickUpItems.transform);
-        pickUpItemGameObject.name = gameObject.name;
-        NetworkObject.IsOwner = isOwner;
-        NetworkObject.Type = NetworkObjectTypes.Environment;
-        return pickUpItemGameObject;
+        return base.CreateInstance(position, GameManager.Instance.Terrain.PickUpItems.transform, isOwner);
     }
     #endregion
 

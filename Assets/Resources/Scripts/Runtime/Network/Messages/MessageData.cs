@@ -13,6 +13,8 @@ namespace SavageWorld.Runtime.Network.Messages
         public long LongNumber2;
         public float FloatNumber1;
         public float FloatNumber2;
+        public float FloatNumber3;
+        public float FloatNumber4;
         public bool Bool1;
         public bool Bool2;
         #endregion
@@ -37,6 +39,8 @@ namespace SavageWorld.Runtime.Network.Messages
             builder.AppendLine($"Long 2: {LongNumber2}");
             builder.AppendLine($"Float 1: {FloatNumber1}");
             builder.AppendLine($"Float 2: {FloatNumber2}");
+            builder.AppendLine($"Float 3: {FloatNumber3}");
+            builder.AppendLine($"Float 4: {FloatNumber4}");
             builder.AppendLine($"Bool 1: {Bool1}");
             builder.Append($"Bool 2: {Bool2}");
             return builder.ToString();

@@ -8,9 +8,14 @@ namespace SavageWorld.Runtime.Enums.Network
 
         CreatePlayer,
         CreateEnvironment,
+        CreateDrop,
+        DestroyObject,
 
         SendTransform,
         SendWorldCellData,
-        SendEntityAnimation
+        SendEntityAnimation,
+
+        AddDamageToTile,
+        TakeDrop,
     }
 }

@@ -55,6 +55,7 @@ public class Player : GameObjectBase
     {
         _worldDataManager = WorldDataManager.Instance;
         _playerInteractions = GetComponent<PlayerInteractions>();
+        NetworkObject.Type = NetworkObjectTypes.Player;
     }
 
     private void FixedUpdate()
@@ -87,20 +88,20 @@ public class Player : GameObjectBase
     #endregion
 
     #region Public Methods
-    public static Player CreatePlayer(Vector3 position, bool isOwner = true)
+    public static Player CreatePlayer(Vector3 position, Transform parent = null, bool isOwner = true)
     {
-        return (Player)GameManager.Instance.PlayerPrefab.CreateInstance(position, isOwner);
+        return (Player)GameManager.Instance.PlayerPrefab.CreateInstance(position, parent, isOwner);
     }
-    public override GameObjectBase CreateInstance(Vector3 position, bool isOwner = true)
+
+    public override GameObjectBase CreateInstance(Vector3 position, Transform parent = null, bool isOwner = true)
     {
-        Player player = Instantiate(this, position, Quaternion.identity);
+        GameObjectBase instance = base.CreateInstance(position, parent, isOwner);
+        Player player = instance.GetComponent<Player>();
         if (isOwner)
         {
             GameManager.Instance.Player = player;
             Camera.main.GetComponent<FollowObject>().Target = player.transform;
         }
-        player.NetworkObject.Type = NetworkObjectTypes.Player;
-        player.NetworkObject.IsOwner = isOwner;
         player.Initialize();
         return player;
     }

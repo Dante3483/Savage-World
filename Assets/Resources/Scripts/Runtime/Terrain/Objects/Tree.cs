@@ -197,6 +197,7 @@ public class Tree : GameObjectBase
     private void Awake()
     {
         GetComponent<SpriteRenderer>().enabled = false;
+        NetworkObject.Type = NetworkObjectTypes.Environment;
         OccupieArea();
     }
 
@@ -216,13 +217,9 @@ public class Tree : GameObjectBase
     #endregion
 
     #region Public Methods
-    public override GameObjectBase CreateInstance(Vector3 position, bool isOwner = true)
+    public override GameObjectBase CreateInstance(Vector3 position, Transform parent = null, bool isOwner = true)
     {
-        Tree treeGameObject = Instantiate(this, position, Quaternion.identity, GameManager.Instance.Terrain.Trees.transform);
-        treeGameObject.name = gameObject.name;
-        NetworkObject.IsOwner = isOwner;
-        NetworkObject.Type = NetworkObjectTypes.Environment;
-        return treeGameObject;
+        return base.CreateInstance(position, GameManager.Instance.Terrain.Trees.transform, isOwner);
     }
     #endregion
 

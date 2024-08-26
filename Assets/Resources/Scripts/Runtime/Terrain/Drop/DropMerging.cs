@@ -1,3 +1,6 @@
+using SavageWorld.Runtime.Enums.Network;
+using SavageWorld.Runtime.Network;
+using SavageWorld.Runtime.Network.Messages;
 using UnityEngine;
 
 public class DropMerging : MonoBehaviour
@@ -24,6 +27,10 @@ public class DropMerging : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!_drop.NetworkObject.IsOwner)
+        {
+            return;
+        }
         Merge();
     }
 
@@ -41,7 +48,13 @@ public class DropMerging : MonoBehaviour
             if (drop.Item == _drop.Item)
             {
                 _drop.Quantity += drop.Quantity;
-                Destroy(drop.gameObject);
+                drop.Quantity = 0;
+                MessageData messageData = new()
+                {
+                    LongNumber2 = _drop.NetworkObject.Id,
+                    IntNumber2 = _drop.Quantity,
+                };
+                NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.CreateDrop, messageData);
             }
         }
     }

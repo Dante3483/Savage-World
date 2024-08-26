@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class DropAttraction : MonoBehaviour
@@ -39,6 +38,10 @@ public class DropAttraction : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!_drop.NetworkObject.IsOwner)
+        {
+            return;
+        }
         _drop.IsPhysicsEnabled = true;
         if (!_drop.IsAttractionEnabled)
         {
@@ -56,11 +59,16 @@ public class DropAttraction : MonoBehaviour
         float distance = Vector3.Distance(transform.position, _target.position);
         if (distance < 0.5f)
         {
-            OnEndOfAttraction?.Invoke(_drop);
+            EndAttraction();
         }
         Vector3 direction = (_target.position - transform.position).normalized;
         _drop.Rigidbody.MovePosition(transform.position + direction * _speed * Time.fixedDeltaTime);
-        _target = null;
+    }
+
+    public void EndAttraction()
+    {
+        OnEndOfAttraction?.Invoke(_drop);
+        OnEndOfAttraction = null;
     }
 
     private IEnumerator AttractionCooldownCoroutine()

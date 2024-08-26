@@ -165,7 +165,8 @@ namespace SavageWorld.Runtime.Network
         public void DisconnectClient(int clientId)
         {
             NetworkClient client = _server.GetClient(clientId);
-            _networkObjects.DestroyPlayer(client.PlayerId);
+            _networkObjects.GetObjectById(client.PlayerId).GetComponent<GameObjectBase>().DestroySelf();
+            //_networkObjects.DestroyObject(client.PlayerId);
             client.Disconnect();
         }
 
@@ -305,7 +306,7 @@ namespace SavageWorld.Runtime.Network
                                         {
                                             MessageData messageData = new()
                                             {
-                                                LongNumber1 = networkObject.Id,
+                                                LongNumber2 = networkObject.Id,
                                                 Bool1 = false,
                                                 FloatNumber1 = networkObject.Position.x,
                                                 FloatNumber2 = networkObject.Position.y,
@@ -341,10 +342,10 @@ namespace SavageWorld.Runtime.Network
                     case 3:
                         {
                             long playerId = -1;
-                            ActionInMainThreadUtil.Instance.InvokeAndWait(() => playerId = Player.CreatePlayer(new(3655, 2200), false).NetworkObject.Id);
+                            ActionInMainThreadUtil.Instance.InvokeAndWait(() => playerId = Player.CreatePlayer(new(3655, 2200), isOwner: false).NetworkObject.Id);
                             MessageData messageData = new()
                             {
-                                LongNumber1 = playerId,
+                                LongNumber2 = playerId,
                                 Bool1 = true,
                                 FloatNumber1 = 3655,
                                 FloatNumber2 = 2200,

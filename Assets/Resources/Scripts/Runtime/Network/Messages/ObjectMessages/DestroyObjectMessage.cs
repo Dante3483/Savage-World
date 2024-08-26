@@ -3,7 +3,7 @@ using System.IO;
 
 namespace SavageWorld.Runtime.Network.Messages
 {
-    public class CreateEnvironmentMessage : CreateObjectMessageBase
+    public class DestroyObjectMessage : NetworkMessageBase
     {
         #region Fields
 
@@ -14,7 +14,7 @@ namespace SavageWorld.Runtime.Network.Messages
         {
             get
             {
-                return NetworkMessageTypes.CreateEnvironment;
+                return NetworkMessageTypes.DestroyObject;
             }
         }
         #endregion
@@ -24,7 +24,7 @@ namespace SavageWorld.Runtime.Network.Messages
         #endregion
 
         #region Public Methods
-        public CreateEnvironmentMessage(BinaryWriter writer, BinaryReader reader) : base(writer, reader)
+        public DestroyObjectMessage(BinaryWriter writer, BinaryReader reader) : base(writer, reader)
         {
         }
         #endregion
@@ -32,17 +32,21 @@ namespace SavageWorld.Runtime.Network.Messages
         #region Private Methods
         protected override void ReadData()
         {
-            long globalObjectId = _reader.ReadInt64();
             long objectId = _reader.ReadInt64();
-            bool isOwner = _reader.ReadBoolean();
-            float x = _reader.ReadSingle();
-            float y = _reader.ReadSingle();
-            NetworkManager.Instance.NetworkObjects.CreateEnvironment(globalObjectId, objectId, new(x, y), isOwner);
+            NetworkManager.Instance.NetworkObjects.DestroyObject(objectId);
+            if (_networkManager.IsServer)
+            {
+                MessageData messageData = new()
+                {
+                    LongNumber1 = objectId,
+                };
+                _networkManager.BroadcastMessage(MessageType, messageData);
+            }
         }
 
         protected override void WriteData(MessageData messageData)
         {
-            base.WriteData(messageData);
+            _writer.Write(messageData.LongNumber1);
         }
         #endregion
     }

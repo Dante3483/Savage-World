@@ -32,7 +32,7 @@ public class MiningDamageData
         _damageByPosition = new Dictionary<Vector2Int, float>();
     }
 
-    public float AddDamage(Vector2Int position, float damage)
+    public void AddDamage(Vector2Int position, float damage)
     {
         float maxDamage = WorldDataManager.Instance.GetBlockData(position.x, position.y).DamageToBreak;
         if (_damageByPosition.TryGetValue(position, out float currentDamage))
@@ -47,10 +47,9 @@ public class MiningDamageData
         {
             ClearDamage(position);
             DamageReachedMaxValue?.Invoke(position);
-            return 0f;
+            return;
         }
         ChangeDamage(position, currentDamage);
-        return currentDamage;
     }
 
     public void HealDamage()
@@ -66,6 +65,11 @@ public class MiningDamageData
     public void SetDamage(Vector2Int position, float damage)
     {
         ChangeDamage(position, damage);
+    }
+
+    public void ClearDamage(Vector2Int position)
+    {
+        ChangeDamage(position, 0);
     }
 
     public float GetDamage(Vector2Int position)
@@ -87,11 +91,6 @@ public class MiningDamageData
             _damageByPosition.Remove(position);
         }
         DamageChanged?.Invoke(position, newDamage);
-    }
-
-    private void ClearDamage(Vector2Int position)
-    {
-        ChangeDamage(position, 0);
     }
     #endregion
 }

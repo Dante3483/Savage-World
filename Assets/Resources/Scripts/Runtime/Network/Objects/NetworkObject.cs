@@ -100,7 +100,7 @@ namespace SavageWorld.Runtime.Network.Objects
         {
             if (NetworkManager.Instance.IsMultiplayer)
             {
-                _id = NetworkManager.Instance.NetworkObjects.AddObjectToDictionary(this);
+                NetworkManager.Instance.NetworkObjects.AddObjectToDictionary(this);
                 _networkTransform = GetComponent<NetworkTransform>();
                 _networkAnimator = GetComponent<NetworkAnimator>();
             }

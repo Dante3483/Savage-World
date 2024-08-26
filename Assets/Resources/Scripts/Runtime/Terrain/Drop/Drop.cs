@@ -1,17 +1,32 @@
 using Items;
+using SavageWorld.Runtime;
+using SavageWorld.Runtime.Enums.Network;
+using SavageWorld.Runtime.Network;
+using SavageWorld.Runtime.Network.Messages;
 using System;
 using UnityEngine;
 
-public class Drop : MonoBehaviour
+public class Drop : GameObjectBase
 {
     #region Private fields
     [Header("Main")]
-    [SerializeField] private SpriteRenderer _spriteRenderer;
-    [SerializeField] private Rigidbody2D _rigidbody;
-    [SerializeField] private BoxCollider2D _boxCollider;
-    [SerializeField] private Vector2 _maxColliderSize;
-    [SerializeField] private ItemSO _item;
-    [SerializeField] private int _quantity;
+    [SerializeField]
+    private SpriteRenderer _spriteRenderer;
+    [SerializeField]
+    private Rigidbody2D _rigidbody;
+    [SerializeField]
+    private BoxCollider2D _boxCollider;
+    [SerializeField]
+    private Vector2 _maxColliderSize;
+    [SerializeField]
+    private ItemSO _item;
+    [SerializeField]
+    private int _quantity;
+    private DropAttraction _attraction;
+    [SerializeField]
+    private bool _hasTarget;
+    [SerializeField]
+    private bool _isAnotherObjectTarget;
 
     private bool _isPhysicsEnabled;
     private bool _isAttractionEnabled;
@@ -65,7 +80,7 @@ public class Drop : MonoBehaviour
         {
             if (value == 0)
             {
-                Destroy(gameObject);
+                DestroySelf();
             }
             _quantity = value;
         }
@@ -109,18 +124,101 @@ public class Drop : MonoBehaviour
             _isMergingEnabled = value;
         }
     }
+
+    public bool HasTarget
+    {
+        get
+        {
+            return _hasTarget;
+        }
+
+        set
+        {
+            _hasTarget = value;
+        }
+    }
+
+    public bool IsAnotherObjectTarget
+    {
+        get
+        {
+            return _isAnotherObjectTarget;
+        }
+
+        set
+        {
+            _isAnotherObjectTarget = value;
+        }
+    }
     #endregion
 
     #region Methods
     private void Awake()
     {
+        NetworkObject.Type = NetworkObjectTypes.Drop;
         _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         _rigidbody = GetComponent<Rigidbody2D>();
-        _boxCollider= GetComponent<BoxCollider2D>();
+        _boxCollider = GetComponent<BoxCollider2D>();
+        _attraction = GetComponent<DropAttraction>();
 
         _isPhysicsEnabled = true;
         _isAttractionEnabled = true;
         _isMergingEnabled = true;
+    }
+
+    public void SetTarget(Transform target, Action<Drop> endAttractionCallback)
+    {
+        if (_hasTarget)
+        {
+            return;
+        }
+        if (NetworkManager.Instance.IsClient)
+        {
+            if (_isAnotherObjectTarget)
+            {
+                return;
+            }
+            MessageData messageData = new()
+            {
+                Bool1 = false,
+                LongNumber1 = GameManager.Instance.Player.NetworkObject.Id,
+                LongNumber2 = NetworkObject.Id
+            };
+            NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.TakeDrop, messageData);
+        }
+        _attraction.Target = target;
+        _hasTarget = true;
+        _attraction.OnEndOfAttraction = endAttractionCallback;
+    }
+
+    public void RemoveTarget(Transform target)
+    {
+        if (!_hasTarget || _attraction.Target != target)
+        {
+            return;
+        }
+        if (NetworkManager.Instance.IsClient)
+        {
+            if (_isAnotherObjectTarget)
+            {
+                return;
+            }
+            MessageData messageData = new()
+            {
+                Bool1 = true,
+                LongNumber1 = GameManager.Instance.Player.NetworkObject.Id,
+                LongNumber2 = NetworkObject.Id
+            };
+            NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.TakeDrop, messageData);
+        }
+        _attraction.Target = null;
+        _hasTarget = false;
+        _attraction.OnEndOfAttraction = null;
+    }
+
+    public void EndAttraction()
+    {
+        _attraction.EndAttraction();
     }
 
     private void SetSprite(Sprite sprite)
@@ -147,6 +245,16 @@ public class Drop : MonoBehaviour
         newScaleY /= size.y;
         _spriteRenderer.transform.localScale = new Vector3(newScaleX, newScaleY, 1);
         OnColliderSizeChanged?.Invoke();
+    }
+
+    public override GameObjectBase CreateInstance(Vector3 position, Transform parent = null, bool isOwner = true)
+    {
+        GameObjectBase instance = base.CreateInstance(position, parent, isOwner);
+        if (!isOwner)
+        {
+            instance.GetComponent<Drop>().Rigidbody.bodyType = RigidbodyType2D.Static;
+        }
+        return instance;
     }
     #endregion
 }

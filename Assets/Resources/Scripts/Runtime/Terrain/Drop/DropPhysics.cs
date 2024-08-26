@@ -1,8 +1,4 @@
-using System;
-using System.Collections;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class DropPhysics : MonoBehaviour
 {
@@ -37,6 +33,10 @@ public class DropPhysics : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!_drop.NetworkObject.IsOwner)
+        {
+            return;
+        }
         if (_drop.IsPhysicsEnabled)
         {
             _intPosition = Vector3Int.FloorToInt(transform.position);
@@ -97,7 +97,7 @@ public class DropPhysics : MonoBehaviour
         _platforms[platformIndex].gameObject.SetActive(result);
         if (result)
         {
-            Vector3 position = new Vector3((_intPosition.x + x) - transform.position.x + 0.5f, (_intPosition.y + y) - transform.position.y + 0.5f);
+            Vector3 position = new((_intPosition.x + x) - transform.position.x + 0.5f, (_intPosition.y + y) - transform.position.y + 0.5f);
             _platforms[platformIndex].transform.localPosition = position;
         }
     }
@@ -131,10 +131,8 @@ public class DropPhysics : MonoBehaviour
         return WorldDataManager.Instance.IsSolid(_intPosition.x + x, _intPosition.y + y);
     }
 
-    public void AddForce()
+    public void AddForce(Vector3 direction)
     {
-        Vector3 screenPoint = Camera.main.WorldToScreenPoint(transform.position);
-        Vector3 direction = Input.mousePosition - screenPoint;
         direction.Normalize();
 
         float xVelocity = direction.x * _speed;

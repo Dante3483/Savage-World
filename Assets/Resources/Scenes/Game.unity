@@ -15868,7 +15868,10 @@ MonoBehaviour:
   _networkObjects:
     _playerPrefab: {fileID: 1832234326415365086, guid: 8f9689393ca9cab418bc256ec4c7f067, type: 3}
     _arrayOfNetworkObjects:
+    - {fileID: 3742841456192554303, guid: 3cafab4b63471bf4b81789ed4f374071, type: 3}
     - {fileID: 1832234326415365086, guid: 8f9689393ca9cab418bc256ec4c7f067, type: 3}
+    - {fileID: 7490204851207612329, guid: 0f5908a1d0556814ca887042132de5a9, type: 3}
+    - {fileID: 1859142412969415777, guid: 8a4a5db4239c32b4c92025dbd54eb8da, type: 3}
     - {fileID: 1732900005312465524, guid: 40f63a090e2903c40984a91305c99f80, type: 3}
     - {fileID: 3834015491224742088, guid: bcc829edaefc1f444bfeec893ca33e6b, type: 3}
     _objectsParent: {fileID: 1956171276}
@@ -16700,6 +16703,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3002a9ac54c039b4fafda831835a8e79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _maxCountOfActionsPerUpdate: 100
+  _currentCountOfActions: 0
 --- !u!1 &1332068269
 GameObject:
   m_ObjectHideFlags: 0

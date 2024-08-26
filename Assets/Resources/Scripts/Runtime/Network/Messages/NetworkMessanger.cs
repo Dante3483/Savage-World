@@ -142,9 +142,13 @@ namespace SavageWorld.Runtime.Network.Messages
                 { NetworkMessageTypes.Disconnect, new DisconnectMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.CreatePlayer, new CreatePlayerMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.CreateEnvironment, new CreateEnvironmentMessage(_binaryWriter, _binaryReader) },
+                { NetworkMessageTypes.CreateDrop, new CreateDropMessage(_binaryWriter, _binaryReader) },
+                { NetworkMessageTypes.DestroyObject, new DestroyObjectMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.SendTransform, new SendTransformMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.SendWorldCellData, new SendWorldCellDataMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.SendEntityAnimation, new SendEntityAnimationMessage(_binaryWriter, _binaryReader) },
+                { NetworkMessageTypes.AddDamageToTile, new AddDamageToTileMessage(_binaryWriter, _binaryReader) },
+                { NetworkMessageTypes.TakeDrop, new TakeDropMessage(_binaryWriter, _binaryReader) },
             };
         }
         #endregion

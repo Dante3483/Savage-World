@@ -1,4 +1,7 @@
 using Items;
+using SavageWorld.Runtime.Enums.Network;
+using SavageWorld.Runtime.Network;
+using SavageWorld.Runtime.Network.Messages;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -106,7 +109,14 @@ public class PlayerInteractions : MonoBehaviour
 
     public bool IsEnoughSpaceToTakeDrop(Drop drop)
     {
-        return !_inventory.IsEnoughSpaceForItem(drop.Item, ItemLocations.Hotbar) || !_inventory.IsEnoughSpaceForItem(drop.Item, ItemLocations.Storage);
+        if (_inventory != null)
+        {
+            return !_inventory.IsEnoughSpaceForItem(drop.Item, ItemLocations.Hotbar) || !_inventory.IsEnoughSpaceForItem(drop.Item, ItemLocations.Storage);
+        }
+        else
+        {
+            return false;
+        }
     }
     #endregion
 
@@ -162,19 +172,22 @@ public class PlayerInteractions : MonoBehaviour
             remainder = _inventory.AddItem(drop.Item, drop.Quantity, ItemLocations.Storage);
             drop.Quantity = remainder;
         }
+        if (NetworkManager.Instance.IsClient)
+        {
+            MessageData messageData = new()
+            {
+                LongNumber2 = drop.NetworkObject.Id,
+                IntNumber2 = drop.Quantity,
+            };
+            NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.CreateDrop, messageData);
+        }
     }
 
     private void ThrowSelectedItem(InputAction.CallbackContext _)
     {
         ItemSO data = _inventory.GetSelectedItemData();
         int quantity = _inventory.GetSelectedItemQuantity();
-        Drop drop = DropManager.Instance.CreateDrop(transform.position, data, quantity);
-        if (drop != null)
-        {
-            DropPhysics dropPhysics = drop.GetComponent<DropPhysics>();
-            dropPhysics.AddForce();
-            _inventory.RemoveQuantityFromSelectedItem(quantity);
-        }
+        DropManager.Instance.CreateDropWithForce(transform.position, data, quantity, () => _inventory.RemoveQuantityFromSelectedItem(quantity));
     }
 
     private void MouseInsideAreaCheck()

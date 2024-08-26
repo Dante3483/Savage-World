@@ -31,15 +31,18 @@ public class ActionInMainThreadUtil : Singleton<ActionInMainThreadUtil>
         _updateActionQueue = new();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         int count = 0;
         _currentCountOfActions = _updateActionQueue.Count;
-        while (_updateActionQueue.Count > 0 && count < _maxCountOfActionsPerUpdate)
+        lock (_updateActionQueue)
         {
-            Action action = _updateActionQueue.Dequeue();
-            action.Invoke();
-            count++;
+            while (_updateActionQueue.Count > 0 && count < _maxCountOfActionsPerUpdate)
+            {
+                Action action = _updateActionQueue.Dequeue();
+                action.Invoke();
+                count++;
+            }
         }
         if (_action != null)
         {
