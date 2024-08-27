@@ -14,24 +14,42 @@ namespace SavageWorld.Runtime.Physics
     public class BasePhysics : MonoBehaviour
     {
         #region Private fields
-        [SerializeField] protected BoxCollider2D _boxCollider;
-        [SerializeField] protected Rigidbody2D _rigidbody;
-        [SerializeField] private BoxCastUtil _groundCheckBoxCast;
-        [SerializeField] protected bool _isGrounded;
-        [SerializeField] private float _rawWidth;
-        [SerializeField] private float _rawHeight;
-        [SerializeField] private int _width;
-        [SerializeField] private int _height;
-        [SerializeField] private Vector2Int _startRenderingArea;
-        [SerializeField] private Vector2Int _endRenderingArea;
-        [SerializeField] private Vector2 _center;
-        [SerializeField] protected float _xSpeed = 100;
-        [SerializeField] protected float _ySpeed = 100;
-        [SerializeField] protected float _maxFallingSpeed = -30;
-        [SerializeField] private Vector2Int _prevTransformPosition;
-        [SerializeField] private Vector2Int _currentTransformPosition;
-        [SerializeField] private List<Vector2Int> _listOfPlatformsPositions;
-        [SerializeField] private bool _isInsideRenderArea;
+        [SerializeField]
+        protected BoxCollider2D _boxCollider;
+        [SerializeField]
+        protected Rigidbody2D _rigidbody;
+        [SerializeField]
+        private BoxCastUtil _groundCheckBoxCast;
+        [SerializeField]
+        protected bool _isGrounded;
+        [SerializeField]
+        private float _rawWidth;
+        [SerializeField]
+        private float _rawHeight;
+        [SerializeField]
+        private int _width;
+        [SerializeField]
+        private int _height;
+        [SerializeField]
+        private Vector2Int _startRenderingArea;
+        [SerializeField]
+        private Vector2Int _endRenderingArea;
+        [SerializeField]
+        private Vector2 _center;
+        [SerializeField]
+        protected float _xSpeed = 100;
+        [SerializeField]
+        protected float _ySpeed = 100;
+        [SerializeField]
+        protected float _maxFallingSpeed = -30;
+        [SerializeField]
+        private Vector2Int _prevTransformPosition;
+        [SerializeField]
+        private Vector2Int _currentTransformPosition;
+        [SerializeField]
+        private List<Vector2Int> _listOfPlatformsPositions;
+        [SerializeField]
+        private bool _isInsideRenderArea;
         #endregion
 
         #region Public fields
@@ -87,7 +105,7 @@ namespace SavageWorld.Runtime.Physics
         {
             foreach (var platformPosition in _listOfPlatformsPositions)
             {
-                Tilemap.Instance.RemovePlatform(platformPosition);
+                Tilemap.Instance.AddPositionToRemovePlatform(platformPosition, gameObject);
             }
         }
 
@@ -114,7 +132,7 @@ namespace SavageWorld.Runtime.Physics
                     if (WorldDataManager.Instance.IsPhysicallySolidBlock(positionX, positionY))
                     {
                         _listOfPlatformsPositions.Add(position);
-                        Tilemap.Instance.CreatePlatform(position);
+                        Tilemap.Instance.AddPositionToCreatePlatform(position, gameObject);
                     }
                 }
             }
@@ -124,7 +142,7 @@ namespace SavageWorld.Runtime.Physics
         [Button("Random position")]
         private void RandomPosition()
         {
-            transform.position = new Vector3(Random.Range(100, 4000), 2152);
+            transform.position = new Vector3(Random.Range(100, 4000), 2200);
         }
         #endregion
     }

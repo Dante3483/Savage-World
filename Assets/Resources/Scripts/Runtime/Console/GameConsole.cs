@@ -85,6 +85,8 @@ namespace SavageWorld.Runtime.Console
                     }
                 }
             }
+            Instance._logs.SetText(Instance._logsStringBuilder);
+            _isLogsUpdated = false;
             if (_isLogsUpdated)
             {
                 Instance._logs.SetText(Instance._logsStringBuilder);

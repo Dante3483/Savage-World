@@ -5,11 +5,7 @@ namespace SavageWorld.Runtime.Physics
 {
     public class DynamicPhysics : BasePhysics
     {
-        #region Private fields
-
-        #endregion
-
-        #region Public fields
+        #region Fields
 
         #endregion
 
@@ -17,7 +13,11 @@ namespace SavageWorld.Runtime.Physics
 
         #endregion
 
-        #region Methods
+        #region Events / Delegates
+
+        #endregion
+
+        #region Monobehaviour Methods
         public override void Awake()
         {
             base.Awake();
@@ -31,7 +31,13 @@ namespace SavageWorld.Runtime.Physics
             base.FixedUpdate();
             FixVelocity();
         }
+        #endregion
 
+        #region Public Methods
+
+        #endregion
+
+        #region Private Methods
         private void FixVelocity()
         {
             float xVelocity = _rigidbody.velocity.x;
