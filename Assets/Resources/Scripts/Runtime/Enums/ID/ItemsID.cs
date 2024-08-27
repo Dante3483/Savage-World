@@ -1,18 +1,21 @@
-public enum ItemsID : ushort
+namespace SavageWorld.Runtime.Enums.Id
 {
-    DirtBlock = 0,
+    public enum ItemsId : ushort
+    {
+        DirtBlock = 0,
 
-    StoneBlock = 1,
+        StoneBlock = 1,
 
-    SandBlock = 2,
+        SandBlock = 2,
 
-    ClayBlock = 3,
+        ClayBlock = 3,
 
-    IronOreBlock = 4,
+        IronOreBlock = 4,
 
-    CopperOreBlock = 5,
+        CopperOreBlock = 5,
 
-    Log = 6,
+        Log = 6,
 
-    Rock = 7
+        Rock = 7
+    }
 }

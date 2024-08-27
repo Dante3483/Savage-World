@@ -1,30 +1,35 @@
-public abstract class ToolItemSO : NonStackableItemSO
+using SavageWorld.Runtime.Enums.Types;
+
+namespace SavageWorld.Runtime.Player.Inventory.Items
 {
-    #region Fields
-    protected ToolTypes _toolType;
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Monobehaviour Methods
-
-    #endregion
-
-    #region Public Methods
-    public ToolItemSO()
+    public abstract class ToolItemSO : NonStackableItemSO
     {
-        _itemType = ItemTypes.Tool;
-        _using = "Can be used";
+        #region Fields
+        protected ToolTypes _toolType;
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Events / Delegates
+
+        #endregion
+
+        #region Monobehaviour Methods
+
+        #endregion
+
+        #region Public Methods
+        public ToolItemSO()
+        {
+            _itemType = ItemTypes.Tool;
+            _using = "Can be used";
+        }
+        #endregion
+
+        #region Private Methods
+
+        #endregion
     }
-    #endregion
-
-    #region Private Methods
-
-    #endregion
 }

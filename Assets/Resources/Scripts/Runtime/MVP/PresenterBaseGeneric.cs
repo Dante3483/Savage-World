@@ -1,61 +1,64 @@
 using UnityEngine;
 
-public abstract class PresenterBaseGeneric<TModel, TView> : PresenterBase
-    where TModel : IModel
-    where TView : ViewBase
+namespace SavageWorld.Runtime.MVP
 {
-    #region Fields
-    protected TModel _model;
-    [SerializeField]
-    protected TView _view;
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Public Methods
-    public PresenterBaseGeneric(TModel model, TView view)
+    public abstract class PresenterBaseGeneric<TModel, TView> : PresenterBase
+        where TModel : IModel
+        where TView : ViewBase
     {
-        _model = model;
-        _view = view;
-        Initialize();
-    }
+        #region Fields
+        protected TModel _model;
+        [SerializeField]
+        protected TView _view;
+        #endregion
 
-    protected virtual void Initialize()
-    {
-        InitializeModel();
-        InitializeView();
-    }
+        #region Properties
 
-    public abstract void ResetPresenter();
+        #endregion
 
-    public override void Enable()
-    {
-        _isAvtive = true;
-        _view.Show();
-    }
+        #region Events / Delegates
 
-    public override void Disable()
-    {
-        _isAvtive = false;
-        _view.Hide();
-    }
-    #endregion
+        #endregion
 
-    #region Private Methods
-    protected virtual void InitializeModel()
-    {
-        _model.Initialize();
-    }
+        #region Public Methods
+        public PresenterBaseGeneric(TModel model, TView view)
+        {
+            _model = model;
+            _view = view;
+            Initialize();
+        }
 
-    protected virtual void InitializeView()
-    {
-        _view.Initialize();
+        protected virtual void Initialize()
+        {
+            InitializeModel();
+            InitializeView();
+        }
+
+        public abstract void ResetPresenter();
+
+        public override void Enable()
+        {
+            _isAvtive = true;
+            _view.Show();
+        }
+
+        public override void Disable()
+        {
+            _isAvtive = false;
+            _view.Hide();
+        }
+        #endregion
+
+        #region Private Methods
+        protected virtual void InitializeModel()
+        {
+            _model.Initialize();
+        }
+
+        protected virtual void InitializeView()
+        {
+            _view.Initialize();
+        }
+        #endregion
     }
-    #endregion
 }

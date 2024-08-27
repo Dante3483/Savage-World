@@ -1,12 +1,15 @@
-public enum ItemTypes : byte
+namespace SavageWorld.Runtime.Enums.Types
 {
-    Block = 0,
+    public enum ItemTypes : byte
+    {
+        Block = 0,
 
-    Tool = 1,
+        Tool = 1,
 
-    Weapon = 2,
+        Weapon = 2,
 
-    Armor = 3,
+        Armor = 3,
 
-    Accessory = 4,
+        Accessory = 4,
+    }
 }

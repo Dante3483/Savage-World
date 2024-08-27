@@ -1,7 +1,8 @@
+using SavageWorld.Runtime.Managers;
 using Unity.Collections;
 using Unity.Jobs;
 
-namespace LightSystem
+namespace SavageWorld.Runtime.Light
 {
     public struct LightSystemGetWorldDataJob : IJobParallelFor
     {

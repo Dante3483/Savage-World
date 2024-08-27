@@ -1,54 +1,58 @@
+using SavageWorld.Runtime.Enums.Id;
 using UnityEngine;
 
-public class GrassSeedingPhase : WorldProcessingPhaseBase
+namespace SavageWorld.Runtime.Terrain.WorldProcessingPhases
 {
-    #region Fields
-
-    #endregion
-
-    #region Properties
-    public override string Name => "Grass seeding";
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Public Methods
-    public override void StartPhase()
+    public class GrassSeedingPhase : WorldProcessingPhaseBase
     {
-        _surfaceCoords.Clear();
-        BiomesID currentBiomeId;
-        Vector2Int vector = new();
-        int x;
-        int y;
+        #region Fields
 
-        for (x = 0; x < _terrainWidth; x++)
+        #endregion
+
+        #region Properties
+        public override string Name => "Grass seeding";
+        #endregion
+
+        #region Events / Delegates
+
+        #endregion
+
+        #region Public Methods
+        public override void StartPhase()
         {
-            for (y = _terrainConfiguration.Equator; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
+            _surfaceCoords.Clear();
+            BiomesId currentBiomeId;
+            Vector2Int vector = new();
+            int x;
+            int y;
+
+            for (x = 0; x < _terrainWidth; x++)
             {
-                currentBiomeId = _chunksManager.GetChunk(x, y).Biome.Id;
-                if (!IsEmpty(x, y + 1))
+                for (y = _terrainConfiguration.Equator; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
                 {
-                    continue;
-                }
-                if (IsLiquid(x, y + 1))
-                {
-                    continue;
-                }
-                vector.x = x;
-                vector.y = y;
-                _surfaceCoords.Add(vector);
-                if (CompareBlock(x, y, _dirt))
-                {
-                    SetBlockData(x, y, _gameManager.BlocksAtlas.GetGrassByBiome(currentBiomeId));
+                    currentBiomeId = _chunksManager.GetChunk(x, y).Biome.Id;
+                    if (!IsEmpty(x, y + 1))
+                    {
+                        continue;
+                    }
+                    if (IsLiquid(x, y + 1))
+                    {
+                        continue;
+                    }
+                    vector.x = x;
+                    vector.y = y;
+                    _surfaceCoords.Add(vector);
+                    if (CompareBlock(x, y, _dirt))
+                    {
+                        SetBlockData(x, y, _gameManager.BlocksAtlas.GetGrassByBiome(currentBiomeId));
+                    }
                 }
             }
         }
+        #endregion
+
+        #region Private Methods
+
+        #endregion
     }
-    #endregion
-
-    #region Private Methods
-
-    #endregion
 }

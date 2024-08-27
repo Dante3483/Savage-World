@@ -1,103 +1,108 @@
-using Items;
+using SavageWorld.Runtime.Enums.Others;
+using SavageWorld.Runtime.MVP;
+using SavageWorld.Runtime.Player.Inventory.Items;
 using System.Collections;
 using UnityEngine;
 
-public class InventoryPresenter : PresenterBaseGeneric<InventoryModel, InventoryView>
+namespace SavageWorld.Runtime.Player.Inventory
 {
-    #region Fields
-    private float _minTimeToTakeItem;
-    private float _maxTimeToTakeItem;
-    private float _stepToLerpTimeToTakeItem;
-    private float _currentTimeToTakeItem;
-    private Coroutine _takeItemCoroutine;
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Public Methods
-    public InventoryPresenter(float minTimeToTakeItem, float maxTimeToTakeItem, float stepToLerpTimeToTakeItem, InventoryModel model, InventoryView view) : base(model, view)
+    public class InventoryPresenter : PresenterBaseGeneric<InventoryModel, InventoryView>
     {
-        _minTimeToTakeItem = minTimeToTakeItem;
-        _maxTimeToTakeItem = maxTimeToTakeItem;
-        _stepToLerpTimeToTakeItem = stepToLerpTimeToTakeItem;
-    }
+        #region Fields
+        private float _minTimeToTakeItem;
+        private float _maxTimeToTakeItem;
+        private float _stepToLerpTimeToTakeItem;
+        private float _currentTimeToTakeItem;
+        private Coroutine _takeItemCoroutine;
+        #endregion
 
-    public override void ResetPresenter()
-    {
+        #region Properties
 
-    }
-    #endregion
+        #endregion
 
-    #region Private Methods
-    protected override void InitializeModel()
-    {
-        base.InitializeModel();
-        _model.ItemDataChanged += ItemDataChangedEventHandler;
-        _model.ItemQuantityChanged += ItemQuantityChangedEventHandler;
-    }
+        #region Events / Delegates
 
-    protected override void InitializeView()
-    {
-        _view.Configure(_model.StorageSize, _model.HotbarSize, _model.AccessoriesSize);
-        _view.Initialize();
-        _view.DragItemRequested += DragItemRequestedEventHandler;
-        _view.TakeItemRequested += TakeItemRequestedEventHandler;
-        _view.StopTakeItemRequested += StopTakeItemRequestedEventHandler;
-        _view.DescriptionRequested += DescriptionRequestedEventHandler;
-    }
+        #endregion
 
-    private IEnumerator TakeItemCoroutine(int index, ItemLocations location)
-    {
-        bool isTurboMode = _currentTimeToTakeItem <= (_minTimeToTakeItem + _minTimeToTakeItem / 10);
-        _model.DragItem(index, location, isTurboMode ? 50 : 1);
-        yield return new WaitForSeconds(_currentTimeToTakeItem);
-        _currentTimeToTakeItem = Mathf.Lerp(_currentTimeToTakeItem, _minTimeToTakeItem, _stepToLerpTimeToTakeItem);
-        _takeItemCoroutine = null;
-    }
-
-    private void ItemDataChangedEventHandler(ItemSO data, int index, ItemLocations location)
-    {
-        _view.UpdateCellSprite(data?.SmallItemImage, index, location);
-    }
-
-    private void ItemQuantityChangedEventHandler(int quantity, int index, ItemLocations location)
-    {
-        _view.UpdateCellQuantity(quantity, index, location);
-    }
-
-    private void DragItemRequestedEventHandler(int index, ItemLocations location)
-    {
-        _model.DragItem(index, location);
-    }
-
-    private void TakeItemRequestedEventHandler(int index, ItemLocations location)
-    {
-        if (_takeItemCoroutine == null)
+        #region Public Methods
+        public InventoryPresenter(float minTimeToTakeItem, float maxTimeToTakeItem, float stepToLerpTimeToTakeItem, InventoryModel model, InventoryView view) : base(model, view)
         {
-            _currentTimeToTakeItem = _model.CompareItemWithBuffer(index, location) ? _currentTimeToTakeItem : _maxTimeToTakeItem;
-            _takeItemCoroutine = _view.StartCoroutine(TakeItemCoroutine(index, location));
+            _minTimeToTakeItem = minTimeToTakeItem;
+            _maxTimeToTakeItem = maxTimeToTakeItem;
+            _stepToLerpTimeToTakeItem = stepToLerpTimeToTakeItem;
         }
-    }
 
-    private void StopTakeItemRequestedEventHandler()
-    {
-        _currentTimeToTakeItem = _maxTimeToTakeItem;
-        if (_takeItemCoroutine != null)
+        public override void ResetPresenter()
         {
-            _view.StopCoroutine(_takeItemCoroutine);
+
+        }
+        #endregion
+
+        #region Private Methods
+        protected override void InitializeModel()
+        {
+            base.InitializeModel();
+            _model.ItemDataChanged += ItemDataChangedEventHandler;
+            _model.ItemQuantityChanged += ItemQuantityChangedEventHandler;
+        }
+
+        protected override void InitializeView()
+        {
+            _view.Configure(_model.StorageSize, _model.HotbarSize, _model.AccessoriesSize);
+            _view.Initialize();
+            _view.DragItemRequested += DragItemRequestedEventHandler;
+            _view.TakeItemRequested += TakeItemRequestedEventHandler;
+            _view.StopTakeItemRequested += StopTakeItemRequestedEventHandler;
+            _view.DescriptionRequested += DescriptionRequestedEventHandler;
+        }
+
+        private IEnumerator TakeItemCoroutine(int index, ItemLocations location)
+        {
+            bool isTurboMode = _currentTimeToTakeItem <= _minTimeToTakeItem + _minTimeToTakeItem / 10;
+            _model.DragItem(index, location, isTurboMode ? 50 : 1);
+            yield return new WaitForSeconds(_currentTimeToTakeItem);
+            _currentTimeToTakeItem = Mathf.Lerp(_currentTimeToTakeItem, _minTimeToTakeItem, _stepToLerpTimeToTakeItem);
             _takeItemCoroutine = null;
         }
-    }
 
-    private void DescriptionRequestedEventHandler(int index, ItemLocations location)
-    {
-        _view.UpdateTooltip(_model.GetItemDescription(index, location));
+        private void ItemDataChangedEventHandler(ItemSO data, int index, ItemLocations location)
+        {
+            _view.UpdateCellSprite(data?.SmallItemImage, index, location);
+        }
+
+        private void ItemQuantityChangedEventHandler(int quantity, int index, ItemLocations location)
+        {
+            _view.UpdateCellQuantity(quantity, index, location);
+        }
+
+        private void DragItemRequestedEventHandler(int index, ItemLocations location)
+        {
+            _model.DragItem(index, location);
+        }
+
+        private void TakeItemRequestedEventHandler(int index, ItemLocations location)
+        {
+            if (_takeItemCoroutine == null)
+            {
+                _currentTimeToTakeItem = _model.CompareItemWithBuffer(index, location) ? _currentTimeToTakeItem : _maxTimeToTakeItem;
+                _takeItemCoroutine = _view.StartCoroutine(TakeItemCoroutine(index, location));
+            }
+        }
+
+        private void StopTakeItemRequestedEventHandler()
+        {
+            _currentTimeToTakeItem = _maxTimeToTakeItem;
+            if (_takeItemCoroutine != null)
+            {
+                _view.StopCoroutine(_takeItemCoroutine);
+                _takeItemCoroutine = null;
+            }
+        }
+
+        private void DescriptionRequestedEventHandler(int index, ItemLocations location)
+        {
+            _view.UpdateTooltip(_model.GetItemDescription(index, location));
+        }
+        #endregion
     }
-    #endregion
 }

@@ -1,44 +1,47 @@
 using System.Threading.Tasks;
 
-public class UpdateDataPhase : WorldProcessingPhaseBase
+namespace SavageWorld.Runtime.Terrain.WorldProcessingPhases
 {
-    #region Fields
-
-    #endregion
-
-    #region Properties
-    public override string Name => "Update data";
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Public Methods
-    public override void StartPhase()
+    public class UpdateDataPhase : WorldProcessingPhaseBase
     {
-        Parallel.For(5, _terrainWidth - 5, (index) =>
+        #region Fields
+
+        #endregion
+
+        #region Properties
+        public override string Name => "Update data";
+        #endregion
+
+        #region Events / Delegates
+
+        #endregion
+
+        #region Public Methods
+        public override void StartPhase()
         {
-            for (int y = 5; y < _terrainHeight - 5; y++)
+            Parallel.For(5, _terrainWidth - 5, (index) =>
             {
-                if (IsDust(index, y) && IsEmpty(index, y - 1))
+                for (int y = 5; y < _terrainHeight - 5; y++)
                 {
-                    lock (this)
+                    if (IsDust(index, y) && IsEmpty(index, y - 1))
                     {
-                        //_terrain.NeedToUpdate.Add(new Vector2Ushort(index, y));
+                        lock (this)
+                        {
+                            //_terrain.NeedToUpdate.Add(new Vector2Ushort(index, y));
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        //while (_terrain.NeedToUpdate.Count != 0)
-        //{
-        //    //_terrain.UpdateWorldData();
-        //}
+            //while (_terrain.NeedToUpdate.Count != 0)
+            //{
+            //    //_terrain.UpdateWorldData();
+            //}
+        }
+        #endregion
+
+        #region Private Methods
+
+        #endregion
     }
-    #endregion
-
-    #region Private Methods
-
-    #endregion
 }

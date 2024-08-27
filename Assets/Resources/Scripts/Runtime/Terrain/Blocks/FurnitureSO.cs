@@ -1,83 +1,88 @@
+using SavageWorld.Runtime.Enums.Id;
+using SavageWorld.Runtime.Enums.Types;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "newFurniture", menuName = "Blocks/Furniture")]
-public class FurnitureSO : BlockSO
+namespace SavageWorld.Runtime.Terrain.Blocks
 {
-    #region Private fields
-    [SerializeField] private FurnitureBlocksID _id;
-    [SerializeField] private bool _canPlaceOnSide;
-    [SerializeField] private bool _canPlaceOnWall;
-    [SerializeField] private bool _canPlaceOnFloor;
-    [SerializeField] private bool _canPlaceOnCeiling;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-    public bool CanPlaceOnSide
+    [CreateAssetMenu(fileName = "newFurniture", menuName = "Blocks/Furniture")]
+    public class FurnitureSO : BlockSO
     {
-        get
+        #region Private fields
+        [SerializeField] private FurnitureBlocksId _id;
+        [SerializeField] private bool _canPlaceOnSide;
+        [SerializeField] private bool _canPlaceOnWall;
+        [SerializeField] private bool _canPlaceOnFloor;
+        [SerializeField] private bool _canPlaceOnCeiling;
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+        public bool CanPlaceOnSide
         {
-            return _canPlaceOnSide;
+            get
+            {
+                return _canPlaceOnSide;
+            }
+
+            set
+            {
+                _canPlaceOnSide = value;
+            }
         }
 
-        set
+        public bool CanPlaceOnWall
         {
-            _canPlaceOnSide = value;
+            get
+            {
+                return _canPlaceOnWall;
+            }
+
+            set
+            {
+                _canPlaceOnWall = value;
+            }
         }
+
+        public bool CanPlaceOnFloor
+        {
+            get
+            {
+                return _canPlaceOnFloor;
+            }
+
+            set
+            {
+                _canPlaceOnFloor = value;
+            }
+        }
+
+        public bool CanPlaceOnCeiling
+        {
+            get
+            {
+                return _canPlaceOnCeiling;
+            }
+
+            set
+            {
+                _canPlaceOnCeiling = value;
+            }
+        }
+        #endregion
+
+        #region Methods
+        public FurnitureSO()
+        {
+            _type = BlockTypes.Furniture;
+        }
+
+        public override ushort GetId()
+        {
+            return (ushort)_id;
+        }
+        #endregion
     }
-
-    public bool CanPlaceOnWall
-    {
-        get
-        {
-            return _canPlaceOnWall;
-        }
-
-        set
-        {
-            _canPlaceOnWall = value;
-        }
-    }
-
-    public bool CanPlaceOnFloor
-    {
-        get
-        {
-            return _canPlaceOnFloor;
-        }
-
-        set
-        {
-            _canPlaceOnFloor = value;
-        }
-    }
-
-    public bool CanPlaceOnCeiling
-    {
-        get
-        {
-            return _canPlaceOnCeiling;
-        }
-
-        set
-        {
-            _canPlaceOnCeiling = value;
-        }
-    }
-    #endregion
-
-    #region Methods
-    public FurnitureSO()
-    {
-        _type = BlockTypes.Furniture;
-    }
-
-    public override ushort GetId()
-    {
-        return (ushort)_id;
-    }
-    #endregion
 }

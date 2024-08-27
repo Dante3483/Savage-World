@@ -1,10 +1,13 @@
-public enum WallsID : ushort
+namespace SavageWorld.Runtime.Enums.Id
 {
-    Empty = 0,
+    public enum WallsId : ushort
+    {
+        Empty = 0,
 
-    Air = 1,
+        Air = 1,
 
-    Dirt = 2,
+        Dirt = 2,
 
-    Stone = 3,
+        Stone = 3,
+    }
 }

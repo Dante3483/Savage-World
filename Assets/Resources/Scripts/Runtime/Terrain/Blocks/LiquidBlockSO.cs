@@ -1,42 +1,46 @@
+using SavageWorld.Runtime.Enums.Id;
+using SavageWorld.Runtime.Enums.Types;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
-[CreateAssetMenu(fileName = "newLiquidBlock", menuName = "Blocks/Liquid")]
-public class LiquidBlockSO : BlockSO
+namespace SavageWorld.Runtime.Terrain.Blocks
 {
-    #region Private fields
-    [SerializeField] private LiquidBlocksID _id;
-    [SerializeField] private ushort _flowTime;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-    public ushort FlowTime
+    [CreateAssetMenu(fileName = "newLiquidBlock", menuName = "Blocks/Liquid")]
+    public class LiquidBlockSO : BlockSO
     {
-        get
+        #region Private fields
+        [SerializeField] private LiquidBlocksId _id;
+        [SerializeField] private ushort _flowTime;
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+        public ushort FlowTime
         {
-            return _flowTime;
+            get
+            {
+                return _flowTime;
+            }
+
+            set
+            {
+                _flowTime = value;
+            }
+        }
+        #endregion
+
+        #region Methods
+        public LiquidBlockSO()
+        {
+            _type = BlockTypes.Liquid;
         }
 
-        set
+        public override ushort GetId()
         {
-            _flowTime = value;
+            return (ushort)_id;
         }
+        #endregion
     }
-    #endregion
-
-    #region Methods
-    public LiquidBlockSO()
-    {
-        _type = BlockTypes.Liquid;
-    }
-
-    public override ushort GetId()
-    {
-        return (ushort) _id;
-    }
-    #endregion
 }

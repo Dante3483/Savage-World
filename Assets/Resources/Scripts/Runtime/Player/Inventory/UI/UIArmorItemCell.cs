@@ -1,29 +1,34 @@
+using SavageWorld.Runtime.Enums.Others;
+using SavageWorld.Runtime.Enums.Types;
 using UnityEngine;
 
-public class UIArmorItemCell : UIWearableItemCell
+namespace SavageWorld.Runtime.Player.Inventory.UI
 {
-    #region Private fields
-    [SerializeField]
-    private ArmorTypes _armorType;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-    public override ItemLocations ItemLocation => ItemLocations.Armor;
-
-    public ArmorTypes ArmorType
+    public class UIArmorItemCell : UIWearableItemCell
     {
-        get
+        #region Private fields
+        [SerializeField]
+        private ArmorTypes _armorType;
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+        public override ItemLocations ItemLocation => ItemLocations.Armor;
+
+        public ArmorTypes ArmorType
         {
-            return _armorType;
+            get
+            {
+                return _armorType;
+            }
         }
+        #endregion
+
+        #region Methods
+
+        #endregion
     }
-    #endregion
-
-    #region Methods
-
-    #endregion
 }

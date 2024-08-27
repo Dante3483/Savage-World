@@ -1,30 +1,33 @@
 using System;
 
-public static class EventManager
+namespace SavageWorld.Runtime.Managers
 {
-    #region Fields
+    public static class EventManager
+    {
+        #region Fields
 
-    #endregion
+        #endregion
 
-    #region Properties
+        #region Properties
 
-    #endregion
+        #endregion
 
-    #region Events / Delegates
-    public static Action<int> PlayerConnectedAsClient;
-    public static Action BookOpened;
-    public static Action BookClosed;
-    #endregion
+        #region Events / Delegates
+        public static Action<int> PlayerConnectedAsClient;
+        public static Action BookOpened;
+        public static Action BookClosed;
+        #endregion
 
-    #region Public Methods
-    public static void OnPlayerConnected(int clientId) => PlayerConnectedAsClient?.Invoke(clientId);
+        #region Public Methods
+        public static void OnPlayerConnected(int clientId) => PlayerConnectedAsClient?.Invoke(clientId);
 
-    public static void OnBookOpened() => BookOpened?.Invoke();
+        public static void OnBookOpened() => BookOpened?.Invoke();
 
-    public static void OnBookClosed() => BookClosed?.Invoke();
-    #endregion
+        public static void OnBookClosed() => BookClosed?.Invoke();
+        #endregion
 
-    #region Private Methods
+        #region Private Methods
 
-    #endregion
+        #endregion
+    }
 }

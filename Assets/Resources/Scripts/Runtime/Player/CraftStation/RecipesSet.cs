@@ -2,41 +2,44 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public class RecipesSet
+namespace SavageWorld.Runtime.Player.CraftStation
 {
-    #region Private fields
-    [SerializeField]
-    private string _name;
-    [SerializeField]
-    private Sprite _icon;
-    [SerializeField]
-    private List<RecipeSO> _recipes;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-    public List<RecipeSO> Recipes
+    [Serializable]
+    public class RecipesSet
     {
-        get
+        #region Private fields
+        [SerializeField]
+        private string _name;
+        [SerializeField]
+        private Sprite _icon;
+        [SerializeField]
+        private List<RecipeSO> _recipes;
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+        public List<RecipeSO> Recipes
         {
-            return _recipes;
+            get
+            {
+                return _recipes;
+            }
         }
-    }
 
-    public Sprite Icon
-    {
-        get
+        public Sprite Icon
         {
-            return _icon;
+            get
+            {
+                return _icon;
+            }
         }
+        #endregion
+
+        #region Methods
+
+        #endregion
     }
-    #endregion
-
-    #region Methods
-
-    #endregion
 }

@@ -1,27 +1,31 @@
+using SavageWorld.Runtime.Attributes;
 using UnityEngine;
 
-public abstract class AtlasSO : ScriptableObject
+namespace SavageWorld.Runtime.Atlases
 {
-    #region Private fields
-    [FolderPath(label: "Path to atlas data", title: "Select atlas data folder", startFolder: "Assets/Resources")]
-    [SerializeField] private string _atlasDataPath;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-    public string AtlasDataPath
+    public abstract class AtlasSO : ScriptableObject
     {
-        get
-        {
-            return _atlasDataPath;
-        }
-    }
-    #endregion
+        #region Private fields
+        [FolderPath(label: "Path to atlas data", title: "Select atlas data folder", startFolder: "Assets/Resources")]
+        [SerializeField] private string _atlasDataPath;
+        #endregion
 
-    #region Methods
-    public abstract void InitializeAtlas();
-    #endregion
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+        public string AtlasDataPath
+        {
+            get
+            {
+                return _atlasDataPath;
+            }
+        }
+        #endregion
+
+        #region Methods
+        public abstract void InitializeAtlas();
+        #endregion
+    }
 }

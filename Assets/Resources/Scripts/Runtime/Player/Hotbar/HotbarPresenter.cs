@@ -1,85 +1,92 @@
-using Items;
+using SavageWorld.Runtime.Enums.Others;
+using SavageWorld.Runtime.GameSession;
+using SavageWorld.Runtime.MVP;
+using SavageWorld.Runtime.Player.Inventory;
+using SavageWorld.Runtime.Player.Inventory.Items;
 using UnityEngine.InputSystem;
 
-public class HotbarPresenter : PresenterBaseGeneric<InventoryModel, HotbarView>
+namespace SavageWorld.Runtime.Player.Hotbar
 {
-    #region Fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Public Methods
-    public HotbarPresenter(InventoryModel model, HotbarView view) : base(model, view)
+    public class HotbarPresenter : PresenterBaseGeneric<InventoryModel, HotbarView>
     {
-        GameManager.Instance.PlayerInputActions.UI.SelectHotbarCellByKeyboard.performed += SelectCell;
-        GameManager.Instance.PlayerInputActions.UI.SelectHotbarCellByScrolling.performed += ScrollCell;
-    }
+        #region Fields
 
-    public override void ResetPresenter()
-    {
+        #endregion
 
-    }
-    #endregion
+        #region Properties
 
-    #region Private Methods
-    protected override void InitializeModel()
-    {
-        _model.ItemDataChanged += ItemDataChangedEventHandler;
-        _model.ItemQuantityChanged += ItemQuantityChangedEventHandler;
-        _model.SelectedItemChanged += SelectedItemChangedEventHandler;
-    }
+        #endregion
 
-    protected override void InitializeView()
-    {
-        _view.Configure(_model.HotbarSize);
-        _view.Initialize();
-    }
+        #region Events / Delegates
 
-    private void SelectCell(InputAction.CallbackContext context)
-    {
-        _model.SelectHotbarItem((int)context.ReadValue<float>());
-    }
+        #endregion
 
-    private void ScrollCell(InputAction.CallbackContext context)
-    {
-        _model.SelectAdjacentItem((int)context.ReadValue<float>());
-    }
-
-    private void ItemDataChangedEventHandler(ItemSO data, int index, ItemLocations location)
-    {
-        if (location != ItemLocations.Hotbar)
+        #region Public Methods
+        public HotbarPresenter(InventoryModel model, HotbarView view) : base(model, view)
         {
-            return;
+            GameManager.Instance.PlayerInputActions.UI.SelectHotbarCellByKeyboard.performed += SelectCell;
+            GameManager.Instance.PlayerInputActions.UI.SelectHotbarCellByScrolling.performed += ScrollCell;
         }
-        _view.UpdateCellSprite(data?.SmallItemImage, index);
-    }
 
-    private void ItemQuantityChangedEventHandler(int quantity, int index, ItemLocations location)
-    {
-        if (location != ItemLocations.Hotbar)
+        public override void ResetPresenter()
         {
-            return;
-        }
-        _view.UpdateCellQuantity(quantity, index);
-    }
 
-    private void SelectedItemChangedEventHandler(int index)
-    {
-        if (index == -1)
-        {
-            _view.DeselectAllCells();
         }
-        else
+        #endregion
+
+        #region Private Methods
+        protected override void InitializeModel()
         {
-            _view.SelectCell(index);
+            _model.ItemDataChanged += ItemDataChangedEventHandler;
+            _model.ItemQuantityChanged += ItemQuantityChangedEventHandler;
+            _model.SelectedItemChanged += SelectedItemChangedEventHandler;
         }
+
+        protected override void InitializeView()
+        {
+            _view.Configure(_model.HotbarSize);
+            _view.Initialize();
+        }
+
+        private void SelectCell(InputAction.CallbackContext context)
+        {
+            _model.SelectHotbarItem((int)context.ReadValue<float>());
+        }
+
+        private void ScrollCell(InputAction.CallbackContext context)
+        {
+            _model.SelectAdjacentItem((int)context.ReadValue<float>());
+        }
+
+        private void ItemDataChangedEventHandler(ItemSO data, int index, ItemLocations location)
+        {
+            if (location != ItemLocations.Hotbar)
+            {
+                return;
+            }
+            _view.UpdateCellSprite(data?.SmallItemImage, index);
+        }
+
+        private void ItemQuantityChangedEventHandler(int quantity, int index, ItemLocations location)
+        {
+            if (location != ItemLocations.Hotbar)
+            {
+                return;
+            }
+            _view.UpdateCellQuantity(quantity, index);
+        }
+
+        private void SelectedItemChangedEventHandler(int index)
+        {
+            if (index == -1)
+            {
+                _view.DeselectAllCells();
+            }
+            else
+            {
+                _view.SelectCell(index);
+            }
+        }
+        #endregion
     }
-    #endregion
 }

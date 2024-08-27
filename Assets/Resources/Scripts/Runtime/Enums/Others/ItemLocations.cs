@@ -1,14 +1,17 @@
-public enum ItemLocations : byte
+namespace SavageWorld.Runtime.Enums.Others
 {
-    None = 0,
+    public enum ItemLocations : byte
+    {
+        None = 0,
 
-    Storage = 1,
+        Storage = 1,
 
-    Hotbar = 2,
+        Hotbar = 2,
 
-    Accessories = 3,
+        Accessories = 3,
 
-    Armor = 4,
+        Armor = 4,
 
-    Buffer = 5,
+        Buffer = 5,
+    }
 }

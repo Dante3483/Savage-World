@@ -1,4 +1,7 @@
-public enum AbstractBlocksID: ushort
+namespace SavageWorld.Runtime.Enums.Id
 {
-    Air = 0,
+    public enum AbstractBlocksId : ushort
+    {
+        Air = 0,
+    }
 }

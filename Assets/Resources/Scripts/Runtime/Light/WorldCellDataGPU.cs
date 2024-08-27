@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace LightSystem
+namespace SavageWorld.Runtime.Light
 {
     public struct WorldCellDataGPU
     {

@@ -1,54 +1,59 @@
+using SavageWorld.Runtime.GameSession;
+using SavageWorld.Runtime.Managers;
 using SavageWorld.Runtime.Network;
 
-public class PlayerSelectionState : MainMenuStateBase
+namespace SavageWorld.Runtime.Menu.States
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public override void Enter()
+    public class PlayerSelectionState : MainMenuStateBase
     {
-        ListOfExistingPlayersController.Instance.UpdateUI();
-        ListOfExistingPlayersController.Instance.OnPlayerCreated += _mainMenuManager.CreatePlayer;
-        ListOfExistingPlayersController.Instance.OnPlayerSelected += _mainMenuManager.SelectPlayer;
-        ListOfExistingPlayersController.Instance.OnPlayerDeleted += _mainMenuManager.DeletePlayer;
-        UIManager.Instance.MainMenuPlayersUI.IsActive = true;
-    }
+        #region Private fields
 
-    public override void Exit()
-    {
-        ListOfExistingPlayersController.Instance.OnPlayerCreated -= _mainMenuManager.CreatePlayer;
-        ListOfExistingPlayersController.Instance.OnPlayerSelected -= _mainMenuManager.SelectPlayer;
-        ListOfExistingPlayersController.Instance.OnPlayerDeleted -= _mainMenuManager.DeletePlayer;
-        UIManager.Instance.MainMenuPlayersUI.IsActive = false;
-    }
+        #endregion
 
-    public override void Back()
-    {
-        if (NetworkManager.Instance.IsMultiplayer)
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public override void Enter()
         {
-            if (GameManager.Instance.IsClient)
+            ListOfExistingPlayersController.Instance.UpdateUI();
+            ListOfExistingPlayersController.Instance.OnPlayerCreated += _mainMenuManager.CreatePlayer;
+            ListOfExistingPlayersController.Instance.OnPlayerSelected += _mainMenuManager.SelectPlayer;
+            ListOfExistingPlayersController.Instance.OnPlayerDeleted += _mainMenuManager.DeletePlayer;
+            UIManager.Instance.MainMenuPlayersUI.IsActive = true;
+        }
+
+        public override void Exit()
+        {
+            ListOfExistingPlayersController.Instance.OnPlayerCreated -= _mainMenuManager.CreatePlayer;
+            ListOfExistingPlayersController.Instance.OnPlayerSelected -= _mainMenuManager.SelectPlayer;
+            ListOfExistingPlayersController.Instance.OnPlayerDeleted -= _mainMenuManager.DeletePlayer;
+            UIManager.Instance.MainMenuPlayersUI.IsActive = false;
+        }
+
+        public override void Back()
+        {
+            if (NetworkManager.Instance.IsMultiplayer)
             {
-                _mainMenuManager.ChangeState(_mainMenuManager.SetupNetworkConnectionState);
+                if (GameManager.Instance.IsClient)
+                {
+                    _mainMenuManager.ChangeState(_mainMenuManager.SetupNetworkConnectionState);
+                }
+                else
+                {
+                    _mainMenuManager.ChangeState(_mainMenuManager.MultiplayerModeSelectionState);
+                }
             }
             else
             {
-                _mainMenuManager.ChangeState(_mainMenuManager.MultiplayerModeSelectionState);
+                _mainMenuManager.ChangeState(_mainMenuManager.StarterMenuState);
             }
         }
-        else
-        {
-            _mainMenuManager.ChangeState(_mainMenuManager.StarterMenuState);
-        }
+        #endregion
     }
-    #endregion
 }

@@ -1,24 +1,27 @@
 using System;
 
-[AttributeUsage(AttributeTargets.Method | AttributeTargets.Field)]
-public class ProvideAttribute : Attribute
+namespace SavageWorld.Runtime.Attributes
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public ProvideAttribute()
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field)]
+    public class ProvideAttribute : Attribute
     {
+        #region Private fields
 
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public ProvideAttribute()
+        {
+
+        }
+        #endregion
     }
-    #endregion
 }

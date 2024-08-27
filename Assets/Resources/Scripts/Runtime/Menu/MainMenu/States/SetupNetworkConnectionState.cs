@@ -1,33 +1,39 @@
-public class SetupNetworkConnectionState : MainMenuStateBase
+using SavageWorld.Runtime.GameSession;
+using SavageWorld.Runtime.Managers;
+
+namespace SavageWorld.Runtime.Menu.States
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public override void Enter()
+    public class SetupNetworkConnectionState : MainMenuStateBase
     {
-        GameManager.Instance.IsClient = true;
-        UIManager.Instance.MainMenuConnectIPUI.IsActive = true;
-    }
+        #region Private fields
 
-    public override void Exit()
-    {
-        UIManager.Instance.MainMenuConnectIPUI.IsActive = false;
-    }
+        #endregion
 
-    public override void Back()
-    {
-        GameManager.Instance.IsClient = false;
-        _mainMenuManager.ChangeState(_mainMenuManager.MultiplayerModeSelectionState);
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public override void Enter()
+        {
+            GameManager.Instance.IsClient = true;
+            UIManager.Instance.MainMenuConnectIPUI.IsActive = true;
+        }
+
+        public override void Exit()
+        {
+            UIManager.Instance.MainMenuConnectIPUI.IsActive = false;
+        }
+
+        public override void Back()
+        {
+            GameManager.Instance.IsClient = false;
+            _mainMenuManager.ChangeState(_mainMenuManager.MultiplayerModeSelectionState);
+        }
+        #endregion
     }
-    #endregion
 }

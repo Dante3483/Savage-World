@@ -1,23 +1,27 @@
+using SavageWorld.Runtime.Attributes;
 using Unity.Netcode;
 using UnityEngine;
 
-public class Provider : MonoBehaviour
+namespace SavageWorld.Runtime.DependencyInjection
 {
-    #region Private fields
-    [SerializeField]
-    [Provide]
-    private Unity.Netcode.NetworkManager _networkManager;
-    #endregion
+    public class Provider : MonoBehaviour
+    {
+        #region Private fields
+        [SerializeField]
+        [Provide]
+        private NetworkManager _networkManager;
+        #endregion
 
-    #region Public fields
+        #region Public fields
 
-    #endregion
+        #endregion
 
-    #region Properties
+        #region Properties
 
-    #endregion
+        #endregion
 
-    #region Methods
+        #region Methods
 
-    #endregion
+        #endregion
+    }
 }

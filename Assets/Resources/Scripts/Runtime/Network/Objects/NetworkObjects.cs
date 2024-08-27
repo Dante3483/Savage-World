@@ -1,11 +1,12 @@
 using SavageWorld.Runtime.Console;
-using SavageWorld.Runtime.Network.Objects;
+using SavageWorld.Runtime.GameSession;
+using SavageWorld.Runtime.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using UnityEngine;
 
-namespace SavageWorld.Runtime.Network
+namespace SavageWorld.Runtime.Network.Objects
 {
     [Serializable]
     public class NetworkObjects
@@ -61,7 +62,7 @@ namespace SavageWorld.Runtime.Network
         {
             foreach (NetworkObject obj in _objectsById.Values)
             {
-                GameObject.Destroy(obj.gameObject);
+                UnityEngine.Object.Destroy(obj.gameObject);
             }
             _objectsById.Clear();
             _objectIDGenerator = new();
@@ -99,12 +100,12 @@ namespace SavageWorld.Runtime.Network
 
         public void DestroyObject(long id)
         {
-            ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() =>
+            MainThreadUtility.Instance.InvokeInNextUpdate(() =>
             {
                 NetworkObject obj = GetObjectById(id);
                 if (obj != null)
                 {
-                    GameObject.Destroy(obj.gameObject);
+                    UnityEngine.Object.Destroy(obj.gameObject);
                     _objectsById.Remove(id);
                 }
             });
@@ -128,7 +129,7 @@ namespace SavageWorld.Runtime.Network
         private void CreateObject(long globalId, Vector2 position, long objectId = -1, bool isOwner = false)
         {
             NetworkObject newObject = null;
-            ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() =>
+            MainThreadUtility.Instance.InvokeInNextUpdate(() =>
             {
                 GameObjectBase prefab = _arrayOfNetworkObjects[globalId].GetComponent<GameObjectBase>();
                 newObject = prefab.CreateInstance(position, isOwner: isOwner).NetworkObject;

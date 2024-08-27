@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Items
+namespace SavageWorld.Runtime.Player.Inventory.Items
 {
     [CreateAssetMenu(fileName = "newRarity", menuName = "Items/Rarity")]
     public class ItemRaritySO : ScriptableObject

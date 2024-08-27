@@ -1,41 +1,44 @@
 using System.Threading.Tasks;
 
-public class SetPhysicsShapesPhase : WorldProcessingPhaseBase
+namespace SavageWorld.Runtime.Terrain.WorldProcessingPhases
 {
-    #region Fields
-
-    #endregion
-
-    #region Properties
-    public override string Name => "Set physics shapes";
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Public Methods
-    public override void StartPhase()
+    public class SetPhysicsShapesPhase : WorldProcessingPhaseBase
     {
-        Parallel.For(5, _terrainWidth - 5, x =>
-        {
-            for (int y = 5; y < _terrainHeight - 5; y++)
-            {
-                _worldDataManager.UpdateCornerColliderWithoutNotification(x, y, true);
-            }
-        });
+        #region Fields
 
-        Parallel.For(5, _terrainWidth - 5, x =>
+        #endregion
+
+        #region Properties
+        public override string Name => "Set physics shapes";
+        #endregion
+
+        #region Events / Delegates
+
+        #endregion
+
+        #region Public Methods
+        public override void StartPhase()
         {
-            for (int y = 5; y < _terrainHeight - 5; y++)
+            Parallel.For(5, _terrainWidth - 5, x =>
             {
-                _worldDataManager.UpdateBlockColliderWithoutNotification(x, y);
-            }
-        });
+                for (int y = 5; y < _terrainHeight - 5; y++)
+                {
+                    _worldDataManager.UpdateCornerColliderWithoutNotification(x, y, true);
+                }
+            });
+
+            Parallel.For(5, _terrainWidth - 5, x =>
+            {
+                for (int y = 5; y < _terrainHeight - 5; y++)
+                {
+                    _worldDataManager.UpdateBlockColliderWithoutNotification(x, y);
+                }
+            });
+        }
+        #endregion
+
+        #region Private Methods
+
+        #endregion
     }
-    #endregion
-
-    #region Private Methods
-
-    #endregion
 }

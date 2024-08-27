@@ -1,29 +1,34 @@
+using SavageWorld.Runtime.Enums.Id;
+using SavageWorld.Runtime.Enums.Types;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "newSolidBlock", menuName = "Blocks/Solid")]
-public class SolidBlockSO : BlockSO
+namespace SavageWorld.Runtime.Terrain.Blocks
 {
-    #region Private fields
-    [SerializeField] private SolidBlocksID _id;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public SolidBlockSO()
+    [CreateAssetMenu(fileName = "newSolidBlock", menuName = "Blocks/Solid")]
+    public class SolidBlockSO : BlockSO
     {
-        _type = BlockTypes.Solid;
-    }
+        #region Private fields
+        [SerializeField] private SolidBlocksId _id;
+        #endregion
 
-    public override ushort GetId()
-    {
-        return (ushort) _id;
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public SolidBlockSO()
+        {
+            _type = BlockTypes.Solid;
+        }
+
+        public override ushort GetId()
+        {
+            return (ushort)_id;
+        }
+        #endregion
     }
-    #endregion
 }

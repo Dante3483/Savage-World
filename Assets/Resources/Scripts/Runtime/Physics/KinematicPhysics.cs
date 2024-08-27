@@ -1,20 +1,21 @@
-using UnityEngine;
-
-public class KinematicPhysics : BasePhysics
+namespace SavageWorld.Runtime.Physics
 {
-    #region Private fields
+    public class KinematicPhysics : BasePhysics
+    {
+        #region Private fields
 
-    #endregion
+        #endregion
 
-    #region Public fields
+        #region Public fields
 
-    #endregion
+        #endregion
 
-    #region Properties
+        #region Properties
 
-    #endregion
+        #endregion
 
-    #region Methods
+        #region Methods
 
-    #endregion
+        #endregion
+    }
 }

@@ -1,23 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class UIDebug : MonoBehaviour
+namespace SavageWorld.Runtime.UI.Debug
 {
-    #region Private fields
-    [SerializeField] protected TMP_Text _debugText;
-    #endregion
+    public class UIDebug : MonoBehaviour
+    {
+        #region Private fields
+        [SerializeField] protected TMP_Text _debugText;
+        #endregion
 
-    #region Public fields
+        #region Public fields
 
-    #endregion
+        #endregion
 
-    #region Properties
+        #region Properties
 
-    #endregion
+        #endregion
 
-    #region Methods
+        #region Methods
 
-    #endregion
+        #endregion
+    }
 }

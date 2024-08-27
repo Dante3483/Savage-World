@@ -1,10 +1,13 @@
-public interface IPlayerAction
+namespace SavageWorld.Runtime.Player.Actions
 {
-    #region Properties
+    public interface IPlayerAction
+    {
+        #region Properties
 
-    #endregion
+        #endregion
 
-    #region Public Methods
-    public void Execute();
-    #endregion
+        #region Public Methods
+        public void Execute();
+        #endregion
+    }
 }

@@ -1,8 +1,11 @@
-public enum ArmorTypes : byte
+namespace SavageWorld.Runtime.Enums.Types
 {
-    Helmet = 0,
+    public enum ArmorTypes : byte
+    {
+        Helmet = 0,
 
-    Chestplate = 1,
+        Chestplate = 1,
 
-    Leggings = 2,
+        Leggings = 2,
+    }
 }

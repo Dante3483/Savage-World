@@ -1,8 +1,9 @@
+using SavageWorld.Runtime.GameSession;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 
-namespace LightSystem
+namespace SavageWorld.Runtime.Light
 {
     public class LightSystem : MonoBehaviour
     {
@@ -160,7 +161,7 @@ namespace LightSystem
 
         private void UpdateLight()
         {
-            _mainCamera.backgroundColor = GameTimeUtil.Instance.CurrentColor;
+            _mainCamera.backgroundColor = GameTime.Instance.CurrentColor;
 
             _renderer.material = _currentLightMapMaterial;
 
@@ -194,7 +195,7 @@ namespace LightSystem
 
         public void FillLight()
         {
-            _computeShader.SetFloat("_dayLightValue", GameTimeUtil.Instance.DayLightValue);
+            _computeShader.SetFloat("_dayLightValue", GameTime.Instance.DayLightValue);
             if (_isColoredMode)
             {
                 _computeShader.GetKernelThreadGroupSizes(_fillLightColoredHandler, out uint x, out _, out _);

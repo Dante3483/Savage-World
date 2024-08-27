@@ -1,21 +1,26 @@
-public class UILoadingBar : UIProgressBar
+using SavageWorld.Runtime.GameSession;
+
+namespace SavageWorld.Runtime.UI.ProgressBar
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public void Update()
+    public class UILoadingBar : UIProgressBar
     {
-        _slider.value = GameManager.Instance.LoadingValue;
+        #region Private fields
+
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public void Update()
+        {
+            _slider.value = GameManager.Instance.LoadingValue;
+        }
+        #endregion
     }
-    #endregion
 }

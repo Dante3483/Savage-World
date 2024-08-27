@@ -1,3 +1,5 @@
+using SavageWorld.Runtime.Menu;
+
 namespace SavageWorld.Runtime.GameSession.States
 {
     public class MainMenuState : GameStateBase

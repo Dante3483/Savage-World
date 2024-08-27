@@ -1,3 +1,5 @@
+using SavageWorld.Runtime.Managers;
+using SavageWorld.Runtime.Utilities;
 using System.Threading.Tasks;
 
 namespace SavageWorld.Runtime.GameSession.States
@@ -34,7 +36,7 @@ namespace SavageWorld.Runtime.GameSession.States
         private void CreateWorld()
         {
             _gameManager.Terrain.CreateNewWorld();
-            ActionInMainThreadUtil.Instance.InvokeAndWait(() => _gameManager.ChangeState(_gameManager.CreatingPlayerState));
+            MainThreadUtility.Instance.InvokeAndWait(() => _gameManager.ChangeState(_gameManager.CreatingPlayerState));
         }
         #endregion
     }

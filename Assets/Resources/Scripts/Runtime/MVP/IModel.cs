@@ -1,10 +1,13 @@
-public interface IModel
+namespace SavageWorld.Runtime.MVP
 {
-    #region Properties
+    public interface IModel
+    {
+        #region Properties
 
-    #endregion
+        #endregion
 
-    #region Public Methods
-    public void Initialize();
-    #endregion
+        #region Public Methods
+        public void Initialize();
+        #endregion
+    }
 }

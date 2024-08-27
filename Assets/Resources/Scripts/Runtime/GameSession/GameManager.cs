@@ -1,573 +1,586 @@
+using SavageWorld.Runtime.Atlases;
+using SavageWorld.Runtime.Enums.Others;
 using SavageWorld.Runtime.GameSession.States;
+using SavageWorld.Runtime.Player;
+using SavageWorld.Runtime.Player.Inventory;
+using SavageWorld.Runtime.Player.Research;
+using SavageWorld.Runtime.Terrain;
+using SavageWorld.Runtime.Utilities;
+using SavageWorld.Runtime.Utilities.Others;
+using SavageWorld.Runtime.Utilities.StateMachine;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = System.Random;
 
-// KeyCode.H - Low quality of light system
-// KeyCode.J - Medium quality of light system
-// KeyCode.K - High quality of light system
-// KeyCode.G - Switch color light system
-// KeyCode.M - Create and save map
-// KeyCode.P - Set active player
-// KeyCode.L - Create torch
-// KeyCode.O - Enable/Disable debug UI
-public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
+namespace SavageWorld.Runtime.GameSession
 {
-    #region Private fields
-    [Header("Main")]
-    [SerializeField]
-    private GameState _currentGameState;
-    [SerializeField]
-    private TerrainConfigurationSO _terrainConfiguration;
-    [SerializeField]
-    private Player _playerPrefab;
-    [SerializeField]
-    private Transform _playerParrent;
-    [SerializeField]
-    private Player _player;
-    [SerializeField]
-    private PlayerInputActions _playerInputActions;
 
-    [Header("Atlases")]
-    [SerializeField]
-    private BlocksAtlasSO _blocksAtlas;
-    [SerializeField]
-    private TreesAtlasSO _treesAtlas;
-    [SerializeField]
-    private PickUpItemsAtlasSO _pickUpItemsAtlas;
-    [SerializeField]
-    private ItemsAtlasSO _itemsAtlas;
-    [SerializeField]
-    private RecipesAtlasSO _recipesAtlas;
-
-    [Header("Session data")]
-    [SerializeField]
-    private string _playerName;
-    [SerializeField]
-    private string _worldName;
-    [SerializeField]
-    private int _seed;
-    [SerializeField]
-    private int _currentTerrainWidth;
-    [SerializeField]
-    private int _currentTerrainHeight;
-    [SerializeField]
-    private ResearchesModelSO _researches;
-
-    [Header("Terrain")]
-    [SerializeField]
-    private GameObject _terrainGameObject;
-
-    [Header("Conditions")]
-    [SerializeField]
-    private bool _isStaticSeed;
-    [SerializeField]
-    private bool _isMenuActive;
-    [SerializeField]
-    private bool _isLoadingProgressActive;
-    [SerializeField]
-    private bool _isInputTextInFocus;
-
-    private StateMachine<GameStateBase> _stateMachine;
-    private InitializationState _initializationState;
-    private MainMenuState _mainMenuState;
-    private CreatingWorldState _creatingWorldState;
-    private LoadingWorldState _loadingWorldState;
-    private CreatingPlayerState _creatingPlayerState;
-    private LoadingPlayerState _loadingPlayerState;
-    private LoadingDataFromHostState _loadingDataFromHostState;
-    private PlayingState _playingState;
-    private QuitGameState _quitGameState;
-
-    private List<string> _playerNames;
-    private List<string> _worldNames;
-    private Random _randomVar;
-    private Terrain _terrain;
-    private float _loadingValue;
-    private string _phasesInfo;
-
-    //TODO:REMOVE
-    public bool IsClient;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-    public TerrainConfigurationSO TerrainConfiguration
+    // KeyCode.H - Low quality of light system
+    // KeyCode.J - Medium quality of light system
+    // KeyCode.K - High quality of light system
+    // KeyCode.G - Switch color light system
+    // KeyCode.M - Create and save map
+    // KeyCode.P - Set active player
+    // KeyCode.L - Create torch
+    // KeyCode.O - Enable/Disable debug UI
+    public class GameManager : Singleton<GameManager>, IStateMachine<GameStateBase>
     {
-        get
-        {
-            return _terrainConfiguration;
-        }
+        #region Private fields
+        [Header("Main")]
+        [SerializeField]
+        private GameState _currentGameState;
+        [SerializeField]
+        private TerrainConfigurationSO _terrainConfiguration;
+        [SerializeField]
+        private PlayerGameObject _playerPrefab;
+        [SerializeField]
+        private Transform _playerParrent;
+        [SerializeField]
+        private PlayerGameObject _player;
+        [SerializeField]
+        private PlayerInputActions _playerInputActions;
 
-        set
-        {
-            _terrainConfiguration = value;
-        }
-    }
+        [Header("Atlases")]
+        [SerializeField]
+        private BlocksAtlasSO _blocksAtlas;
+        [SerializeField]
+        private TreesAtlasSO _treesAtlas;
+        [SerializeField]
+        private PickUpItemsAtlasSO _pickUpItemsAtlas;
+        [SerializeField]
+        private ItemsAtlasSO _itemsAtlas;
+        [SerializeField]
+        private RecipesAtlasSO _recipesAtlas;
 
-    public BlocksAtlasSO BlocksAtlas
-    {
-        get
-        {
-            return _blocksAtlas;
-        }
+        [Header("Session data")]
+        [SerializeField]
+        private string _playerName;
+        [SerializeField]
+        private string _worldName;
+        [SerializeField]
+        private int _seed;
+        [SerializeField]
+        private int _currentTerrainWidth;
+        [SerializeField]
+        private int _currentTerrainHeight;
+        [SerializeField]
+        private ResearchesModelSO _researches;
 
-        set
-        {
-            _blocksAtlas = value;
-        }
-    }
+        [Header("Terrain")]
+        [SerializeField]
+        private GameObject _terrainGameObject;
 
-    public TreesAtlasSO TreesAtlas
-    {
-        get
-        {
-            return _treesAtlas;
-        }
+        [Header("Conditions")]
+        [SerializeField]
+        private bool _isStaticSeed;
+        [SerializeField]
+        private bool _isMenuActive;
+        [SerializeField]
+        private bool _isLoadingProgressActive;
+        [SerializeField]
+        private bool _isInputTextInFocus;
 
-        set
-        {
-            _treesAtlas = value;
-        }
-    }
+        private StateMachine<GameStateBase> _stateMachine;
+        private InitializationState _initializationState;
+        private MainMenuState _mainMenuState;
+        private CreatingWorldState _creatingWorldState;
+        private LoadingWorldState _loadingWorldState;
+        private CreatingPlayerState _creatingPlayerState;
+        private LoadingPlayerState _loadingPlayerState;
+        private LoadingDataFromHostState _loadingDataFromHostState;
+        private PlayingState _playingState;
+        private QuitGameState _quitGameState;
 
-    public PickUpItemsAtlasSO PickUpItemsAtlas
-    {
-        get
-        {
-            return _pickUpItemsAtlas;
-        }
+        private List<string> _playerNames;
+        private List<string> _worldNames;
+        private Random _randomVar;
+        private TerrainBehaviour _terrain;
+        private float _loadingValue;
+        private string _phasesInfo;
 
-        set
-        {
-            _pickUpItemsAtlas = value;
-        }
-    }
+        //TODO:REMOVE
+        public bool IsClient;
+        #endregion
 
-    public string PlayerName
-    {
-        get
-        {
-            return _playerName;
-        }
+        #region Public fields
 
-        set
-        {
-            _playerName = value;
-        }
-    }
+        #endregion
 
-    public string WorldName
-    {
-        get
+        #region Properties
+        public TerrainConfigurationSO TerrainConfiguration
         {
-            return _worldName;
-        }
-
-        set
-        {
-            _worldName = value;
-        }
-    }
-
-    public int Seed
-    {
-        get
-        {
-            return _seed;
-        }
-
-        set
-        {
-            _seed = value;
-        }
-    }
-
-    public Terrain Terrain
-    {
-        get
-        {
-            return _terrain;
-        }
-
-        set
-        {
-            _terrain = value;
-        }
-    }
-
-    public int CurrentTerrainWidth
-    {
-        get
-        {
-            return _currentTerrainWidth;
-        }
-
-        set
-        {
-            _currentTerrainWidth = value;
-        }
-    }
-
-    public int CurrentTerrainHeight
-    {
-        get
-        {
-            return _currentTerrainHeight;
-        }
-
-        set
-        {
-            _currentTerrainHeight = value;
-        }
-    }
-
-    public bool IsStaticSeed
-    {
-        get
-        {
-            return _isStaticSeed;
-        }
-
-        set
-        {
-            _isStaticSeed = value;
-        }
-    }
-
-    public Random RandomVar
-    {
-        get
-        {
-            if (_randomVar is null)
+            get
             {
-                _randomVar = new(_seed);
+                return _terrainConfiguration;
             }
-            return _randomVar;
-        }
 
-        set
-        {
-            _randomVar = value;
-        }
-    }
-
-    public float LoadingValue
-    {
-        get
-        {
-            return _loadingValue;
-        }
-
-        set
-        {
-            _loadingValue = value;
-        }
-    }
-
-    public bool IsPlayingState
-    {
-        get
-        {
-            return CurrentState == _playingState;
-        }
-    }
-
-    public string PhasesInfo
-    {
-        get
-        {
-            return _phasesInfo;
-        }
-
-        set
-        {
-            _phasesInfo = value;
-        }
-    }
-
-    public List<string> PlayerNames
-    {
-        get
-        {
-            return _playerNames;
-        }
-
-        set
-        {
-            _playerNames = value;
-        }
-    }
-
-    public List<string> WorldNames
-    {
-        get
-        {
-            return _worldNames;
-        }
-
-        set
-        {
-            _worldNames = value;
-        }
-    }
-
-    public bool IsInputTextInFocus
-    {
-        get
-        {
-            return _isInputTextInFocus;
-        }
-
-        set
-        {
-            if (value)
+            set
             {
-                InputSystem.DisableDevice(Keyboard.current);
+                _terrainConfiguration = value;
             }
-            else
+        }
+
+        public BlocksAtlasSO BlocksAtlas
+        {
+            get
             {
-                InputSystem.EnableDevice(Keyboard.current);
+                return _blocksAtlas;
             }
-            _isInputTextInFocus = value;
-        }
-    }
 
-    public ItemsAtlasSO ItemsAtlas
-    {
-        get
-        {
-            return _itemsAtlas;
-        }
-
-        set
-        {
-            _itemsAtlas = value;
-        }
-    }
-
-    public Player Player
-    {
-        get
-        {
-            return _player;
-        }
-
-        set
-        {
-            _player = value;
-        }
-    }
-
-    public InitializationState InitializationState
-    {
-        get
-        {
-            return _initializationState;
-        }
-    }
-
-    public MainMenuState MainMenuState
-    {
-        get
-        {
-            return _mainMenuState;
-        }
-    }
-
-    public StateMachine<GameStateBase> StateMachine => _stateMachine;
-
-    public GameStateBase CurrentState => StateMachine.CurrentState;
-
-    public GameStateBase PrevState => StateMachine.PrevState;
-
-    public CreatingWorldState CreatingWorldState
-    {
-        get
-        {
-            return _creatingWorldState;
-        }
-    }
-
-    public LoadingWorldState LoadingWorldState
-    {
-        get
-        {
-            return _loadingWorldState;
-        }
-    }
-
-    public GameObject TerrainGameObject
-    {
-        get
-        {
-            return _terrainGameObject;
-        }
-    }
-
-    public PlayingState PlayingState
-    {
-        get
-        {
-            return _playingState;
-        }
-    }
-
-    public LoadingDataFromHostState LoadingDataFromHostState
-    {
-        get
-        {
-            return _loadingDataFromHostState;
-        }
-
-        set
-        {
-            _loadingDataFromHostState = value;
-        }
-    }
-
-    public PlayerInputActions PlayerInputActions
-    {
-        get
-        {
-            if (_playerInputActions is null)
+            set
             {
-                _playerInputActions = new();
+                _blocksAtlas = value;
             }
-            return _playerInputActions;
         }
-    }
 
-    public RecipesAtlasSO RecipesAtlas
-    {
-        get
+        public TreesAtlasSO TreesAtlas
         {
-            return _recipesAtlas;
+            get
+            {
+                return _treesAtlas;
+            }
+
+            set
+            {
+                _treesAtlas = value;
+            }
         }
 
-        set
+        public PickUpItemsAtlasSO PickUpItemsAtlas
         {
-            _recipesAtlas = value;
-        }
-    }
+            get
+            {
+                return _pickUpItemsAtlas;
+            }
 
-    public CreatingPlayerState CreatingPlayerState
-    {
-        get
+            set
+            {
+                _pickUpItemsAtlas = value;
+            }
+        }
+
+        public string PlayerName
         {
-            return _creatingPlayerState;
+            get
+            {
+                return _playerName;
+            }
+
+            set
+            {
+                _playerName = value;
+            }
         }
 
-        set
+        public string WorldName
         {
-            _creatingPlayerState = value;
-        }
-    }
+            get
+            {
+                return _worldName;
+            }
 
-    public LoadingPlayerState LoadingPlayerState
-    {
-        get
+            set
+            {
+                _worldName = value;
+            }
+        }
+
+        public int Seed
         {
-            return _loadingPlayerState;
+            get
+            {
+                return _seed;
+            }
+
+            set
+            {
+                _seed = value;
+            }
         }
 
-        set
+        public TerrainBehaviour Terrain
         {
-            _loadingPlayerState = value;
-        }
-    }
+            get
+            {
+                return _terrain;
+            }
 
-    public Player PlayerPrefab
-    {
-        get
+            set
+            {
+                _terrain = value;
+            }
+        }
+
+        public int CurrentTerrainWidth
         {
-            return _playerPrefab;
+            get
+            {
+                return _currentTerrainWidth;
+            }
+
+            set
+            {
+                _currentTerrainWidth = value;
+            }
         }
 
-        set
+        public int CurrentTerrainHeight
         {
-            _playerPrefab = value;
+            get
+            {
+                return _currentTerrainHeight;
+            }
+
+            set
+            {
+                _currentTerrainHeight = value;
+            }
         }
-    }
-    #endregion
 
-    #region Methods
-    private void OnApplicationQuit()
-    {
-        ChangeState(_quitGameState);
-        _currentGameState = GameState.CloseApplication;
-        GetPlayerInventory().IsInitialized = false;
-    }
-
-    protected override void Awake()
-    {
-        base.Awake();
-        _stateMachine = new(GetType().Name);
-        _initializationState = new();
-        _mainMenuState = new();
-        _creatingWorldState = new();
-        _loadingWorldState = new();
-        _creatingPlayerState = new();
-        _loadingPlayerState = new();
-        _loadingDataFromHostState = new();
-        _playingState = new();
-        _terrain = _terrainGameObject.GetComponent<Terrain>();
-        _terrainGameObject.SetActive(false);
-        InputSystem.EnableDevice(Keyboard.current);
-        StaticInfo.Initialize();
-    }
-
-    private void Start()
-    {
-        ChangeState(_initializationState);
-    }
-
-    private void Update()
-    {
-        if (!IsInputTextInFocus && Input.GetKeyDown(KeyCode.P))
+        public bool IsStaticSeed
         {
-            _player.EnableMovement();
-            _terrain.gameObject.SetActive(true);
+            get
+            {
+                return _isStaticSeed;
+            }
+
+            set
+            {
+                _isStaticSeed = value;
+            }
         }
-    }
 
-    public void ChangeState(GameStateBase nextState)
-    {
-        StateMachine.ChangeState(nextState);
-    }
+        public Random RandomVar
+        {
+            get
+            {
+                if (_randomVar is null)
+                {
+                    _randomVar = new(_seed);
+                }
+                return _randomVar;
+            }
 
-    public void ResetLoadingValue()
-    {
-        LoadingValue = 0;
-    }
+            set
+            {
+                _randomVar = value;
+            }
+        }
 
-    public bool IsInMapRange(int x, int y)
-    {
-        return x >= 0 && x < _currentTerrainWidth && y >= 0 && y < _currentTerrainHeight;
-    }
+        public float LoadingValue
+        {
+            get
+            {
+                return _loadingValue;
+            }
 
-    public Transform GetPlayerTransform()
-    {
-        return _player.transform;
-    }
+            set
+            {
+                _loadingValue = value;
+            }
+        }
 
-    public InventoryModel GetPlayerInventory()
-    {
-        return _player.Inventory;
-    }
+        public bool IsPlayingState
+        {
+            get
+            {
+                return CurrentState == _playingState;
+            }
+        }
 
-    public ResearchesModelSO GetResearches()
-    {
-        return _researches;
-    }
+        public string PhasesInfo
+        {
+            get
+            {
+                return _phasesInfo;
+            }
 
-    public void SetPlayerPosition(float x, float y)
-    {
-        _player.transform.position = new(x, y);
+            set
+            {
+                _phasesInfo = value;
+            }
+        }
+
+        public List<string> PlayerNames
+        {
+            get
+            {
+                return _playerNames;
+            }
+
+            set
+            {
+                _playerNames = value;
+            }
+        }
+
+        public List<string> WorldNames
+        {
+            get
+            {
+                return _worldNames;
+            }
+
+            set
+            {
+                _worldNames = value;
+            }
+        }
+
+        public bool IsInputTextInFocus
+        {
+            get
+            {
+                return _isInputTextInFocus;
+            }
+
+            set
+            {
+                if (value)
+                {
+                    InputSystem.DisableDevice(Keyboard.current);
+                }
+                else
+                {
+                    InputSystem.EnableDevice(Keyboard.current);
+                }
+                _isInputTextInFocus = value;
+            }
+        }
+
+        public ItemsAtlasSO ItemsAtlas
+        {
+            get
+            {
+                return _itemsAtlas;
+            }
+
+            set
+            {
+                _itemsAtlas = value;
+            }
+        }
+
+        public PlayerGameObject Player
+        {
+            get
+            {
+                return _player;
+            }
+
+            set
+            {
+                _player = value;
+            }
+        }
+
+        public InitializationState InitializationState
+        {
+            get
+            {
+                return _initializationState;
+            }
+        }
+
+        public MainMenuState MainMenuState
+        {
+            get
+            {
+                return _mainMenuState;
+            }
+        }
+
+        public StateMachine<GameStateBase> StateMachine => _stateMachine;
+
+        public GameStateBase CurrentState => StateMachine.CurrentState;
+
+        public GameStateBase PrevState => StateMachine.PrevState;
+
+        public CreatingWorldState CreatingWorldState
+        {
+            get
+            {
+                return _creatingWorldState;
+            }
+        }
+
+        public LoadingWorldState LoadingWorldState
+        {
+            get
+            {
+                return _loadingWorldState;
+            }
+        }
+
+        public GameObject TerrainGameObject
+        {
+            get
+            {
+                return _terrainGameObject;
+            }
+        }
+
+        public PlayingState PlayingState
+        {
+            get
+            {
+                return _playingState;
+            }
+        }
+
+        public LoadingDataFromHostState LoadingDataFromHostState
+        {
+            get
+            {
+                return _loadingDataFromHostState;
+            }
+
+            set
+            {
+                _loadingDataFromHostState = value;
+            }
+        }
+
+        public PlayerInputActions PlayerInputActions
+        {
+            get
+            {
+                if (_playerInputActions is null)
+                {
+                    _playerInputActions = new();
+                }
+                return _playerInputActions;
+            }
+        }
+
+        public RecipesAtlasSO RecipesAtlas
+        {
+            get
+            {
+                return _recipesAtlas;
+            }
+
+            set
+            {
+                _recipesAtlas = value;
+            }
+        }
+
+        public CreatingPlayerState CreatingPlayerState
+        {
+            get
+            {
+                return _creatingPlayerState;
+            }
+
+            set
+            {
+                _creatingPlayerState = value;
+            }
+        }
+
+        public LoadingPlayerState LoadingPlayerState
+        {
+            get
+            {
+                return _loadingPlayerState;
+            }
+
+            set
+            {
+                _loadingPlayerState = value;
+            }
+        }
+
+        public PlayerGameObject PlayerPrefab
+        {
+            get
+            {
+                return _playerPrefab;
+            }
+
+            set
+            {
+                _playerPrefab = value;
+            }
+        }
+        #endregion
+
+        #region Methods
+        private void OnApplicationQuit()
+        {
+            ChangeState(_quitGameState);
+            _currentGameState = GameState.CloseApplication;
+            GetPlayerInventory().IsInitialized = false;
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            _stateMachine = new(GetType().Name);
+            _initializationState = new();
+            _mainMenuState = new();
+            _creatingWorldState = new();
+            _loadingWorldState = new();
+            _creatingPlayerState = new();
+            _loadingPlayerState = new();
+            _loadingDataFromHostState = new();
+            _playingState = new();
+            _terrain = _terrainGameObject.GetComponent<TerrainBehaviour>();
+            _terrainGameObject.SetActive(false);
+            InputSystem.EnableDevice(Keyboard.current);
+            StaticInfo.Initialize();
+        }
+
+        private void Start()
+        {
+            ChangeState(_initializationState);
+        }
+
+        private void Update()
+        {
+            if (!IsInputTextInFocus && Input.GetKeyDown(KeyCode.P))
+            {
+                _player.EnableMovement();
+                _terrain.gameObject.SetActive(true);
+            }
+        }
+
+        public void ChangeState(GameStateBase nextState)
+        {
+            StateMachine.ChangeState(nextState);
+        }
+
+        public void ResetLoadingValue()
+        {
+            LoadingValue = 0;
+        }
+
+        public bool IsInMapRange(int x, int y)
+        {
+            return x >= 0 && x < _currentTerrainWidth && y >= 0 && y < _currentTerrainHeight;
+        }
+
+        public Transform GetPlayerTransform()
+        {
+            return _player.transform;
+        }
+
+        public InventoryModel GetPlayerInventory()
+        {
+            return _player.Inventory;
+        }
+
+        public ResearchesModelSO GetResearches()
+        {
+            return _researches;
+        }
+
+        public void SetPlayerPosition(float x, float y)
+        {
+            _player.transform.position = new(x, y);
+        }
+        #endregion
     }
-    #endregion
 }

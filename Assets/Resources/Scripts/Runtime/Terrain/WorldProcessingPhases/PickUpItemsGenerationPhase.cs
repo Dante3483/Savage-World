@@ -1,104 +1,110 @@
+using SavageWorld.Runtime.Enums.Id;
+using SavageWorld.Runtime.Terrain.Objects;
+using SavageWorld.Runtime.Utilities;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PickUpItemsGenerationPhase : WorldProcessingPhaseBase
+namespace SavageWorld.Runtime.Terrain.WorldProcessingPhases
 {
-    #region Fields
-
-    #endregion
-
-    #region Properties
-    public override string Name => "Pick up items generation";
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Public Methods
-    public override void StartPhase()
+    public class PickUpItemsGenerationPhase : WorldProcessingPhaseBase
     {
-        //Create surface collected items
-        Dictionary<BiomesID, List<PickUpItem>> allPickUpItems = null;
-        List<Vector3> coords = new();
-        Vector3 vector = new();
+        #region Fields
 
-        GameObject pickUpItemsSection = _gameManager.Terrain.PickUpItems;
-        BiomeSO currentBiome;
-        int chance;
-        int startX;
-        int endX;
-        int x;
-        int y;
+        #endregion
 
-        ActionInMainThreadUtil.Instance.InvokeAndWait(() =>
+        #region Properties
+        public override string Name => "Pick up items generation";
+        #endregion
+
+        #region Events / Delegates
+
+        #endregion
+
+        #region Public Methods
+        public override void StartPhase()
         {
-            allPickUpItems = new Dictionary<BiomesID, List<PickUpItem>>()
+            //Create surface collected items
+            Dictionary<BiomesId, List<PickUpItem>> allPickUpItems = null;
+            List<Vector3> coords = new();
+            Vector3 vector = new();
+
+            GameObject pickUpItemsSection = _gameManager.Terrain.PickUpItems;
+            BiomeSO currentBiome;
+            int chance;
+            int startX;
+            int endX;
+            int x;
+            int y;
+
+            MainThreadUtility.Instance.InvokeAndWait(() =>
             {
+                allPickUpItems = new Dictionary<BiomesId, List<PickUpItem>>()
+                {
                 //{ BiomesID.NonBiom, _gameManager.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.NonBiom) },
                 //{ BiomesID.Ocean, _gameManager.ObjectsAtlass.GetAllBiomePickUpItems(BiomesID.Ocean) },
-                { BiomesID.Desert, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Desert) },
-                { BiomesID.Savannah, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Savannah) },
-                { BiomesID.Meadow, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Meadow) },
-                { BiomesID.Forest, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Forest) },
-                { BiomesID.Swamp, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.Swamp) },
-                { BiomesID.ConiferousForest, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesID.ConiferousForest) },
-            };
-        });
+                { BiomesId.Desert, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesId.Desert) },
+                { BiomesId.Savannah, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesId.Savannah) },
+                { BiomesId.Meadow, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesId.Meadow) },
+                { BiomesId.Forest, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesId.Forest) },
+                { BiomesId.Swamp, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesId.Swamp) },
+                { BiomesId.ConiferousForest, _gameManager.PickUpItemsAtlas.GetPickUpItemByBiome(BiomesId.ConiferousForest) },
+                };
+            });
 
-        foreach (var pickUpItems in allPickUpItems)
-        {
-            foreach (PickUpItem pickUpItem in pickUpItems.Value)
+            foreach (var pickUpItems in allPickUpItems)
             {
-                if (pickUpItems.Key == BiomesID.NonBiome)
+                foreach (PickUpItem pickUpItem in pickUpItems.Value)
                 {
-                    startX = 0;
-                    endX = _terrainWidth - 1;
-                }
-                else
-                {
-                    currentBiome = _terrainConfiguration.GetBiome(pickUpItems.Key);
-                    startX = currentBiome.StartX;
-                    endX = currentBiome.EndX;
-                }
-
-                for (x = startX; x <= endX; x++)
-                {
-                    for (y = _equator; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
+                    if (pickUpItems.Key == BiomesId.NonBiome)
                     {
-                        if (!IsPhysicallySolid(x, y))
+                        startX = 0;
+                        endX = _terrainWidth - 1;
+                    }
+                    else
+                    {
+                        currentBiome = _terrainConfiguration.GetBiome(pickUpItems.Key);
+                        startX = currentBiome.StartX;
+                        endX = currentBiome.EndX;
+                    }
+
+                    for (x = startX; x <= endX; x++)
+                    {
+                        for (y = _equator; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
                         {
-                            continue;
-                        }
-                        if (!IsEmpty(x, y + 1))
-                        {
-                            continue;
-                        }
-                        chance = GetNextRandomValue(0, 101);
-                        if (chance <= pickUpItem.ChanceToSpawn)
-                        {
-                            vector.x = x;
-                            vector.y = y + 1;
-                            coords.Add(vector);
-                            SetOccupied(x, y);
+                            if (!IsPhysicallySolid(x, y))
+                            {
+                                continue;
+                            }
+                            if (!IsEmpty(x, y + 1))
+                            {
+                                continue;
+                            }
+                            chance = GetNextRandomValue(0, 101);
+                            if (chance <= pickUpItem.ChanceToSpawn)
+                            {
+                                vector.x = x;
+                                vector.y = y + 1;
+                                coords.Add(vector);
+                                SetOccupied(x, y);
+                            }
                         }
                     }
-                }
 
-                ActionInMainThreadUtil.Instance.InvokeAndWait(() =>
-                {
-                    foreach (Vector3 coord in coords)
+                    MainThreadUtility.Instance.InvokeAndWait(() =>
                     {
-                        pickUpItem.CreateInstance(coord);
-                    }
-                });
-                coords.Clear();
+                        foreach (Vector3 coord in coords)
+                        {
+                            pickUpItem.CreateInstance(coord);
+                        }
+                    });
+                    coords.Clear();
+                }
             }
         }
+        #endregion
+
+        #region Private Methods
+
+        #endregion
     }
-    #endregion
-
-    #region Private Methods
-
-    #endregion
 }

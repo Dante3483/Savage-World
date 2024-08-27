@@ -1,68 +1,73 @@
+using SavageWorld.Runtime.Enums.Id;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Tree = SavageWorld.Runtime.Terrain.Objects.Tree;
 
-[CreateAssetMenu(fileName = "TreesAtlas", menuName = "Atlases/TreesAtlas")]
-public class TreesAtlasSO : AtlasSO
+namespace SavageWorld.Runtime.Atlases
 {
-    #region Private fields
-    [SerializeField] private Tree[] _trees;
-
-    private Dictionary<TreesID, Tree> _treeById;
-    private Dictionary<BiomesID, List<Tree>> _treesByBiome;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public override void InitializeAtlas()
+    [CreateAssetMenu(fileName = "TreesAtlas", menuName = "Atlases/TreesAtlas")]
+    public class TreesAtlasSO : AtlasSO
     {
-        InitializeSetTreeById();
-        InitializeSetTreesByBiome();
-    }
+        #region Private fields
+        [SerializeField] private Tree[] _trees;
 
-    private void InitializeSetTreeById()
-    {
-        _treeById = new Dictionary<TreesID, Tree>();
+        private Dictionary<TreesId, Tree> _treeById;
+        private Dictionary<BiomesId, List<Tree>> _treesByBiome;
+        #endregion
 
-        foreach (Tree tree in _trees)
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public override void InitializeAtlas()
         {
-            _treeById.Add(tree.Id, tree);
+            InitializeSetTreeById();
+            InitializeSetTreesByBiome();
         }
-    }
 
-    private void InitializeSetTreesByBiome()
-    {
-        _treesByBiome = new Dictionary<BiomesID, List<Tree>>();
+        private void InitializeSetTreeById()
+        {
+            _treeById = new Dictionary<TreesId, Tree>();
 
-        BiomesID[] biomesId = (BiomesID[])Enum.GetValues(typeof(BiomesID));
-        foreach (BiomesID biomeId in biomesId)
-        {
-            _treesByBiome.Add(biomeId, new List<Tree>());
-        }
-        foreach (Tree tree in _trees)
-        {
-            foreach (BiomesID biomeId in tree.BiomesToSpawn)
+            foreach (Tree tree in _trees)
             {
-                _treesByBiome[biomeId].Add(tree);
+                _treeById.Add(tree.Id, tree);
             }
         }
-    }
 
-    public Tree GetTreeById(TreesID treeID)
-    {
-        return _treeById[treeID];
-    }
+        private void InitializeSetTreesByBiome()
+        {
+            _treesByBiome = new Dictionary<BiomesId, List<Tree>>();
 
-    public List<Tree> GetTreesByBiome(BiomesID biomeID)
-    {
-        return _treesByBiome[biomeID];
+            BiomesId[] biomesId = (BiomesId[])Enum.GetValues(typeof(BiomesId));
+            foreach (BiomesId biomeId in biomesId)
+            {
+                _treesByBiome.Add(biomeId, new List<Tree>());
+            }
+            foreach (Tree tree in _trees)
+            {
+                foreach (BiomesId biomeId in tree.BiomesToSpawn)
+                {
+                    _treesByBiome[biomeId].Add(tree);
+                }
+            }
+        }
+
+        public Tree GetTreeById(TreesId treeID)
+        {
+            return _treeById[treeID];
+        }
+
+        public List<Tree> GetTreesByBiome(BiomesId biomeID)
+        {
+            return _treesByBiome[biomeID];
+        }
+        #endregion
     }
-    #endregion
 }

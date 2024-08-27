@@ -3,105 +3,108 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class UIQuantityInput : MonoBehaviour, IPointerClickHandler
+namespace SavageWorld.Runtime.Player.CraftStation.UI
 {
-    #region Private fields
-    [SerializeField] private TMP_InputField _quantityInputField;
-    [SerializeField] private int _quantity;
-    [SerializeField] private int _maxQuantity;
-    private StringBuilder _quantityBuilder;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-    public int Quantity
+    public class UIQuantityInput : MonoBehaviour, IPointerClickHandler
     {
-        get
+        #region Private fields
+        [SerializeField] private TMP_InputField _quantityInputField;
+        [SerializeField] private int _quantity;
+        [SerializeField] private int _maxQuantity;
+        private StringBuilder _quantityBuilder;
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+        public int Quantity
         {
-            return _quantity;
+            get
+            {
+                return _quantity;
+            }
         }
-    }
-    #endregion
+        #endregion
 
-    #region Methods
-    public void Initialize()
-    {
-        _quantityInputField = GetComponent<TMP_InputField>();
-        _quantityBuilder = new StringBuilder();
-        _quantityInputField.text = "x1";
-        _quantity = 1;
-    }
-
-    private void FixQuantity()
-    {
-        if (_quantity > _maxQuantity)
+        #region Methods
+        public void Initialize()
         {
-            _quantity = _maxQuantity;
-        }
-    }
-
-    private void UpdateText()
-    {
-        FixQuantity();
-        _quantityBuilder.Clear();
-        _quantityBuilder.Append('x').Append(_quantity);
-        _quantityInputField.characterLimit = 5;
-        _quantityInputField.contentType = TMP_InputField.ContentType.Standard;
-        _quantityInputField.text = _quantityBuilder.ToString();
-    }
-
-    public void UpdateMaxQuantity(int quantity)
-    {
-        _maxQuantity = quantity;
-        if (_quantity == 0 && _maxQuantity != 0)
-        {
+            _quantityInputField = GetComponent<TMP_InputField>();
+            _quantityBuilder = new StringBuilder();
+            _quantityInputField.text = "x1";
             _quantity = 1;
         }
-        UpdateText();
-    }
 
-    public void ParseTextToQuantity(string quantityString)
-    {
-        int.TryParse(quantityString, out _quantity);
-        if (_quantity < 1)
+        private void FixQuantity()
         {
-            _quantity = 1;
+            if (_quantity > _maxQuantity)
+            {
+                _quantity = _maxQuantity;
+            }
         }
-        UpdateText();
-    }
 
-    public void IncreaseQuantity(int value)
-    {
-        if (_quantity + value > 9999)
+        private void UpdateText()
         {
-            return;
+            FixQuantity();
+            _quantityBuilder.Clear();
+            _quantityBuilder.Append('x').Append(_quantity);
+            _quantityInputField.characterLimit = 5;
+            _quantityInputField.contentType = TMP_InputField.ContentType.Standard;
+            _quantityInputField.text = _quantityBuilder.ToString();
         }
-        _quantity += value;
-        UpdateText();
-    }
 
-    public void DecreaseQuantity(int value)
-    {
-        if (_quantity - value < 1)
+        public void UpdateMaxQuantity(int quantity)
         {
-            return;
+            _maxQuantity = quantity;
+            if (_quantity == 0 && _maxQuantity != 0)
+            {
+                _quantity = 1;
+            }
+            UpdateText();
         }
-        _quantity -= value;
-        UpdateText();
-    }
 
-    public void OnPointerClick(PointerEventData pointerData)
-    {
-        if (pointerData.button == PointerEventData.InputButton.Left)
+        public void ParseTextToQuantity(string quantityString)
         {
-            _quantityInputField.text = "";
-            _quantityInputField.characterLimit = 4;
-            _quantityInputField.contentType = TMP_InputField.ContentType.Custom;
-            _quantityInputField.characterValidation = TMP_InputField.CharacterValidation.Regex;
+            int.TryParse(quantityString, out _quantity);
+            if (_quantity < 1)
+            {
+                _quantity = 1;
+            }
+            UpdateText();
         }
+
+        public void IncreaseQuantity(int value)
+        {
+            if (_quantity + value > 9999)
+            {
+                return;
+            }
+            _quantity += value;
+            UpdateText();
+        }
+
+        public void DecreaseQuantity(int value)
+        {
+            if (_quantity - value < 1)
+            {
+                return;
+            }
+            _quantity -= value;
+            UpdateText();
+        }
+
+        public void OnPointerClick(PointerEventData pointerData)
+        {
+            if (pointerData.button == PointerEventData.InputButton.Left)
+            {
+                _quantityInputField.text = "";
+                _quantityInputField.characterLimit = 4;
+                _quantityInputField.contentType = TMP_InputField.ContentType.Custom;
+                _quantityInputField.characterValidation = TMP_InputField.CharacterValidation.Regex;
+            }
+        }
+        #endregion
     }
-    #endregion
 }

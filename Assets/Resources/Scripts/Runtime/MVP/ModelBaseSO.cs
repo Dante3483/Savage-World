@@ -1,28 +1,31 @@
 using UnityEngine;
 
-public abstract class ModelBaseSO : ScriptableObject, IModel
+namespace SavageWorld.Runtime.MVP
 {
-    #region Fields
+    public abstract class ModelBaseSO : ScriptableObject, IModel
+    {
+        #region Fields
 
-    #endregion
+        #endregion
 
-    #region Properties
+        #region Properties
 
-    #endregion
+        #endregion
 
-    #region Events / Delegates
+        #region Events / Delegates
 
-    #endregion
+        #endregion
 
-    #region Monobehaviour Methods
+        #region Monobehaviour Methods
 
-    #endregion
+        #endregion
 
-    #region Public Methods
-    public abstract void Initialize();
-    #endregion
+        #region Public Methods
+        public abstract void Initialize();
+        #endregion
 
-    #region Private Methods
+        #region Private Methods
 
-    #endregion
+        #endregion
+    }
 }

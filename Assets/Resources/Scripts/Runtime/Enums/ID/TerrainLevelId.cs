@@ -1,10 +1,13 @@
-public enum TerrainLevelId : byte
+namespace SavageWorld.Runtime.Enums.Id
 {
-    Air = 0,
+    public enum TerrainLevelId : byte
+    {
+        Air = 0,
 
-    Surface = 1,
+        Surface = 1,
 
-    PreUnderground = 2,
+        PreUnderground = 2,
 
-    Underground = 3,
+        Underground = 3,
+    }
 }

@@ -1,13 +1,15 @@
+using SavageWorld.Runtime.Enums.Id;
+using SavageWorld.Runtime.Enums.Types;
 using System.Text;
 using UnityEngine;
 
-namespace Items
+namespace SavageWorld.Runtime.Player.Inventory.Items
 {
     public abstract class ItemSO : ScriptableObject
     {
         #region Fields
         [SerializeField]
-        private ItemsID _id;
+        private ItemsId _id;
         protected ItemTypes _itemType;
         [SerializeField]
         protected ItemRaritySO _itemRarity;
@@ -135,7 +137,7 @@ namespace Items
             }
         }
 
-        public ItemsID Id
+        public ItemsId Id
         {
             get
             {

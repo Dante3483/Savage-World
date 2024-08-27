@@ -1,4 +1,7 @@
-public enum DustBlocksID : ushort
+namespace SavageWorld.Runtime.Enums.Id
 {
-    Sand = 0,
+    public enum DustBlocksId : ushort
+    {
+        Sand = 0,
+    }
 }

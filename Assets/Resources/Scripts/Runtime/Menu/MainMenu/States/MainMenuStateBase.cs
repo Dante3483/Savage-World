@@ -1,26 +1,31 @@
-public abstract class MainMenuStateBase : StateBase
+using SavageWorld.Runtime.Utilities.StateMachine;
+
+namespace SavageWorld.Runtime.Menu.States
 {
-    #region Private fields
-    protected MainMenuManager _mainMenuManager;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public MainMenuStateBase()
+    public abstract class MainMenuStateBase : StateBase
     {
-        _mainMenuManager = MainMenuManager.Instance;
-    }
+        #region Private fields
+        protected MainMenuManager _mainMenuManager;
+        #endregion
 
-    public virtual void Back()
-    {
+        #region Public fields
 
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public MainMenuStateBase()
+        {
+            _mainMenuManager = MainMenuManager.Instance;
+        }
+
+        public virtual void Back()
+        {
+
+        }
+        #endregion
     }
-    #endregion
 }

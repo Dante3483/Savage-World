@@ -1,18 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public enum GameState
+namespace SavageWorld.Runtime.Enums.Others
 {
-    GameInitializationState,
+    public enum GameState
+    {
+        GameInitializationState,
 
-    MainMenuState,
+        MainMenuState,
 
-    NewGameState,
+        NewGameState,
 
-    LoadGameState,
+        LoadGameState,
 
-    GameSession,
+        GameSession,
 
-    CloseApplication,
+        CloseApplication,
+    }
 }

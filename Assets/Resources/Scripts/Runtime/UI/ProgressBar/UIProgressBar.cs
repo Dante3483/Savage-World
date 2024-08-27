@@ -1,26 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIProgressBar : MonoBehaviour
+namespace SavageWorld.Runtime.UI.ProgressBar
 {
-    #region Private fields
-    [SerializeField] protected Slider _slider;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    private void Awake()
+    public class UIProgressBar : MonoBehaviour
     {
-        _slider = GetComponent<Slider>();
+        #region Private fields
+        [SerializeField] protected Slider _slider;
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        private void Awake()
+        {
+            _slider = GetComponent<Slider>();
+        }
+        #endregion
     }
-    #endregion
 }

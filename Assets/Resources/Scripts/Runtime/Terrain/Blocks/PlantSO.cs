@@ -1,154 +1,158 @@
-using System.Collections;
+using SavageWorld.Runtime.Enums.Id;
+using SavageWorld.Runtime.Enums.Types;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "newPlant", menuName = "Blocks/Plant")]
-public class PlantSO : BlockSO
+namespace SavageWorld.Runtime.Terrain.Blocks
 {
-    #region Private fields
-    [SerializeField] private PlantsID _id;
-    [SerializeField] private BiomesID _biomeId;
-    [SerializeField] private List<BlockSO> _allowedToSpawnOn;
-    [SerializeField] private bool _canGrow = false;
-    [SerializeField] private bool _isBottomBlockSolid = true;
-    [SerializeField] private bool _isTopBlockSolid = false;
-    [SerializeField] private int _chanceToSpawn;
-    [SerializeField] private int _chanceToGrow;
-    [SerializeField] private bool _isBiomeSpecific;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-    public PlantsID Id
+    [CreateAssetMenu(fileName = "newPlant", menuName = "Blocks/Plant")]
+    public class PlantSO : BlockSO
     {
-        get
+        #region Private fields
+        [SerializeField] private PlantsId _id;
+        [SerializeField] private BiomesId _biomeId;
+        [SerializeField] private List<BlockSO> _allowedToSpawnOn;
+        [SerializeField] private bool _canGrow = false;
+        [SerializeField] private bool _isBottomBlockSolid = true;
+        [SerializeField] private bool _isTopBlockSolid = false;
+        [SerializeField] private int _chanceToSpawn;
+        [SerializeField] private int _chanceToGrow;
+        [SerializeField] private bool _isBiomeSpecific;
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+        public PlantsId Id
         {
-            return _id;
+            get
+            {
+                return _id;
+            }
+
+            set
+            {
+                _id = value;
+            }
         }
 
-        set
+        public List<BlockSO> AllowedToSpawnOn
         {
-            _id = value;
+            get
+            {
+                return _allowedToSpawnOn;
+            }
+
+            set
+            {
+                _allowedToSpawnOn = value;
+            }
         }
+
+        public bool CanGrow
+        {
+            get
+            {
+                return _canGrow;
+            }
+
+            set
+            {
+                _canGrow = value;
+            }
+        }
+
+        public bool IsBottomBlockSolid
+        {
+            get
+            {
+                return _isBottomBlockSolid;
+            }
+
+            set
+            {
+                _isBottomBlockSolid = value;
+            }
+        }
+
+        public bool IsTopBlockSolid
+        {
+            get
+            {
+                return _isTopBlockSolid;
+            }
+
+            set
+            {
+                _isTopBlockSolid = value;
+            }
+        }
+
+        public int ChanceToSpawn
+        {
+            get
+            {
+                return _chanceToSpawn;
+            }
+
+            set
+            {
+                _chanceToSpawn = value;
+            }
+        }
+
+        public int ChanceToGrow
+        {
+            get
+            {
+                return _chanceToGrow;
+            }
+
+            set
+            {
+                _chanceToGrow = value;
+            }
+        }
+
+        public BiomesId BiomeId
+        {
+            get
+            {
+                return _biomeId;
+            }
+
+            set
+            {
+                _biomeId = value;
+            }
+        }
+
+        public bool IsBiomeSpecific
+        {
+            get
+            {
+                return _isBiomeSpecific;
+            }
+
+            set
+            {
+                _isBiomeSpecific = value;
+            }
+        }
+        #endregion
+
+        #region Methods
+        public PlantSO()
+        {
+            _type = BlockTypes.Plant;
+        }
+
+        public override ushort GetId()
+        {
+            return (ushort)Id;
+        }
+        #endregion
     }
-
-    public List<BlockSO> AllowedToSpawnOn
-    {
-        get
-        {
-            return _allowedToSpawnOn;
-        }
-
-        set
-        {
-            _allowedToSpawnOn = value;
-        }
-    }
-
-    public bool CanGrow
-    {
-        get
-        {
-            return _canGrow;
-        }
-
-        set
-        {
-            _canGrow = value;
-        }
-    }
-
-    public bool IsBottomBlockSolid
-    {
-        get
-        {
-            return _isBottomBlockSolid;
-        }
-
-        set
-        {
-            _isBottomBlockSolid = value;
-        }
-    }
-
-    public bool IsTopBlockSolid
-    {
-        get
-        {
-            return _isTopBlockSolid;
-        }
-
-        set
-        {
-            _isTopBlockSolid = value;
-        }
-    }
-
-    public int ChanceToSpawn
-    {
-        get
-        {
-            return _chanceToSpawn;
-        }
-
-        set
-        {
-            _chanceToSpawn = value;
-        }
-    }
-
-    public int ChanceToGrow
-    {
-        get
-        {
-            return _chanceToGrow;
-        }
-
-        set
-        {
-            _chanceToGrow = value;
-        }
-    }
-
-    public BiomesID BiomeId
-    {
-        get
-        {
-            return _biomeId;
-        }
-
-        set
-        {
-            _biomeId = value;
-        }
-    }
-
-    public bool IsBiomeSpecific
-    {
-        get
-        {
-            return _isBiomeSpecific;
-        }
-
-        set
-        {
-            _isBiomeSpecific = value;
-        }
-    }
-    #endregion
-
-    #region Methods
-    public PlantSO()
-    {
-        _type = BlockTypes.Plant;
-    }
-
-    public override ushort GetId()
-    {
-        return (ushort)Id;
-    }
-    #endregion
 }

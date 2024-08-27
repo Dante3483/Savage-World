@@ -1,38 +1,42 @@
-using Items;
+using SavageWorld.Runtime.Enums.Id;
+using SavageWorld.Runtime.Player.Inventory.Items;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "ItemsAtlas", menuName = "Atlases/ItemsAtlas")]
-public class ItemsAtlasSO : AtlasSO
+namespace SavageWorld.Runtime.Atlases
 {
-    #region Private fields
-    [SerializeField]
-    private ItemSO[] _items;
-
-    private Dictionary<ItemsID, ItemSO> _itemsByIndex;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public override void InitializeAtlas()
+    [CreateAssetMenu(fileName = "ItemsAtlas", menuName = "Atlases/ItemsAtlas")]
+    public class ItemsAtlasSO : AtlasSO
     {
-        _itemsByIndex = new();
-        foreach (ItemSO item in _items)
+        #region Private fields
+        [SerializeField]
+        private ItemSO[] _items;
+
+        private Dictionary<ItemsId, ItemSO> _itemsByIndex;
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public override void InitializeAtlas()
         {
-            _itemsByIndex.Add(item.Id, item);
+            _itemsByIndex = new();
+            foreach (ItemSO item in _items)
+            {
+                _itemsByIndex.Add(item.Id, item);
+            }
         }
-    }
 
-    public ItemSO GetItemByID(ItemsID id)
-    {
-        return _itemsByIndex[id];
+        public ItemSO GetItemByID(ItemsId id)
+        {
+            return _itemsByIndex[id];
+        }
+        #endregion
     }
-    #endregion
 }

@@ -4,7 +4,7 @@ using SavageWorld.Runtime.Network.Messages;
 using SavageWorld.Runtime.Network.Objects;
 using UnityEngine;
 
-namespace SavageWorld.Runtime
+namespace SavageWorld.Runtime.GameSession
 {
     [RequireComponent(typeof(NetworkObject))]
     public abstract class GameObjectBase : MonoBehaviour

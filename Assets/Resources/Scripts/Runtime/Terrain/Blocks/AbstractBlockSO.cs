@@ -1,29 +1,34 @@
+using SavageWorld.Runtime.Enums.Id;
+using SavageWorld.Runtime.Enums.Types;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "newAbstractBlock", menuName = "Blocks/Abstract")]
-public class AbstractBlockSO : BlockSO
+namespace SavageWorld.Runtime.Terrain.Blocks
 {
-    #region Private fields
-    [SerializeField] private AbstractBlocksID _id;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public AbstractBlockSO()
+    [CreateAssetMenu(fileName = "newAbstractBlock", menuName = "Blocks/Abstract")]
+    public class AbstractBlockSO : BlockSO
     {
-        _type = BlockTypes.Abstract;
-    }
+        #region Private fields
+        [SerializeField] private AbstractBlocksId _id;
+        #endregion
 
-    public override ushort GetId()
-    {
-        return (ushort)_id;
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public AbstractBlockSO()
+        {
+            _type = BlockTypes.Abstract;
+        }
+
+        public override ushort GetId()
+        {
+            return (ushort)_id;
+        }
+        #endregion
     }
-    #endregion
 }

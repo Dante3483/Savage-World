@@ -1,65 +1,69 @@
+using SavageWorld.Runtime.Player.Book;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Recipe", menuName = "Player/CraftStation/Recipe")]
-public class RecipeSO : ScriptableObject
+namespace SavageWorld.Runtime.Player.CraftStation
 {
-    #region Fields
-    [SerializeField]
-    private ItemQuantity[] _materials;
-    [SerializeField]
-    private ItemQuantity _result;
-    [SerializeField]
-    private bool _isUnlocked;
-    [SerializeField]
-    private bool _isUnlockedByDefault;
-
-    public static RecipeSO SelectedRecipe;
-    #endregion
-
-    #region Properties
-    public ItemQuantity[] Materials
+    [CreateAssetMenu(fileName = "Recipe", menuName = "Player/CraftStation/Recipe")]
+    public class RecipeSO : ScriptableObject
     {
-        get
+        #region Fields
+        [SerializeField]
+        private ItemQuantity[] _materials;
+        [SerializeField]
+        private ItemQuantity _result;
+        [SerializeField]
+        private bool _isUnlocked;
+        [SerializeField]
+        private bool _isUnlockedByDefault;
+
+        public static RecipeSO SelectedRecipe;
+        #endregion
+
+        #region Properties
+        public ItemQuantity[] Materials
         {
-            return _materials;
+            get
+            {
+                return _materials;
+            }
         }
-    }
 
-    public ItemQuantity Result
-    {
-        get
+        public ItemQuantity Result
         {
-            return _result;
+            get
+            {
+                return _result;
+            }
         }
-    }
 
-    public bool IsUnlocked { get => _isUnlocked; set => _isUnlocked = value; }
+        public bool IsUnlocked { get => _isUnlocked; set => _isUnlocked = value; }
 
-    public bool IsUnlockedByDefault
-    {
-        get
+        public bool IsUnlockedByDefault
         {
-            return _isUnlockedByDefault;
+            get
+            {
+                return _isUnlockedByDefault;
+            }
         }
+        #endregion
+
+        #region Events / Delegates
+
+        #endregion
+
+        #region Monobehaviour Methods
+
+        #endregion
+
+        #region Public Methods
+        public void SelectRecipe()
+        {
+            SelectedRecipe = this;
+        }
+        #endregion
+
+        #region Private Methods
+
+        #endregion
     }
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Monobehaviour Methods
-
-    #endregion
-
-    #region Public Methods
-    public void SelectRecipe()
-    {
-        SelectedRecipe = this;
-    }
-    #endregion
-
-    #region Private Methods
-
-    #endregion
 }

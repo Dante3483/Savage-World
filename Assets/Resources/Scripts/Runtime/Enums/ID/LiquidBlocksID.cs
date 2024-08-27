@@ -1,4 +1,7 @@
-public enum LiquidBlocksID : ushort
+namespace SavageWorld.Runtime.Enums.Id
 {
-    Water = 0,
+    public enum LiquidBlocksId : ushort
+    {
+        Water = 0,
+    }
 }

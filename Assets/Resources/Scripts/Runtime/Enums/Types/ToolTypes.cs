@@ -1,6 +1,9 @@
-public enum ToolTypes
+namespace SavageWorld.Runtime.Enums.Types
 {
-    Pickaxe = 1,
+    public enum ToolTypes
+    {
+        Pickaxe = 1,
 
-    Axe = 2,
+        Axe = 2,
+    }
 }

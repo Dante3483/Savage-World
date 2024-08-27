@@ -1,131 +1,134 @@
 using System;
 using UnityEngine;
 
-[Serializable]
-public class PlayerStats
+namespace SavageWorld.Runtime.Player.Main
 {
-    #region Private fields
-    [Header("Main")]
-    [SerializeField]
-    private float _maxHealth;
-    [SerializeField]
-    private float _currentHealth;
-    [Space]
-    [SerializeField]
-    private float _maxStamina;
-    [SerializeField]
-    private float _currentStamina;
-    [Space]
-    [SerializeField]
-    private float _maxMana;
-    [SerializeField]
-    private float _currentMana;
-
-    [Header("Movement")]
-    [Space]
-    [SerializeField]
-    private float _gravityScale;
-    [Space]
-    [SerializeField]
-    private float _walkingSpeed;
-    [Space]
-    [SerializeField]
-    private float _runningSpeed;
-    [Space]
-    [SerializeField]
-    private float _jumpForce;
-    [Space]
-    [SerializeField]
-    private float _crouchWalkingSpeed;
-    [Space]
-    [SerializeField]
-    private float _slidingSpeed;
-    [SerializeField]
-    private float _slidingMinTime;
-    [SerializeField]
-    private float _slidingMaxTime;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-    public float WalkingSpeed
+    [Serializable]
+    public class PlayerStats
     {
-        get
+        #region Private fields
+        [Header("Main")]
+        [SerializeField]
+        private float _maxHealth;
+        [SerializeField]
+        private float _currentHealth;
+        [Space]
+        [SerializeField]
+        private float _maxStamina;
+        [SerializeField]
+        private float _currentStamina;
+        [Space]
+        [SerializeField]
+        private float _maxMana;
+        [SerializeField]
+        private float _currentMana;
+
+        [Header("Movement")]
+        [Space]
+        [SerializeField]
+        private float _gravityScale;
+        [Space]
+        [SerializeField]
+        private float _walkingSpeed;
+        [Space]
+        [SerializeField]
+        private float _runningSpeed;
+        [Space]
+        [SerializeField]
+        private float _jumpForce;
+        [Space]
+        [SerializeField]
+        private float _crouchWalkingSpeed;
+        [Space]
+        [SerializeField]
+        private float _slidingSpeed;
+        [SerializeField]
+        private float _slidingMinTime;
+        [SerializeField]
+        private float _slidingMaxTime;
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+        public float WalkingSpeed
         {
-            return _walkingSpeed;
+            get
+            {
+                return _walkingSpeed;
+            }
         }
-    }
 
-    public float RunningSpeed
-    {
-        get
+        public float RunningSpeed
         {
-            return _runningSpeed;
+            get
+            {
+                return _runningSpeed;
+            }
         }
-    }
 
-    public float JumpForce
-    {
-        get
+        public float JumpForce
         {
-            return _jumpForce;
+            get
+            {
+                return _jumpForce;
+            }
         }
-    }
 
-    public float CrouchWalkingSpeed
-    {
-        get
+        public float CrouchWalkingSpeed
         {
-            return _crouchWalkingSpeed;
+            get
+            {
+                return _crouchWalkingSpeed;
+            }
         }
-    }
 
-    public float SlidingSpeed
-    {
-        get
+        public float SlidingSpeed
         {
-            return _slidingSpeed;
+            get
+            {
+                return _slidingSpeed;
+            }
         }
-    }
 
-    public float SlidingMinTime
-    {
-        get
+        public float SlidingMinTime
         {
-            return _slidingMinTime;
+            get
+            {
+                return _slidingMinTime;
+            }
         }
-    }
 
-    public float SlidingMaxTime
-    {
-        get
+        public float SlidingMaxTime
         {
-            return _slidingMaxTime;
+            get
+            {
+                return _slidingMaxTime;
+            }
         }
-    }
-    #endregion
+        #endregion
 
-    #region Methods
-    public void Reset()
-    {
-        _currentHealth = _maxHealth;
-        _currentMana = _maxMana;
-        _currentStamina = _maxStamina;
-    }
+        #region Methods
+        public void Reset()
+        {
+            _currentHealth = _maxHealth;
+            _currentMana = _maxMana;
+            _currentStamina = _maxStamina;
+        }
 
-    public void IncreaseHealth(float healthCount)
-    {
-        _currentHealth = Mathf.Clamp(_currentHealth + healthCount, 0, _maxHealth);
-    }
+        public void IncreaseHealth(float healthCount)
+        {
+            _currentHealth = Mathf.Clamp(_currentHealth + healthCount, 0, _maxHealth);
+        }
 
-    public bool DecreaseHealth(float healthCount)
-    {
-        _currentHealth = Mathf.Clamp(_currentHealth - healthCount, 0, _maxHealth);
+        public bool DecreaseHealth(float healthCount)
+        {
+            _currentHealth = Mathf.Clamp(_currentHealth - healthCount, 0, _maxHealth);
 
-        return _currentHealth == 0;
+            return _currentHealth == 0;
+        }
+        #endregion
     }
-    #endregion
 }

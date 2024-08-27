@@ -1,10 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public enum TreesID : byte
+namespace SavageWorld.Runtime.Enums.Id
 {
-    Pine = 0,
+    public enum TreesId : byte
+    {
+        Pine = 0,
 
-    Cactus = 1,
+        Cactus = 1,
+    }
 }

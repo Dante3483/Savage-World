@@ -1,21 +1,26 @@
-public class UIBlockInfo : UIDebug
+using SavageWorld.Runtime.Managers;
+
+namespace SavageWorld.Runtime.UI.Debug
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    private void Update()
+    public class UIBlockInfo : UIDebug
     {
-        _debugText.text = WorldDataManager.Instance.BlockInfo;
+        #region Private fields
+
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        private void Update()
+        {
+            _debugText.text = WorldDataManager.Instance.BlockInfo;
+        }
+        #endregion
     }
-    #endregion
 }

@@ -1,89 +1,92 @@
 using System;
 using UnityEngine;
 
-public class DropAttraction : MonoBehaviour
+namespace SavageWorld.Runtime.Terrain.Drop
 {
-    #region Fields
-    [SerializeField]
-    private Drop _drop;
-    [SerializeField]
-    private float _cooldown;
-    [SerializeField]
-    private Transform _target;
-    [SerializeField]
-    private float _speed;
-    #endregion
-
-    #region Properties
-    public Transform Target
+    public class DropAttraction : MonoBehaviour
     {
-        get
+        #region Fields
+        [SerializeField]
+        private Drop _drop;
+        [SerializeField]
+        private float _cooldown;
+        [SerializeField]
+        private Transform _target;
+        [SerializeField]
+        private float _speed;
+        #endregion
+
+        #region Properties
+        public Transform Target
         {
-            return _target;
+            get
+            {
+                return _target;
+            }
+
+            set
+            {
+                _target = value;
+            }
         }
 
-        set
+        public float Cooldown
         {
-            _target = value;
+            get
+            {
+                return _cooldown;
+            }
         }
-    }
+        #endregion
 
-    public float Cooldown
-    {
-        get
+        #region Events / Delegates
+        public Action<Drop> OnEndOfAttraction;
+        #endregion
+
+        #region Monobehaviour Methods
+        private void Awake()
         {
-            return _cooldown;
+            _drop = GetComponent<Drop>();
         }
-    }
-    #endregion
 
-    #region Events / Delegates
-    public Action<Drop> OnEndOfAttraction;
-    #endregion
-
-    #region Monobehaviour Methods
-    private void Awake()
-    {
-        _drop = GetComponent<Drop>();
-    }
-
-    private void FixedUpdate()
-    {
-        if (!_drop.NetworkObject.IsOwner)
+        private void FixedUpdate()
         {
-            return;
+            if (!_drop.NetworkObject.IsOwner)
+            {
+                return;
+            }
+            bool needToAttract = _drop.IsAttractionEnabled && _target != null;
+            _drop.IsPhysicsEnabled = !needToAttract;
+            if (needToAttract)
+            {
+                Attract();
+            }
         }
-        bool needToAttract = _drop.IsAttractionEnabled && _target != null;
-        _drop.IsPhysicsEnabled = !needToAttract;
-        if (needToAttract)
+        #endregion
+
+        #region Public Methods
+
+        private void Attract()
         {
-            Attract();
+            float distance = Vector3.Distance(transform.position, _target.position);
+            if (distance < 0.5f)
+            {
+                EndAttraction();
+            }
+            Vector3 direction = (_target.position - transform.position).normalized;
+            _drop.Rigidbody.MovePosition(transform.position + direction * _speed * Time.fixedDeltaTime);
         }
-    }
-    #endregion
 
-    #region Public Methods
-
-    private void Attract()
-    {
-        float distance = Vector3.Distance(transform.position, _target.position);
-        if (distance < 0.5f)
+        public void EndAttraction()
         {
-            EndAttraction();
+            OnEndOfAttraction?.Invoke(_drop);
+            OnEndOfAttraction = null;
         }
-        Vector3 direction = (_target.position - transform.position).normalized;
-        _drop.Rigidbody.MovePosition(transform.position + direction * _speed * Time.fixedDeltaTime);
+
+        #endregion
+
+        #region Private Methods
+
+        #endregion
     }
-
-    public void EndAttraction()
-    {
-        OnEndOfAttraction?.Invoke(_drop);
-        OnEndOfAttraction = null;
-    }
-
-    #endregion
-
-    #region Private Methods
-
-    #endregion
 }

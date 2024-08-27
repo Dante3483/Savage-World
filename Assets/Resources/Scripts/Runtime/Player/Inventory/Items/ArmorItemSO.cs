@@ -1,6 +1,7 @@
+using SavageWorld.Runtime.Enums.Types;
 using UnityEngine;
 
-namespace Items
+namespace SavageWorld.Runtime.Player.Inventory.Items
 {
     [CreateAssetMenu(fileName = "Armor", menuName = "Items/Armor")]
     public class ArmorItemSO : NonStackableItemSO

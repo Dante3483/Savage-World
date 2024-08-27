@@ -1,43 +1,44 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using System;
-using TMPro;
 
-public class UIResearchCost : MonoBehaviour, IPointerEnterHandler,
-        IPointerExitHandler
+namespace SavageWorld.Runtime.Player.Research.UI
 {
- #region Private fields
-    private bool _isMouseAbove;
-    [SerializeField]
-    private Image _image;
-    [SerializeField]
-    private TMP_Text _quantity;
-    #endregion
-
-    #region Public fields
-    public event Action<UIResearchCost> OnMouseEnter;
-    public event Action OnMouseLeave;
-    #endregion
-
-    #region Properties
-    public Image Image { get => _image; set => _image = value; }
-    public TMP_Text Quantity { get => _quantity; set => _quantity = value; }
-    #endregion
-
-    #region Methods
-    public void OnPointerEnter(PointerEventData pointerData)
+    public class UIResearchCost : MonoBehaviour, IPointerEnterHandler,
+            IPointerExitHandler
     {
-        _isMouseAbove = true;
-        OnMouseEnter?.Invoke(this);
-    }
+        #region Private fields
+        private bool _isMouseAbove;
+        [SerializeField]
+        private Image _image;
+        [SerializeField]
+        private TMP_Text _quantity;
+        #endregion
 
-    public void OnPointerExit(PointerEventData pointerData)
-    {
-        _isMouseAbove = false;
-        OnMouseLeave?.Invoke();
+        #region Public fields
+        public event Action<UIResearchCost> OnMouseEnter;
+        public event Action OnMouseLeave;
+        #endregion
+
+        #region Properties
+        public Image Image { get => _image; set => _image = value; }
+        public TMP_Text Quantity { get => _quantity; set => _quantity = value; }
+        #endregion
+
+        #region Methods
+        public void OnPointerEnter(PointerEventData pointerData)
+        {
+            _isMouseAbove = true;
+            OnMouseEnter?.Invoke(this);
+        }
+
+        public void OnPointerExit(PointerEventData pointerData)
+        {
+            _isMouseAbove = false;
+            OnMouseLeave?.Invoke();
+        }
+        #endregion
     }
-    #endregion
 }

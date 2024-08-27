@@ -1,8 +1,14 @@
+using SavageWorld.Runtime.Attributes;
 using SavageWorld.Runtime.Console;
 using SavageWorld.Runtime.Enums.Network;
+using SavageWorld.Runtime.GameSession;
+using SavageWorld.Runtime.Managers;
 using SavageWorld.Runtime.Network.Connection;
 using SavageWorld.Runtime.Network.Messages;
 using SavageWorld.Runtime.Network.Objects;
+using SavageWorld.Runtime.Player;
+using SavageWorld.Runtime.Utilities;
+using SavageWorld.Runtime.Utilities.Others;
 using System;
 using System.Threading.Tasks;
 using TMPro;
@@ -126,7 +132,7 @@ namespace SavageWorld.Runtime.Network
                 SetServerConnection();
                 string ipAddress = string.IsNullOrEmpty(_ipAddressInputField.text) ? _networkConfiguration.IpAddress : _ipAddressInputField.text;
                 _server.Start(_ipAddressInputField.text, _networkConfiguration.Port);
-                Player.CreatePlayer(new(3655, 2200));
+                PlayerGameObject.CreatePlayer(new(3655, 2200));
             }
             GameConsole.Log("Server started", Color.green);
         }
@@ -342,7 +348,7 @@ namespace SavageWorld.Runtime.Network
                     case 3:
                         {
                             long playerId = -1;
-                            ActionInMainThreadUtil.Instance.InvokeAndWait(() => playerId = Player.CreatePlayer(new(3655, 2200), isOwner: false).NetworkObject.Id);
+                            MainThreadUtility.Instance.InvokeAndWait(() => playerId = PlayerGameObject.CreatePlayer(new(3655, 2200), isOwner: false).NetworkObject.Id);
                             MessageData messageData = new()
                             {
                                 LongNumber2 = playerId,

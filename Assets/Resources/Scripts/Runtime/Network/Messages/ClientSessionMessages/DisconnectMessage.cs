@@ -1,4 +1,5 @@
 using SavageWorld.Runtime.Enums.Network;
+using SavageWorld.Runtime.Utilities;
 using System.IO;
 
 namespace SavageWorld.Runtime.Network.Messages
@@ -36,7 +37,7 @@ namespace SavageWorld.Runtime.Network.Messages
         /// </summary>
         protected override void ReadData()
         {
-            ActionInMainThreadUtil.Instance.InvokeAndWait(() => NetworkManager.Instance.DisconnectClient(_senderId));
+            MainThreadUtility.Instance.InvokeAndWait(() => NetworkManager.Instance.DisconnectClient(_senderId));
         }
 
         /// <summary>

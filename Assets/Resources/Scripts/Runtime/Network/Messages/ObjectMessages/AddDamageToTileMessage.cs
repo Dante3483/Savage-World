@@ -1,4 +1,6 @@
 using SavageWorld.Runtime.Enums.Network;
+using SavageWorld.Runtime.Player.Interactions;
+using SavageWorld.Runtime.Utilities;
 using System.IO;
 
 namespace SavageWorld.Runtime.Network.Messages
@@ -35,7 +37,7 @@ namespace SavageWorld.Runtime.Network.Messages
             int x = _reader.ReadInt32();
             int y = _reader.ReadInt32();
             float damage = _reader.ReadSingle();
-            ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() =>
+            MainThreadUtility.Instance.InvokeInNextUpdate(() =>
             {
                 MiningDamageController.Instance.AddDamageToBlock(new(x, y), damage);
                 if (_networkManager.IsServer)

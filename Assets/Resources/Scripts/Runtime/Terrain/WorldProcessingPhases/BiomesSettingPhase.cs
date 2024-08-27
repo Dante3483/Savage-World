@@ -1,215 +1,220 @@
-public class BiomesSettingPhase : WorldProcessingPhaseBase
+using SavageWorld.Runtime.Terrain.Objects;
+
+namespace SavageWorld.Runtime.Terrain.WorldProcessingPhases
 {
-    #region Fields
-    private int _oceanLowestY;
-    #endregion
-
-    #region Properties
-    public override string Name => "Biomes setting";
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Public Methods
-    public override void StartPhase()
+    public class BiomesSettingPhase : WorldProcessingPhaseBase
     {
-        CreateOcean(_terrainConfiguration.Ocean);
-        CreateDesert(_terrainConfiguration.Desert);
-        CreateSavannah(_terrainConfiguration.Savannah);
-        CreateMeadow(_terrainConfiguration.Meadow);
-        CreateForest(_terrainConfiguration.Forest);
-        CreateSwamp(_terrainConfiguration.Swamp);
-        CreateConiferousForest(_terrainConfiguration.ConiferousForest);
-    }
-    #endregion
+        #region Fields
+        private int _oceanLowestY;
+        #endregion
 
-    #region Private Methods
-    private void CreateOcean(BiomeSO biome)
-    {
-        int x;
-        int y;
-        int startX = biome.EndX - 50;
-        int startY = _equator;
-        int downHeight = 0;
-        int smoothStartY = 1;
-        int maxLength = 6;
-        int currentLength = 0;
-        int chanceToMoveDown;
-        int chanceToMoveUp;
+        #region Properties
+        public override string Name => "Biomes setting";
+        #endregion
 
-        //Hole generation
-        for (x = startX; x > 5; x--)
+        #region Events / Delegates
+
+        #endregion
+
+        #region Public Methods
+        public override void StartPhase()
         {
-            //Clear dirt above ocean
-            for (y = startY; y <= startY + biome.MountainHeight; y++)
-            {
-                SetBlockData(x, y, _air);
-            }
-
-            //Create hole
-            for (y = startY; y >= startY - downHeight; y--)
-            {
-                SetBlockData(x, y, _air);
-                SetLiquidData(x, y, _water);
-                SetChunkBiome(x, y, biome);
-            }
-
-            chanceToMoveDown = GetNextRandomValue(0, 6);
-            if (chanceToMoveDown % 5 == 0 || currentLength == maxLength)
-            {
-                downHeight++;
-                currentLength = 0;
-            }
-            else
-            {
-                currentLength++;
-            }
+            CreateOcean(_terrainConfiguration.Ocean);
+            CreateDesert(_terrainConfiguration.Desert);
+            CreateSavannah(_terrainConfiguration.Savannah);
+            CreateMeadow(_terrainConfiguration.Meadow);
+            CreateForest(_terrainConfiguration.Forest);
+            CreateSwamp(_terrainConfiguration.Swamp);
+            CreateConiferousForest(_terrainConfiguration.ConiferousForest);
         }
-        _oceanLowestY = startY - downHeight;
+        #endregion
 
-        //Smooth beach and hole
-        for (x = startX + 1; ; x++)
+        #region Private Methods
+        private void CreateOcean(BiomeSO biome)
         {
-            if (CompareBlock(x, startY + smoothStartY, _air))
-            {
-                break;
-            }
+            int x;
+            int y;
+            int startX = biome.EndX - 50;
+            int startY = _equator;
+            int downHeight = 0;
+            int smoothStartY = 1;
+            int maxLength = 6;
+            int currentLength = 0;
+            int chanceToMoveDown;
+            int chanceToMoveUp;
 
-            for (y = startY + smoothStartY; ; y++)
+            //Hole generation
+            for (x = startX; x > 5; x--)
             {
-                if (CompareBlock(x, y, _air))
+                //Clear dirt above ocean
+                for (y = startY; y <= startY + biome.MountainHeight; y++)
+                {
+                    SetBlockData(x, y, _air);
+                }
+
+                //Create hole
+                for (y = startY; y >= startY - downHeight; y--)
+                {
+                    SetBlockData(x, y, _air);
+                    SetLiquidData(x, y, _water);
+                    SetChunkBiome(x, y, biome);
+                }
+
+                chanceToMoveDown = GetNextRandomValue(0, 6);
+                if (chanceToMoveDown % 5 == 0 || currentLength == maxLength)
+                {
+                    downHeight++;
+                    currentLength = 0;
+                }
+                else
+                {
+                    currentLength++;
+                }
+            }
+            _oceanLowestY = startY - downHeight;
+
+            //Smooth beach and hole
+            for (x = startX + 1; ; x++)
+            {
+                if (CompareBlock(x, startY + smoothStartY, _air))
                 {
                     break;
                 }
-                SetBlockData(x, y, _air);
-            }
 
-            chanceToMoveUp = GetNextRandomValue(0, 3);
-            if (chanceToMoveUp % 2 == 0)
-            {
-                smoothStartY++;
+                for (y = startY + smoothStartY; ; y++)
+                {
+                    if (CompareBlock(x, y, _air))
+                    {
+                        break;
+                    }
+                    SetBlockData(x, y, _air);
+                }
+
+                chanceToMoveUp = GetNextRandomValue(0, 3);
+                if (chanceToMoveUp % 2 == 0)
+                {
+                    smoothStartY++;
+                }
             }
         }
-    }
 
-    private void CreateDesert(BiomeSO biome)
-    {
-        int startX = biome.EndX;
-        int startY = _equator + (int)biome.MountainHeight;
-        int additionalHeight = 20;
-        int x;
-        int y;
-
-        //Replace dirt with sand (inclusive ocean biome)
-        for (x = startX; x > 5; x--)
+        private void CreateDesert(BiomeSO biome)
         {
-            for (y = startY; y > _oceanLowestY - additionalHeight; y--)
+            int startX = biome.EndX;
+            int startY = _equator + (int)biome.MountainHeight;
+            int additionalHeight = 20;
+            int x;
+            int y;
+
+            //Replace dirt with sand (inclusive ocean biome)
+            for (x = startX; x > 5; x--)
             {
-                if (CompareBlock(x, y, _dirt))
+                for (y = startY; y > _oceanLowestY - additionalHeight; y--)
                 {
-                    SetBlockData(x, y, _sand);
-                    SetChunkBiome(x, y, biome);
+                    if (CompareBlock(x, y, _dirt))
+                    {
+                        SetBlockData(x, y, _sand);
+                        SetChunkBiome(x, y, biome);
+                    }
+                }
+            }
+
+            //Pulverize
+            int minLength = 10;
+            int maxLength = 21;
+            int lengthOfPulverizing;
+            int additionalHeightPulverize = GetNextRandomValue(10, 21) + additionalHeight;
+            int chanceToPulverize;
+
+            //Vertical
+            for (y = startY; y > _oceanLowestY - additionalHeightPulverize; y--)
+            {
+                lengthOfPulverizing = GetNextRandomValue(minLength, maxLength);
+                for (x = startX; x > startX - lengthOfPulverizing; x--)
+                {
+                    chanceToPulverize = GetNextRandomValue(0, 6);
+                    if (CompareBlock(x, y, _sand) &&
+                        chanceToPulverize % 5 == 0)
+                    {
+                        SetBlockData(x, y, _dirt);
+                    }
+                }
+
+                for (x = startX; x < startX + lengthOfPulverizing; x++)
+                {
+                    chanceToPulverize = GetNextRandomValue(0, 6);
+                    if (CompareBlock(x, y, _dirt) &&
+                        chanceToPulverize % 5 == 0)
+                    {
+                        SetBlockData(x, y, _sand);
+                    }
+                }
+            }
+
+            //Horizontal
+            startY = _oceanLowestY - additionalHeight;
+            for (x = startX; x > 5; x--)
+            {
+                lengthOfPulverizing = GetNextRandomValue(minLength, maxLength);
+                for (y = startY; y > startY - lengthOfPulverizing; y--)
+                {
+                    chanceToPulverize = GetNextRandomValue(0, 6);
+                    if (CompareBlock(x, y, _dirt) &&
+                        chanceToPulverize % 5 == 0)
+                    {
+                        SetBlockData(x, y, _sand);
+                    }
+                }
+
+                for (y = startY; y < startY + lengthOfPulverizing; y++)
+                {
+                    chanceToPulverize = GetNextRandomValue(0, 6);
+                    if (CompareBlock(x, y, _sand) &&
+                        chanceToPulverize % 5 == 0)
+                    {
+                        SetBlockData(x, y, _dirt);
+                    }
                 }
             }
         }
 
-        //Pulverize
-        int minLength = 10;
-        int maxLength = 21;
-        int lengthOfPulverizing;
-        int additionalHeightPulverize = GetNextRandomValue(10, 21) + additionalHeight;
-        int chanceToPulverize;
-
-        //Vertical
-        for (y = startY; y > _oceanLowestY - additionalHeightPulverize; y--)
+        private void CreateSavannah(BiomeSO biome)
         {
-            lengthOfPulverizing = GetNextRandomValue(minLength, maxLength);
-            for (x = startX; x > startX - lengthOfPulverizing; x--)
-            {
-                chanceToPulverize = GetNextRandomValue(0, 6);
-                if (CompareBlock(x, y, _sand) &&
-                    chanceToPulverize % 5 == 0)
-                {
-                    SetBlockData(x, y, _dirt);
-                }
-            }
-
-            for (x = startX; x < startX + lengthOfPulverizing; x++)
-            {
-                chanceToPulverize = GetNextRandomValue(0, 6);
-                if (CompareBlock(x, y, _dirt) &&
-                    chanceToPulverize % 5 == 0)
-                {
-                    SetBlockData(x, y, _sand);
-                }
-            }
+            SetBiomeIntoChunk(biome);
         }
 
-        //Horizontal
-        startY = _oceanLowestY - additionalHeight;
-        for (x = startX; x > 5; x--)
+        private void CreateMeadow(BiomeSO biome)
         {
-            lengthOfPulverizing = GetNextRandomValue(minLength, maxLength);
-            for (y = startY; y > startY - lengthOfPulverizing; y--)
-            {
-                chanceToPulverize = GetNextRandomValue(0, 6);
-                if (CompareBlock(x, y, _dirt) &&
-                    chanceToPulverize % 5 == 0)
-                {
-                    SetBlockData(x, y, _sand);
-                }
-            }
-
-            for (y = startY; y < startY + lengthOfPulverizing; y++)
-            {
-                chanceToPulverize = GetNextRandomValue(0, 6);
-                if (CompareBlock(x, y, _sand) &&
-                    chanceToPulverize % 5 == 0)
-                {
-                    SetBlockData(x, y, _dirt);
-                }
-            }
+            SetBiomeIntoChunk(biome);
         }
-    }
 
-    private void CreateSavannah(BiomeSO biome)
-    {
-        SetBiomeIntoChunk(biome);
-    }
-
-    private void CreateMeadow(BiomeSO biome)
-    {
-        SetBiomeIntoChunk(biome);
-    }
-
-    private void CreateForest(BiomeSO biome)
-    {
-        SetBiomeIntoChunk(biome);
-    }
-
-    private void CreateSwamp(BiomeSO biome)
-    {
-        SetBiomeIntoChunk(biome);
-    }
-
-    private void CreateConiferousForest(BiomeSO biome)
-    {
-        SetBiomeIntoChunk(biome);
-    }
-
-    private void SetBiomeIntoChunk(BiomeSO biome)
-    {
-        for (int x = biome.StartX; x < biome.EndX; x += _terrainConfiguration.ChunkSize)
+        private void CreateForest(BiomeSO biome)
         {
-            SetChunkBiome(x, _terrainConfiguration.Equator, biome);
+            SetBiomeIntoChunk(biome);
         }
-    }
 
-    private void SetChunkBiome(int x, int y, BiomeSO biome)
-    {
-        _chunksManager.SetChunkBiome(x, y, biome);
+        private void CreateSwamp(BiomeSO biome)
+        {
+            SetBiomeIntoChunk(biome);
+        }
+
+        private void CreateConiferousForest(BiomeSO biome)
+        {
+            SetBiomeIntoChunk(biome);
+        }
+
+        private void SetBiomeIntoChunk(BiomeSO biome)
+        {
+            for (int x = biome.StartX; x < biome.EndX; x += _terrainConfiguration.ChunkSize)
+            {
+                SetChunkBiome(x, _terrainConfiguration.Equator, biome);
+            }
+        }
+
+        private void SetChunkBiome(int x, int y, BiomeSO biome)
+        {
+            _chunksManager.SetChunkBiome(x, y, biome);
+        }
+        #endregion
     }
-    #endregion
 }

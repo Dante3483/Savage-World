@@ -1,4 +1,10 @@
+using SavageWorld.Runtime.Atlases;
 using SavageWorld.Runtime.Enums.Network;
+using SavageWorld.Runtime.Enums.Types;
+using SavageWorld.Runtime.GameSession;
+using SavageWorld.Runtime.Managers;
+using SavageWorld.Runtime.Terrain.Blocks;
+using SavageWorld.Runtime.Utilities;
 using System.IO;
 
 namespace SavageWorld.Runtime.Network.Messages
@@ -50,7 +56,7 @@ namespace SavageWorld.Runtime.Network.Messages
                     case BlockTypes.Furniture:
                         {
                             BlockSO block = blockAtlas.GetBlockByTypeAndId(blockType, id);
-                            ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() => worldDataManager.SetBlockData(x, y, block));
+                            MainThreadUtility.Instance.InvokeInNextUpdate(() => worldDataManager.SetBlockData(x, y, block));
                         }
                         break;
                     case BlockTypes.Wall:
@@ -84,7 +90,7 @@ namespace SavageWorld.Runtime.Network.Messages
                 BlockSO block = blockAtlas.GetBlockByTypeAndId(blockType, blockId);
                 BlockSO wall = blockAtlas.GetBlockByTypeAndId(BlockTypes.Wall, wallId);
                 BlockSO liquid = liquidId == byte.MaxValue ? null : blockAtlas.GetBlockById(liquidId);
-                ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() =>
+                MainThreadUtility.Instance.InvokeInNextUpdate(() =>
                 {
                     worldDataManager.SetFullData(x, y, block, wall, liquid, flowValue, colliderIndex, tileId, blockFlags);
                     worldDataManager.SetUpBlockData(x, y);

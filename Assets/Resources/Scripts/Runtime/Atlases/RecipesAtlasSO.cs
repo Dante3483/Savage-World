@@ -1,41 +1,45 @@
+using SavageWorld.Runtime.Player.CraftStation;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "RecipesAtlas", menuName = "Atlases/RecipesAtlas")]
-public class RecipesAtlasSO : AtlasSO
+namespace SavageWorld.Runtime.Atlases
 {
-    #region Fields
-    [SerializeField]
-    private RecipeSO[] _recipes;
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Monobehaviour Methods
-
-    #endregion
-
-    #region Public Methods
-    public override void InitializeAtlas()
+    [CreateAssetMenu(fileName = "RecipesAtlas", menuName = "Atlases/RecipesAtlas")]
+    public class RecipesAtlasSO : AtlasSO
     {
-        ResetRecipes();
-    }
+        #region Fields
+        [SerializeField]
+        private RecipeSO[] _recipes;
+        #endregion
 
-    public void ResetRecipes()
-    {
-        foreach (RecipeSO recipe in _recipes)
+        #region Properties
+
+        #endregion
+
+        #region Events / Delegates
+
+        #endregion
+
+        #region Monobehaviour Methods
+
+        #endregion
+
+        #region Public Methods
+        public override void InitializeAtlas()
         {
-            recipe.IsUnlocked = recipe.IsUnlockedByDefault;
+            ResetRecipes();
         }
+
+        public void ResetRecipes()
+        {
+            foreach (RecipeSO recipe in _recipes)
+            {
+                recipe.IsUnlocked = recipe.IsUnlockedByDefault;
+            }
+        }
+        #endregion
+
+        #region Private Methods
+
+        #endregion
     }
-    #endregion
-
-    #region Private Methods
-
-    #endregion
 }

@@ -1,6 +1,8 @@
+using SavageWorld.Runtime.Enums.Types;
+using SavageWorld.Runtime.Terrain.Blocks;
 using UnityEngine;
 
-namespace Items
+namespace SavageWorld.Runtime.Player.Inventory.Items
 {
     [CreateAssetMenu(fileName = "Block", menuName = "Items/Block")]
     public class BlockItemSO : StackableItemSO

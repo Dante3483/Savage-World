@@ -1,3 +1,5 @@
+using SavageWorld.Runtime.Utilities.StateMachine;
+
 namespace SavageWorld.Runtime.Network.States
 {
     public abstract class ConnectionStateBase : StateBase

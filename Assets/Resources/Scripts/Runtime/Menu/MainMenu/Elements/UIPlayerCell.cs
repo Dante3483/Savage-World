@@ -4,45 +4,48 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UIPlayerCell : MonoBehaviour, IPointerClickHandler
+namespace SavageWorld.Runtime.Menu.Elements
 {
-    #region Private fields
-    [Header("Main")]
-    [SerializeField]
-    private Button _button;
-    [SerializeField]
-    private TMP_Text _playerName;
-    #endregion
-
-    #region Public fields
-    public Action<string> OnPlayerSelect, OnPlayerDelete;
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    private void Awake()
+    public class UIPlayerCell : MonoBehaviour, IPointerClickHandler
     {
-        _button = GetComponent<Button>();
-        _button.onClick.AddListener(() =>
+        #region Private fields
+        [Header("Main")]
+        [SerializeField]
+        private Button _button;
+        [SerializeField]
+        private TMP_Text _playerName;
+        #endregion
+
+        #region Public fields
+        public Action<string> OnPlayerSelect, OnPlayerDelete;
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        private void Awake()
         {
-            OnPlayerSelect?.Invoke(_playerName.text);
-        });
-    }
-
-    public void SetData(string playerName)
-    {
-        _playerName.text = playerName;
-    }
-
-    public void OnPointerClick(PointerEventData pointerData)
-    {
-        if (pointerData.button == PointerEventData.InputButton.Right)
-        {
-            OnPlayerDelete?.Invoke(_playerName.text);
+            _button = GetComponent<Button>();
+            _button.onClick.AddListener(() =>
+            {
+                OnPlayerSelect?.Invoke(_playerName.text);
+            });
         }
+
+        public void SetData(string playerName)
+        {
+            _playerName.text = playerName;
+        }
+
+        public void OnPointerClick(PointerEventData pointerData)
+        {
+            if (pointerData.button == PointerEventData.InputButton.Right)
+            {
+                OnPlayerDelete?.Invoke(_playerName.text);
+            }
+        }
+        #endregion
     }
-    #endregion
 }

@@ -1,39 +1,42 @@
-public class BreakBlockAction : BreakAction
+namespace SavageWorld.Runtime.Player.Actions
 {
-    #region Fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Public Methods
-    public BreakBlockAction() : base()
+    public class BreakBlockAction : BreakAction
     {
-        _replacment = _gameManager.BlocksAtlas.Air;
-        _addDamage += _miningDamageController.AddDamageToBlock;
-        _replace += _worldDataManager.SetBlockData;
-        _miningDamageController.BlockDamageReachedMaxValue += Break;
-    }
-    #endregion
+        #region Fields
 
-    #region Private Methods
-    protected override bool CanBreak(int x, int y)
-    {
-        if (!base.CanBreak(x, y))
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Events / Delegates
+
+        #endregion
+
+        #region Public Methods
+        public BreakBlockAction() : base()
         {
-            return false;
+            _replacment = _gameManager.BlocksAtlas.Air;
+            _addDamage += _miningDamageController.AddDamageToBlock;
+            _replace += _worldDataManager.SetBlockData;
+            _miningDamageController.BlockDamageReachedMaxValue += Break;
         }
-        if (_worldDataManager.IsEmpty(x, y))
+        #endregion
+
+        #region Private Methods
+        protected override bool CanBreak(int x, int y)
         {
-            return false;
+            if (!base.CanBreak(x, y))
+            {
+                return false;
+            }
+            if (_worldDataManager.IsEmpty(x, y))
+            {
+                return false;
+            }
+            return true;
         }
-        return true;
+        #endregion
     }
-    #endregion
 }

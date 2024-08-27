@@ -1,86 +1,90 @@
+using SavageWorld.Runtime.Utilities;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class ListItem : VisualElement
+namespace SavageWorld.Editor.VisualElements
 {
-    public new class UxmlFactory : UxmlFactory<ListItem, UxmlTraits>
+    public class ListItem : VisualElement
     {
-
-    }
-
-    public new class UxmlTraits : VisualElement.UxmlTraits
-    {
-
-    }
-
-    #region Private fields
-    private static readonly string _styleResource = StaticInfo.StyleSheetsDirectory + "ListItem";
-    private static readonly string _ussListItem = "list_item";
-    private static readonly string _ussIcon = _ussListItem + "__icon";
-    private static readonly string _ussName = _ussListItem + "__name";
-    protected Image _icon;
-    protected Label _name;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-    public Image Icon
-    {
-        get
+        public new class UxmlFactory : UxmlFactory<ListItem, UxmlTraits>
         {
-            return _icon;
-        }
-    }
 
-    public Label Name
-    {
-        get
+        }
+
+        public new class UxmlTraits : VisualElement.UxmlTraits
         {
-            return _name;
+
         }
-    }
-    #endregion
 
-    #region Methods
-    public ListItem()
-    {
-        styleSheets.Add(Resources.Load<StyleSheet>(_styleResource));
+        #region Private fields
+        private static readonly string _styleResource = StaticInfo.StyleSheetsDirectory + "ListItem";
+        private static readonly string _ussListItem = "list_item";
+        private static readonly string _ussIcon = _ussListItem + "__icon";
+        private static readonly string _ussName = _ussListItem + "__name";
+        protected Image _icon;
+        protected Label _name;
+        #endregion
 
-        _icon = new Image();
-        _name = new Label();
+        #region Public fields
 
-        hierarchy.Add(_icon);
-        hierarchy.Add(_name);
-    }
+        #endregion
 
-    public void SetIcon(Sprite icon)
-    {
-        AddToClassList(_ussListItem);
-        if (icon == null)
+        #region Properties
+        public Image Icon
         {
-            _icon.RemoveFromClassList(_ussIcon);
+            get
+            {
+                return _icon;
+            }
         }
-        else
-        {
-            _icon.AddToClassList(_ussIcon);
-        }
-        _icon.sprite = icon;
-    }
 
-    public void SetName(string name)
-    {
-        if (string.IsNullOrEmpty(name))
+        public Label Name
         {
-            _name.RemoveFromClassList(_ussName);
+            get
+            {
+                return _name;
+            }
         }
-        else
+        #endregion
+
+        #region Methods
+        public ListItem()
         {
-            _name.AddToClassList(_ussName);
+            styleSheets.Add(Resources.Load<StyleSheet>(_styleResource));
+
+            _icon = new Image();
+            _name = new Label();
+
+            hierarchy.Add(_icon);
+            hierarchy.Add(_name);
         }
-        _name.text = name;
+
+        public void SetIcon(Sprite icon)
+        {
+            AddToClassList(_ussListItem);
+            if (icon == null)
+            {
+                _icon.RemoveFromClassList(_ussIcon);
+            }
+            else
+            {
+                _icon.AddToClassList(_ussIcon);
+            }
+            _icon.sprite = icon;
+        }
+
+        public void SetName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                _name.RemoveFromClassList(_ussName);
+            }
+            else
+            {
+                _name.AddToClassList(_ussName);
+            }
+            _name.text = name;
+        }
+        #endregion
     }
-    #endregion
 }

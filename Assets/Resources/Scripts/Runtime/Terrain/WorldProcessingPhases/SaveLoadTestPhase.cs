@@ -1,45 +1,48 @@
 using System.Threading.Tasks;
 
-public class SaveLoadTestPhase : WorldProcessingPhaseBase
+namespace SavageWorld.Runtime.Terrain.WorldProcessingPhases
 {
-    #region Fields
-
-    #endregion
-
-    #region Properties
-    public override string Name => "Save/Load test";
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Public Methods
-    public override void StartPhase()
+    public class SaveLoadTestPhase : WorldProcessingPhaseBase
     {
-        Parallel.For(0, _terrainWidth, (index) =>
+        #region Fields
+
+        #endregion
+
+        #region Properties
+        public override string Name => "Save/Load test";
+        #endregion
+
+        #region Events / Delegates
+
+        #endregion
+
+        #region Public Methods
+        public override void StartPhase()
         {
-            int x = index;
-            for (int y = 0; y < _terrainHeight; y++)
+            Parallel.For(0, _terrainWidth, (index) =>
             {
-                if (y % 2 == 0)
+                int x = index;
+                for (int y = 0; y < _terrainHeight; y++)
                 {
-                    SetBlockData(x, y, _dirt);
-                    SetWallData(x, y, _dirtWall);
-                    SetLiquidData(x, y, _water);
+                    if (y % 2 == 0)
+                    {
+                        SetBlockData(x, y, _dirt);
+                        SetWallData(x, y, _dirtWall);
+                        SetLiquidData(x, y, _water);
+                    }
+                    else
+                    {
+                        SetBlockData(x, y, _stone);
+                        SetWallData(x, y, _dirtWall);
+                        SetLiquidData(x, y, _water);
+                    }
                 }
-                else
-                {
-                    SetBlockData(x, y, _stone);
-                    SetWallData(x, y, _dirtWall);
-                    SetLiquidData(x, y, _water);
-                }
-            }
-        });
+            });
+        }
+        #endregion
+
+        #region Private Methods
+
+        #endregion
     }
-    #endregion
-
-    #region Private Methods
-
-    #endregion
 }

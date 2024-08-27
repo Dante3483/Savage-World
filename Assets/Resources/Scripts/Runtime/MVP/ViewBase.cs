@@ -1,24 +1,27 @@
 using UnityEngine;
 
-public abstract class ViewBase : MonoBehaviour
+namespace SavageWorld.Runtime.MVP
 {
-    #region Private fields
+    public abstract class ViewBase : MonoBehaviour
+    {
+        #region Private fields
 
-    #endregion
+        #endregion
 
-    #region Public fields
+        #region Public fields
 
-    #endregion
+        #endregion
 
-    #region Properties
+        #region Properties
 
-    #endregion
+        #endregion
 
-    #region Methods
-    public abstract void Initialize();
+        #region Methods
+        public abstract void Initialize();
 
-    public abstract void Show();
+        public abstract void Show();
 
-    public abstract void Hide();
-    #endregion
+        public abstract void Hide();
+        #endregion
+    }
 }

@@ -1,10 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public enum PickUpItemsID : byte
+namespace SavageWorld.Runtime.Enums.Id
 {
-    Rock = 0,
+    public enum PickUpItemsId : byte
+    {
+        Rock = 0,
 
-    Log = 1,
+        Log = 1,
+    }
 }

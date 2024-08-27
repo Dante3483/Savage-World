@@ -1,25 +1,26 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using SavageWorld.Runtime.GameSession;
 
-public class UIPhasesInfo : UIDebug
+namespace SavageWorld.Runtime.UI.Debug
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public void Update()
+    public class UIPhasesInfo : UIDebug
     {
-        _debugText.text = GameManager.Instance.PhasesInfo;
+        #region Private fields
+
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public void Update()
+        {
+            _debugText.text = GameManager.Instance.PhasesInfo;
+        }
+        #endregion
     }
-    #endregion
 }

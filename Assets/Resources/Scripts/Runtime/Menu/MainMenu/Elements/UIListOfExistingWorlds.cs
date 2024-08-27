@@ -1,66 +1,68 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIListOfExistingWorlds : MonoBehaviour
+namespace SavageWorld.Runtime.Menu.Elements
 {
-    #region Private fields
-    [Header("Main")]
-    [SerializeField] private RectTransform _content;
-    [SerializeField] private UIWorldCell _cellPrefab;
-    [SerializeField] private List<UIWorldCell> _listOfCells;
-    #endregion
-
-    #region Public fields
-    public Action OnCreateWorld;
-    public Action<string> OnWorldSelect, OnWorldDelete;
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public void InitializeUI(int worldsCount)
+    public class UIListOfExistingWorlds : MonoBehaviour
     {
-        _listOfCells.Clear();
-        foreach (Transform child in _content.transform)
+        #region Private fields
+        [Header("Main")]
+        [SerializeField] private RectTransform _content;
+        [SerializeField] private UIWorldCell _cellPrefab;
+        [SerializeField] private List<UIWorldCell> _listOfCells;
+        #endregion
+
+        #region Public fields
+        public Action OnCreateWorld;
+        public Action<string> OnWorldSelect, OnWorldDelete;
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public void InitializeUI(int worldsCount)
         {
-            Destroy(child.gameObject);
+            _listOfCells.Clear();
+            foreach (Transform child in _content.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            for (int i = 0; i < worldsCount; i++)
+            {
+                UIWorldCell worldCell = Instantiate(_cellPrefab, Vector3.zero, Quaternion.identity, _content);
+                _listOfCells.Add(worldCell);
+
+                worldCell.OnWorldSelect += HandleWorldSelect;
+                worldCell.OnWorldDelete += HandleWorldDelete;
+            }
         }
 
-        for (int i = 0; i < worldsCount; i++)
+        public void UpdateCell(int worldIndex, string worldName)
         {
-            UIWorldCell worldCell = Instantiate(_cellPrefab, Vector3.zero, Quaternion.identity, _content);
-            _listOfCells.Add(worldCell);
-
-            worldCell.OnWorldSelect += HandleWorldSelect;
-            worldCell.OnWorldDelete += HandleWorldDelete;
+            if (_listOfCells.Count > worldIndex)
+            {
+                _listOfCells[worldIndex].SetData(worldName);
+            }
         }
-    }
 
-    public void UpdateCell(int worldIndex, string worldName)
-    {
-        if (_listOfCells.Count > worldIndex)
+        public void CreateWorld()
         {
-            _listOfCells[worldIndex].SetData(worldName);
+            OnCreateWorld?.Invoke();
         }
-    }
 
-    public void CreateWorld()
-    {
-        OnCreateWorld?.Invoke();
-    }
+        private void HandleWorldSelect(string worldName)
+        {
+            OnWorldSelect?.Invoke(worldName);
+        }
 
-    private void HandleWorldSelect(string worldName)
-    {
-        OnWorldSelect?.Invoke(worldName);
+        private void HandleWorldDelete(string worldName)
+        {
+            OnWorldDelete?.Invoke(worldName);
+        }
+        #endregion
     }
-
-    private void HandleWorldDelete(string worldName)
-    {
-        OnWorldDelete?.Invoke(worldName);
-    }
-    #endregion
 }

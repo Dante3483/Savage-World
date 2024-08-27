@@ -1,16 +1,19 @@
-public enum BlockTypes: byte
+namespace SavageWorld.Runtime.Enums.Types
 {
-    Abstract = 0,
+    public enum BlockTypes : byte
+    {
+        Abstract = 0,
 
-    Solid = 1,
+        Solid = 1,
 
-    Dust = 2,
+        Dust = 2,
 
-    Liquid = 3,
+        Liquid = 3,
 
-    Plant = 4,
+        Plant = 4,
 
-    Wall = 5,
+        Wall = 5,
 
-    Furniture = 6,
+        Furniture = 6,
+    }
 }

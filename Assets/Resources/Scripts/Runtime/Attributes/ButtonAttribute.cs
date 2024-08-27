@@ -1,31 +1,33 @@
 using System;
-using UnityEngine;
 
-[System.AttributeUsage(System.AttributeTargets.Method)]
-public class ButtonAttribute : Attribute
+namespace SavageWorld.Runtime.Attributes
 {
-    #region Private fields
-    private string _buttonName;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-    public string ButtonName
+    [AttributeUsage(AttributeTargets.Method)]
+    public class ButtonAttribute : Attribute
     {
-        get
+        #region Private fields
+        private string _buttonName;
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+        public string ButtonName
         {
-            return _buttonName;
+            get
+            {
+                return _buttonName;
+            }
         }
-    }
-    #endregion
+        #endregion
 
-    #region Methods
-    public ButtonAttribute(string buttonName = "Button")
-    {
-        _buttonName = buttonName;
+        #region Methods
+        public ButtonAttribute(string buttonName = "Button")
+        {
+            _buttonName = buttonName;
+        }
+        #endregion
     }
-    #endregion
 }

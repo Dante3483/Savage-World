@@ -1,52 +1,56 @@
+using SavageWorld.Runtime.Enums.Types;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Pickaxe", menuName = "Items/Pickaxe")]
-public class PickaxeItemSO : ToolItemSO
+namespace SavageWorld.Runtime.Player.Inventory.Items
 {
-    #region Fields
-    [SerializeField]
-    [Min(1)]
-    private float _miningDamage = 1;
-    [SerializeField]
-    [Min(0.01f)]
-    private float _miningSpeed = 0.5f;
-    #endregion
-
-    #region Properties
-    public float MiningDamage
+    [CreateAssetMenu(fileName = "Pickaxe", menuName = "Items/Pickaxe")]
+    public class PickaxeItemSO : ToolItemSO
     {
-        get
+        #region Fields
+        [SerializeField]
+        [Min(1)]
+        private float _miningDamage = 1;
+        [SerializeField]
+        [Min(0.01f)]
+        private float _miningSpeed = 0.5f;
+        #endregion
+
+        #region Properties
+        public float MiningDamage
         {
-            return _miningDamage;
+            get
+            {
+                return _miningDamage;
+            }
         }
-    }
 
-    public float MiningSpeed
-    {
-        get
+        public float MiningSpeed
         {
-            return _miningSpeed;
+            get
+            {
+                return _miningSpeed;
+            }
         }
+        #endregion
+
+        #region Events / Delegates
+
+        #endregion
+
+        #region Monobehaviour Methods
+
+        #endregion
+
+        #region Public Methods
+        public PickaxeItemSO()
+        {
+            _toolType = ToolTypes.Pickaxe;
+            _using = "Can break blocks";
+        }
+        #endregion
+
+        #region Private Methods
+
+        #endregion
     }
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Monobehaviour Methods
-
-    #endregion
-
-    #region Public Methods
-    public PickaxeItemSO()
-    {
-        _toolType = ToolTypes.Pickaxe;
-        _using = "Can break blocks";
-    }
-    #endregion
-
-    #region Private Methods
-
-    #endregion
 }

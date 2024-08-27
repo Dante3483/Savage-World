@@ -1,5 +1,7 @@
 using SavageWorld.Runtime.Enums.Network;
 using SavageWorld.Runtime.Network.Objects;
+using SavageWorld.Runtime.Terrain.Drop;
+using SavageWorld.Runtime.Utilities;
 using System;
 using System.IO;
 
@@ -41,7 +43,7 @@ namespace SavageWorld.Runtime.Network.Messages
             long dropId = _reader.ReadInt64();
             NetworkObject playerObject = _networkManager.NetworkObjects.GetObjectById(palyerId);
             NetworkObject dropObject = _networkManager.NetworkObjects.GetObjectById(dropId);
-            ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() =>
+            MainThreadUtility.Instance.InvokeInNextUpdate(() =>
             {
                 if (dropObject == null)
                 {

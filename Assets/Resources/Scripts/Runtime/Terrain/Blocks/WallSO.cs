@@ -1,29 +1,34 @@
+using SavageWorld.Runtime.Enums.Id;
+using SavageWorld.Runtime.Enums.Types;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "newWall", menuName = "Blocks/Wall")]
-public class WallSO : BlockSO
+namespace SavageWorld.Runtime.Terrain.Blocks
 {
-    #region Private fields
-    [SerializeField] private WallsID _id;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public WallSO()
+    [CreateAssetMenu(fileName = "newWall", menuName = "Blocks/Wall")]
+    public class WallSO : BlockSO
     {
-        _type = BlockTypes.Wall;
-    }
+        #region Private fields
+        [SerializeField] private WallsId _id;
+        #endregion
 
-    public override ushort GetId()
-    {
-        return (ushort)_id;
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public WallSO()
+        {
+            _type = BlockTypes.Wall;
+        }
+
+        public override ushort GetId()
+        {
+            return (ushort)_id;
+        }
+        #endregion
     }
-    #endregion
 }

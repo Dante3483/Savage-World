@@ -1,35 +1,38 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIWearableItemCell : UIItemCell
+namespace SavageWorld.Runtime.Player.Inventory.UI
 {
-    #region Private fields
-    [SerializeField]
-    private Image _silhouette;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public override void ResetData()
+    public class UIWearableItemCell : UIItemCell
     {
-        base.ResetData();
-        _silhouette.gameObject.SetActive(true);
-    }
+        #region Private fields
+        [SerializeField]
+        private Image _silhouette;
+        #endregion
 
-    public override void SetSprite(Sprite sprite)
-    {
-        if (sprite != null)
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public override void ResetData()
         {
-            _silhouette.gameObject.SetActive(false);
+            base.ResetData();
+            _silhouette.gameObject.SetActive(true);
         }
-        base.SetSprite(sprite);
+
+        public override void SetSprite(Sprite sprite)
+        {
+            if (sprite != null)
+            {
+                _silhouette.gameObject.SetActive(false);
+            }
+            base.SetSprite(sprite);
+        }
+        #endregion
     }
-    #endregion
 }

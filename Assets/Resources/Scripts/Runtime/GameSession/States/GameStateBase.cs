@@ -1,3 +1,5 @@
+using SavageWorld.Runtime.Utilities.StateMachine;
+
 namespace SavageWorld.Runtime.GameSession.States
 {
     public abstract class GameStateBase : StateBase

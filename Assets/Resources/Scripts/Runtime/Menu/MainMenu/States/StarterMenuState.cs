@@ -1,26 +1,31 @@
-public class StarterMenuState : MainMenuStateBase
+using SavageWorld.Runtime.Managers;
+
+namespace SavageWorld.Runtime.Menu.States
 {
-    #region Private fields
-
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    public override void Enter()
+    public class StarterMenuState : MainMenuStateBase
     {
-        UIManager.Instance.MainMenuUI.IsActive = true;
-    }
+        #region Private fields
 
-    public override void Exit()
-    {
-        UIManager.Instance.MainMenuUI.IsActive = false;
+        #endregion
+
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        public override void Enter()
+        {
+            UIManager.Instance.MainMenuUI.IsActive = true;
+        }
+
+        public override void Exit()
+        {
+            UIManager.Instance.MainMenuUI.IsActive = false;
+        }
+        #endregion
     }
-    #endregion
 }

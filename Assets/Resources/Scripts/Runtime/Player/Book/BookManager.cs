@@ -1,133 +1,143 @@
+using SavageWorld.Runtime.Managers;
+using SavageWorld.Runtime.MVP;
+using SavageWorld.Runtime.Player.CraftStation;
+using SavageWorld.Runtime.Player.Hotbar;
+using SavageWorld.Runtime.Player.Inventory;
+using SavageWorld.Runtime.Player.Research;
+using SavageWorld.Runtime.Utilities.Others;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class BookManager : Singleton<BookManager>
+namespace SavageWorld.Runtime.Player.Book
 {
-    #region Fields
-    [Header("Inventory Configuration")]
-    [SerializeField]
-    private InventoryView _inventoryView;
-    [SerializeField]
-    private float _minTimeToTakeItem;
-    [SerializeField]
-    private float _maxTimeToTakeItem;
-    [SerializeField]
-    private float _stepToLerpTimeToTakeItem;
-    private InventoryPresenter _inventoryPresenter;
-
-    [Header("Hotbar Configuration")]
-    [SerializeField]
-    private HotbarView _hotbarView;
-    private HotbarPresenter _hotbarPresenter;
-
-    [Header("Craft Station Configuration")]
-    [SerializeField]
-    private CraftStationView _craftStationView;
-    private CraftStationPresenter _craftStationPresenter;
-
-    [Header("Researches Configuration")]
-    [SerializeField]
-    private ResearchesView _researchesView;
-    private ResearchesPresenter _researchesPresenter;
-
-    private List<PresenterBase> _listOfPresenters;
-    #endregion
-
-    #region Properties
-    public InventoryPresenter InventoryPresenter
+    public class BookManager : Singleton<BookManager>
     {
-        get
+        #region Fields
+        [Header("Inventory Configuration")]
+        [SerializeField]
+        private InventoryView _inventoryView;
+        [SerializeField]
+        private float _minTimeToTakeItem;
+        [SerializeField]
+        private float _maxTimeToTakeItem;
+        [SerializeField]
+        private float _stepToLerpTimeToTakeItem;
+        private InventoryPresenter _inventoryPresenter;
+
+        [Header("Hotbar Configuration")]
+        [SerializeField]
+        private HotbarView _hotbarView;
+        private HotbarPresenter _hotbarPresenter;
+
+        [Header("Craft Station Configuration")]
+        [SerializeField]
+        private CraftStationView _craftStationView;
+        private CraftStationPresenter _craftStationPresenter;
+
+        [Header("Researches Configuration")]
+        [SerializeField]
+        private ResearchesView _researchesView;
+        private ResearchesPresenter _researchesPresenter;
+
+        private List<PresenterBase> _listOfPresenters;
+        #endregion
+
+        #region Properties
+        public InventoryPresenter InventoryPresenter
         {
-            return _inventoryPresenter;
+            get
+            {
+                return _inventoryPresenter;
+            }
         }
-    }
 
-    public CraftStationPresenter CraftStationPresenter
-    {
-        get
+        public CraftStationPresenter CraftStationPresenter
         {
-            return _craftStationPresenter;
+            get
+            {
+                return _craftStationPresenter;
+            }
         }
-    }
 
-    public ResearchesPresenter ResearchesPresenter
-    {
-        get
+        public ResearchesPresenter ResearchesPresenter
         {
-            return _researchesPresenter;
+            get
+            {
+                return _researchesPresenter;
+            }
         }
-    }
-    #endregion
+        #endregion
 
-    #region Events / Delegates
+        #region Events / Delegates
 
-    #endregion
+        #endregion
 
-    #region Monobehaviour Methods
-    private void Start()
-    {
-        _listOfPresenters = new();
-    }
-    #endregion
-
-    #region Public Methods
-    public void InitializeInventory(InventoryModel model)
-    {
-        if (_inventoryPresenter is null)
+        #region Monobehaviour Methods
+        private void Start()
         {
-            _inventoryPresenter = new(_minTimeToTakeItem, _maxTimeToTakeItem, _stepToLerpTimeToTakeItem, model, _inventoryView);
-            _listOfPresenters.Add(_inventoryPresenter);
+            _listOfPresenters = new();
         }
-    }
+        #endregion
 
-    public void InitializeHotbar(InventoryModel model)
-    {
-        if (_hotbarPresenter is null)
+        #region Public Methods
+        public void InitializeInventory(InventoryModel model)
         {
-            _hotbarPresenter = new(model, _hotbarView);
-            _hotbarPresenter.Enable();
+            if (_inventoryPresenter is null)
+            {
+                _inventoryPresenter = new(_minTimeToTakeItem, _maxTimeToTakeItem, _stepToLerpTimeToTakeItem, model, _inventoryView);
+                _listOfPresenters.Add(_inventoryPresenter);
+            }
         }
-    }
 
-    public void InitializeCraftStation(CraftStationModelSO model, InventoryModel inventory)
-    {
-        if (_craftStationPresenter is null)
+        public void InitializeHotbar(InventoryModel model)
         {
-            _craftStationPresenter = new(model, _craftStationView, inventory);
-            _listOfPresenters.Add(_craftStationPresenter);
+            if (_hotbarPresenter is null)
+            {
+                _hotbarPresenter = new(model, _hotbarView);
+                _hotbarPresenter.Enable();
+            }
         }
-    }
 
-    public void InitializeResearches(ResearchesModelSO model, InventoryModel inventory)
-    {
-        if (_researchesPresenter is null)
+        public void InitializeCraftStation(CraftStationModelSO model, InventoryModel inventory)
         {
-            _researchesPresenter = new(model, _researchesView, inventory);
-            _listOfPresenters.Add(_researchesPresenter);
+            if (_craftStationPresenter is null)
+            {
+                _craftStationPresenter = new(model, _craftStationView, inventory);
+                _listOfPresenters.Add(_craftStationPresenter);
+            }
         }
-    }
 
-    public bool TogglePresenter(PresenterBase presenter)
-    {
-        PresenterBase currentActivePresenter = _listOfPresenters.FirstOrDefault(p => p.IsAvtive);
-        if (currentActivePresenter == presenter)
+        public void InitializeResearches(ResearchesModelSO model, InventoryModel inventory)
         {
-            presenter.Disable();
-            EventManager.OnBookClosed();
-            return false;
+            if (_researchesPresenter is null)
+            {
+                _researchesPresenter = new(model, _researchesView, inventory);
+                _listOfPresenters.Add(_researchesPresenter);
+            }
         }
-        else
+
+        public bool TogglePresenter(PresenterBase presenter)
         {
-            currentActivePresenter?.Disable();
-            presenter.Enable();
-            EventManager.OnBookOpened();
-            return true;
+            PresenterBase currentActivePresenter = _listOfPresenters.FirstOrDefault(p => p.IsAvtive);
+            if (currentActivePresenter == presenter)
+            {
+                presenter.Disable();
+                EventManager.OnBookClosed();
+                return false;
+            }
+            else
+            {
+                currentActivePresenter?.Disable();
+                presenter.Enable();
+                EventManager.OnBookOpened();
+                return true;
+            }
         }
+        #endregion
+
+        #region Private Methods
+
+        #endregion
     }
-    #endregion
-
-    #region Private Methods
-
-    #endregion
 }

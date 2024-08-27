@@ -1,58 +1,64 @@
+using SavageWorld.Runtime.GameSession;
+using SavageWorld.Runtime.Menu.Elements;
+using SavageWorld.Runtime.Utilities.Others;
 using System;
 using UnityEngine;
 
-public class ListOfExistingWorldsController : Singleton<ListOfExistingWorldsController>
+namespace SavageWorld.Runtime.Menu
 {
-    #region Private fields
-    [SerializeField] private UIListOfExistingWorlds _listOfExistingWorldsUI;
-    #endregion
-
-    #region Public fields
-    public event Action OnWorldCreated;
-    public event Action<string> OnWorldSelected, OnWorldDeleted;
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    private void Start()
+    public class ListOfExistingWorldsController : Singleton<ListOfExistingWorldsController>
     {
-        PrepareUI();
-    }
+        #region Private fields
+        [SerializeField] private UIListOfExistingWorlds _listOfExistingWorldsUI;
+        #endregion
 
-    private void PrepareUI()
-    {
-        _listOfExistingWorldsUI.OnCreateWorld += HandleCreateWorld;
-        _listOfExistingWorldsUI.OnWorldSelect += HandleWorldSelect;
-        _listOfExistingWorldsUI.OnWorldDelete += HandleWorldDelete;
-    }
+        #region Public fields
+        public event Action OnWorldCreated;
+        public event Action<string> OnWorldSelected, OnWorldDeleted;
+        #endregion
 
-    public void UpdateUI()
-    {
-        _listOfExistingWorldsUI.InitializeUI(GameManager.Instance.WorldNames.Count);
+        #region Properties
 
-        for (int i = 0; i < GameManager.Instance.WorldNames.Count; i++)
+        #endregion
+
+        #region Methods
+        private void Start()
         {
-            _listOfExistingWorldsUI.UpdateCell(i, GameManager.Instance.WorldNames[i]);
+            PrepareUI();
         }
-    }
 
-    private void HandleCreateWorld()
-    {
-        OnWorldCreated?.Invoke();
-    }
+        private void PrepareUI()
+        {
+            _listOfExistingWorldsUI.OnCreateWorld += HandleCreateWorld;
+            _listOfExistingWorldsUI.OnWorldSelect += HandleWorldSelect;
+            _listOfExistingWorldsUI.OnWorldDelete += HandleWorldDelete;
+        }
 
-    private void HandleWorldSelect(string worldName)
-    {
-        OnWorldSelected?.Invoke(worldName);
-    }
+        public void UpdateUI()
+        {
+            _listOfExistingWorldsUI.InitializeUI(GameManager.Instance.WorldNames.Count);
 
-    private void HandleWorldDelete(string worldName)
-    {
-        OnWorldDeleted?.Invoke(worldName);
-        UpdateUI();
+            for (int i = 0; i < GameManager.Instance.WorldNames.Count; i++)
+            {
+                _listOfExistingWorldsUI.UpdateCell(i, GameManager.Instance.WorldNames[i]);
+            }
+        }
+
+        private void HandleCreateWorld()
+        {
+            OnWorldCreated?.Invoke();
+        }
+
+        private void HandleWorldSelect(string worldName)
+        {
+            OnWorldSelected?.Invoke(worldName);
+        }
+
+        private void HandleWorldDelete(string worldName)
+        {
+            OnWorldDeleted?.Invoke(worldName);
+            UpdateUI();
+        }
+        #endregion
     }
-    #endregion
 }

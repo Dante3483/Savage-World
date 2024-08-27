@@ -1,6 +1,11 @@
-using Items;
+using SavageWorld.Runtime.Enums.Id;
 using SavageWorld.Runtime.Enums.Network;
+using SavageWorld.Runtime.GameSession;
+using SavageWorld.Runtime.Managers;
 using SavageWorld.Runtime.Network.Objects;
+using SavageWorld.Runtime.Player.Inventory.Items;
+using SavageWorld.Runtime.Terrain.Drop;
+using SavageWorld.Runtime.Utilities;
 using System.IO;
 using UnityEngine;
 
@@ -40,14 +45,14 @@ namespace SavageWorld.Runtime.Network.Messages
             bool __ = _reader.ReadBoolean();
             float x = _reader.ReadSingle();
             float y = _reader.ReadSingle();
-            ItemsID itemId = (ItemsID)_reader.ReadUInt16();
+            ItemsId itemId = (ItemsId)_reader.ReadUInt16();
             byte flags = _reader.ReadByte();
             int quantity = _reader.ReadInt32();
             bool isThrowing = _reader.ReadBoolean();
             float directionX = isThrowing ? _reader.ReadSingle() : 0f;
             float directionY = isThrowing ? _reader.ReadSingle() : 0f;
             ItemSO item = GameManager.Instance.ItemsAtlas.GetItemByID(itemId);
-            ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() =>
+            MainThreadUtility.Instance.InvokeInNextUpdate(() =>
             {
                 NetworkObject dropObject = _networkManager.NetworkObjects.GetObjectById(objectId);
                 AddQuantityToExistingObject(dropObject, quantity);

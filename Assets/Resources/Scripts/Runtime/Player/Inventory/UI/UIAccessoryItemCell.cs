@@ -1,18 +1,23 @@
-public class UIAccessoryItemCell : UIWearableItemCell
+using SavageWorld.Runtime.Enums.Others;
+
+namespace SavageWorld.Runtime.Player.Inventory.UI
 {
-    #region Private fields
+    public class UIAccessoryItemCell : UIWearableItemCell
+    {
+        #region Private fields
 
-    #endregion
+        #endregion
 
-    #region Public fields
+        #region Public fields
 
-    #endregion
+        #endregion
 
-    #region Properties
-    public override ItemLocations ItemLocation => ItemLocations.Accessories;
-    #endregion
+        #region Properties
+        public override ItemLocations ItemLocation => ItemLocations.Accessories;
+        #endregion
 
-    #region Methods
+        #region Methods
 
-    #endregion
+        #endregion
+    }
 }

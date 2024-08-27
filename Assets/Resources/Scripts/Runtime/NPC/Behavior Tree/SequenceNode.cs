@@ -1,22 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class SequenceNode : MonoBehaviour
+namespace SavageWorld.Runtime.NPC.BehaviourTree
 {
-    #region Private fields
+    public class SequenceNode : MonoBehaviour
+    {
+        #region Private fields
 
-    #endregion
+        #endregion
 
-    #region Public fields
+        #region Public fields
 
-    #endregion
+        #endregion
 
-    #region Properties
+        #region Properties
 
-    #endregion
+        #endregion
 
-    #region Methods
+        #region Methods
 
-    #endregion
+        #endregion
+    }
 }

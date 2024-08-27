@@ -1,154 +1,161 @@
+using SavageWorld.Runtime.Enums.Id;
+using SavageWorld.Runtime.Terrain.Objects;
+using SavageWorld.Runtime.Utilities;
 using System.Collections.Generic;
 using UnityEngine;
+using Tree = SavageWorld.Runtime.Terrain.Objects.Tree;
 
-public class TreesGenerationPhase : WorldProcessingPhaseBase
+namespace SavageWorld.Runtime.Terrain.WorldProcessingPhases
 {
-    #region Fields
-
-    #endregion
-
-    #region Properties
-    public override string Name => "Tree generation";
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Public Methods
-    public override void StartPhase()
+    public class TreesGenerationPhase : WorldProcessingPhaseBase
     {
-        //Create surface trees
-        Dictionary<BiomesID, List<Tree>> allTrees = null;
-        List<Vector3> coords = new();
+        #region Fields
 
-        GameObject treesSection = _gameManager.Terrain.Trees;
-        BiomeSO currentBiome;
-        int chance;
-        int startX;
-        int endX;
-        int x;
-        int y;
-        int i;
-        bool isValidPlace;
+        #endregion
 
-        ActionInMainThreadUtil.Instance.InvokeAndWait(() =>
+        #region Properties
+        public override string Name => "Tree generation";
+        #endregion
+
+        #region Events / Delegates
+
+        #endregion
+
+        #region Public Methods
+        public override void StartPhase()
         {
-            allTrees = new Dictionary<BiomesID, List<Tree>>()
+            //Create surface trees
+            Dictionary<BiomesId, List<Tree>> allTrees = null;
+            List<Vector3> coords = new();
+
+            GameObject treesSection = _gameManager.Terrain.Trees;
+            BiomeSO currentBiome;
+            int chance;
+            int startX;
+            int endX;
+            int x;
+            int y;
+            int i;
+            bool isValidPlace;
+
+            MainThreadUtility.Instance.InvokeAndWait(() =>
             {
+                allTrees = new Dictionary<BiomesId, List<Tree>>()
+                {
                 //{ BiomesID.NonBiom, _gameManager.ObjectsAtlass.GetAllBiomeTrees(BiomesID.NonBiom) },
                 //{ BiomesID.Ocean, _gameManager.ObjectsAtlass.GetAllBiomeTrees(BiomesID.Ocean) },
-                { BiomesID.Desert, _gameManager.TreesAtlas.GetTreesByBiome(BiomesID.Desert) },
-                { BiomesID.Savannah, _gameManager.TreesAtlas.GetTreesByBiome(BiomesID.Savannah) },
-                { BiomesID.Meadow, _gameManager.TreesAtlas.GetTreesByBiome(BiomesID.Meadow) },
-                { BiomesID.Forest, _gameManager.TreesAtlas.GetTreesByBiome(BiomesID.Forest) },
-                { BiomesID.Swamp, _gameManager.TreesAtlas.GetTreesByBiome(BiomesID.Swamp) },
-                { BiomesID.ConiferousForest, _gameManager.TreesAtlas.GetTreesByBiome(BiomesID.ConiferousForest) },
-            };
-        });
+                { BiomesId.Desert, _gameManager.TreesAtlas.GetTreesByBiome(BiomesId.Desert) },
+                { BiomesId.Savannah, _gameManager.TreesAtlas.GetTreesByBiome(BiomesId.Savannah) },
+                { BiomesId.Meadow, _gameManager.TreesAtlas.GetTreesByBiome(BiomesId.Meadow) },
+                { BiomesId.Forest, _gameManager.TreesAtlas.GetTreesByBiome(BiomesId.Forest) },
+                { BiomesId.Swamp, _gameManager.TreesAtlas.GetTreesByBiome(BiomesId.Swamp) },
+                { BiomesId.ConiferousForest, _gameManager.TreesAtlas.GetTreesByBiome(BiomesId.ConiferousForest) },
+                };
+            });
 
-        foreach (var trees in allTrees)
-        {
-            foreach (Tree tree in trees.Value)
+            foreach (var trees in allTrees)
             {
-                if (trees.Key == BiomesID.NonBiome)
+                foreach (Tree tree in trees.Value)
                 {
-                    startX = 0;
-                    endX = _terrainWidth - 1;
-                }
-                else
-                {
-                    currentBiome = _terrainConfiguration.GetBiome(trees.Key);
-                    startX = currentBiome.StartX;
-                    endX = currentBiome.EndX;
-                }
-
-                for (x = startX; x <= endX - tree.Width - 5; x++)
-                {
-                    for (y = _equator; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
+                    if (trees.Key == BiomesId.NonBiome)
                     {
-                        isValidPlace = true;
-                        for (i = 0; i < tree.WidthToSpawn; i++)
+                        startX = 0;
+                        endX = _terrainWidth - 1;
+                    }
+                    else
+                    {
+                        currentBiome = _terrainConfiguration.GetBiome(trees.Key);
+                        startX = currentBiome.StartX;
+                        endX = currentBiome.EndX;
+                    }
+
+                    for (x = startX; x <= endX - tree.Width - 5; x++)
+                    {
+                        for (y = _equator; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
                         {
-                            if (!tree.AllowedToSpawnOn.Contains(GetBlockData(x + i, y)))
+                            isValidPlace = true;
+                            for (i = 0; i < tree.WidthToSpawn; i++)
                             {
-                                isValidPlace = false;
-                                break;
-                            }
-                            if (!IsValidForTree(x + i, y + 1))
-                            {
-                                isValidPlace = false;
-                                break;
-                            }
-                            if (IsLiquid(x + i, y + 1))
-                            {
-                                isValidPlace = false;
-                                break;
-                            }
-                        }
-                        if (isValidPlace)
-                        {
-                            chance = GetNextRandomValue(0, 101);
-                            if (chance <= tree.ChanceToSpawn)
-                            {
-                                if (CreateTree(x, y + 1, tree, ref coords))
+                                if (!tree.AllowedToSpawnOn.Contains(GetBlockData(x + i, y)))
                                 {
-                                    x += tree.Width + tree.DistanceEachOthers;
+                                    isValidPlace = false;
+                                    break;
+                                }
+                                if (!IsValidForTree(x + i, y + 1))
+                                {
+                                    isValidPlace = false;
+                                    break;
+                                }
+                                if (IsLiquid(x + i, y + 1))
+                                {
+                                    isValidPlace = false;
+                                    break;
+                                }
+                            }
+                            if (isValidPlace)
+                            {
+                                chance = GetNextRandomValue(0, 101);
+                                if (chance <= tree.ChanceToSpawn)
+                                {
+                                    if (CreateTree(x, y + 1, tree, ref coords))
+                                    {
+                                        x += tree.Width + tree.DistanceEachOthers;
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                ActionInMainThreadUtil.Instance.InvokeAndWait(() =>
-                {
-                    foreach (Vector3 coord in coords)
+                    MainThreadUtility.Instance.InvokeAndWait(() =>
                     {
-                        tree.CreateInstance(coord);
-                    }
-                });
-                coords.Clear();
+                        foreach (Vector3 coord in coords)
+                        {
+                            tree.CreateInstance(coord);
+                        }
+                    });
+                    coords.Clear();
+                }
             }
-        }
 
-        allTrees = null;
-        coords = null;
-    }
-    #endregion
+            allTrees = null;
+            coords = null;
+        }
+        #endregion
 
-    #region Private Methods
-    private bool CreateTree(int x, int y, Tree tree, ref List<Vector3> coords)
-    {
-        int blockX;
-        int blockY;
-        foreach (Vector2Int vector in tree.TrunkBlocks)
+        #region Private Methods
+        private bool CreateTree(int x, int y, Tree tree, ref List<Vector3> coords)
         {
-            blockX = x + (int)(vector.x - tree.Start.x);
-            blockY = y;
-            if (!IsValidForTree(blockX, blockY))
+            int blockX;
+            int blockY;
+            foreach (Vector2Int vector in tree.TrunkBlocks)
             {
-                return false;
+                blockX = x + (int)(vector.x - tree.Start.x);
+                blockY = y;
+                if (!IsValidForTree(blockX, blockY))
+                {
+                    return false;
+                }
+                if (IsLiquid(blockX, blockY))
+                {
+                    return false;
+                }
             }
-            if (IsLiquid(blockX, blockY))
+            foreach (Vector2Int vector in tree.TreeBlocks)
             {
-                return false;
+                blockX = x + (int)(vector.x - tree.Start.x);
+                blockY = y;
+                if (!IsValidForTree(blockX, blockY))
+                {
+                    return false;
+                }
+                if (IsLiquid(blockX, blockY))
+                {
+                    return false;
+                }
             }
+            coords.Add(new Vector3(x - tree.Start.x + tree.Offset.x, y));
+            return true;
         }
-        foreach (Vector2Int vector in tree.TreeBlocks)
-        {
-            blockX = x + (int)(vector.x - tree.Start.x);
-            blockY = y;
-            if (!IsValidForTree(blockX, blockY))
-            {
-                return false;
-            }
-            if (IsLiquid(blockX, blockY))
-            {
-                return false;
-            }
-        }
-        coords.Add(new Vector3(x - tree.Start.x + tree.Offset.x, y));
-        return true;
+        #endregion
     }
-    #endregion
 }

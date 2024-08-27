@@ -1,30 +1,33 @@
-public abstract class PresenterBase
+namespace SavageWorld.Runtime.MVP
 {
-    #region Fields
-    protected bool _isAvtive;
-    #endregion
-
-    #region Properties
-    public bool IsAvtive
+    public abstract class PresenterBase
     {
-        get
+        #region Fields
+        protected bool _isAvtive;
+        #endregion
+
+        #region Properties
+        public bool IsAvtive
         {
-            return _isAvtive;
+            get
+            {
+                return _isAvtive;
+            }
         }
+        #endregion
+
+        #region Events / Delegates
+
+        #endregion
+
+        #region Public Methods
+        public abstract void Enable();
+
+        public abstract void Disable();
+        #endregion
+
+        #region Private Methods
+
+        #endregion
     }
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Public Methods
-    public abstract void Enable();
-
-    public abstract void Disable();
-    #endregion
-
-    #region Private Methods
-
-    #endregion
 }

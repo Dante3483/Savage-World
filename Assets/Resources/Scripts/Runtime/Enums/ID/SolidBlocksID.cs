@@ -1,26 +1,29 @@
-public enum SolidBlocksID: ushort
+namespace SavageWorld.Runtime.Enums.Id
 {
-    Dirt = 0,
+    public enum SolidBlocksId : ushort
+    {
+        Dirt = 0,
 
-    OceanGrass = 1,
+        OceanGrass = 1,
 
-    DesertGrass = 2,
+        DesertGrass = 2,
 
-    SavannahGrass = 3,
+        SavannahGrass = 3,
 
-    MeadowGrass = 4,
+        MeadowGrass = 4,
 
-    ForestGrass = 5,
+        ForestGrass = 5,
 
-    SwampGrass = 6,
+        SwampGrass = 6,
 
-    ConiferousForestGrass = 7,
+        ConiferousForestGrass = 7,
 
-    Stone = 8,
+        Stone = 8,
 
-    Clay = 9,
+        Clay = 9,
 
-    IronOre = 10,
+        IronOre = 10,
 
-    CopperOre = 11,
+        CopperOre = 11,
+    }
 }

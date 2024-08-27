@@ -1,18 +1,21 @@
-public interface IWorldProcessingPhase
+namespace SavageWorld.Runtime.Terrain.WorldProcessingPhases
 {
-    #region Private fields
+    public interface IWorldProcessingPhase
+    {
+        #region Private fields
 
-    #endregion
+        #endregion
 
-    #region Public fields
-    public string Name { get; }
-    #endregion
+        #region Public fields
+        public string Name { get; }
+        #endregion
 
-    #region Properties
+        #region Properties
 
-    #endregion
+        #endregion
 
-    #region Methods
-    public void StartPhase();
-    #endregion
+        #region Methods
+        public void StartPhase();
+        #endregion
+    }
 }

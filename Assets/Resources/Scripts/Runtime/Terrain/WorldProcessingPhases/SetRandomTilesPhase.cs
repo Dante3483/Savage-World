@@ -1,33 +1,36 @@
-public class SetRandomTilesPhase : WorldProcessingPhaseBase
+namespace SavageWorld.Runtime.Terrain.WorldProcessingPhases
 {
-    #region Fields
-
-    #endregion
-
-    #region Properties
-    public override string Name => "Set random tiles";
-    #endregion
-
-    #region Events / Delegates
-
-    #endregion
-
-    #region Public Methods
-    public override void StartPhase()
+    public class SetRandomTilesPhase : WorldProcessingPhaseBase
     {
+        #region Fields
 
-        for (int x = 0; x < _terrainWidth; x++)
+        #endregion
+
+        #region Properties
+        public override string Name => "Set random tiles";
+        #endregion
+
+        #region Events / Delegates
+
+        #endregion
+
+        #region Public Methods
+        public override void StartPhase()
         {
-            for (int y = 0; y < _terrainHeight; y++)
+
+            for (int x = 0; x < _terrainWidth; x++)
             {
-                _worldDataManager.SetRandomBlockTile(x, y);
-                _worldDataManager.SetRandomWallTile(x, y);
+                for (int y = 0; y < _terrainHeight; y++)
+                {
+                    _worldDataManager.SetRandomBlockTile(x, y);
+                    _worldDataManager.SetRandomWallTile(x, y);
+                }
             }
         }
+        #endregion
+
+        #region Private Methods
+
+        #endregion
     }
-    #endregion
-
-    #region Private Methods
-
-    #endregion
 }

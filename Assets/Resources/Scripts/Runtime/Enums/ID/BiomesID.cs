@@ -1,31 +1,34 @@
-public enum BiomesID
+namespace SavageWorld.Runtime.Enums.Id
 {
-    NonBiome = 0,
+    public enum BiomesId
+    {
+        NonBiome = 0,
 
-    Ocean = 1,
+        Ocean = 1,
 
-    Desert = 2,
+        Desert = 2,
 
-    Savannah = 3,
+        Savannah = 3,
 
-    Meadow = 4,
+        Meadow = 4,
 
-    Forest = 5,
+        Forest = 5,
 
-    Swamp = 6,
+        Swamp = 6,
 
-    ConiferousForest = 7,
+        ConiferousForest = 7,
 
-    //Future biomes
-    Beach,
+        //Future biomes
+        Beach,
 
-    Jungle,
+        Jungle,
 
-    DeepOcean,
+        DeepOcean,
 
-    Taiga,
+        Taiga,
 
-    Mountains,
+        Mountains,
 
-    Skyland,
+        Skyland,
+    }
 }

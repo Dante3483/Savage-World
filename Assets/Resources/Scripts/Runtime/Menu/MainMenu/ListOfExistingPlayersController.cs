@@ -1,59 +1,65 @@
+using SavageWorld.Runtime.GameSession;
+using SavageWorld.Runtime.Menu.Elements;
+using SavageWorld.Runtime.Utilities.Others;
 using System;
 using UnityEngine;
 
-public class ListOfExistingPlayersController : Singleton<ListOfExistingPlayersController>
+namespace SavageWorld.Runtime.Menu
 {
-    #region Private fields
-    [SerializeField] private UIListOfExistingPlayers _listOfExistingPlayersUI;
-    #endregion
-
-    #region Public fields
-    public event Action OnPlayerCreated;
-    public event Action<string> OnPlayerSelected, OnPlayerDeleted;
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    private void Start()
+    public class ListOfExistingPlayersController : Singleton<ListOfExistingPlayersController>
     {
-        PrepareUI();
-    }
+        #region Private fields
+        [SerializeField] private UIListOfExistingPlayers _listOfExistingPlayersUI;
+        #endregion
 
-    private void PrepareUI()
-    {
-        _listOfExistingPlayersUI.OnCreatePlayer += HandleCreatePlayer;
-        _listOfExistingPlayersUI.OnPlayerSelect += HandlePlayerSelect;
-        _listOfExistingPlayersUI.OnPlayerDelete += HandlePlayerDelete;
-    }
+        #region Public fields
+        public event Action OnPlayerCreated;
+        public event Action<string> OnPlayerSelected, OnPlayerDeleted;
+        #endregion
 
-    public void UpdateUI()
-    {
-        _listOfExistingPlayersUI.InitializeUI(GameManager.Instance.PlayerNames.Count);
+        #region Properties
 
-        for (int i = 0; i < GameManager.Instance.PlayerNames.Count; i++)
+        #endregion
+
+        #region Methods
+        private void Start()
         {
-            _listOfExistingPlayersUI.UpdateCell(i, GameManager.Instance.PlayerNames[i]);
+            PrepareUI();
         }
-    }
 
-    private void HandleCreatePlayer()
-    {
-        OnPlayerCreated?.Invoke();
-        UpdateUI();
-    }
+        private void PrepareUI()
+        {
+            _listOfExistingPlayersUI.OnCreatePlayer += HandleCreatePlayer;
+            _listOfExistingPlayersUI.OnPlayerSelect += HandlePlayerSelect;
+            _listOfExistingPlayersUI.OnPlayerDelete += HandlePlayerDelete;
+        }
 
-    private void HandlePlayerSelect(string playerName)
-    {
-        OnPlayerSelected?.Invoke(playerName);
-    }
+        public void UpdateUI()
+        {
+            _listOfExistingPlayersUI.InitializeUI(GameManager.Instance.PlayerNames.Count);
 
-    private void HandlePlayerDelete(string playerName)
-    {
-        OnPlayerDeleted?.Invoke(playerName);
-        UpdateUI();
+            for (int i = 0; i < GameManager.Instance.PlayerNames.Count; i++)
+            {
+                _listOfExistingPlayersUI.UpdateCell(i, GameManager.Instance.PlayerNames[i]);
+            }
+        }
+
+        private void HandleCreatePlayer()
+        {
+            OnPlayerCreated?.Invoke();
+            UpdateUI();
+        }
+
+        private void HandlePlayerSelect(string playerName)
+        {
+            OnPlayerSelected?.Invoke(playerName);
+        }
+
+        private void HandlePlayerDelete(string playerName)
+        {
+            OnPlayerDeleted?.Invoke(playerName);
+            UpdateUI();
+        }
+        #endregion
     }
-    #endregion
 }

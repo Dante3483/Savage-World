@@ -1,54 +1,58 @@
+using SavageWorld.Runtime.Utilities.Raycasts;
 using UnityEngine;
 
-public class DropMerging : MonoBehaviour
+namespace SavageWorld.Runtime.Terrain.Drop
 {
-    #region Private fields
-    [SerializeField] private Drop _drop;
-    [SerializeField] private BoxCastUtil _mergeCheckBoxCast;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    private void Awake()
+    public class DropMerging : MonoBehaviour
     {
-        _drop = GetComponent<Drop>();
-        _mergeCheckBoxCast.Self = gameObject;
-    }
+        #region Private fields
+        [SerializeField] private Drop _drop;
+        [SerializeField] private BoxCastUtil _mergeCheckBoxCast;
+        #endregion
 
-    private void FixedUpdate()
-    {
-        if (!_drop.NetworkObject.IsOwner)
+        #region Public fields
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Methods
+        private void Awake()
         {
-            return;
-        }
-        Merge();
-    }
-
-    private void Merge()
-    {
-        if (!_drop.Item.IsStackable)
-        {
-            return;
+            _drop = GetComponent<Drop>();
+            _mergeCheckBoxCast.Self = gameObject;
         }
 
-        RaycastHit2D dropHit = _mergeCheckBoxCast.BoxCast(transform.position);
-        if (_mergeCheckBoxCast.Result)
+        private void FixedUpdate()
         {
-            Drop drop = dropHit.collider.GetComponent<Drop>();
-            if (drop.Item == _drop.Item)
+            if (!_drop.NetworkObject.IsOwner)
             {
-                _drop.Quantity += drop.Quantity;
-                drop.Quantity = 0;
-                Drop.SendUpdateMessage(_drop.NetworkObject.Id, _drop.Quantity);
+                return;
+            }
+            Merge();
+        }
+
+        private void Merge()
+        {
+            if (!_drop.Item.IsStackable)
+            {
+                return;
+            }
+
+            RaycastHit2D dropHit = _mergeCheckBoxCast.BoxCast(transform.position);
+            if (_mergeCheckBoxCast.Result)
+            {
+                Drop drop = dropHit.collider.GetComponent<Drop>();
+                if (drop.Item == _drop.Item)
+                {
+                    _drop.Quantity += drop.Quantity;
+                    drop.Quantity = 0;
+                    Drop.SendUpdateMessage(_drop.NetworkObject.Id, _drop.Quantity);
+                }
             }
         }
+        #endregion
     }
-    #endregion
 }

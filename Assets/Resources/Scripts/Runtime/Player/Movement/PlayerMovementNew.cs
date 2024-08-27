@@ -1,549 +1,556 @@
+using SavageWorld.Runtime.Animations;
+using SavageWorld.Runtime.GameSession;
+using SavageWorld.Runtime.Player.Main;
+using SavageWorld.Runtime.Utilities.Raycasts;
 using System;
 using System.Collections;
 using UnityEngine;
 
-public class PlayerMovementNew : MonoBehaviour
+namespace SavageWorld.Runtime.Player.Movement
 {
-    [Serializable]
-    private struct StateProperties
+    public class PlayerMovementNew : MonoBehaviour
     {
-        [SerializeField] private Vector2 _colliderSize;
-        [SerializeField] private Vector2 _colliderOffset;
-        [SerializeField] private float _wallInFrontCheckDistance;
-
-        public Vector2 ColliderSize
+        [Serializable]
+        private struct StateProperties
         {
-            get
+            [SerializeField] private Vector2 _colliderSize;
+            [SerializeField] private Vector2 _colliderOffset;
+            [SerializeField] private float _wallInFrontCheckDistance;
+
+            public Vector2 ColliderSize
             {
-                return _colliderSize;
+                get
+                {
+                    return _colliderSize;
+                }
+
+                set
+                {
+                    _colliderSize = value;
+                }
             }
 
-            set
+            public Vector2 ColliderOffset
             {
-                _colliderSize = value;
+                get
+                {
+                    return _colliderOffset;
+                }
+
+                set
+                {
+                    _colliderOffset = value;
+                }
+            }
+
+            public float WallInFrontCheckDistance
+            {
+                get
+                {
+                    return _wallInFrontCheckDistance;
+                }
+
+                set
+                {
+                    _wallInFrontCheckDistance = value;
+                }
             }
         }
 
-        public Vector2 ColliderOffset
-        {
-            get
-            {
-                return _colliderOffset;
-            }
+        #region Private fields
+        [Header("Main")]
+        [SerializeField]
+        private PlayerGameObject _player;
+        private PlayerStats _playerStats;
+        [SerializeField]
+        private PlayerFlags _playerFlags;
+        [SerializeField]
+        private PlayerAnimationsController _playerAnimationsController;
+        [SerializeField]
+        private Rigidbody2D _rigidbody;
+        [SerializeField]
+        private BoxCollider2D _boxCollider;
 
-            set
-            {
-                _colliderOffset = value;
-            }
-        }
+        [Header("Movement")]
+        [SerializeField]
+        private float _movementDirection;
+        [SerializeField]
+        private float _slideDirection;
+        [SerializeField]
+        private float _slidingCooldown;
 
-        public float WallInFrontCheckDistance
-        {
-            get
-            {
-                return _wallInFrontCheckDistance;
-            }
+        [Header("State properties")]
+        [SerializeField]
+        private StateProperties _currentState;
+        [SerializeField]
+        private StateProperties _fullHeightState;
+        [SerializeField]
+        private StateProperties _crouchState;
+        [SerializeField]
+        private StateProperties _slideState;
 
-            set
-            {
-                _wallInFrontCheckDistance = value;
-            }
-        }
-    }
+        [Header("Layers")]
+        [SerializeField]
+        private LayerMask _groundLayer;
 
-    #region Private fields
-    [Header("Main")]
-    [SerializeField]
-    private Player _player;
-    private PlayerStats _playerStats;
-    [SerializeField]
-    private PlayerFlags _playerFlags;
-    [SerializeField]
-    private PlayerAnimationsController _playerAnimationsController;
-    [SerializeField]
-    private Rigidbody2D _rigidbody;
-    [SerializeField]
-    private BoxCollider2D _boxCollider;
+        [Header("Ground check")]
+        [SerializeField]
+        private BoxCastUtil _groundCheckBoxCast;
 
-    [Header("Movement")]
-    [SerializeField]
-    private float _movementDirection;
-    [SerializeField]
-    private float _slideDirection;
-    [SerializeField]
-    private float _slidingCooldown;
+        [Header("Wall check")]
+        [SerializeField]
+        private BoxCastUtil _wallCheckBoxCast;
 
-    [Header("State properties")]
-    [SerializeField]
-    private StateProperties _currentState;
-    [SerializeField]
-    private StateProperties _fullHeightState;
-    [SerializeField]
-    private StateProperties _crouchState;
-    [SerializeField]
-    private StateProperties _slideState;
+        [Header("Ceiling check")]
+        [SerializeField]
+        private BoxCastUtil _ceilingCheckBoxCast;
 
-    [Header("Layers")]
-    [SerializeField]
-    private LayerMask _groundLayer;
+        [Header("Slope check")]
+        [SerializeField]
+        private float _slopeCheckDistanceLeft;
+        [SerializeField]
+        private float _slopeCheckDistanceRight;
+        [SerializeField]
+        private float _slopeAngle;
+        [SerializeField]
+        private Vector2 _slopeNormalPerpendicular;
+        [SerializeField]
+        private PhysicsMaterial2D _noFriction;
+        [SerializeField]
+        private PhysicsMaterial2D _fullFriction;
+        private RaycastUtil _slopeCheckRaycast;
 
-    [Header("Ground check")]
-    [SerializeField]
-    private BoxCastUtil _groundCheckBoxCast;
-
-    [Header("Wall check")]
-    [SerializeField]
-    private BoxCastUtil _wallCheckBoxCast;
-
-    [Header("Ceiling check")]
-    [SerializeField]
-    private BoxCastUtil _ceilingCheckBoxCast;
-
-    [Header("Slope check")]
-    [SerializeField]
-    private float _slopeCheckDistanceLeft;
-    [SerializeField]
-    private float _slopeCheckDistanceRight;
-    [SerializeField]
-    private float _slopeAngle;
-    [SerializeField]
-    private Vector2 _slopeNormalPerpendicular;
-    [SerializeField]
-    private PhysicsMaterial2D _noFriction;
-    [SerializeField]
-    private PhysicsMaterial2D _fullFriction;
-    private RaycastUtil _slopeCheckRaycast;
-
-    private Coroutine _waitForMaxSlidingTime;
-    #endregion
-
-    #region Public fields
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Methods
-    private void Awake()
-    {
-        #region Initialization
-        if (_player is null)
-        {
-            _player = GetComponent<Player>();
-        }
-        _playerStats = _player.Stats;
-        _playerFlags = GetComponent<PlayerFlags>();
-        _playerAnimationsController = GetComponent<PlayerAnimationsController>();
-        _rigidbody = GetComponent<Rigidbody2D>();
-        _boxCollider = GetComponent<BoxCollider2D>();
-
-        _playerFlags.IsFaceToTheRight = true;
-        //_isJumpCooldownComplete = true;
-        //_isSlidingBlocked = false;
+        private Coroutine _waitForMaxSlidingTime;
         #endregion
-    }
 
-    private void FixedUpdate()
-    {
-        GroundCheck();
-        SlopeCheck();
-        RiseCheck();
-        FallCheck();
-        WallInFrontCheck();
-        CeilingCheck();
-        SlideCheck();
+        #region Public fields
 
-        _playerFlags.ChangeBlockFlagsState();
+        #endregion
 
-        Move();
+        #region Properties
 
-        SetFriction();
-        SetVelocity();
-        SetColliderSize();
-    }
+        #endregion
 
-    private void Update()
-    {
-        ReadMove();
-        ReadJump();
-        ReadRun();
-        ReadCrouch();
-        ReadSlide();
-
-        StopMovement();
-
-        _playerAnimationsController.SelectAnimation();
-    }
-
-    #region Read movement
-    private void ReadMove()
-    {
-        bool keyA = !GameManager.Instance.IsInputTextInFocus && Input.GetKey(KeyCode.A);
-        bool keyD = !GameManager.Instance.IsInputTextInFocus && Input.GetKey(KeyCode.D);
-
-        if (keyA)
+        #region Methods
+        private void Awake()
         {
-            _movementDirection = -1;
-            if (_playerFlags.IsFaceToTheRight)
+            #region Initialization
+            if (_player is null)
             {
-                Flip();
+                _player = GetComponent<PlayerGameObject>();
             }
+            _playerStats = _player.Stats;
+            _playerFlags = GetComponent<PlayerFlags>();
+            _playerAnimationsController = GetComponent<PlayerAnimationsController>();
+            _rigidbody = GetComponent<Rigidbody2D>();
+            _boxCollider = GetComponent<BoxCollider2D>();
+
+            _playerFlags.IsFaceToTheRight = true;
+            //_isJumpCooldownComplete = true;
+            //_isSlidingBlocked = false;
+            #endregion
         }
-        else if (keyD)
+
+        private void FixedUpdate()
         {
-            _movementDirection = 1;
-            if (!_playerFlags.IsFaceToTheRight)
+            GroundCheck();
+            SlopeCheck();
+            RiseCheck();
+            FallCheck();
+            WallInFrontCheck();
+            CeilingCheck();
+            SlideCheck();
+
+            _playerFlags.ChangeBlockFlagsState();
+
+            Move();
+
+            SetFriction();
+            SetVelocity();
+            SetColliderSize();
+        }
+
+        private void Update()
+        {
+            ReadMove();
+            ReadJump();
+            ReadRun();
+            ReadCrouch();
+            ReadSlide();
+
+            StopMovement();
+
+            _playerAnimationsController.SelectAnimation();
+        }
+
+        #region Read movement
+        private void ReadMove()
+        {
+            bool keyA = !GameManager.Instance.IsInputTextInFocus && Input.GetKey(KeyCode.A);
+            bool keyD = !GameManager.Instance.IsInputTextInFocus && Input.GetKey(KeyCode.D);
+
+            if (keyA)
             {
-                Flip();
+                _movementDirection = -1;
+                if (_playerFlags.IsFaceToTheRight)
+                {
+                    Flip();
+                }
             }
-        }
-        else
-        {
-            _movementDirection = 0;
-        }
-
-        _playerFlags.IsIdle = !keyA && !keyD;
-        _playerFlags.IsWalk = keyA || keyD;
-    }
-
-    private void ReadJump()
-    {
-        if (_playerFlags.IsJumpBlocked)
-        {
-            return;
-        }
-
-        if (_playerFlags.IsGrounded && !GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(KeyCode.Space))
-        {
-            _playerFlags.IsRise = true;
-            _rigidbody.velocity = Vector2.up * _playerStats.JumpForce;
-        }
-
-        if (!GameManager.Instance.IsInputTextInFocus && Input.GetKeyUp(KeyCode.Space) && _rigidbody.velocity.y > 0)
-        {
-            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.y * 0.5f);
-        }
-    }
-
-    private void ReadRun()
-    {
-        if (_playerFlags.IsWalk && !_playerFlags.IsWallInFront && !_playerFlags.IsCrouch && !GameManager.Instance.IsInputTextInFocus && Input.GetKey(KeyCode.LeftShift))
-        {
-            _playerFlags.IsWalk = false;
-            _playerFlags.IsRun = true;
-        }
-        else
-        {
-            _playerFlags.IsRun = false;
-        }
-    }
-
-    private void ReadCrouch()
-    {
-        if (!GameManager.Instance.IsInputTextInFocus && Input.GetKey(KeyCode.LeftControl))
-        {
-            _playerFlags.IsCrouch = true;
-        }
-        else
-        {
-            if (_playerFlags.IsTouchCeiling)
+            else if (keyD)
             {
-                return;
+                _movementDirection = 1;
+                if (!_playerFlags.IsFaceToTheRight)
+                {
+                    Flip();
+                }
             }
             else
             {
-                _playerFlags.IsCrouch = false;
+                _movementDirection = 0;
+            }
+
+            _playerFlags.IsIdle = !keyA && !keyD;
+            _playerFlags.IsWalk = keyA || keyD;
+        }
+
+        private void ReadJump()
+        {
+            if (_playerFlags.IsJumpBlocked)
+            {
+                return;
+            }
+
+            if (_playerFlags.IsGrounded && !GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(KeyCode.Space))
+            {
+                _playerFlags.IsRise = true;
+                _rigidbody.velocity = Vector2.up * _playerStats.JumpForce;
+            }
+
+            if (!GameManager.Instance.IsInputTextInFocus && Input.GetKeyUp(KeyCode.Space) && _rigidbody.velocity.y > 0)
+            {
+                _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.y * 0.5f);
             }
         }
-    }
 
-    private void ReadSlide()
-    {
-        if (_playerFlags.IsRun && !_playerFlags.IsRise && !_playerFlags.IsFall && !_playerFlags.IsSlide && !GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(KeyCode.C))
+        private void ReadRun()
         {
-            _playerFlags.IsStartSlide = true;
-            _playerFlags.IsCancelSlideBlocked = true;
-            StartCoroutine(WaitForMinSlideTime());
-            _waitForMaxSlidingTime = StartCoroutine(WaitForMaxSlideTime());
-            _slideDirection = _movementDirection;
+            if (_playerFlags.IsWalk && !_playerFlags.IsWallInFront && !_playerFlags.IsCrouch && !GameManager.Instance.IsInputTextInFocus && Input.GetKey(KeyCode.LeftShift))
+            {
+                _playerFlags.IsWalk = false;
+                _playerFlags.IsRun = true;
+            }
+            else
+            {
+                _playerFlags.IsRun = false;
+            }
         }
 
-        if (_playerFlags.IsSlide && !GameManager.Instance.IsInputTextInFocus && !Input.GetKey(KeyCode.C) && !_playerFlags.IsCancelSlideBlocked)
+        private void ReadCrouch()
         {
-            _playerFlags.IsEndSlide = true;
-            StopCoroutine(_waitForMaxSlidingTime);
-        }
-    }
-    #endregion
-
-    #region Apply movement
-    private void Move()
-    {
-        if (_playerFlags.IsMovementBlocked)
-        {
-            _rigidbody.velocity = Vector2.zero;
-            return;
-        }
-
-        float xSpeed = _playerStats.WalkingSpeed;
-        if (_playerFlags.IsRun)
-        {
-            xSpeed = _playerStats.RunningSpeed;
-        }
-        if (_playerFlags.IsCrouch)
-        {
-            xSpeed = _playerStats.CrouchWalkingSpeed;
-        }
-        if (_playerFlags.IsSlide)
-        {
-            xSpeed = _playerStats.SlidingSpeed;
+            if (!GameManager.Instance.IsInputTextInFocus && Input.GetKey(KeyCode.LeftControl))
+            {
+                _playerFlags.IsCrouch = true;
+            }
+            else
+            {
+                if (_playerFlags.IsTouchCeiling)
+                {
+                    return;
+                }
+                else
+                {
+                    _playerFlags.IsCrouch = false;
+                }
+            }
         }
 
-        float currentMovementDirection = _playerFlags.IsSlide ? _slideDirection : _movementDirection;
-
-        if (_playerFlags.IsGrounded && !_playerFlags.IsOnSlope && !_playerFlags.IsRise && _rigidbody.velocity.y >= -0.05f)
+        private void ReadSlide()
         {
-            _rigidbody.velocity = new Vector2(xSpeed * currentMovementDirection, 0.0f);
+            if (_playerFlags.IsRun && !_playerFlags.IsRise && !_playerFlags.IsFall && !_playerFlags.IsSlide && !GameManager.Instance.IsInputTextInFocus && Input.GetKeyDown(KeyCode.C))
+            {
+                _playerFlags.IsStartSlide = true;
+                _playerFlags.IsCancelSlideBlocked = true;
+                StartCoroutine(WaitForMinSlideTime());
+                _waitForMaxSlidingTime = StartCoroutine(WaitForMaxSlideTime());
+                _slideDirection = _movementDirection;
+            }
+
+            if (_playerFlags.IsSlide && !GameManager.Instance.IsInputTextInFocus && !Input.GetKey(KeyCode.C) && !_playerFlags.IsCancelSlideBlocked)
+            {
+                _playerFlags.IsEndSlide = true;
+                StopCoroutine(_waitForMaxSlidingTime);
+            }
         }
-        else if (_playerFlags.IsGrounded && _playerFlags.IsOnSlope && !_playerFlags.IsRise)
+        #endregion
+
+        #region Apply movement
+        private void Move()
         {
-            _rigidbody.velocity = new Vector2(xSpeed * _slopeNormalPerpendicular.x * -currentMovementDirection, xSpeed * _slopeNormalPerpendicular.y * -currentMovementDirection);
+            if (_playerFlags.IsMovementBlocked)
+            {
+                _rigidbody.velocity = Vector2.zero;
+                return;
+            }
+
+            float xSpeed = _playerStats.WalkingSpeed;
+            if (_playerFlags.IsRun)
+            {
+                xSpeed = _playerStats.RunningSpeed;
+            }
+            if (_playerFlags.IsCrouch)
+            {
+                xSpeed = _playerStats.CrouchWalkingSpeed;
+            }
+            if (_playerFlags.IsSlide)
+            {
+                xSpeed = _playerStats.SlidingSpeed;
+            }
+
+            float currentMovementDirection = _playerFlags.IsSlide ? _slideDirection : _movementDirection;
+
+            if (_playerFlags.IsGrounded && !_playerFlags.IsOnSlope && !_playerFlags.IsRise && _rigidbody.velocity.y >= -0.05f)
+            {
+                _rigidbody.velocity = new Vector2(xSpeed * currentMovementDirection, 0.0f);
+            }
+            else if (_playerFlags.IsGrounded && _playerFlags.IsOnSlope && !_playerFlags.IsRise)
+            {
+                _rigidbody.velocity = new Vector2(xSpeed * _slopeNormalPerpendicular.x * -currentMovementDirection, xSpeed * _slopeNormalPerpendicular.y * -currentMovementDirection);
+            }
+            else if (!_playerFlags.IsGrounded)
+            {
+                _rigidbody.velocity = new Vector2(xSpeed * currentMovementDirection, _rigidbody.velocity.y);
+            }
         }
-        else if (!_playerFlags.IsGrounded)
+        #endregion
+
+        #region Slide
+        private IEnumerator WaitForMinSlideTime()
         {
-            _rigidbody.velocity = new Vector2(xSpeed * currentMovementDirection, _rigidbody.velocity.y);
+            yield return new WaitForSeconds(_playerStats.SlidingMinTime);
+            _playerFlags.IsCancelSlideBlocked = false;
         }
-    }
-    #endregion
 
-    #region Slide
-    private IEnumerator WaitForMinSlideTime()
-    {
-        yield return new WaitForSeconds(_playerStats.SlidingMinTime);
-        _playerFlags.IsCancelSlideBlocked = false;
-    }
-
-    private IEnumerator WaitForMaxSlideTime()
-    {
-        yield return new WaitForSeconds(_playerStats.SlidingMaxTime);
-        if (_playerFlags.IsSlide)
+        private IEnumerator WaitForMaxSlideTime()
         {
-            _playerFlags.IsEndSlide = true;
+            yield return new WaitForSeconds(_playerStats.SlidingMaxTime);
+            if (_playerFlags.IsSlide)
+            {
+                _playerFlags.IsEndSlide = true;
+            }
         }
-    }
 
-    private void StartSlideComplete()
-    {
-        _playerFlags.IsStartSlide = false;
-        _playerFlags.IsSlide = true;
-    }
-
-    private void TryStandUp()
-    {
-        if (_playerFlags.IsTouchCeiling)
+        private void StartSlideComplete()
         {
-            EndSlideComplete();
-            _playerFlags.IsCrouch = true;
-            _playerAnimationsController.SelectAnimation();
+            _playerFlags.IsStartSlide = false;
+            _playerFlags.IsSlide = true;
         }
-    }
 
-    private void EndSlideComplete()
-    {
-        _playerFlags.IsEndSlide = false;
-        StopSlide();
-    }
-
-    private void StopSlide()
-    {
-        _playerFlags.IsSlide = false;
-        _slideDirection = 0;
-    }
-    #endregion
-
-    #region Checks
-    private void GroundCheck()
-    {
-        Vector3 origin = _boxCollider.bounds.center;
-        origin.y -= _boxCollider.bounds.extents.y;
-
-        _groundCheckBoxCast.BoxCast(origin);
-        _playerFlags.IsGrounded = _groundCheckBoxCast.Result;
-    }
-
-    private void RiseCheck()
-    {
-        if (_rigidbody.velocity.y <= 0)
+        private void TryStandUp()
         {
-            _playerFlags.IsRise = false;
+            if (_playerFlags.IsTouchCeiling)
+            {
+                EndSlideComplete();
+                _playerFlags.IsCrouch = true;
+                _playerAnimationsController.SelectAnimation();
+            }
         }
-    }
 
-    private void FallCheck()
-    {
-        _playerFlags.IsFall = _rigidbody.velocity.y < 0.1f && !_playerFlags.IsGrounded && !_playerFlags.IsOnSlope;
-        if (_playerFlags.IsFall)
+        private void EndSlideComplete()
         {
-            _playerFlags.IsRise = false;
+            _playerFlags.IsEndSlide = false;
             StopSlide();
         }
+
+        private void StopSlide()
+        {
+            _playerFlags.IsSlide = false;
+            _slideDirection = 0;
+        }
+        #endregion
+
+        #region Checks
+        private void GroundCheck()
+        {
+            Vector3 origin = _boxCollider.bounds.center;
+            origin.y -= _boxCollider.bounds.extents.y;
+
+            _groundCheckBoxCast.BoxCast(origin);
+            _playerFlags.IsGrounded = _groundCheckBoxCast.Result;
+        }
+
+        private void RiseCheck()
+        {
+            if (_rigidbody.velocity.y <= 0)
+            {
+                _playerFlags.IsRise = false;
+            }
+        }
+
+        private void FallCheck()
+        {
+            _playerFlags.IsFall = _rigidbody.velocity.y < 0.1f && !_playerFlags.IsGrounded && !_playerFlags.IsOnSlope;
+            if (_playerFlags.IsFall)
+            {
+                _playerFlags.IsRise = false;
+                StopSlide();
+            }
+        }
+
+        private void SlopeCheck()
+        {
+            if (_playerFlags.IsSlopeCheckBlocked)
+            {
+                _playerFlags.IsOnSlope = false;
+                return;
+            }
+
+            Vector2 checkPosistion = _boxCollider.bounds.center - new Vector3(0, _boxCollider.bounds.extents.y);
+
+            RaycastHit2D slopeHitFront = _slopeCheckRaycast.Raycast(
+                checkPosistion,
+                transform.right,
+                _slopeCheckDistanceRight,
+                _groundLayer,
+                Color.cyan,
+                Color.red);
+
+            RaycastHit2D slopeHitBack = _slopeCheckRaycast.Raycast(
+                checkPosistion,
+                -transform.right,
+                _slopeCheckDistanceLeft,
+                _groundLayer,
+                Color.cyan,
+                Color.red);
+
+            if (slopeHitFront)
+            {
+                _slopeAngle = Vector2.Angle(slopeHitFront.normal, Vector2.up);
+                _slopeNormalPerpendicular = Vector2.Perpendicular(slopeHitFront.normal).normalized;
+
+                //if (_playerDebugger.EnableSlopeCheckVizualization)
+                //{
+                //    Debug.DrawRay(slopeHitFront.point, _slopeNormalPerpendicular, Color.blue);
+                //    Debug.DrawRay(slopeHitFront.point, slopeHitFront.normal, Color.red);
+                //}
+            }
+            else if (slopeHitBack)
+            {
+                _slopeAngle = Vector2.Angle(slopeHitBack.normal, Vector2.up);
+                _slopeNormalPerpendicular = Vector2.Perpendicular(slopeHitBack.normal).normalized;
+
+                //if (_playerDebugger.EnableSlopeCheckVizualization)
+                //{
+                //    Debug.DrawRay(slopeHitBack.point, _slopeNormalPerpendicular, Color.blue);
+                //    Debug.DrawRay(slopeHitBack.point, slopeHitBack.normal, Color.red);
+                //}
+            }
+            else
+            {
+                _slopeAngle = 0.0f;
+            }
+
+            _playerFlags.IsOnSlope = _slopeAngle != 0f && _slopeAngle != 90;
+
+            if (_playerFlags.IsOnSlope)
+            {
+                _playerFlags.IsGrounded = true;
+            }
+        }
+
+        private void WallInFrontCheck()
+        {
+            Vector3 origin = _boxCollider.bounds.center;
+            origin.y += _boxCollider.bounds.extents.y;
+            origin.x += _boxCollider.bounds.extents.x * transform.right.x;
+            _wallCheckBoxCast.Distance = _currentState.WallInFrontCheckDistance;
+
+            _wallCheckBoxCast.BoxCast(origin);
+            _playerFlags.IsWallInFront = _wallCheckBoxCast.Result;
+        }
+
+        private void CeilingCheck()
+        {
+            Vector3 origin = _boxCollider.bounds.center;
+            origin.y += _boxCollider.bounds.extents.y;
+
+            _ceilingCheckBoxCast.BoxCast(origin);
+            _playerFlags.IsTouchCeiling = _ceilingCheckBoxCast.Result;
+        }
+
+        private void SlideCheck()
+        {
+            if (_playerFlags.IsSlide && _rigidbody.velocity.y > 0f)
+            {
+                _playerFlags.IsEndSlide = true;
+            }
+        }
+        #endregion
+
+        #region Others
+        private void Flip()
+        {
+            if (_playerFlags.IsFlipBlocked)
+            {
+                return;
+            }
+
+            _playerFlags.IsFaceToTheRight = !_playerFlags.IsFaceToTheRight;
+            transform.Rotate(0.0f, 180.0f, 0.0f);
+        }
+
+        private void SetFriction()
+        {
+            if (_movementDirection == 0 && _slideDirection == 0 || _playerFlags.IsMovementBlocked)
+            {
+                _rigidbody.sharedMaterial = _fullFriction;
+            }
+            else
+            {
+                _rigidbody.sharedMaterial = _noFriction;
+            }
+        }
+
+        private void SetVelocity()
+        {
+            if (_rigidbody.velocity.y > 0 && _playerFlags.IsOnSlope && !_playerFlags.IsRise)
+            {
+                _rigidbody.velocity *= 1.5f;
+            }
+        }
+
+        private void SetColliderSize()
+        {
+            _currentState = _fullHeightState;
+            if (_playerFlags.IsCrouch)
+            {
+                _currentState = _crouchState;
+            }
+
+            if (_playerFlags.IsSlide)
+            {
+                _currentState = _slideState;
+            }
+            _boxCollider.size = _currentState.ColliderSize;
+            _boxCollider.offset = _currentState.ColliderOffset;
+        }
+
+        private void StopMovement()
+        {
+            if (_playerFlags.IsWallInFront)
+            {
+                _playerFlags.IsWalk = false;
+                _playerFlags.IsRun = false;
+                //if (_playerFlags.IsSlide)
+                //{
+                //    _playerFlags.IsEndSlide = true;
+                //}
+                _playerFlags.IsIdle = true;
+                _movementDirection = 0;
+            }
+        }
+        #endregion
+
+        #endregion
     }
-
-    private void SlopeCheck()
-    {
-        if (_playerFlags.IsSlopeCheckBlocked)
-        {
-            _playerFlags.IsOnSlope = false;
-            return;
-        }
-
-        Vector2 checkPosistion = _boxCollider.bounds.center - new Vector3(0, _boxCollider.bounds.extents.y);
-
-        RaycastHit2D slopeHitFront = _slopeCheckRaycast.Raycast(
-            checkPosistion,
-            transform.right,
-            _slopeCheckDistanceRight,
-            _groundLayer,
-            Color.cyan,
-            Color.red);
-
-        RaycastHit2D slopeHitBack = _slopeCheckRaycast.Raycast(
-            checkPosistion,
-            -transform.right,
-            _slopeCheckDistanceLeft,
-            _groundLayer,
-            Color.cyan,
-            Color.red);
-
-        if (slopeHitFront)
-        {
-            _slopeAngle = Vector2.Angle(slopeHitFront.normal, Vector2.up);
-            _slopeNormalPerpendicular = Vector2.Perpendicular(slopeHitFront.normal).normalized;
-
-            //if (_playerDebugger.EnableSlopeCheckVizualization)
-            //{
-            //    Debug.DrawRay(slopeHitFront.point, _slopeNormalPerpendicular, Color.blue);
-            //    Debug.DrawRay(slopeHitFront.point, slopeHitFront.normal, Color.red);
-            //}
-        }
-        else if (slopeHitBack)
-        {
-            _slopeAngle = Vector2.Angle(slopeHitBack.normal, Vector2.up);
-            _slopeNormalPerpendicular = Vector2.Perpendicular(slopeHitBack.normal).normalized;
-
-            //if (_playerDebugger.EnableSlopeCheckVizualization)
-            //{
-            //    Debug.DrawRay(slopeHitBack.point, _slopeNormalPerpendicular, Color.blue);
-            //    Debug.DrawRay(slopeHitBack.point, slopeHitBack.normal, Color.red);
-            //}
-        }
-        else
-        {
-            _slopeAngle = 0.0f;
-        }
-
-        _playerFlags.IsOnSlope = _slopeAngle != 0f && _slopeAngle != 90;
-
-        if (_playerFlags.IsOnSlope)
-        {
-            _playerFlags.IsGrounded = true;
-        }
-    }
-
-    private void WallInFrontCheck()
-    {
-        Vector3 origin = _boxCollider.bounds.center;
-        origin.y += _boxCollider.bounds.extents.y;
-        origin.x += _boxCollider.bounds.extents.x * transform.right.x;
-        _wallCheckBoxCast.Distance = _currentState.WallInFrontCheckDistance;
-
-        _wallCheckBoxCast.BoxCast(origin);
-        _playerFlags.IsWallInFront = _wallCheckBoxCast.Result;
-    }
-
-    private void CeilingCheck()
-    {
-        Vector3 origin = _boxCollider.bounds.center;
-        origin.y += _boxCollider.bounds.extents.y;
-
-        _ceilingCheckBoxCast.BoxCast(origin);
-        _playerFlags.IsTouchCeiling = _ceilingCheckBoxCast.Result;
-    }
-
-    private void SlideCheck()
-    {
-        if (_playerFlags.IsSlide && _rigidbody.velocity.y > 0f)
-        {
-            _playerFlags.IsEndSlide = true;
-        }
-    }
-    #endregion
-
-    #region Others
-    private void Flip()
-    {
-        if (_playerFlags.IsFlipBlocked)
-        {
-            return;
-        }
-
-        _playerFlags.IsFaceToTheRight = !_playerFlags.IsFaceToTheRight;
-        transform.Rotate(0.0f, 180.0f, 0.0f);
-    }
-
-    private void SetFriction()
-    {
-        if ((_movementDirection == 0 && _slideDirection == 0) || _playerFlags.IsMovementBlocked)
-        {
-            _rigidbody.sharedMaterial = _fullFriction;
-        }
-        else
-        {
-            _rigidbody.sharedMaterial = _noFriction;
-        }
-    }
-
-    private void SetVelocity()
-    {
-        if (_rigidbody.velocity.y > 0 && _playerFlags.IsOnSlope && !_playerFlags.IsRise)
-        {
-            _rigidbody.velocity *= 1.5f;
-        }
-    }
-
-    private void SetColliderSize()
-    {
-        _currentState = _fullHeightState;
-        if (_playerFlags.IsCrouch)
-        {
-            _currentState = _crouchState;
-        }
-
-        if (_playerFlags.IsSlide)
-        {
-            _currentState = _slideState;
-        }
-        _boxCollider.size = _currentState.ColliderSize;
-        _boxCollider.offset = _currentState.ColliderOffset;
-    }
-
-    private void StopMovement()
-    {
-        if (_playerFlags.IsWallInFront)
-        {
-            _playerFlags.IsWalk = false;
-            _playerFlags.IsRun = false;
-            //if (_playerFlags.IsSlide)
-            //{
-            //    _playerFlags.IsEndSlide = true;
-            //}
-            _playerFlags.IsIdle = true;
-            _movementDirection = 0;
-        }
-    }
-    #endregion
-
-    #endregion
 }

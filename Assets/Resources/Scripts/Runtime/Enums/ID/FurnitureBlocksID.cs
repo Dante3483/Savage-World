@@ -1,4 +1,7 @@
-public enum FurnitureBlocksID : ushort
+namespace SavageWorld.Runtime.Enums.Id
 {
-    Torch = 0,
+    public enum FurnitureBlocksId : ushort
+    {
+        Torch = 0,
+    }
 }
