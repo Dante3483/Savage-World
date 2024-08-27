@@ -1,4 +1,3 @@
-using SavageWorld.Editor.VisualElements;
 using SavageWorld.Runtime.Attributes;
 using UnityEditor;
 using UnityEngine.UIElements;

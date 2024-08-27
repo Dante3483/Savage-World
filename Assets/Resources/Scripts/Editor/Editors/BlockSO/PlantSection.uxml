@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
     <ui:VisualElement name="biome" style="flex-direction: row; margin-bottom: 5px; height: 20px;">
         <ui:Toggle label="Is Biome Specific" name="is-biome-specific" binding-path="_isBiomeSpecific" style="flex-direction: row; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; width: 50%;" />
-        <ui:EnumField type="BiomesID, SavageWorld.Runtime" name="biome-id" binding-path="_biomeId" style="width: 50%; flex-direction: row; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+        <ui:EnumField type="SavageWorld.Runtime.Enums.Id.BiomesId, SavageWorld.Runtime" name="biome-id" binding-path="_biomeId" style="width: 50%; flex-direction: row; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
     </ui:VisualElement>
     <ui:VisualElement name="solid-direction" style="flex-direction: row; margin-bottom: 5px; height: 20px;">
         <ui:RadioButton label="Is Top Block Solid" name="is-top-block-solid" binding-path="_isTopBlockSolid" style="flex-direction: row; width: 50%; flex-shrink: 1; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />

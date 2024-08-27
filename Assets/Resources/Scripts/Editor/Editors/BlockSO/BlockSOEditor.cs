@@ -1,10 +1,8 @@
-using SavageWorld.Editor.VisualElements;
 using SavageWorld.Runtime.Terrain.Blocks;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using ObjectPreview = SavageWorld.Editor.VisualElements.ObjectPreview;
 
 namespace SavageWorld.Editor.Editors
 {

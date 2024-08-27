@@ -1,3 +1,3 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <ui:EnumField label="Type" type="BlockTypes, SavageWorld.Runtime" name="type" binding-path="_type" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; height: 20px;" />
+    <ui:EnumField label="Type" type="SavageWorld.Runtime.Enums.Types.BlockTypes, SavageWorld.Runtime" name="type" binding-path="_type" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; height: 20px;" />
 </ui:UXML>

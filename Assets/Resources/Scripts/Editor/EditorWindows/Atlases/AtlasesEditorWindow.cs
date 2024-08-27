@@ -1,4 +1,3 @@
-using SavageWorld.Editor.VisualElements;
 using SavageWorld.Runtime.Atlases;
 using SavageWorld.Runtime.Terrain.Blocks;
 using SavageWorld.Runtime.Terrain.Objects;

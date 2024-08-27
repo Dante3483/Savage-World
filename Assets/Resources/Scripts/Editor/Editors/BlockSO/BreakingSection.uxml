@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <uie:ObjectField label="Drop" name="drop" binding-path="_drop" type="Items.ItemSO, SavageWorld.Runtime" allow-scene-objects="false" style="margin-bottom: 5px; margin-top: 0; margin-right: 0; margin-left: 0; height: 20px;" />
+    <uie:ObjectField label="Drop" name="drop" binding-path="_drop" type="SavageWorld.Runtime.Player.Inventory.Items.ItemSO, SavageWorld.Runtime" allow-scene-objects="false" style="margin-bottom: 5px; margin-top: 0; margin-right: 0; margin-left: 0; height: 20px;" />
     <ui:FloatField label="Damage To Break" value="42,2" name="damage-to-break" binding-path="_damageToBreak" style="margin-bottom: 5px; margin-top: 0; margin-right: 0; margin-left: 0; height: 20px;" />
     <ui:Toggle label="Is Waterproof" name="is-waterproof" binding-path="_isWaterproof" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; height: 20px;" />
 </ui:UXML>
