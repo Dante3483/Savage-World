@@ -149,6 +149,7 @@ namespace SavageWorld.Runtime.Network.Messages
             {
                 { NetworkMessageTypes.SendClientId, new SendClientIdMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.SendChunkData, new SendChunkDataMessage(_binaryWriter, _binaryReader) },
+                { NetworkMessageTypes.SendTime, new SendTimeMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.Disconnect, new DisconnectMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.CreatePlayer, new CreatePlayerMessage(_binaryWriter, _binaryReader) },
                 { NetworkMessageTypes.CreateEnvironment, new CreateEnvironmentMessage(_binaryWriter, _binaryReader) },

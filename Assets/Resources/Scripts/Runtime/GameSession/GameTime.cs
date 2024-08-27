@@ -1,22 +1,32 @@
-using System.Collections;
+using SavageWorld.Runtime.Utilities.Others;
 using UnityEngine;
 
 namespace SavageWorld.Runtime.GameSession
 {
-    public class GameTime : MonoBehaviour
+    public class GameTime : Singleton<GameTime>
     {
-        #region Private fields
-        [SerializeField] private byte _minutes;
-        [SerializeField] private byte _hours;
-        [SerializeField] private float _dayLightValue;
-        [SerializeField] private Color _currentColor;
-        [SerializeField] private Color _dayColor;
-        [SerializeField] private Color _eveningColor;
-        [SerializeField] private Color _nightColor;
-        #endregion
-
-        #region Public fields
-        public static GameTime Instance;
+        #region Fields
+        [SerializeField]
+        private float _cooldown;
+        [SerializeField]
+        private ulong _globalTime;
+        [SerializeField]
+        private int _days;
+        [SerializeField]
+        private int _minutes;
+        [SerializeField]
+        private int _hours;
+        [SerializeField]
+        private float _dayLightValue;
+        [SerializeField]
+        private Color _currentColor;
+        [SerializeField]
+        private Color _dayColor;
+        [SerializeField]
+        private Color _eveningColor;
+        [SerializeField]
+        private Color _nightColor;
+        private float _currentCooldown;
         #endregion
 
         #region Properties
@@ -26,11 +36,6 @@ namespace SavageWorld.Runtime.GameSession
             {
                 return _dayLightValue;
             }
-
-            set
-            {
-                _dayLightValue = value;
-            }
         }
 
         public Color CurrentColor
@@ -39,87 +44,126 @@ namespace SavageWorld.Runtime.GameSession
             {
                 return _currentColor;
             }
+        }
 
-            set
+        public ulong GlobalTime
+        {
+            get
             {
-                _currentColor = value;
+                return _globalTime;
             }
         }
         #endregion
 
-        #region Methods
-        private void Awake()
-        {
-            Instance = this;
-        }
+        #region Events / Delegates
 
+        #endregion
+
+        #region Monobehaviour Methods
         private void Start()
         {
-            StartCoroutine(CalculateTime());
-            _hours = 6;
+            ResetTime();
         }
 
-        private IEnumerator CalculateTime()
+        private void FixedUpdate()
         {
-            float percentage;
-            while (true)
+            _currentCooldown += Time.fixedDeltaTime;
+            IncreaseTime();
+            ParseTime();
+        }
+
+        private void OnEnable()
+        {
+            ResetTime();
+        }
+        #endregion
+
+        #region Public Methods
+        public void ResetTime()
+        {
+            _globalTime = 360;
+            _currentCooldown = 0f;
+            ParseTime();
+            SetSkyColor();
+        }
+
+        public void SetTime(ulong value)
+        {
+            _globalTime = value;
+            ParseTime();
+        }
+        #endregion
+
+        #region Private Methods
+        private void IncreaseTime()
+        {
+            if (_currentCooldown >= _cooldown)
             {
-                yield return new WaitForSeconds(0.1f);
-                if (!GameManager.Instance.IsPlayingState)
-                {
-                    continue;
-                }
-                _minutes++;
+                _currentCooldown = 0f;
+                _globalTime++;
+                SetSkyColor();
+            }
+        }
 
-                if (_minutes >= 60)
-                {
-                    _hours++;
-                    _minutes = 0;
-                }
+        private void ParseTime()
+        {
+            _days = (int)(_globalTime / 1440);
+            _hours = (int)(_globalTime / 60 % 24);
+            _minutes = (int)(_globalTime % 60);
+        }
 
-                if (_hours >= 24)
-                {
-                    _hours = 0;
-                }
+        private void SetSkyColor()
+        {
+            SetNight();
+            SetMorning();
+            SetDay();
+            SetEvening();
+        }
 
-                //Night
-                if (_hours >= 0 && _hours <= 3)
+        private void SetEvening()
+        {
+            if (_hours >= 18 && _hours <= 23)
+            {
+                float percentage = (_minutes + 60 * (_hours - 18)) / 360f;
+                _dayLightValue = Mathf.Lerp(1f, 0f, percentage);
+                if (_hours >= 18 && _hours <= 20)
                 {
-                    DayLightValue = 0f;
-                    CurrentColor = _nightColor;
+                    percentage = (_minutes + 60 * (_hours - 18)) / 180f;
+                    _currentColor = Color.Lerp(_dayColor, _eveningColor, percentage);
                 }
+                if (_hours >= 21 && _hours <= 23)
+                {
+                    percentage = (_minutes + 60 * (_hours - 21)) / 180f;
+                    _currentColor = Color.Lerp(_eveningColor, _nightColor, percentage);
+                }
+            }
+        }
 
-                //Morning
-                if (_hours >= 4 && _hours <= 6)
-                {
-                    percentage = (_minutes + 60 * (_hours - 4)) / 180f;
-                    DayLightValue = Mathf.Lerp(0f, 1f, percentage);
-                    CurrentColor = Color.Lerp(_nightColor, _dayColor, percentage);
-                }
+        private void SetDay()
+        {
+            if (_hours >= 7 && _hours <= 17)
+            {
+                _dayLightValue = 1f;
+                _currentColor = _dayColor;
+            }
+        }
 
-                //Day
-                if (_hours >= 7 && _hours <= 17)
-                {
-                    DayLightValue = 1f;
-                    CurrentColor = _dayColor;
-                }
+        private void SetMorning()
+        {
+            if (_hours >= 4 && _hours <= 6)
+            {
+                float percentage = (_minutes + 60 * (_hours - 4)) / 180f;
+                _dayLightValue = Mathf.Lerp(0f, 1f, percentage);
+                _currentColor = Color.Lerp(_nightColor, _dayColor, percentage);
+            }
+        }
 
-                //Evening
-                if (_hours >= 18 && _hours <= 23)
-                {
-                    percentage = (_minutes + 60 * (_hours - 18)) / 360f;
-                    DayLightValue = Mathf.Lerp(1f, 0f, percentage);
-                    if (_hours >= 18 && _hours <= 20)
-                    {
-                        percentage = (_minutes + 60 * (_hours - 18)) / 180f;
-                        CurrentColor = Color.Lerp(_dayColor, _eveningColor, percentage);
-                    }
-                    if (_hours >= 21 && _hours <= 23)
-                    {
-                        percentage = (_minutes + 60 * (_hours - 21)) / 180f;
-                        CurrentColor = Color.Lerp(_eveningColor, _nightColor, percentage);
-                    }
-                }
+        private void SetNight()
+        {
+            if (_hours >= 0 && _hours <= 3)
+            {
+                _dayLightValue = 0f;
+                _currentColor = _nightColor;
             }
         }
         #endregion

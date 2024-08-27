@@ -17,12 +17,12 @@ namespace SavageWorld.Runtime.GameSession.States
         #region Methods
         public override void Enter()
         {
-
+            GameTime.Instance.enabled = true;
         }
 
         public override void Exit()
         {
-
+            GameTime.Instance.enabled = false;
         }
         #endregion
     }

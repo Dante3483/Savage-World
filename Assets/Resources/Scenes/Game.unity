@@ -8618,6 +8618,7 @@ GameObject:
   m_Component:
   - component: {fileID: 757566710}
   - component: {fileID: 757566711}
+  - component: {fileID: 757566712}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -8674,6 +8675,28 @@ MonoBehaviour:
   _isLoadingProgressActive: 0
   _isInputTextInFocus: 0
   IsClient: 0
+--- !u!114 &757566712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 757566709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe503b5ba122fb54a9d4b982b775645c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldown: 1
+  _globalTime: 0
+  _days: 0
+  _minutes: 0
+  _hours: 0
+  _dayLightValue: 0
+  _currentColor: {r: 0, g: 0, b: 0, a: 0}
+  _dayColor: {r: 0.7882353, g: 0.9529412, b: 1, a: 1}
+  _eveningColor: {r: 1, g: 0.7221989, b: 0.30566037, a: 1}
+  _nightColor: {r: 0, g: 0.015686275, b: 0.05490196, a: 1}
 --- !u!28 &758104367
 Texture2D:
   m_ObjectHideFlags: 0
@@ -11459,57 +11482,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 947028974}
   m_CullTransparentMesh: 1
---- !u!1 &959524540
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 959524541}
-  - component: {fileID: 959524542}
-  m_Layer: 0
-  m_Name: GameTimeUtil
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &959524541
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 959524540}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -999.9579, y: -2150.6646, z: 12.63257}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1074330279}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &959524542
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 959524540}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe503b5ba122fb54a9d4b982b775645c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _minutes: 0
-  _hours: 0
-  _dayLightValue: 0
-  _currentColor: {r: 0, g: 0, b: 0, a: 0}
-  _dayColor: {r: 0.7882353, g: 0.9529412, b: 1, a: 1}
-  _eveningColor: {r: 1, g: 0.7221989, b: 0.30566037, a: 1}
-  _nightColor: {r: 0, g: 0.015686275, b: 0.05490196, a: 1}
 --- !u!1 &961893446
 GameObject:
   m_ObjectHideFlags: 0
@@ -13469,7 +13441,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1808748869}
-  - {fileID: 959524541}
   - {fileID: 1330428318}
   - {fileID: 1690256285}
   - {fileID: 70073722}

@@ -531,6 +531,7 @@ namespace SavageWorld.Runtime.GameSession
             _terrainGameObject.SetActive(false);
             InputSystem.EnableDevice(Keyboard.current);
             StaticInfo.Initialize();
+            GameTime.Instance.enabled = false;
         }
 
         private void Start()

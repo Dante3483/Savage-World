@@ -285,7 +285,6 @@ namespace SavageWorld.Runtime.Network
                     case 0:
                         {
                             await SendMessageToAsync(NetworkMessageTypes.SendClientId, new MessageData { IntNumber1 = id }, id);
-                            client.State = 1;
                         }
                         break;
                     case 1:
@@ -299,7 +298,6 @@ namespace SavageWorld.Runtime.Network
                                     await SendMessageToAsync(NetworkMessageTypes.SendChunkData, new MessageData { IntNumber1 = x, IntNumber2 = y }, id);
                                 }
                             }
-                            client.State = 2;
                         }
                         break;
                     case 2:
@@ -342,7 +340,6 @@ namespace SavageWorld.Runtime.Network
                                         break;
                                 }
                             }
-                            client.State = 3;
                         }
                         break;
                     case 3:
@@ -360,7 +357,11 @@ namespace SavageWorld.Runtime.Network
                             messageData.Bool1 = false;
                             await BroadcastMessageAsync(NetworkMessageTypes.CreatePlayer, messageData, id);
                             client.PlayerId = playerId;
-                            client.State = 4;
+                        }
+                        break;
+                    case 4:
+                        {
+                            await SendMessageToAsync(NetworkMessageTypes.SendTime, new(), id);
                         }
                         break;
                     default:
@@ -371,6 +372,7 @@ namespace SavageWorld.Runtime.Network
                         }
                         break;
                 }
+                client.State++;
             }
         }
 
