@@ -1,6 +1,3 @@
-using SavageWorld.Runtime.Enums.Network;
-using SavageWorld.Runtime.Network;
-using SavageWorld.Runtime.Network.Messages;
 using UnityEngine;
 
 public class DropMerging : MonoBehaviour
@@ -49,12 +46,7 @@ public class DropMerging : MonoBehaviour
             {
                 _drop.Quantity += drop.Quantity;
                 drop.Quantity = 0;
-                MessageData messageData = new()
-                {
-                    LongNumber2 = _drop.NetworkObject.Id,
-                    IntNumber2 = _drop.Quantity,
-                };
-                NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.CreateDrop, messageData);
+                Drop.SendUpdateMessage(_drop.NetworkObject.Id, _drop.Quantity);
             }
         }
     }

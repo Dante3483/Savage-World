@@ -1,7 +1,5 @@
 using Items;
-using SavageWorld.Runtime.Enums.Network;
 using SavageWorld.Runtime.Network;
-using SavageWorld.Runtime.Network.Messages;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -174,12 +172,7 @@ public class PlayerInteractions : MonoBehaviour
         }
         if (NetworkManager.Instance.IsClient)
         {
-            MessageData messageData = new()
-            {
-                LongNumber2 = drop.NetworkObject.Id,
-                IntNumber2 = drop.Quantity,
-            };
-            NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.CreateDrop, messageData);
+            Drop.SendUpdateMessage(drop.NetworkObject.Id, drop.Quantity);
         }
     }
 

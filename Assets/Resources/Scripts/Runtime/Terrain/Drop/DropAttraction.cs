@@ -1,18 +1,17 @@
 using System;
-using System.Collections;
 using UnityEngine;
 
 public class DropAttraction : MonoBehaviour
 {
-    #region Private fields
-    [SerializeField] private Drop _drop;
-    [SerializeField] private float _cooldown;
-    [SerializeField] private Transform _target;
-    [SerializeField] private float _speed;
-    #endregion
-
-    #region Public fields
-    public Action<Drop> OnEndOfAttraction;
+    #region Fields
+    [SerializeField]
+    private Drop _drop;
+    [SerializeField]
+    private float _cooldown;
+    [SerializeField]
+    private Transform _target;
+    [SerializeField]
+    private float _speed;
     #endregion
 
     #region Properties
@@ -28,9 +27,21 @@ public class DropAttraction : MonoBehaviour
             _target = value;
         }
     }
+
+    public float Cooldown
+    {
+        get
+        {
+            return _cooldown;
+        }
+    }
     #endregion
 
-    #region Methods
+    #region Events / Delegates
+    public Action<Drop> OnEndOfAttraction;
+    #endregion
+
+    #region Monobehaviour Methods
     private void Awake()
     {
         _drop = GetComponent<Drop>();
@@ -42,17 +53,16 @@ public class DropAttraction : MonoBehaviour
         {
             return;
         }
-        _drop.IsPhysicsEnabled = true;
-        if (!_drop.IsAttractionEnabled)
+        bool needToAttract = _drop.IsAttractionEnabled && _target != null;
+        _drop.IsPhysicsEnabled = !needToAttract;
+        if (needToAttract)
         {
-            StartCoroutine(AttractionCooldownCoroutine());
-        }
-        else if (_target != null)
-        {
-            _drop.IsPhysicsEnabled = false;
             Attract();
         }
     }
+    #endregion
+
+    #region Public Methods
 
     private void Attract()
     {
@@ -71,10 +81,9 @@ public class DropAttraction : MonoBehaviour
         OnEndOfAttraction = null;
     }
 
-    private IEnumerator AttractionCooldownCoroutine()
-    {
-        yield return new WaitForSeconds(_cooldown);
-        _drop.IsAttractionEnabled = true;
-    }
+    #endregion
+
+    #region Private Methods
+
     #endregion
 }

@@ -1,8 +1,6 @@
 using Items;
 using SavageWorld.Runtime;
-using SavageWorld.Runtime.Enums.Network;
 using SavageWorld.Runtime.Network;
-using SavageWorld.Runtime.Network.Messages;
 using System;
 using UnityEngine;
 
@@ -41,17 +39,7 @@ public class DropManager : Singleton<DropManager>
         }
         else if (NetworkManager.Instance.IsClient)
         {
-            MessageData messageData = new()
-            {
-                FloatNumber1 = position.x,
-                FloatNumber2 = position.y,
-                FloatNumber3 = direction.x,
-                FloatNumber4 = direction.y,
-                IntNumber1 = (int)item.Id,
-                IntNumber2 = quantity,
-                Bool1 = true
-            };
-            NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.CreateDrop, messageData);
+            Drop.SendCreationMessage(position, direction, item, quantity);
         }
         else
         {
@@ -63,34 +51,21 @@ public class DropManager : Singleton<DropManager>
 
     public Drop CreateDropWithForce(Vector3 position, Vector3 direction, ItemSO item, int quantity)
     {
-        Drop drop = CreateDrop(position, item, quantity, true);
-        if (drop != null)
-        {
-            DropPhysics dropPhysics = drop.GetComponent<DropPhysics>();
-            dropPhysics.AddForce(direction);
-        }
+        Drop drop = CreateDrop(position, item, quantity, true, (drop) => drop.GetComponent<DropPhysics>().AddForce(direction));
         return drop;
     }
 
-    public Drop CreateDrop(Vector3 position, ItemSO item, int quantity, bool isOwner = true)
+    public Drop CreateDrop(Vector3 position, ItemSO item, int quantity, bool isOwner = true, Action<Drop> dropCreatedCallback = null)
     {
-        Drop drop = CreateDropWithoutMessage(position, item, quantity, isOwner);
+        Drop drop = CreateDropWithoutMessage(position, item, quantity, isOwner, dropCreatedCallback);
         if (NetworkManager.Instance.IsServer && drop != null)
         {
-            MessageData messageData = new()
-            {
-                LongNumber2 = drop.NetworkObject.Id,
-                FloatNumber1 = position.x,
-                FloatNumber2 = position.y,
-                IntNumber1 = (int)item.Id,
-                IntNumber2 = quantity,
-            };
-            NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.CreateDrop, messageData);
+            Drop.SendCreationMessage(position, drop.NetworkObject.Id, item, drop.Flags, quantity);
         }
         return drop;
     }
 
-    public Drop CreateDropWithoutMessage(Vector3 position, ItemSO item, int quantity, bool isOwner = true)
+    public Drop CreateDropWithoutMessage(Vector3 position, ItemSO item, int quantity, bool isOwner = true, Action<Drop> dropCreatedCallback = null)
     {
         if (item == null)
         {
@@ -100,6 +75,7 @@ public class DropManager : Singleton<DropManager>
         Drop drop = instance.GetComponent<Drop>();
         drop.Quantity = quantity;
         drop.Item = item;
+        dropCreatedCallback?.Invoke(drop);
         return drop;
     }
     #endregion

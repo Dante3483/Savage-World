@@ -4,11 +4,12 @@ using SavageWorld.Runtime.Enums.Network;
 using SavageWorld.Runtime.Network;
 using SavageWorld.Runtime.Network.Messages;
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class Drop : GameObjectBase
 {
-    #region Private fields
+    #region Fields
     [Header("Main")]
     [SerializeField]
     private SpriteRenderer _spriteRenderer;
@@ -22,20 +23,16 @@ public class Drop : GameObjectBase
     private ItemSO _item;
     [SerializeField]
     private int _quantity;
+    [SerializeField]
+    private byte _flags;
+
+    [Header("Attraction")]
+    [SerializeField]
     private DropAttraction _attraction;
     [SerializeField]
     private bool _hasTarget;
     [SerializeField]
     private bool _isAnotherObjectTarget;
-
-    private bool _isPhysicsEnabled;
-    private bool _isAttractionEnabled;
-    private bool _isMergingEnabled;
-    #endregion
-
-    #region Public fields
-    public Action OnColliderSizeChanged;
-    public Action OnDropReset;
     #endregion
 
     #region Properties
@@ -90,12 +87,19 @@ public class Drop : GameObjectBase
     {
         get
         {
-            return _isPhysicsEnabled;
+            return (_flags & StaticInfo.Bit1) == StaticInfo.Bit1;
         }
 
         set
         {
-            _isPhysicsEnabled = value;
+            if (value)
+            {
+                _flags |= StaticInfo.Bit1;
+            }
+            else
+            {
+                _flags &= StaticInfo.InvertedBit1;
+            }
         }
     }
 
@@ -103,12 +107,19 @@ public class Drop : GameObjectBase
     {
         get
         {
-            return _isAttractionEnabled;
+            return (_flags & StaticInfo.Bit2) == StaticInfo.Bit2;
         }
 
         set
         {
-            _isAttractionEnabled = value;
+            if (value)
+            {
+                _flags |= StaticInfo.Bit2;
+            }
+            else
+            {
+                _flags &= StaticInfo.InvertedBit2;
+            }
         }
     }
 
@@ -116,12 +127,19 @@ public class Drop : GameObjectBase
     {
         get
         {
-            return _isMergingEnabled;
+            return (_flags & StaticInfo.Bit3) == StaticInfo.Bit3;
         }
 
         set
         {
-            _isMergingEnabled = value;
+            if (value)
+            {
+                _flags |= StaticInfo.Bit3;
+            }
+            else
+            {
+                _flags &= StaticInfo.InvertedBit3;
+            }
         }
     }
 
@@ -150,9 +168,27 @@ public class Drop : GameObjectBase
             _isAnotherObjectTarget = value;
         }
     }
+
+    public byte Flags
+    {
+        get
+        {
+            return _flags;
+        }
+
+        set
+        {
+            _flags = value;
+        }
+    }
     #endregion
 
-    #region Methods
+    #region Events / Delegates
+    public event Action OnColliderSizeChanged;
+    public event Action OnDropReset;
+    #endregion
+
+    #region Monobehaviour Methods
     private void Awake()
     {
         NetworkObject.Type = NetworkObjectTypes.Drop;
@@ -161,9 +197,21 @@ public class Drop : GameObjectBase
         _boxCollider = GetComponent<BoxCollider2D>();
         _attraction = GetComponent<DropAttraction>();
 
-        _isPhysicsEnabled = true;
-        _isAttractionEnabled = true;
-        _isMergingEnabled = true;
+        IsPhysicsEnabled = true;
+        IsAttractionEnabled = true;
+        IsMergingEnabled = true;
+    }
+    #endregion
+
+    #region Public Methods
+    public override GameObjectBase CreateInstance(Vector3 position, Transform parent = null, bool isOwner = true)
+    {
+        GameObjectBase instance = base.CreateInstance(position, parent, isOwner);
+        if (!isOwner)
+        {
+            instance.GetComponent<Drop>().Rigidbody.bodyType = RigidbodyType2D.Static;
+        }
+        return instance;
     }
 
     public void SetTarget(Transform target, Action<Drop> endAttractionCallback)
@@ -172,19 +220,17 @@ public class Drop : GameObjectBase
         {
             return;
         }
-        if (NetworkManager.Instance.IsClient)
+        if (NetworkManager.Instance.IsServer)
+        {
+            NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.TakeDrop, new() { Bool3 = true, LongNumber2 = NetworkObject.Id });
+        }
+        else if (NetworkManager.Instance.IsClient)
         {
             if (_isAnotherObjectTarget)
             {
                 return;
             }
-            MessageData messageData = new()
-            {
-                Bool1 = false,
-                LongNumber1 = GameManager.Instance.Player.NetworkObject.Id,
-                LongNumber2 = NetworkObject.Id
-            };
-            NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.TakeDrop, messageData);
+            SendTakeMessage(NetworkObject.Id, false);
         }
         _attraction.Target = target;
         _hasTarget = true;
@@ -203,13 +249,7 @@ public class Drop : GameObjectBase
             {
                 return;
             }
-            MessageData messageData = new()
-            {
-                Bool1 = true,
-                LongNumber1 = GameManager.Instance.Player.NetworkObject.Id,
-                LongNumber2 = NetworkObject.Id
-            };
-            NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.TakeDrop, messageData);
+            SendTakeMessage(NetworkObject.Id, true);
         }
         _attraction.Target = null;
         _hasTarget = false;
@@ -221,6 +261,66 @@ public class Drop : GameObjectBase
         _attraction.EndAttraction();
     }
 
+    public void StartAttractionCooldown()
+    {
+        if (!IsAttractionEnabled)
+        {
+            StartCoroutine(AttractionCooldownCoroutine());
+        }
+    }
+
+    public static void SendCreationMessage(Vector2 position, long objectId, ItemSO item, byte flags, int quantity)
+    {
+        MessageData messageData = new()
+        {
+            FloatNumber1 = position.x,
+            FloatNumber2 = position.y,
+            LongNumber2 = objectId,
+            IntNumber1 = (int)item.Id,
+            IntNumber2 = flags,
+            IntNumber3 = quantity,
+        };
+        NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.CreateDrop, messageData);
+    }
+
+    public static void SendCreationMessage(Vector2 position, Vector2 direction, ItemSO item, int quantity)
+    {
+        MessageData messageData = new()
+        {
+            FloatNumber1 = position.x,
+            FloatNumber2 = position.y,
+            FloatNumber3 = direction.x,
+            FloatNumber4 = direction.y,
+            IntNumber1 = (int)item.Id,
+            IntNumber3 = quantity,
+            Bool1 = true
+        };
+        NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.CreateDrop, messageData);
+    }
+
+    public static void SendUpdateMessage(long objectId, int quantity)
+    {
+        MessageData messageData = new()
+        {
+            LongNumber2 = objectId,
+            IntNumber3 = quantity,
+        };
+        NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.CreateDrop, messageData);
+    }
+
+    public static void SendTakeMessage(long objectId, bool needToRemoveTarget)
+    {
+        MessageData messageData = new()
+        {
+            Bool1 = needToRemoveTarget,
+            LongNumber1 = GameManager.Instance.Player.NetworkObject.Id,
+            LongNumber2 = objectId
+        };
+        NetworkManager.Instance.BroadcastMessage(NetworkMessageTypes.TakeDrop, messageData);
+    }
+    #endregion
+
+    #region Private Methods
     private void SetSprite(Sprite sprite)
     {
         _spriteRenderer.sprite = sprite;
@@ -247,14 +347,10 @@ public class Drop : GameObjectBase
         OnColliderSizeChanged?.Invoke();
     }
 
-    public override GameObjectBase CreateInstance(Vector3 position, Transform parent = null, bool isOwner = true)
+    private IEnumerator AttractionCooldownCoroutine()
     {
-        GameObjectBase instance = base.CreateInstance(position, parent, isOwner);
-        if (!isOwner)
-        {
-            instance.GetComponent<Drop>().Rigidbody.bodyType = RigidbodyType2D.Static;
-        }
-        return instance;
+        yield return new WaitForSeconds(_attraction.Cooldown);
+        IsAttractionEnabled = true;
     }
     #endregion
 }

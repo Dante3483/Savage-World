@@ -66,7 +66,7 @@ public class PickUpItemsGenerationPhase : WorldProcessingPhaseBase
                 {
                     for (y = _equator; y < _terrainConfiguration.SurfaceLevel.EndY; y++)
                     {
-                        if (!IsSolid(x, y))
+                        if (!IsPhysicallySolid(x, y))
                         {
                             continue;
                         }

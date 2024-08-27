@@ -132,6 +132,11 @@ public abstract class WorldProcessingPhaseBase : IWorldProcessingPhase
         return _worldDataManager.IsValidForTree(x, y);
     }
 
+    protected bool IsPhysicallySolid(int x, int y)
+    {
+        return _worldDataManager.IsPhysicallySolidBlock(x, y);
+    }
+
     protected bool CompareBlock(int x, int y, BlockSO data)
     {
         return _worldDataManager.CompareBlock(x, y, data);

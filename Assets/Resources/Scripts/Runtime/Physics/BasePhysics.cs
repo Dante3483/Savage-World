@@ -1,5 +1,4 @@
 using CustomTilemap;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -7,7 +6,7 @@ using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(BoxCollider2D))]
 [RequireComponent(typeof(Rigidbody2D))]
-public class BasePhysics: MonoBehaviour
+public class BasePhysics : MonoBehaviour
 {
     #region Private fields
     [SerializeField] protected BoxCollider2D _boxCollider;
@@ -107,7 +106,7 @@ public class BasePhysics: MonoBehaviour
                 int positionX = Mathf.FloorToInt(_center.x + x);
                 int positionY = Mathf.FloorToInt(_center.y + y);
                 Vector2Int position = new(positionX, positionY);
-                if (WorldDataManager.Instance.IsSolid(positionX, positionY))
+                if (WorldDataManager.Instance.IsPhysicallySolidBlock(positionX, positionY))
                 {
                     _listOfPlatformsPositions.Add(position);
                     Tilemap.Instance.CreatePlatform(position);

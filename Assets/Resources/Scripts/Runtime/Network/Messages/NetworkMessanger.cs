@@ -87,9 +87,14 @@ namespace SavageWorld.Runtime.Network.Messages
                 long packetSize = _binaryWriter.BaseStream.Position;
                 _binaryWriter.BaseStream.Position = 0;
                 _binaryWriter.Write((ushort)packetSize);
-                if (messageType != NetworkMessageTypes.SendTransform && messageType != NetworkMessageTypes.SendWorldCellData)
+                if (messageType != NetworkMessageTypes.SendTransform &&
+                    messageType != NetworkMessageTypes.SendWorldCellData &&
+                    messageType != NetworkMessageTypes.AddDamageToTile &&
+                    messageType != NetworkMessageTypes.SendEntityAnimation &&
+                    messageType != NetworkMessageTypes.TakeDrop)
                 {
                     GameConsole.Log(messageType.ToString() + $" {packetSize}", Color.yellow);
+                    Debug.Log(messageType.ToString() + $" {packetSize}");
                 }
                 return packetSize;
             }
@@ -123,9 +128,14 @@ namespace SavageWorld.Runtime.Network.Messages
                 NetworkMessageTypes messageType = (NetworkMessageTypes)_binaryReader.ReadByte();
                 NetworkMessageBase message = _messageByType[messageType];
                 message.Read();
-                if (messageType != NetworkMessageTypes.SendTransform)
+                if (messageType != NetworkMessageTypes.SendTransform &&
+                    messageType != NetworkMessageTypes.SendWorldCellData &&
+                    messageType != NetworkMessageTypes.AddDamageToTile &&
+                    messageType != NetworkMessageTypes.SendEntityAnimation &&
+                    messageType != NetworkMessageTypes.TakeDrop)
                 {
                     GameConsole.Log(messageType.ToString() + $" {packetSize}", Color.yellow);
+                    Debug.Log(messageType.ToString() + $" {packetSize}");
                 }
                 size -= packetSize;
             }

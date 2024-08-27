@@ -1079,6 +1079,8 @@ MonoBehaviour:
   _maxColliderSize: {x: 1.5, y: 1.5}
   _item: {fileID: 0}
   _quantity: 0
+  _flags: 0
+  _attraction: {fileID: 0}
   _hasTarget: 0
   _isAnotherObjectTarget: 0
 --- !u!114 &7019620428535080678

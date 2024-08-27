@@ -128,7 +128,7 @@ public class DropPhysics : MonoBehaviour
 
     private bool CheckAdjacentBlock(int x, int y)
     {
-        return WorldDataManager.Instance.IsSolid(_intPosition.x + x, _intPosition.y + y);
+        return WorldDataManager.Instance.IsPhysicallySolidBlock(_intPosition.x + x, _intPosition.y + y);
     }
 
     public void AddForce(Vector3 direction)
@@ -141,6 +141,7 @@ public class DropPhysics : MonoBehaviour
         _drop.Rigidbody.AddForce(new Vector2(xVelocity, yVelocity), ForceMode2D.Impulse);
 
         _drop.IsAttractionEnabled = false;
+        _drop.StartAttractionCooldown();
     }
     #endregion
 }

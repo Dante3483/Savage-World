@@ -101,22 +101,26 @@ namespace SavageWorld.Runtime.Network
         {
             ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() =>
             {
-                if (_objectsById.TryGetValue(id, out NetworkObject obj))
+                NetworkObject obj = GetObjectById(id);
+                if (obj != null)
                 {
                     GameObject.Destroy(obj.gameObject);
                     _objectsById.Remove(id);
-                }
-                else
-                {
-                    Debug.Log($"Object with id {id} not found");
                 }
             });
         }
 
         public NetworkObject GetObjectById(long id)
         {
-            _objectsById.TryGetValue(id, out NetworkObject obj);
-            return obj;
+            if (_objectsById.TryGetValue(id, out NetworkObject obj))
+            {
+                return obj;
+            }
+            else
+            {
+                Debug.Log($"Object with id {id} not found");
+                return null;
+            }
         }
         #endregion
 

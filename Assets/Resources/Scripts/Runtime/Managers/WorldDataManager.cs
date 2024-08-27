@@ -132,7 +132,7 @@ public class WorldDataManager : Singleton<WorldDataManager>
         {
             SetRandomBlockTile(x, y);
         }
-        if (IsEmpty(x, y) || IsSolid(x, y))
+        if (IsEmpty(x, y) || IsPhysicallySolidBlock(x, y))
         {
             SetColliderIndex(x, y, byte.MaxValue);
             UpdateCollidersAround(x, y);
@@ -483,7 +483,7 @@ public class WorldDataManager : Singleton<WorldDataManager>
 
     public bool IsSolidAnyNeighbor(int x, int y)
     {
-        return IsSolid(x - 1, y) | IsSolid(x + 1, y) || IsSolid(x, y - 1) || IsSolid(x, y + 1);
+        return IsPhysicallySolidBlock(x - 1, y) | IsPhysicallySolidBlock(x + 1, y) || IsPhysicallySolidBlock(x, y - 1) || IsPhysicallySolidBlock(x, y + 1);
     }
 
     public bool IsPhysicallySolidBlock(int x, int y)
@@ -499,7 +499,7 @@ public class WorldDataManager : Singleton<WorldDataManager>
 
     public void UpdateCornerColliderWithoutNotification(int x, int y, bool stopPropagation = false)
     {
-        if (!_worldData[x, y].IsSolid)
+        if (!_worldData[x, y].IsPhysicallySolidBlock)
         {
             byte prevIndex = _worldData[x, y].ColliderIndex;
             if (CheckRule(x, y, _mainRules.CornerRule))
@@ -519,7 +519,7 @@ public class WorldDataManager : Singleton<WorldDataManager>
 
     public void UpdateBlockColliderWithoutNotification(int x, int y)
     {
-        if (_worldData[x, y].IsSolid)
+        if (_worldData[x, y].IsPhysicallySolidBlock)
         {
             CheckRules(x, y, _mainRules, out byte i);
             _worldData[x, y].ColliderIndex = i;
@@ -566,7 +566,7 @@ public class WorldDataManager : Singleton<WorldDataManager>
 
     private void UpdateCornerCollider(int x, int y, bool stopPropagation = false)
     {
-        if (!_worldData[x, y].IsSolid)
+        if (!_worldData[x, y].IsPhysicallySolidBlock)
         {
             byte prevIndex = _worldData[x, y].ColliderIndex;
             if (CheckRule(x, y, _mainRules.CornerRule))
@@ -587,7 +587,7 @@ public class WorldDataManager : Singleton<WorldDataManager>
 
     private void UpdateBlockCollider(int x, int y)
     {
-        if (_worldData[x, y].IsSolid)
+        if (_worldData[x, y].IsPhysicallySolidBlock)
         {
             CheckRules(x, y, _mainRules, out byte i);
             _worldData[x, y].ColliderIndex = i;

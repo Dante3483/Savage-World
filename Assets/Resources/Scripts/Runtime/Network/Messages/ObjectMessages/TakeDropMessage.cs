@@ -34,76 +34,79 @@ namespace SavageWorld.Runtime.Network.Messages
         #region Private Methods
         protected override void ReadData()
         {
-            bool stopTaking = _reader.ReadBoolean();
-            bool isTaken = _reader.ReadBoolean();
+            bool needToRemoveTarget = _reader.ReadBoolean();
+            bool isDropReachedTarget = _reader.ReadBoolean();
+            bool needToToggleTargetFlag = _reader.ReadBoolean();
             long palyerId = _reader.ReadInt64();
             long dropId = _reader.ReadInt64();
+            NetworkObject playerObject = _networkManager.NetworkObjects.GetObjectById(palyerId);
             NetworkObject dropObject = _networkManager.NetworkObjects.GetObjectById(dropId);
-            if (_networkManager.IsServer)
+            ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() =>
             {
-                NetworkObject playerObject = _networkManager.NetworkObjects.GetObjectById(palyerId);
-                ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() =>
+                if (dropObject == null)
                 {
-                    Drop drop = dropObject.GetComponent<Drop>();
-                    if (!drop.HasTarget)
-                    {
-                        Action<Drop> endAttractionCallback = (drop) =>
-                        {
-                            MessageData messageData = new()
-                            {
-                                Bool2 = true,
-                                LongNumber2 = dropObject.Id
-                            };
-                            _networkManager.SendMessageTo(NetworkMessageTypes.TakeDrop, messageData, _senderId);
-                        };
-                        drop.SetTarget(playerObject.transform, endAttractionCallback);
-                        MessageData messageData = new()
-                        {
-                            Bool2 = false,
-                            LongNumber2 = dropObject.Id
-                        };
-                        _networkManager.BroadcastMessage(NetworkMessageTypes.TakeDrop, messageData, _senderId);
-                    }
-                    if (stopTaking)
-                    {
-                        drop.RemoveTarget(playerObject.transform);
-                        MessageData messageData = new()
-                        {
-                            Bool2 = false,
-                            LongNumber2 = dropObject.Id
-                        };
-                        _networkManager.BroadcastMessage(NetworkMessageTypes.TakeDrop, messageData, _senderId);
-                    }
-                });
-            }
-            else if (_networkManager.IsClient)
-            {
-                if (isTaken)
-                {
-                    ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() =>
-                    {
-                        Drop drop = dropObject.GetComponent<Drop>();
-                        drop.EndAttraction();
-                    });
+                    return;
                 }
-                else
+                Drop drop = dropObject.GetComponent<Drop>();
+                if (_networkManager.IsServer)
                 {
-                    ActionInMainThreadUtil.Instance.InvokeInNextUpdate(() =>
-                    {
-                        Drop drop = dropObject.GetComponent<Drop>();
-                        drop.IsAnotherObjectTarget = !drop.IsAnotherObjectTarget;
-                    });
+                    SetTargetOnServer(playerObject, dropObject, drop);
+                    RemoveTargetOnServer(playerObject, dropObject, drop, needToRemoveTarget);
                 }
-            }
-
+                else if (_networkManager.IsClient)
+                {
+                    CompleteAttractionOnClient(dropObject, drop, isDropReachedTarget);
+                    ToggleBusyFlagOnClient(dropObject, drop, isDropReachedTarget);
+                }
+            });
         }
 
         protected override void WriteData(MessageData messageData)
         {
             _writer.Write(messageData.Bool1);
             _writer.Write(messageData.Bool2);
+            _writer.Write(messageData.Bool3);
             _writer.Write(messageData.LongNumber1);
             _writer.Write(messageData.LongNumber2);
+        }
+
+        private void SetTargetOnServer(NetworkObject playerObject, NetworkObject dropObject, Drop drop)
+        {
+            if (drop.HasTarget)
+            {
+                return;
+            }
+            Action<Drop> endAttractionCallback = (drop) => _networkManager.SendMessageTo(NetworkMessageTypes.TakeDrop, new() { Bool2 = true, LongNumber2 = dropObject.Id }, _senderId);
+            drop.SetTarget(playerObject.transform, endAttractionCallback);
+            _networkManager.BroadcastMessage(NetworkMessageTypes.TakeDrop, new() { Bool3 = true, LongNumber2 = dropObject.Id }, _senderId);
+        }
+
+        private void RemoveTargetOnServer(NetworkObject playerObject, NetworkObject dropObject, Drop drop, bool needToRemoveTarget)
+        {
+            if (!needToRemoveTarget)
+            {
+                return;
+            }
+            drop.RemoveTarget(playerObject.transform);
+            _networkManager.BroadcastMessage(NetworkMessageTypes.TakeDrop, new() { Bool3 = true, LongNumber2 = dropObject.Id }, _senderId);
+        }
+
+        private void CompleteAttractionOnClient(NetworkObject dropObject, Drop drop, bool isDropReachedTarget)
+        {
+            if (!isDropReachedTarget)
+            {
+                return;
+            }
+            drop.EndAttraction();
+        }
+
+        private void ToggleBusyFlagOnClient(NetworkObject dropObject, Drop drop, bool needToToggleTargetFlag)
+        {
+            if (needToToggleTargetFlag)
+            {
+                drop.IsAnotherObjectTarget = !drop.IsAnotherObjectTarget;
+            }
+
         }
         #endregion
     }
