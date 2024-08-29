@@ -1,4 +1,5 @@
 using SavageWorld.Runtime.Console.Commands;
+using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Utilities.Others;
 using System;
 using System.Collections.Generic;
@@ -23,11 +24,13 @@ namespace SavageWorld.Runtime.Console
         private TMP_Text _logs;
         [SerializeField]
         private TMP_InputField _commandInputField;
+        private PlayerInputActions _inputActions;
         private StringBuilder _logsStringBuilder;
         private bool _isLogsUpdated;
         private List<string> _history;
         private string _tempCommand;
         private int _currentHistoryIndex;
+        private bool _lastFocus;
         #endregion
 
         #region Properties
@@ -44,10 +47,28 @@ namespace SavageWorld.Runtime.Console
             base.Awake();
             _logsStringBuilder = new();
             _history = new();
+            _inputActions = GameManager.Instance.InputActions;
+            _inputActions.Debug.Enable();
+        }
+
+        private void OnEnable()
+        {
+            _inputActions.Debug.ToggleDeveloperConsole.performed += OnToggleDeveloperConsole;
+        }
+
+        private void OnDisable()
+        {
+            _inputActions.Debug.ToggleDeveloperConsole.performed -= OnToggleDeveloperConsole;
         }
 
         private void Update()
         {
+            bool focus = _commandInputField.isFocused;
+            if (_lastFocus != focus)
+            {
+                FocusChanged(focus);
+                _lastFocus = focus;
+            }
             if (_content.gameObject.activeSelf)
             {
                 if (Input.GetKeyUp(KeyCode.Return))
@@ -85,35 +106,17 @@ namespace SavageWorld.Runtime.Console
                     }
                 }
             }
-            Instance._logs.SetText(Instance._logsStringBuilder);
+            _logs.SetText(_logsStringBuilder);
             _isLogsUpdated = false;
             if (_isLogsUpdated)
             {
-                Instance._logs.SetText(Instance._logsStringBuilder);
+                _logs.SetText(_logsStringBuilder);
                 _isLogsUpdated = false;
             }
         }
         #endregion
 
         #region Public Methods
-        public void Toggle(CallbackContext context)
-        {
-            if (!context.action.triggered)
-            {
-                return;
-            }
-            if (_commandInputField.isFocused)
-            {
-                return;
-            }
-            Toggle();
-            if ((int)context.ReadValue<float>() == 2)
-            {
-                _commandInputField.text = "/";
-                _commandInputField.caretPosition = 1;
-            }
-        }
-
         public static void Log(string text)
         {
             lock (Instance._logsStringBuilder)
@@ -141,6 +144,22 @@ namespace SavageWorld.Runtime.Console
         #endregion
 
         #region Private Methods
+        private void FocusChanged(bool focus)
+        {
+            if (focus)
+            {
+                _inputActions.Player.Disable();
+                _inputActions.UI.Disable();
+                _inputActions.Interactions.Disable();
+            }
+            else
+            {
+                _inputActions.Player.Enable();
+                _inputActions.UI.Enable();
+                _inputActions.Interactions.Enable();
+            }
+        }
+
         private void Toggle()
         {
             if (_content.gameObject.activeSelf)
@@ -188,6 +207,20 @@ namespace SavageWorld.Runtime.Console
         {
             _history.Add(command);
             _currentHistoryIndex = _history.Count;
+        }
+
+        private void OnToggleDeveloperConsole(CallbackContext context)
+        {
+            if (_commandInputField.isFocused)
+            {
+                return;
+            }
+            Toggle();
+            if ((int)context.ReadValue<float>() == 2)
+            {
+                _commandInputField.text = "/";
+                _commandInputField.caretPosition = 1;
+            }
         }
         #endregion
     }

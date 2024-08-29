@@ -1,4 +1,4 @@
-using SavageWorld.Runtime.Player.Main;
+using SavageWorld.Runtime.Physics;
 using UnityEngine;
 
 namespace SavageWorld.Runtime.Animations
@@ -9,7 +9,7 @@ namespace SavageWorld.Runtime.Animations
         [SerializeField] private Animator _playerAnimator;
         [SerializeField] private string _currentAnimationState;
 
-        private PlayerFlags _playerFlags;
+        private PhysicsFlags _flags;
         private const string _playerIdle = "Player_idle";
         private const string _playerWalk = "Player_walk";
         private const string _playerRun = "Player_run";
@@ -63,44 +63,44 @@ namespace SavageWorld.Runtime.Animations
         private void Awake()
         {
             _playerAnimator = GetComponent<Animator>();
-            _playerFlags = GetComponent<PlayerFlags>();
+            _flags = GetComponent<DynamicPhysics>().Flags;
         }
 
         public void SelectAnimation()
         {
             string newAnimationState = "";
 
-            if (_playerFlags.IsIdle)
+            if (_flags.IsIdle)
             {
                 newAnimationState = _playerIdle;
             }
 
-            if (_playerFlags.IsWalk)
+            if (_flags.IsWalk)
             {
                 newAnimationState = _playerWalk;
             }
 
-            if (_playerFlags.IsRun)
+            if (_flags.IsRun)
             {
                 newAnimationState = _playerRun;
             }
 
-            if (_playerFlags.IsCrouch)
+            if (_flags.IsCrouch)
             {
                 newAnimationState = _playerCrouchIdle;
 
-                if (_playerFlags.IsWalk)
+                if (_flags.IsWalk)
                 {
                     newAnimationState = _playerCrouchWalk;
                 }
             }
 
-            if (_playerFlags.IsRise)
+            if (_flags.IsRise)
             {
                 newAnimationState = _playerJump;
             }
 
-            if (_playerFlags.IsFall)
+            if (_flags.IsFall)
             {
                 newAnimationState = _playerFall;
             }
@@ -120,17 +120,17 @@ namespace SavageWorld.Runtime.Animations
             //    newAnimationState = _playerHurt;
             //}
 
-            if (_playerFlags.IsStartSlide)
+            if (_flags.IsStartSlide)
             {
                 newAnimationState = _playerStartSlide;
             }
 
-            if (_playerFlags.IsSlide)
+            if (_flags.IsSlide)
             {
                 newAnimationState = _playerSlide;
             }
 
-            if (_playerFlags.IsEndSlide)
+            if (_flags.IsEndSlide)
             {
                 newAnimationState = _playerEndSlide;
             }

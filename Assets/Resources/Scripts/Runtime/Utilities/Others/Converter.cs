@@ -21,12 +21,12 @@ namespace SavageWorld.Runtime.Utilities.Others
             int i = charArray.Length;
             while (i != 0)
             {
-                charArray[--i] = StaticInfo.DigitsCharArray[10];
+                charArray[--i] = StaticParameters.DigitsCharArray[10];
                 if (value > 0)
                 {
                     digit = value % 10;
                     value /= 10;
-                    charArray[i] = StaticInfo.DigitsCharArray[digit];
+                    charArray[i] = StaticParameters.DigitsCharArray[digit];
                 }
             }
         }

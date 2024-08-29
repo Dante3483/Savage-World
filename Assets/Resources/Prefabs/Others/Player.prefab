@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 166097981377187674}
   - component: {fileID: 8580786190906558709}
   - component: {fileID: 1181441038070284372}
-  - component: {fileID: 786310154602479331}
   - component: {fileID: 5913716759420320057}
-  - component: {fileID: 4426414403718054618}
+  - component: {fileID: -1260734674383072233}
+  - component: {fileID: 5095762892254346800}
   - component: {fileID: -5410989748371277972}
   - component: {fileID: 7534789336813920865}
   - component: {fileID: 1832234326415365086}
@@ -235,7 +235,6 @@ MonoBehaviour:
     _armorSize: 3
   _handCraftStation: {fileID: 11400000, guid: a666079fbbc7ae040898ba497ed3a6ad, type: 2}
   _playerInteractions: {fileID: 0}
-  _networkObject: {fileID: 0}
   _currentChunk: {x: 0, y: 0}
   _starterItems:
   - _item: {fileID: 11400000, guid: 50073aedebcc11b4c9f60545afac46fb, type: 2}
@@ -250,41 +249,6 @@ MonoBehaviour:
     _quantity: 1
   - _item: {fileID: 11400000, guid: 5f4712c04ae345745bf0f57a1355fc55, type: 2}
     _quantity: 1
---- !u!114 &786310154602479331
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 181470870697314535}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c00b3fda36870ce478ce24263c6914a4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _isIdle: 0
-  _isWalk: 0
-  _isRun: 0
-  _isRise: 0
-  _isFall: 0
-  _isCrouch: 0
-  _isSlide: 0
-  _isDeath: 0
-  _isPunch: 0
-  _isHurt: 0
-  _isGrounded: 0
-  _isWallInFront: 0
-  _isTouchCeiling: 0
-  _isOnSlope: 0
-  _isMovementBlocked: 0
-  _isJumpBlocked: 0
-  _isFlipBlocked: 0
-  _isSlideBlocked: 0
-  _isCancelSlideBlocked: 0
-  _isSlopeCheckBlocked: 0
-  _isFaceToTheRight: 0
-  _isStartSlide: 0
-  _isEndSlide: 0
 --- !u!114 &5913716759420320057
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -299,7 +263,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerAnimator: {fileID: 0}
   _currentAnimationState: 
---- !u!114 &4426414403718054618
+--- !u!114 &-1260734674383072233
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -308,33 +272,51 @@ MonoBehaviour:
   m_GameObject: {fileID: 181470870697314535}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8653754ca22e0584ea479bce8b1542c8, type: 3}
+  m_Script: {fileID: 11500000, guid: ef4be4a5629b86f448d6853af284610e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player: {fileID: 0}
-  _playerFlags: {fileID: 0}
-  _playerAnimationsController: {fileID: 0}
-  _rigidbody: {fileID: 0}
   _boxCollider: {fileID: 0}
-  _movementDirection: 0
-  _slideDirection: 0
-  _slidingCooldown: 0
-  _currentState:
+  _rigidbody: {fileID: 0}
+  _noFriction: {fileID: 6200000, guid: effc25d654d75ac4da8990d7cf05bf96, type: 2}
+  _fullFriction: {fileID: 6200000, guid: bd55736fb0ba2874480c595e02c9a5c4, type: 2}
+  _flags:
+    _isIdle: 0
+    _isWalk: 0
+    _isRun: 0
+    _isRise: 0
+    _isFall: 0
+    _isCrouch: 0
+    _isSlide: 0
+    _isDeath: 0
+    _isPunch: 0
+    _isHurt: 0
+    _isGrounded: 0
+    _isWallInFront: 0
+    _isTouchCeiling: 0
+    _isOnSlope: 0
+    _isMovementBlocked: 0
+    _isJumpBlocked: 0
+    _isFlipBlocked: 0
+    _isSlideBlocked: 0
+    _isCancelSlideBlocked: 0
+    _isSlopeCheckBlocked: 0
+    _isFaceToTheRight: 0
+    _isStartSlide: 0
+    _isEndSlide: 0
+  _platformsCreator:
+    _rawWidth: 0
+    _rawHeight: 0
+    _width: 0
+    _height: 0
+    _center: {x: 0, y: 0}
+    _startRenderingArea: {x: 0, y: 0}
+    _endRenderingArea: {x: 0, y: 0}
+    _listOfPlatformsPositions: []
+  _maxFallingSpeed: -30
+  _state:
     _colliderSize: {x: 0, y: 0}
     _colliderOffset: {x: 0, y: 0}
     _wallInFrontCheckDistance: 0
-  _fullHeightState:
-    _colliderSize: {x: 1.2, y: 4}
-    _colliderOffset: {x: 0, y: 0}
-    _wallInFrontCheckDistance: 2.8
-  _crouchState:
-    _colliderSize: {x: 1.25, y: 2.8}
-    _colliderOffset: {x: 0, y: -0.6}
-    _wallInFrontCheckDistance: 1.8
-  _slideState:
-    _colliderSize: {x: 1.25, y: 2.8}
-    _colliderOffset: {x: 0, y: -0.6}
-    _wallInFrontCheckDistance: 1.8
   _groundLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -343,20 +325,20 @@ MonoBehaviour:
     _checkYourself: 0
     _result: 0
     _originOffset: {x: 0, y: 0}
-    _size: {x: 1.1, y: 1}
+    _size: {x: 1, y: 1}
     _angle: 0
-    _direction: {x: 0, y: -1}
+    _direction: {x: 0, y: 0}
     _distance: 0
     _layerMask:
       serializedVersion: 2
       m_Bits: 64
-    _hitColor: {r: 0.06544244, g: 1, b: 0, a: 1}
-    _notHitColor: {r: 1, g: 0.09461251, b: 0, a: 1}
+    _hitColor: {r: 0, g: 1, b: 0, a: 1}
+    _notHitColor: {r: 1, g: 0, b: 0, a: 1}
   _wallCheckBoxCast:
     _needVisualize: 0
     _checkYourself: 0
     _result: 0
-    _originOffset: {x: 0, y: -0.5}
+    _originOffset: {x: 0, y: 0}
     _size: {x: 0.4, y: 0.001}
     _angle: 0
     _direction: {x: 0, y: -1}
@@ -364,8 +346,8 @@ MonoBehaviour:
     _layerMask:
       serializedVersion: 2
       m_Bits: 64
-    _hitColor: {r: 1, g: 0.85426843, b: 0, a: 1}
-    _notHitColor: {r: 1, g: 0, b: 0.5315466, a: 1}
+    _hitColor: {r: 1, g: 0.85490197, b: 0, a: 1}
+    _notHitColor: {r: 1, g: 0, b: 0.53333336, a: 1}
   _ceilingCheckBoxCast:
     _needVisualize: 0
     _checkYourself: 0
@@ -378,14 +360,36 @@ MonoBehaviour:
     _layerMask:
       serializedVersion: 2
       m_Bits: 64
-    _hitColor: {r: 0, g: 1, b: 0.8829396, a: 1}
-    _notHitColor: {r: 0.59985447, g: 0, b: 1, a: 1}
+    _hitColor: {r: 0, g: 1, b: 0.88235295, a: 1}
+    _notHitColor: {r: 0.6, g: 0, b: 1, a: 1}
   _slopeCheckDistanceLeft: 1.25
   _slopeCheckDistanceRight: 0.75
   _slopeAngle: 0
   _slopeNormalPerpendicular: {x: 0, y: 0}
-  _noFriction: {fileID: 6200000, guid: effc25d654d75ac4da8990d7cf05bf96, type: 2}
-  _fullFriction: {fileID: 6200000, guid: bd55736fb0ba2874480c595e02c9a5c4, type: 2}
+--- !u!114 &5095762892254346800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 181470870697314535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d50c7311bf183d418d4836af9a70c6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _fullHeightState:
+    _colliderSize: {x: 1.2, y: 4}
+    _colliderOffset: {x: 0, y: 0}
+    _wallInFrontCheckDistance: 2.8
+  _crouchState:
+    _colliderSize: {x: 1.25, y: 2.8}
+    _colliderOffset: {x: 0, y: -0.6}
+    _wallInFrontCheckDistance: 1.8
+  _slideState:
+    _colliderSize: {x: 1.25, y: 2.8}
+    _colliderOffset: {x: 0, y: -0.6}
+    _wallInFrontCheckDistance: 1.8
 --- !u!114 &-5410989748371277972
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -446,6 +450,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9a04ec75d8cedb45ae2df6c86e84179, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _globalId: 1
   _id: 0
   _type: 0
   _position: {x: 0, y: 0}
@@ -481,3 +486,5 @@ MonoBehaviour:
   _networkObject: {fileID: 0}
   _animator: {fileID: 0}
   _currentAnimationHash: 0
+  _isAnimationChanged: 0
+  _networkAnimationHash: 0

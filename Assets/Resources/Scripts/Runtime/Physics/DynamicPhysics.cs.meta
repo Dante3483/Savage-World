@@ -3,8 +3,12 @@ guid: ef4be4a5629b86f448d6853af284610e
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 500
+  defaultReferences:
+  - _boxCollider: {instanceID: 0}
+  - _rigidbody: {instanceID: 0}
+  - _noFriction: {fileID: 6200000, guid: effc25d654d75ac4da8990d7cf05bf96, type: 2}
+  - _fullFriction: {fileID: 6200000, guid: bd55736fb0ba2874480c595e02c9a5c4, type: 2}
+  executionOrder: 50
   icon: {instanceID: 0}
   userData: 
   assetBundleName: 

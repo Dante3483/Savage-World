@@ -90,18 +90,18 @@ namespace SavageWorld.Runtime.Terrain.Drop
         {
             get
             {
-                return (_flags & StaticInfo.Bit1) == StaticInfo.Bit1;
+                return (_flags & StaticParameters.Bit0) == StaticParameters.Bit0;
             }
 
             set
             {
                 if (value)
                 {
-                    _flags |= StaticInfo.Bit1;
+                    _flags |= StaticParameters.Bit0;
                 }
                 else
                 {
-                    _flags &= StaticInfo.InvertedBit1;
+                    _flags &= StaticParameters.InvertedBit0;
                 }
             }
         }
@@ -110,18 +110,18 @@ namespace SavageWorld.Runtime.Terrain.Drop
         {
             get
             {
-                return (_flags & StaticInfo.Bit2) == StaticInfo.Bit2;
+                return (_flags & StaticParameters.Bit1) == StaticParameters.Bit1;
             }
 
             set
             {
                 if (value)
                 {
-                    _flags |= StaticInfo.Bit2;
+                    _flags |= StaticParameters.Bit1;
                 }
                 else
                 {
-                    _flags &= StaticInfo.InvertedBit2;
+                    _flags &= StaticParameters.InvertedBit1;
                 }
             }
         }
@@ -130,18 +130,18 @@ namespace SavageWorld.Runtime.Terrain.Drop
         {
             get
             {
-                return (_flags & StaticInfo.Bit3) == StaticInfo.Bit3;
+                return (_flags & StaticParameters.Bit2) == StaticParameters.Bit2;
             }
 
             set
             {
                 if (value)
                 {
-                    _flags |= StaticInfo.Bit3;
+                    _flags |= StaticParameters.Bit2;
                 }
                 else
                 {
-                    _flags &= StaticInfo.InvertedBit3;
+                    _flags &= StaticParameters.InvertedBit2;
                 }
             }
         }

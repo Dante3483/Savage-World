@@ -19,6 +19,8 @@ namespace SavageWorld.Runtime.Player.Interactions
         #region Fields
         private GameManager _gameManager;
         private WorldDataManager _worldDataManager;
+        private PlayerInputActions _inputActions;
+
         [Header("Interaction area")]
         [SerializeField]
         private bool _isAreaDrawing;
@@ -37,7 +39,7 @@ namespace SavageWorld.Runtime.Player.Interactions
         private float _placementSpeed;
         [SerializeField]
         private LayerMask _playerLayerMask;
-        private BoxCastUtil _checkPlayerBoxCast;
+        private BoxCastUtil _checkPlayerBoxCast = new();
 
         private InventoryModel _inventory;
         [SerializeField]
@@ -63,6 +65,8 @@ namespace SavageWorld.Runtime.Player.Interactions
         {
             _gameManager = GameManager.Instance;
             _worldDataManager = WorldDataManager.Instance;
+            _inputActions = _gameManager.InputActions;
+            _inputActions.Interactions.Enable();
             _isActive = false;
         }
 
@@ -96,16 +100,12 @@ namespace SavageWorld.Runtime.Player.Interactions
             _inventory = inventory;
             _inventory.InventoryOverflowed += InventoryOverflowedEventHandler;
             _checkPlayerBoxCast.OriginOffset = new Vector2(0.5f, 0.5f);
-            _checkPlayerBoxCast.Size = new Vector2(1f, 1f);
             _checkPlayerBoxCast.LayerMask = _playerLayerMask;
-
-            PlayerInputActions playerInputActions = GameManager.Instance.PlayerInputActions;
-            playerInputActions.Interactions.Enable();
-            playerInputActions.Interactions.UseItemFromHotbar.performed += UseItemFromHotbarPerformed;
-            playerInputActions.Interactions.UseItemFromHotbar.canceled += UseItemFromHotbarCanceled;
-            playerInputActions.Interactions.BreakBlock.performed += BreakWallPerformed;
-            playerInputActions.Interactions.BreakBlock.canceled += BreakWallCanceled;
-            playerInputActions.Interactions.ThrowItem.performed += ThrowSelectedItem;
+            _inputActions.Interactions.UseItemFromHotbar.performed += UseItemFromHotbarPerformed;
+            _inputActions.Interactions.UseItemFromHotbar.canceled += UseItemFromHotbarCanceled;
+            _inputActions.Interactions.BreakBlock.performed += BreakWallPerformed;
+            _inputActions.Interactions.BreakBlock.canceled += BreakWallCanceled;
+            _inputActions.Interactions.ThrowItem.performed += ThrowSelectedItem;
 
             EventManager.BookOpened += Disable;
             EventManager.BookClosed += Enable;

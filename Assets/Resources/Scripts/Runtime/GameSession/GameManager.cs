@@ -39,7 +39,7 @@ namespace SavageWorld.Runtime.GameSession
         [SerializeField]
         private PlayerGameObject _player;
         [SerializeField]
-        private PlayerInputActions _playerInputActions;
+        private PlayerInputActions _inputActions;
 
         [Header("Atlases")]
         [SerializeField]
@@ -442,15 +442,15 @@ namespace SavageWorld.Runtime.GameSession
             }
         }
 
-        public PlayerInputActions PlayerInputActions
+        public PlayerInputActions InputActions
         {
             get
             {
-                if (_playerInputActions is null)
+                if (_inputActions is null)
                 {
-                    _playerInputActions = new();
+                    _inputActions = new();
                 }
-                return _playerInputActions;
+                return _inputActions;
             }
         }
 
@@ -530,7 +530,7 @@ namespace SavageWorld.Runtime.GameSession
             _terrain = _terrainGameObject.GetComponent<TerrainBehaviour>();
             _terrainGameObject.SetActive(false);
             InputSystem.EnableDevice(Keyboard.current);
-            StaticInfo.Initialize();
+            StaticParameters.Initialize();
             GameTime.Instance.enabled = false;
         }
 

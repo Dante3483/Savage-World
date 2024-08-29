@@ -18,7 +18,7 @@ public class TabGroup : VisualElement
     }
 
     #region Private fields
-    private static readonly string _styleResource = StaticInfo.StyleSheetsDirectory + "TabGroup";
+    private static readonly string _styleResource = StaticParameters.StyleSheetsDirectory + "TabGroup";
     private static readonly string _ussTabGroup = "tab-group";
     private static readonly string _ussTabs = _ussTabGroup + "__tabs";
     private static readonly string _ussTab = _ussTabGroup + "__tab";

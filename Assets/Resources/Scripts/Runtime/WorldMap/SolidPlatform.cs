@@ -26,6 +26,7 @@ namespace SavageWorld.Runtime.WorldMap
         private void Awake()
         {
             _polygonCollider = GetComponent<PolygonCollider2D>();
+            _polygonCollider.enabled = false;
         }
 
         public void SetActive()

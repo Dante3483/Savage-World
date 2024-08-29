@@ -24,8 +24,8 @@ namespace SavageWorld.Runtime.Player.Hotbar
         #region Public Methods
         public HotbarPresenter(InventoryModel model, HotbarView view) : base(model, view)
         {
-            GameManager.Instance.PlayerInputActions.UI.SelectHotbarCellByKeyboard.performed += SelectCell;
-            GameManager.Instance.PlayerInputActions.UI.SelectHotbarCellByScrolling.performed += ScrollCell;
+            GameManager.Instance.InputActions.UI.SelectHotbarCellByKeyboard.performed += SelectCell;
+            GameManager.Instance.InputActions.UI.SelectHotbarCellByScrolling.performed += ScrollCell;
         }
 
         public override void ResetPresenter()

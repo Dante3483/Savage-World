@@ -5,25 +5,33 @@ using UnityEngine;
 namespace SavageWorld.Runtime.Utilities.Raycasts
 {
     [Serializable]
-    public struct BoxCastUtil
+    public class BoxCastUtil
     {
-        #region Private fields
-        [SerializeField] private bool _needVisualize;
-        [SerializeField] private bool _checkYourself;
-        [SerializeField] private bool _result;
-        [SerializeField] private Vector2 _originOffset;
-        [Min(0.001f)][SerializeField] private Vector2 _size;
-        [SerializeField] private float _angle;
-        [SerializeField] private Vector2 _direction;
-        [SerializeField] private float _distance;
-        [SerializeField] private LayerMask _layerMask;
-        [SerializeField] private Color _hitColor;
-        [SerializeField] private Color _notHitColor;
+        #region Fields
+        [SerializeField]
+        private bool _needVisualize;
+        [SerializeField]
+        private bool _checkYourself;
+        [SerializeField]
+        private bool _result;
+        [SerializeField]
+        private Vector2 _originOffset;
+        [Min(0.001f)]
+        [SerializeField]
+        private Vector2 _size;
+        [SerializeField]
+        private float _angle;
+        [SerializeField]
+        private Vector2 _direction;
+        [SerializeField]
+        private float _distance;
+        [SerializeField]
+        private LayerMask _layerMask;
+        [SerializeField]
+        private Color _hitColor;
+        [SerializeField]
+        private Color _notHitColor;
         private GameObject _self;
-        #endregion
-
-        #region Public fields
-
         #endregion
 
         #region Properties
@@ -124,7 +132,22 @@ namespace SavageWorld.Runtime.Utilities.Raycasts
         }
         #endregion
 
-        #region Methods
+        #region Events / Delegates
+
+        #endregion
+
+        #region Monobehaviour Methods
+
+        #endregion
+
+        #region Public Methods
+        public BoxCastUtil()
+        {
+            _size = new(1, 1);
+            _hitColor = Color.green;
+            _notHitColor = Color.red;
+        }
+
         public RaycastHit2D BoxCast(Vector2 origin)
         {
             Color rayColor;
@@ -167,6 +190,30 @@ namespace SavageWorld.Runtime.Utilities.Raycasts
             }
             return hits;
         }
+
+        public void SetSizeX(float xValue)
+        {
+            _size.x = xValue;
+        }
+
+        public void SetSizeY(float yValue)
+        {
+            _size.y = yValue;
+        }
+
+        public void SetOffsetX(float xValue)
+        {
+            _originOffset.x = xValue;
+        }
+
+        public void SetOffsetY(float yValue)
+        {
+            _originOffset.y = yValue;
+        }
+        #endregion
+
+        #region Private Methods
+
         #endregion
     }
 }

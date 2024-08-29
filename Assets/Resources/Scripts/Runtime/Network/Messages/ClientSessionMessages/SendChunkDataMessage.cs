@@ -169,16 +169,16 @@ namespace SavageWorld.Runtime.Network.Messages
         {
             _writer.Write(flags);
             _writer.Write((byte)(blockId));
-            if ((flags & StaticInfo.Bit1) == StaticInfo.Bit1)
+            if ((flags & StaticParameters.Bit0) == StaticParameters.Bit0)
             {
                 _writer.Write((byte)(blockId >> 8));
             }
             _writer.Write((byte)(wallId));
-            if ((flags & StaticInfo.Bit2) == StaticInfo.Bit2)
+            if ((flags & StaticParameters.Bit1) == StaticParameters.Bit1)
             {
                 _writer.Write((byte)(wallId >> 8));
             }
-            if ((flags & StaticInfo.Bit3) == StaticInfo.Bit3)
+            if ((flags & StaticParameters.Bit2) == StaticParameters.Bit2)
             {
                 _writer.Write(liquidId);
                 _writer.Write((byte)(flowValue * 2.54f));
@@ -187,7 +187,7 @@ namespace SavageWorld.Runtime.Network.Messages
             _writer.Write(colliderIndex);
             _writer.Write(blockFlags);
             _writer.Write((byte)type);
-            if ((flags & StaticInfo.Bit4) == StaticInfo.Bit4)
+            if ((flags & StaticParameters.Bit3) == StaticParameters.Bit3)
             {
                 _writer.Write((byte)countOfSameObject);
                 _writer.Write((byte)(countOfSameObject >> 8));
@@ -226,18 +226,18 @@ namespace SavageWorld.Runtime.Network.Messages
                     flags = _reader.ReadByte();
 
                     blockId = _reader.ReadByte();
-                    if ((flags & StaticInfo.Bit1) == StaticInfo.Bit1)
+                    if ((flags & StaticParameters.Bit0) == StaticParameters.Bit0)
                     {
                         blockId |= (ushort)(_reader.ReadByte() << 8);
                     }
 
                     wallId = _reader.ReadByte();
-                    if ((flags & StaticInfo.Bit2) == StaticInfo.Bit2)
+                    if ((flags & StaticParameters.Bit1) == StaticParameters.Bit1)
                     {
                         wallId |= (ushort)(_reader.ReadByte() << 8);
                     }
 
-                    if ((flags & StaticInfo.Bit3) == StaticInfo.Bit3)
+                    if ((flags & StaticParameters.Bit2) == StaticParameters.Bit2)
                     {
                         liquidId = _reader.ReadByte();
                         flowValue = _reader.ReadByte() / 2.54f;
@@ -253,7 +253,7 @@ namespace SavageWorld.Runtime.Network.Messages
                     blockFlags = _reader.ReadByte();
                     blockType = (BlockTypes)_reader.ReadByte();
 
-                    if ((flags & StaticInfo.Bit4) == StaticInfo.Bit4)
+                    if ((flags & StaticParameters.Bit3) == StaticParameters.Bit3)
                     {
                         count = _reader.ReadByte();
                         count |= _reader.ReadByte() << 8;

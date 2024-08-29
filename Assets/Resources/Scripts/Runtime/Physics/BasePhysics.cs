@@ -1,11 +1,8 @@
-using SavageWorld.Runtime.Attributes;
-using SavageWorld.Runtime.Managers;
+using SavageWorld.Runtime.Player.Movement;
+using SavageWorld.Runtime.Utilities.Extensions;
 using SavageWorld.Runtime.Utilities.Raycasts;
-using SavageWorld.Runtime.WorldMap;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
-using UnityEngine.UIElements;
-using Random = UnityEngine.Random;
 
 namespace SavageWorld.Runtime.Physics
 {
@@ -13,136 +10,242 @@ namespace SavageWorld.Runtime.Physics
     [RequireComponent(typeof(Rigidbody2D))]
     public class BasePhysics : MonoBehaviour
     {
-        #region Private fields
+        #region Fields
+        [Header("Main")]
         [SerializeField]
         protected BoxCollider2D _boxCollider;
         [SerializeField]
         protected Rigidbody2D _rigidbody;
         [SerializeField]
-        private BoxCastUtil _groundCheckBoxCast;
+        protected PhysicsMaterial2D _noFriction;
         [SerializeField]
-        protected bool _isGrounded;
+        protected PhysicsMaterial2D _fullFriction;
         [SerializeField]
-        private float _rawWidth;
+        protected PhysicsFlags _flags;
         [SerializeField]
-        private float _rawHeight;
-        [SerializeField]
-        private int _width;
-        [SerializeField]
-        private int _height;
-        [SerializeField]
-        private Vector2Int _startRenderingArea;
-        [SerializeField]
-        private Vector2Int _endRenderingArea;
-        [SerializeField]
-        private Vector2 _center;
-        [SerializeField]
-        protected float _xSpeed = 100;
-        [SerializeField]
-        protected float _ySpeed = 100;
+        protected PlatformCreator _platformsCreator;
+        private Vector2Int _currentTransformPosition;
+        private Vector2Int _prevTransformPosition;
+
+        [Space]
+        [Header("Movement params")]
         [SerializeField]
         protected float _maxFallingSpeed = -30;
         [SerializeField]
-        private Vector2Int _prevTransformPosition;
-        [SerializeField]
-        private Vector2Int _currentTransformPosition;
-        [SerializeField]
-        private List<Vector2Int> _listOfPlatformsPositions;
-        [SerializeField]
-        private bool _isInsideRenderArea;
-        #endregion
+        protected PhysicStateProperties _state;
 
-        #region Public fields
+        [Space]
+        [Header("Checks")]
+        [SerializeField]
+        private LayerMask _groundLayer = 1 << 6;
+        [SerializeField]
+        private BoxCastUtil _groundCheckBoxCast = new();
+        [SerializeField]
+        private BoxCastUtil _wallCheckBoxCast = new();
+        [SerializeField]
+        private BoxCastUtil _ceilingCheckBoxCast = new();
+        private RaycastUtil _slopeCheckRaycast;
 
+        [Space]
+        [Header("Slope params")]
+        [SerializeField]
+        protected float _slopeCheckDistanceLeft;
+        [SerializeField]
+        protected float _slopeCheckDistanceRight;
+        [SerializeField]
+        protected float _slopeAngle;
+        [SerializeField]
+        protected Vector2 _slopeNormalPerpendicular;
         #endregion
 
         #region Properties
-        public bool IsInsideRenderArea
+        public PhysicsFlags Flags
         {
             get
             {
-                return _isInsideRenderArea;
-            }
-
-            set
-            {
-                _isInsideRenderArea = value;
+                return _flags;
             }
         }
         #endregion
 
-        #region Methods
+        #region Events / Delegates
+        public event Action EntityFall;
+        #endregion
+
+        #region Monobehaviour Methods
         public virtual void Awake()
         {
             _boxCollider = GetComponent<BoxCollider2D>();
             _rigidbody = GetComponent<Rigidbody2D>();
-            _rawWidth = _boxCollider.size.x;
-            _rawHeight = _boxCollider.size.y;
-            _width = Mathf.FloorToInt(_rawWidth);
-            _height = Mathf.FloorToInt(_rawHeight);
-            _startRenderingArea = new(-Mathf.CeilToInt((_width + 1) / 2f), -Mathf.CeilToInt((_height + 1) / 2f));
-            _endRenderingArea = new(-_startRenderingArea.x, -_startRenderingArea.y);
-            _listOfPlatformsPositions = new();
-
+            _platformsCreator = new(_boxCollider.size);
+            _flags.IsIdle = true;
+            _flags.IsFaceToTheRight = true;
         }
 
         public virtual void FixedUpdate()
         {
+            SetFlags();
             if (transform.hasChanged)
             {
                 _currentTransformPosition = Vector2Int.FloorToInt(_boxCollider.bounds.center);
-                if (_currentTransformPosition != _prevTransformPosition)
-                {
-                    ClearPlatforms();
-                    _prevTransformPosition = _currentTransformPosition;
-                }
-                GroundCheck();
-                MovePlatforms();
+                _platformsCreator.Process(_boxCollider.bounds.center, _currentTransformPosition != _prevTransformPosition);
+                _prevTransformPosition = _currentTransformPosition;
+                transform.hasChanged = false;
             }
         }
+        #endregion
 
-        private void ClearPlatforms()
+        #region Public Methods
+        public BasePhysics()
         {
-            foreach (var platformPosition in _listOfPlatformsPositions)
-            {
-                Tilemap.Instance.AddPositionToRemovePlatform(platformPosition, gameObject);
-            }
+            _groundCheckBoxCast.LayerMask = _groundLayer;
+
+            _wallCheckBoxCast.LayerMask = _groundLayer;
+            _wallCheckBoxCast.HitColor = ColorExtension.GetColor("FFDA00");
+            _wallCheckBoxCast.NotHitColor = ColorExtension.GetColor("FF0088");
+            _wallCheckBoxCast.Size = new(0.4f, 0.001f);
+            _wallCheckBoxCast.Direction = Vector2.down;
+
+            _ceilingCheckBoxCast.LayerMask = _groundLayer;
+            _ceilingCheckBoxCast.HitColor = ColorExtension.GetColor("00FFE1");
+            _ceilingCheckBoxCast.NotHitColor = ColorExtension.GetColor("9900FF");
+            _ceilingCheckBoxCast.Size = new(1f, 0.001f);
+            _ceilingCheckBoxCast.Direction = Vector2.up;
+            _ceilingCheckBoxCast.Distance = 0.5f;
+
+            _slopeCheckDistanceLeft = 1f;
+            _slopeCheckDistanceRight = 1f;
         }
 
-        private void GroundCheck()
+        public void SetState(PhysicStateProperties state)
+        {
+            _state = state;
+            _boxCollider.size = _state.ColliderSize;
+            _boxCollider.offset = _state.ColliderOffset;
+        }
+        #endregion
+
+        #region Private Methods
+        private void SetFlags()
+        {
+            CheckGrounding();
+            CheckSlope();
+            CheckRising();
+            CheckFalling();
+            CheckWallInFront();
+            CheckCeil();
+        }
+
+        protected void Flip()
+        {
+            if (_flags.IsFlipBlocked)
+            {
+                return;
+            }
+
+            _flags.IsFaceToTheRight = !_flags.IsFaceToTheRight;
+            transform.Rotate(0.0f, 180.0f, 0.0f);
+        }
+
+        protected void SetMaterial(PhysicsMaterial2D material)
+        {
+            _rigidbody.sharedMaterial = material;
+        }
+
+        private void CheckGrounding()
         {
             Vector3 origin = _boxCollider.bounds.center;
             origin.y -= _boxCollider.bounds.extents.y;
-
+            _groundCheckBoxCast.SetSizeX(_boxCollider.size.x);
             _groundCheckBoxCast.BoxCast(origin);
-            _isGrounded = _groundCheckBoxCast.Result;
+            _flags.IsGrounded = _groundCheckBoxCast.Result;
         }
 
-        private void MovePlatforms()
+        private void CheckSlope()
         {
-            _listOfPlatformsPositions.Clear();
-            _center = _boxCollider.bounds.center;
-            for (int x = _startRenderingArea.x; x <= _endRenderingArea.x; x++)
+            if (_flags.IsSlopeCheckBlocked)
             {
-                for (int y = _startRenderingArea.y; y <= _endRenderingArea.y; y++)
-                {
-                    int positionX = Mathf.FloorToInt(_center.x + x);
-                    int positionY = Mathf.FloorToInt(_center.y + y);
-                    Vector2Int position = new(positionX, positionY);
-                    if (WorldDataManager.Instance.IsPhysicallySolidBlock(positionX, positionY))
-                    {
-                        _listOfPlatformsPositions.Add(position);
-                        Tilemap.Instance.AddPositionToCreatePlatform(position, gameObject);
-                    }
-                }
+                _flags.IsOnSlope = false;
+                return;
             }
-            transform.hasChanged = false;
+
+            Vector2 origin = _boxCollider.bounds.center - new Vector3(0, _boxCollider.bounds.extents.y);
+            _slopeCheckDistanceRight = _boxCollider.size.x - 0.45f;
+            _slopeCheckDistanceLeft = _boxCollider.size.x + 0.05f;
+
+            RaycastHit2D slopeHitFront = _slopeCheckRaycast.Raycast(
+                origin,
+                transform.right,
+                _slopeCheckDistanceRight,
+                _groundLayer,
+                Color.cyan,
+                Color.red);
+
+            RaycastHit2D slopeHitBack = _slopeCheckRaycast.Raycast(
+                origin,
+                -transform.right,
+                _slopeCheckDistanceLeft,
+                _groundLayer,
+                Color.cyan,
+                Color.red);
+
+            if (slopeHitFront)
+            {
+                _slopeAngle = Vector2.Angle(slopeHitFront.normal, Vector2.up);
+                _slopeNormalPerpendicular = Vector2.Perpendicular(slopeHitFront.normal).normalized;
+            }
+            else if (slopeHitBack)
+            {
+                _slopeAngle = Vector2.Angle(slopeHitBack.normal, Vector2.up);
+                _slopeNormalPerpendicular = Vector2.Perpendicular(slopeHitBack.normal).normalized;
+            }
+            else
+            {
+                _slopeAngle = 0.0f;
+            }
+
+            _flags.IsOnSlope = _slopeAngle != 0f && _slopeAngle != 90;
+
+            if (_flags.IsOnSlope)
+            {
+                _flags.IsGrounded = true;
+            }
         }
 
-        [Button("Random position")]
-        private void RandomPosition()
+        private void CheckRising()
         {
-            transform.position = new Vector3(Random.Range(100, 4000), 2200);
+            if (_rigidbody.velocity.y <= 0)
+            {
+                _flags.IsRise = false;
+            }
+        }
+
+        private void CheckFalling()
+        {
+            _flags.IsFall = _rigidbody.velocity.y < 0.1f && !_flags.IsGrounded && !_flags.IsOnSlope;
+            if (_flags.IsFall)
+            {
+                _flags.IsRise = false;
+                EntityFall?.Invoke();
+            }
+        }
+
+        private void CheckWallInFront()
+        {
+            Vector3 origin = _boxCollider.bounds.center;
+            origin.x += _boxCollider.bounds.extents.x * transform.right.x;
+            _wallCheckBoxCast.Distance = _state.WallInFrontCheckDistance;
+            _wallCheckBoxCast.SetOffsetY(_state.WallInFrontCheckDistance / 2f);
+            _wallCheckBoxCast.BoxCast(origin);
+            _flags.IsWallInFront = _wallCheckBoxCast.Result;
+        }
+
+        private void CheckCeil()
+        {
+            Vector3 origin = _boxCollider.bounds.center;
+            origin.y += _boxCollider.bounds.extents.y;
+            _ceilingCheckBoxCast.BoxCast(origin);
+            _flags.IsTouchCeiling = _ceilingCheckBoxCast.Result;
         }
         #endregion
     }

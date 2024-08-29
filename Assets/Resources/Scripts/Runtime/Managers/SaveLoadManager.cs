@@ -64,10 +64,10 @@ namespace SavageWorld.Runtime.Managers
         {
             _worldColumnIndexes = new List<int>();
 
-            string worldDirectory = StaticInfo.WorldsDirectory + $"/{_gameManager.WorldName}";
+            string worldDirectory = StaticParameters.WorldsDirectory + $"/{_gameManager.WorldName}";
             string worldSaveFile = worldDirectory + $"/{_gameManager.WorldName}.sw.world";
             string worldMetaFile = worldDirectory + $"/{_gameManager.WorldName}.swm.world";
-            string playerFile = StaticInfo.PlayersDirectory + $"/{_gameManager.PlayerName}.sw.player";
+            string playerFile = StaticParameters.PlayersDirectory + $"/{_gameManager.PlayerName}.sw.player";
 
             Directory.CreateDirectory(worldDirectory);
 
@@ -98,10 +98,10 @@ namespace SavageWorld.Runtime.Managers
         {
             _worldColumnIndexes = new List<int>();
 
-            string worldDirectory = StaticInfo.WorldsDirectory + $"/{_gameManager.WorldName}";
+            string worldDirectory = StaticParameters.WorldsDirectory + $"/{_gameManager.WorldName}";
             string worldSaveFile = worldDirectory + $"/{_gameManager.WorldName}.sw.world";
             string worldMetaFile = worldDirectory + $"/{_gameManager.WorldName}.swm.world";
-            string playerFile = StaticInfo.PlayersDirectory + $"/{_gameManager.PlayerName}.sw.player";
+            string playerFile = StaticParameters.PlayersDirectory + $"/{_gameManager.PlayerName}.sw.player";
 
             _loadingStep = 100f / 5f;
 

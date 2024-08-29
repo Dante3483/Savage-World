@@ -50,15 +50,15 @@ namespace SavageWorld.Runtime.Terrain
 
         public bool IsFurniture => BlockType == BlockTypes.Furniture;
 
-        public bool IsUnbreakable => (Flags & StaticInfo.Bit1) == StaticInfo.Bit1;
+        public bool IsUnbreakable => (Flags & StaticParameters.Bit0) == StaticParameters.Bit0;
 
-        public bool IsOccupied => (Flags & StaticInfo.Bit2) == StaticInfo.Bit2;
+        public bool IsOccupied => (Flags & StaticParameters.Bit1) == StaticParameters.Bit1;
 
-        public bool IsTree => (Flags & StaticInfo.Bit3) == StaticInfo.Bit3;
+        public bool IsTree => (Flags & StaticParameters.Bit2) == StaticParameters.Bit2;
 
-        public bool IsTreeTrunk => (Flags & StaticInfo.Bit4) == StaticInfo.Bit4;
+        public bool IsTreeTrunk => (Flags & StaticParameters.Bit3) == StaticParameters.Bit3;
 
-        public bool IsColliderHorizontalFlipped => (Flags & StaticInfo.Bit5) == StaticInfo.Bit5;
+        public bool IsColliderHorizontalFlipped => (Flags & StaticParameters.Bit4) == StaticParameters.Bit4;
 
         public bool IsFree => !IsOccupied && !IsTree && !IsTreeTrunk;
 
@@ -137,11 +137,11 @@ namespace SavageWorld.Runtime.Terrain
         {
             if (value)
             {
-                Flags |= StaticInfo.Bit1;
+                Flags |= StaticParameters.Bit0;
             }
             else
             {
-                Flags &= StaticInfo.InvertedBit1;
+                Flags &= StaticParameters.InvertedBit0;
             }
         }
 
@@ -149,11 +149,11 @@ namespace SavageWorld.Runtime.Terrain
         {
             if (value)
             {
-                Flags |= StaticInfo.Bit2;
+                Flags |= StaticParameters.Bit1;
             }
             else
             {
-                Flags &= StaticInfo.InvertedBit2;
+                Flags &= StaticParameters.InvertedBit1;
             }
         }
 
@@ -161,11 +161,11 @@ namespace SavageWorld.Runtime.Terrain
         {
             if (value)
             {
-                Flags |= StaticInfo.Bit3;
+                Flags |= StaticParameters.Bit2;
             }
             else
             {
-                Flags &= StaticInfo.InvertedBit3;
+                Flags &= StaticParameters.InvertedBit2;
             }
         }
 
@@ -173,11 +173,11 @@ namespace SavageWorld.Runtime.Terrain
         {
             if (value)
             {
-                Flags |= StaticInfo.Bit4;
+                Flags |= StaticParameters.Bit3;
             }
             else
             {
-                Flags &= StaticInfo.InvertedBit4;
+                Flags &= StaticParameters.InvertedBit3;
             }
         }
 
@@ -185,11 +185,11 @@ namespace SavageWorld.Runtime.Terrain
         {
             if (value)
             {
-                Flags |= StaticInfo.Bit5;
+                Flags |= StaticParameters.Bit4;
             }
             else
             {
-                Flags &= StaticInfo.InvertedBit5;
+                Flags &= StaticParameters.InvertedBit4;
             }
         }
 

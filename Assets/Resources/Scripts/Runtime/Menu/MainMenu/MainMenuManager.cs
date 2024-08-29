@@ -133,7 +133,7 @@ namespace SavageWorld.Runtime.Menu
         public void CreatePlayer()
         {
             string playerName = $"Player {GameManager.Instance.PlayerNames.Count + 1}";
-            string playerPath = StaticInfo.PlayersDirectory + $"/{playerName}.sw.player";
+            string playerPath = StaticParameters.PlayersDirectory + $"/{playerName}.sw.player";
 
             using (BinaryWriter binaryWriter = new(File.Open(playerPath, FileMode.Create)))
             {
@@ -161,7 +161,7 @@ namespace SavageWorld.Runtime.Menu
         //Delete
         public void DeletePlayer(string playerName)
         {
-            string playerPath = StaticInfo.PlayersDirectory + $"/{playerName}.sw.player";
+            string playerPath = StaticParameters.PlayersDirectory + $"/{playerName}.sw.player";
             File.Delete(playerPath);
             GameManager.Instance.PlayerNames.Remove(playerName);
         }
@@ -185,7 +185,7 @@ namespace SavageWorld.Runtime.Menu
         //Delete
         public void DeleteWorld(string worldName)
         {
-            string worldPath = StaticInfo.WorldsDirectory + $"/{worldName}";
+            string worldPath = StaticParameters.WorldsDirectory + $"/{worldName}";
             Directory.Delete(worldPath, true);
             GameManager.Instance.WorldNames.Remove(worldName);
         }

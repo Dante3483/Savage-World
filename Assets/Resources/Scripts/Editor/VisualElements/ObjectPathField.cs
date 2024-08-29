@@ -11,7 +11,7 @@ public abstract class ObjectPathField : BaseField<DefaultAsset>
     }
 
     #region Private fields
-    private static readonly string _styleResource = StaticInfo.StyleSheetsDirectory + "ObjectPathField";
+    private static readonly string _styleResource = StaticParameters.StyleSheetsDirectory + "ObjectPathField";
     private static readonly string _ussObjectPathField = "object-path-field";
     private static readonly string _ussInput = _ussObjectPathField + "__input";
     private static readonly string _ussOpenPanel = _ussObjectPathField + "__open-panel";

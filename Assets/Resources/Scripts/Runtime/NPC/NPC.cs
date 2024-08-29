@@ -19,13 +19,13 @@ namespace SavageWorld.Runtime.NPC
         [SerializeField] protected NPCStats _npcStats;
         [SerializeField] protected float _movementDirection;
         [SerializeField] protected SpriteRenderer _spriteRenderer;
-        ///
+
         [Header("Layers")]
         [SerializeField] private LayerMask _groundLayer;
-        ///
+
         [Header("Ground check")]
         [SerializeField] private BoxCastUtil _groundCheckBoxCast;
-        ///
+
         [Header("Slope check")]
         [SerializeField] private float _slopeCheckDistanceLeft;
         [SerializeField] private float _slopeCheckDistanceRight;
@@ -34,7 +34,7 @@ namespace SavageWorld.Runtime.NPC
         [SerializeField] private PhysicsMaterial2D _noFriction;
         [SerializeField] private PhysicsMaterial2D _fullFriction;
         private RaycastUtil _slopeCheckRaycast;
-        ///
+
         [Header("Attack properties")]
         [SerializeField] private GameObject _attackCollider;
         [SerializeField] private GameObject _hitCollider;

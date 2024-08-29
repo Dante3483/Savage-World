@@ -67,15 +67,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
-                },
-                {
-                    "name": "Toggle Developer Console",
-                    "type": "Button",
-                    "id": "516ed990-a0fc-442f-8f0e-5ec4bfa4f0be",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -199,28 +190,6 @@
                     "action": "Select Hotbar Cell By Scrolling",
                     "isComposite": false,
                     "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "9a749093-c225-47bf-82cd-e0ffa4a3af64",
-                    "path": "<Keyboard>/backquote",
-                    "interactions": "",
-                    "processors": "Scale",
-                    "groups": "",
-                    "action": "Toggle Developer Console",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "b50a87ca-600e-4704-9f5f-6cdf0a4f8327",
-                    "path": "<Keyboard>/slash",
-                    "interactions": "",
-                    "processors": "Scale(factor=2)",
-                    "groups": "",
-                    "action": "Toggle Developer Console",
-                    "isComposite": false,
-                    "isPartOfComposite": false
                 }
             ]
         },
@@ -287,6 +256,175 @@
                     "processors": "",
                     "groups": "",
                     "action": "Throw Item",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Player",
+            "id": "b1467f1f-2938-4567-ada8-05bb85a92db1",
+            "actions": [
+                {
+                    "name": "Move",
+                    "type": "Value",
+                    "id": "c5ff6c31-0939-4108-bd88-f30e291057ad",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Jump",
+                    "type": "Button",
+                    "id": "c6950a64-47c8-4a25-a89b-ab7463ba0cca",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Run",
+                    "type": "Button",
+                    "id": "3c140f77-f5e6-4d8a-9f78-b1f4480c7dc1",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Crouch",
+                    "type": "Button",
+                    "id": "6c971866-4db3-4c69-8ea5-62266db557b6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Slide",
+                    "type": "Button",
+                    "id": "1b0df3e3-0645-4193-a226-1cb0bf24dbb9",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "AD",
+                    "id": "9b85d804-69d3-466e-9452-116dd227a660",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "b80037b9-1b70-4b7f-a8d9-eee45a9afb7e",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "2305c6b0-d575-45a3-bb23-9c962437905a",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "bafb6fa6-4845-426d-b2f9-95250004b08e",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d11d6c37-1dae-47ee-9790-0d024e1fe77a",
+                    "path": "<Keyboard>/leftShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Run",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "94277dad-d1f5-4e9a-a3f7-26bef0277e09",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Crouch",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fbf1d959-31a5-4d73-ad47-0ebf3e84875b",
+                    "path": "<Keyboard>/c",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Slide",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Debug",
+            "id": "3af39e40-6a15-44c1-8c29-320d01d8c693",
+            "actions": [
+                {
+                    "name": "Toggle Developer Console",
+                    "type": "Button",
+                    "id": "21e0c46b-02bc-43bc-a94e-010b02827ba1",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "63d9c554-a154-42f2-a140-4088e86e7857",
+                    "path": "<Keyboard>/backquote",
+                    "interactions": "",
+                    "processors": "Scale",
+                    "groups": "",
+                    "action": "Toggle Developer Console",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "77290bd4-5d68-4420-a1ec-e4b3aa760f3f",
+                    "path": "<Keyboard>/slash",
+                    "interactions": "",
+                    "processors": "Scale(factor=2)",
+                    "groups": "",
+                    "action": "Toggle Developer Console",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

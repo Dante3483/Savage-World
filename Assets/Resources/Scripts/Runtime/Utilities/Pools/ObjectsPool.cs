@@ -27,7 +27,7 @@ namespace SavageWorld.Runtime.Utilities.Pools
             {
                 for (int i = 0; i < starterSize; i++)
                 {
-                    _pool.Push(createInstance());
+                    _pool.Push(createInstance.Invoke());
                 }
             }
         }

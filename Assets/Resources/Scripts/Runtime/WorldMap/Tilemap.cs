@@ -1,5 +1,6 @@
 using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Managers;
+using SavageWorld.Runtime.Physics;
 using SavageWorld.Runtime.Player.Interactions;
 using SavageWorld.Runtime.Utilities.Others;
 using SavageWorld.Runtime.Utilities.Pools;
@@ -40,7 +41,7 @@ namespace SavageWorld.Runtime.WorldMap
         [SerializeField]
         private Transform _platformsContent;
         private Dictionary<Vector2Int, SolidPlatform> _usedPlatformsByPositions;
-        private Dictionary<Vector2Int, HashSet<GameObject>> _setsOfRequestedObjectsByPlatformPosition;
+        private Dictionary<Vector2Int, HashSet<PlatformCreator>> _setsOfRequestedObjectsByPlatformPosition;
         private HashSet<Vector2Int> _setOfPlatformPositionsToCreate;
         private HashSet<Vector2Int> _setOfPlatformPositionsToRemove;
         private ObjectsPool<SolidPlatform> _platformsPool;
@@ -109,27 +110,29 @@ namespace SavageWorld.Runtime.WorldMap
         #endregion
 
         #region Public Methods
-        public void AddPositionToCreatePlatform(Vector2Int position, GameObject sender)
+        public void AddPositionToCreatePlatform(Vector2Int position, PlatformCreator sender)
         {
             if (!_setsOfRequestedObjectsByPlatformPosition.ContainsKey(position))
             {
+                _needUpdateCompositeCollider = true;
                 _setsOfRequestedObjectsByPlatformPosition[position] = new();
+                _setOfPlatformPositionsToCreate.Add(position);
             }
             _setsOfRequestedObjectsByPlatformPosition[position].Add(sender);
-            _needUpdateCompositeCollider = _setOfPlatformPositionsToCreate.Add(position);
         }
 
-        public void AddPositionToRemovePlatform(Vector2Int position, GameObject sender)
+        public void AddPositionToRemovePlatform(Vector2Int position, PlatformCreator sender)
         {
             if (_setsOfRequestedObjectsByPlatformPosition.ContainsKey(position))
             {
                 _setsOfRequestedObjectsByPlatformPosition[position].Remove(sender);
                 if (_setsOfRequestedObjectsByPlatformPosition[position].Count == 0)
                 {
+                    _needUpdateCompositeCollider = true;
                     _setsOfRequestedObjectsByPlatformPosition.Remove(position);
+                    _setOfPlatformPositionsToRemove.Add(position);
                 }
             }
-            _needUpdateCompositeCollider = _setOfPlatformPositionsToRemove.Add(position);
         }
         #endregion
 
@@ -165,24 +168,13 @@ namespace SavageWorld.Runtime.WorldMap
             _prevAreaRect.position = new(_prevPosition.x, _prevPosition.y);
             _currentAreaRect.position = new(_currentPosition.x, _currentPosition.y);
 
-            if (isPositionChanged)
-            {
-                foreach (Vector2Int position in _prevAreaRect.allPositionsWithin)
-                {
-                    if (!_currentAreaRect.Contains(position))
-                    {
-                        AddPositionToRemovePlatform(position, gameObject);
-                    }
-                }
-                _needUpdateTiles = true;
-            }
+            _needUpdateTiles = isPositionChanged;
             if (_needUpdateTiles)
             {
                 _needUpdateTiles = false;
                 foreach (Vector2Int position in _currentAreaRect.allPositionsWithin)
                 {
                     UpdateTileData(position);
-                    AddPositionToCreatePlatform(position, gameObject);
                 }
             }
             if (_needUpdateCompositeCollider)
@@ -316,10 +308,7 @@ namespace SavageWorld.Runtime.WorldMap
 
         private void CreatePlatform(Vector2Int position)
         {
-            int x = position.x;
-            int y = position.y;
-            _usedPlatformsByPositions.TryGetValue(position, out SolidPlatform platform);
-            if (platform == null)
+            if (!_usedPlatformsByPositions.TryGetValue(position, out SolidPlatform platform))
             {
                 platform = GetPlatform();
                 platform.SetActive();
@@ -327,14 +316,13 @@ namespace SavageWorld.Runtime.WorldMap
                 _usedPlatformsByPositions.Add(position, platform);
             }
             platform.SetPolygonColliderPoints(
-                _worldDataManager.GetColliderShape(x, y),
-                _worldDataManager.IsColliderHorizontalFlipped(x, y));
+                _worldDataManager.GetColliderShape(position.x, position.y),
+                _worldDataManager.IsColliderHorizontalFlipped(position.x, position.y));
         }
 
         private void RemovePlatform(Vector2Int position)
         {
-            _usedPlatformsByPositions.TryGetValue(position, out SolidPlatform platform);
-            if (platform != null)
+            if (_usedPlatformsByPositions.TryGetValue(position, out SolidPlatform platform))
             {
                 if (!_setsOfRequestedObjectsByPlatformPosition.ContainsKey(position))
                 {
@@ -376,9 +364,12 @@ namespace SavageWorld.Runtime.WorldMap
 
         private void CellColliderChangedEventHandler(int x, int y)
         {
-            if (IsInRenderArea(x, y))
+            if (_usedPlatformsByPositions.TryGetValue(new(x, y), out SolidPlatform platform))
             {
-                AddPositionToCreatePlatform(new(x, y), gameObject);
+                platform.SetPolygonColliderPoints(
+                    _worldDataManager.GetColliderShape(x, y),
+                    _worldDataManager.IsColliderHorizontalFlipped(x, y));
+                _compositeCollider.GenerateGeometry();
             }
         }
 

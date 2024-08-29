@@ -89,15 +89,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""Toggle Developer Console"",
-                    ""type"": ""Button"",
-                    ""id"": ""516ed990-a0fc-442f-8f0e-5ec4bfa4f0be"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -221,28 +212,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Select Hotbar Cell By Scrolling"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""9a749093-c225-47bf-82cd-e0ffa4a3af64"",
-                    ""path"": ""<Keyboard>/backquote"",
-                    ""interactions"": """",
-                    ""processors"": ""Scale"",
-                    ""groups"": """",
-                    ""action"": ""Toggle Developer Console"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""b50a87ca-600e-4704-9f5f-6cdf0a4f8327"",
-                    ""path"": ""<Keyboard>/slash"",
-                    ""interactions"": """",
-                    ""processors"": ""Scale(factor=2)"",
-                    ""groups"": """",
-                    ""action"": ""Toggle Developer Console"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -313,6 +282,175 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Player"",
+            ""id"": ""b1467f1f-2938-4567-ada8-05bb85a92db1"",
+            ""actions"": [
+                {
+                    ""name"": ""Move"",
+                    ""type"": ""Value"",
+                    ""id"": ""c5ff6c31-0939-4108-bd88-f30e291057ad"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""c6950a64-47c8-4a25-a89b-ab7463ba0cca"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Run"",
+                    ""type"": ""Button"",
+                    ""id"": ""3c140f77-f5e6-4d8a-9f78-b1f4480c7dc1"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Crouch"",
+                    ""type"": ""Button"",
+                    ""id"": ""6c971866-4db3-4c69-8ea5-62266db557b6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Slide"",
+                    ""type"": ""Button"",
+                    ""id"": ""1b0df3e3-0645-4193-a226-1cb0bf24dbb9"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": ""AD"",
+                    ""id"": ""9b85d804-69d3-466e-9452-116dd227a660"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""b80037b9-1b70-4b7f-a8d9-eee45a9afb7e"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""2305c6b0-d575-45a3-bb23-9c962437905a"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bafb6fa6-4845-426d-b2f9-95250004b08e"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d11d6c37-1dae-47ee-9790-0d024e1fe77a"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Run"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""94277dad-d1f5-4e9a-a3f7-26bef0277e09"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Crouch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fbf1d959-31a5-4d73-ad47-0ebf3e84875b"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Slide"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Debug"",
+            ""id"": ""3af39e40-6a15-44c1-8c29-320d01d8c693"",
+            ""actions"": [
+                {
+                    ""name"": ""Toggle Developer Console"",
+                    ""type"": ""Button"",
+                    ""id"": ""21e0c46b-02bc-43bc-a94e-010b02827ba1"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""63d9c554-a154-42f2-a140-4088e86e7857"",
+                    ""path"": ""<Keyboard>/backquote"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale"",
+                    ""groups"": """",
+                    ""action"": ""Toggle Developer Console"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""77290bd4-5d68-4420-a1ec-e4b3aa760f3f"",
+                    ""path"": ""<Keyboard>/slash"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=2)"",
+                    ""groups"": """",
+                    ""action"": ""Toggle Developer Console"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -326,12 +464,21 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_UI_OpenCloseResearch = m_UI.FindAction("Open/Close Research", throwIfNotFound: true);
         m_UI_SelectHotbarCellByKeyboard = m_UI.FindAction("Select Hotbar Cell By Keyboard", throwIfNotFound: true);
         m_UI_SelectHotbarCellByScrolling = m_UI.FindAction("Select Hotbar Cell By Scrolling", throwIfNotFound: true);
-        m_UI_ToggleDeveloperConsole = m_UI.FindAction("Toggle Developer Console", throwIfNotFound: true);
         // Interactions
         m_Interactions = asset.FindActionMap("Interactions", throwIfNotFound: true);
         m_Interactions_UseItemFromHotbar = m_Interactions.FindAction("Use Item From Hotbar", throwIfNotFound: true);
         m_Interactions_BreakBlock = m_Interactions.FindAction("Break Block", throwIfNotFound: true);
         m_Interactions_ThrowItem = m_Interactions.FindAction("Throw Item", throwIfNotFound: true);
+        // Player
+        m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
+        m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
+        m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
+        m_Player_Run = m_Player.FindAction("Run", throwIfNotFound: true);
+        m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
+        m_Player_Slide = m_Player.FindAction("Slide", throwIfNotFound: true);
+        // Debug
+        m_Debug = asset.FindActionMap("Debug", throwIfNotFound: true);
+        m_Debug_ToggleDeveloperConsole = m_Debug.FindAction("Toggle Developer Console", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -400,7 +547,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_OpenCloseResearch;
     private readonly InputAction m_UI_SelectHotbarCellByKeyboard;
     private readonly InputAction m_UI_SelectHotbarCellByScrolling;
-    private readonly InputAction m_UI_ToggleDeveloperConsole;
     public struct UIActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -412,7 +558,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @OpenCloseResearch => m_Wrapper.m_UI_OpenCloseResearch;
         public InputAction @SelectHotbarCellByKeyboard => m_Wrapper.m_UI_SelectHotbarCellByKeyboard;
         public InputAction @SelectHotbarCellByScrolling => m_Wrapper.m_UI_SelectHotbarCellByScrolling;
-        public InputAction @ToggleDeveloperConsole => m_Wrapper.m_UI_ToggleDeveloperConsole;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -443,9 +588,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @SelectHotbarCellByScrolling.started += instance.OnSelectHotbarCellByScrolling;
             @SelectHotbarCellByScrolling.performed += instance.OnSelectHotbarCellByScrolling;
             @SelectHotbarCellByScrolling.canceled += instance.OnSelectHotbarCellByScrolling;
-            @ToggleDeveloperConsole.started += instance.OnToggleDeveloperConsole;
-            @ToggleDeveloperConsole.performed += instance.OnToggleDeveloperConsole;
-            @ToggleDeveloperConsole.canceled += instance.OnToggleDeveloperConsole;
         }
 
         private void UnregisterCallbacks(IUIActions instance)
@@ -471,9 +613,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @SelectHotbarCellByScrolling.started -= instance.OnSelectHotbarCellByScrolling;
             @SelectHotbarCellByScrolling.performed -= instance.OnSelectHotbarCellByScrolling;
             @SelectHotbarCellByScrolling.canceled -= instance.OnSelectHotbarCellByScrolling;
-            @ToggleDeveloperConsole.started -= instance.OnToggleDeveloperConsole;
-            @ToggleDeveloperConsole.performed -= instance.OnToggleDeveloperConsole;
-            @ToggleDeveloperConsole.canceled -= instance.OnToggleDeveloperConsole;
         }
 
         public void RemoveCallbacks(IUIActions instance)
@@ -553,6 +692,130 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         }
     }
     public InteractionsActions @Interactions => new InteractionsActions(this);
+
+    // Player
+    private readonly InputActionMap m_Player;
+    private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
+    private readonly InputAction m_Player_Move;
+    private readonly InputAction m_Player_Jump;
+    private readonly InputAction m_Player_Run;
+    private readonly InputAction m_Player_Crouch;
+    private readonly InputAction m_Player_Slide;
+    public struct PlayerActions
+    {
+        private @PlayerInputActions m_Wrapper;
+        public PlayerActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Move => m_Wrapper.m_Player_Move;
+        public InputAction @Jump => m_Wrapper.m_Player_Jump;
+        public InputAction @Run => m_Wrapper.m_Player_Run;
+        public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
+        public InputAction @Slide => m_Wrapper.m_Player_Slide;
+        public InputActionMap Get() { return m_Wrapper.m_Player; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
+        public void AddCallbacks(IPlayerActions instance)
+        {
+            if (instance == null || m_Wrapper.m_PlayerActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_PlayerActionsCallbackInterfaces.Add(instance);
+            @Move.started += instance.OnMove;
+            @Move.performed += instance.OnMove;
+            @Move.canceled += instance.OnMove;
+            @Jump.started += instance.OnJump;
+            @Jump.performed += instance.OnJump;
+            @Jump.canceled += instance.OnJump;
+            @Run.started += instance.OnRun;
+            @Run.performed += instance.OnRun;
+            @Run.canceled += instance.OnRun;
+            @Crouch.started += instance.OnCrouch;
+            @Crouch.performed += instance.OnCrouch;
+            @Crouch.canceled += instance.OnCrouch;
+            @Slide.started += instance.OnSlide;
+            @Slide.performed += instance.OnSlide;
+            @Slide.canceled += instance.OnSlide;
+        }
+
+        private void UnregisterCallbacks(IPlayerActions instance)
+        {
+            @Move.started -= instance.OnMove;
+            @Move.performed -= instance.OnMove;
+            @Move.canceled -= instance.OnMove;
+            @Jump.started -= instance.OnJump;
+            @Jump.performed -= instance.OnJump;
+            @Jump.canceled -= instance.OnJump;
+            @Run.started -= instance.OnRun;
+            @Run.performed -= instance.OnRun;
+            @Run.canceled -= instance.OnRun;
+            @Crouch.started -= instance.OnCrouch;
+            @Crouch.performed -= instance.OnCrouch;
+            @Crouch.canceled -= instance.OnCrouch;
+            @Slide.started -= instance.OnSlide;
+            @Slide.performed -= instance.OnSlide;
+            @Slide.canceled -= instance.OnSlide;
+        }
+
+        public void RemoveCallbacks(IPlayerActions instance)
+        {
+            if (m_Wrapper.m_PlayerActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IPlayerActions instance)
+        {
+            foreach (var item in m_Wrapper.m_PlayerActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_PlayerActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public PlayerActions @Player => new PlayerActions(this);
+
+    // Debug
+    private readonly InputActionMap m_Debug;
+    private List<IDebugActions> m_DebugActionsCallbackInterfaces = new List<IDebugActions>();
+    private readonly InputAction m_Debug_ToggleDeveloperConsole;
+    public struct DebugActions
+    {
+        private @PlayerInputActions m_Wrapper;
+        public DebugActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @ToggleDeveloperConsole => m_Wrapper.m_Debug_ToggleDeveloperConsole;
+        public InputActionMap Get() { return m_Wrapper.m_Debug; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(DebugActions set) { return set.Get(); }
+        public void AddCallbacks(IDebugActions instance)
+        {
+            if (instance == null || m_Wrapper.m_DebugActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_DebugActionsCallbackInterfaces.Add(instance);
+            @ToggleDeveloperConsole.started += instance.OnToggleDeveloperConsole;
+            @ToggleDeveloperConsole.performed += instance.OnToggleDeveloperConsole;
+            @ToggleDeveloperConsole.canceled += instance.OnToggleDeveloperConsole;
+        }
+
+        private void UnregisterCallbacks(IDebugActions instance)
+        {
+            @ToggleDeveloperConsole.started -= instance.OnToggleDeveloperConsole;
+            @ToggleDeveloperConsole.performed -= instance.OnToggleDeveloperConsole;
+            @ToggleDeveloperConsole.canceled -= instance.OnToggleDeveloperConsole;
+        }
+
+        public void RemoveCallbacks(IDebugActions instance)
+        {
+            if (m_Wrapper.m_DebugActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IDebugActions instance)
+        {
+            foreach (var item in m_Wrapper.m_DebugActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_DebugActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public DebugActions @Debug => new DebugActions(this);
     public interface IUIActions
     {
         void OnOpenCloseInventory(InputAction.CallbackContext context);
@@ -562,12 +825,23 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnOpenCloseResearch(InputAction.CallbackContext context);
         void OnSelectHotbarCellByKeyboard(InputAction.CallbackContext context);
         void OnSelectHotbarCellByScrolling(InputAction.CallbackContext context);
-        void OnToggleDeveloperConsole(InputAction.CallbackContext context);
     }
     public interface IInteractionsActions
     {
         void OnUseItemFromHotbar(InputAction.CallbackContext context);
         void OnBreakBlock(InputAction.CallbackContext context);
         void OnThrowItem(InputAction.CallbackContext context);
+    }
+    public interface IPlayerActions
+    {
+        void OnMove(InputAction.CallbackContext context);
+        void OnJump(InputAction.CallbackContext context);
+        void OnRun(InputAction.CallbackContext context);
+        void OnCrouch(InputAction.CallbackContext context);
+        void OnSlide(InputAction.CallbackContext context);
+    }
+    public interface IDebugActions
+    {
+        void OnToggleDeveloperConsole(InputAction.CallbackContext context);
     }
 }

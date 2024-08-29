@@ -34,6 +34,7 @@ namespace SavageWorld.Runtime.Player
         [Header("Debug")]
         [SerializeField]
         private List<ItemQuantity> _starterItems;
+        private PlayerInputActions _inputActions;
 
         private WorldDataManager _worldDataManager;
         #endregion
@@ -63,9 +64,11 @@ namespace SavageWorld.Runtime.Player
         #region Monobehaviour Methods
         private void Awake()
         {
+            NetworkObject.Type = NetworkObjectTypes.Player;
             _worldDataManager = WorldDataManager.Instance;
             _playerInteractions = GetComponent<PlayerInteractions>();
-            NetworkObject.Type = NetworkObjectTypes.Player;
+            _inputActions = GameManager.Instance.InputActions;
+            _inputActions.Player.Enable();
         }
 
         private void FixedUpdate()
@@ -138,13 +141,13 @@ namespace SavageWorld.Runtime.Player
         public void DisableMovement()
         {
             GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
-            GetComponent<PlayerMovementNew>().enabled = false;
+            GetComponent<PlayerMovement>().enabled = false;
         }
 
         public void EnableMovement()
         {
             GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
-            GetComponent<PlayerMovementNew>().enabled = true;
+            GetComponent<PlayerMovement>().enabled = true;
         }
         #endregion
 
@@ -153,11 +156,9 @@ namespace SavageWorld.Runtime.Player
         {
             _stats.Reset();
             _inventory = new();
-            PlayerInputActions playerInputActions = GameManager.Instance.PlayerInputActions;
-            playerInputActions.UI.Enable();
-            playerInputActions.UI.OpenCloseInventory.performed += ToggleInventoryEventHandler;
-            playerInputActions.UI.OpenCloseCraftStation.performed += ToggleCraftStationEventHandler;
-            playerInputActions.UI.OpenCloseResearch.performed += ToggleResearchEventHandler;
+            _inputActions.UI.OpenCloseInventory.performed += ToggleInventoryEventHandler;
+            _inputActions.UI.OpenCloseCraftStation.performed += ToggleCraftStationEventHandler;
+            _inputActions.UI.OpenCloseResearch.performed += ToggleResearchEventHandler;
             BookManager.Instance.InitializeInventory(_inventory);
             BookManager.Instance.InitializeHotbar(_inventory);
             BookManager.Instance.InitializeCraftStation(_handCraftStation, _inventory);

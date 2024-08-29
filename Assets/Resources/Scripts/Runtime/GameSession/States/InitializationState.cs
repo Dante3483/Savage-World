@@ -98,7 +98,7 @@ namespace SavageWorld.Runtime.GameSession.States
 
         private void GetAllPlayerNames()
         {
-            DirectoryInfo directoryInfo = new(StaticInfo.PlayersDirectory);
+            DirectoryInfo directoryInfo = new(StaticParameters.PlayersDirectory);
             FileInfo[] filesInfo = directoryInfo.GetFiles("*.sw.player");
             _gameManager.PlayerNames = new();
             foreach (FileInfo fileInfo in filesInfo)
@@ -109,7 +109,7 @@ namespace SavageWorld.Runtime.GameSession.States
 
         private void GetAllWorldNames()
         {
-            DirectoryInfo directoryInfo = new(StaticInfo.WorldsDirectory);
+            DirectoryInfo directoryInfo = new(StaticParameters.WorldsDirectory);
             DirectoryInfo[] directoriesInfo = directoryInfo.GetDirectories();
             GameManager.Instance.WorldNames = new List<string>();
             foreach (DirectoryInfo directoryIndo in directoriesInfo)

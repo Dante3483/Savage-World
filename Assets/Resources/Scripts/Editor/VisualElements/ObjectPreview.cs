@@ -15,7 +15,7 @@ public class ObjectPreview : VisualElement
     }
 
     #region Private fields
-    private static readonly string _styleResource = StaticInfo.StyleSheetsDirectory + "ObjectPreview";
+    private static readonly string _styleResource = StaticParameters.StyleSheetsDirectory + "ObjectPreview";
     private static readonly string _ussObjectPreview = "object-preview";
 
     private Image _preview;

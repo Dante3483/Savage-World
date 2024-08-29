@@ -30,7 +30,7 @@ namespace SavageWorld.Runtime.Utilities.Others
         #endregion
 
         #region Methods
-        private void Update()
+        private void FixedUpdate()
         {
             if (_target != null)
             {

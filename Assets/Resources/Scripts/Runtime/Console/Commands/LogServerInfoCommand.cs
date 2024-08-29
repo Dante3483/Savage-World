@@ -25,7 +25,10 @@ namespace SavageWorld.Runtime.Console.Commands
         #region Public Methods
         public override bool Process(string[] args)
         {
-            GameConsole.Log(NetworkManager.Instance.GetServerInfo());
+            for (int i = 0; i < 1000; i++)
+            {
+                GameConsole.Log(NetworkManager.Instance.GetServerInfo());
+            }
             return true;
         }
         #endregion
