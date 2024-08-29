@@ -3,7 +3,7 @@ using SavageWorld.Runtime.Enums.Network;
 using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Managers;
 using SavageWorld.Runtime.Network.Objects;
-using SavageWorld.Runtime.Player.Inventory.Items;
+using SavageWorld.Runtime.Entities.Player.Inventory.Items;
 using SavageWorld.Runtime.Terrain.Drop;
 using SavageWorld.Runtime.Utilities;
 using System.IO;

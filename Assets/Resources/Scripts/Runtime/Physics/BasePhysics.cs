@@ -1,4 +1,4 @@
-using SavageWorld.Runtime.Player.Movement;
+using SavageWorld.Runtime.Entities.Player.Movement;
 using SavageWorld.Runtime.Utilities.Extensions;
 using SavageWorld.Runtime.Utilities.Raycasts;
 using System;
@@ -69,7 +69,8 @@ namespace SavageWorld.Runtime.Physics
         #endregion
 
         #region Events / Delegates
-        public event Action EntityFall;
+        public event Action Grounded;
+        public event Action Falls;
         #endregion
 
         #region Monobehaviour Methods
@@ -158,7 +159,12 @@ namespace SavageWorld.Runtime.Physics
             origin.y -= _boxCollider.bounds.extents.y;
             _groundCheckBoxCast.SetSizeX(_boxCollider.size.x);
             _groundCheckBoxCast.BoxCast(origin);
-            _flags.IsGrounded = _groundCheckBoxCast.Result;
+            bool isGrounded = _groundCheckBoxCast.Result;
+            if (isGrounded && _flags.IsGrounded != isGrounded)
+            {
+                Grounded?.Invoke();
+            }
+            _flags.IsGrounded = isGrounded;
         }
 
         private void CheckSlope()
@@ -226,7 +232,7 @@ namespace SavageWorld.Runtime.Physics
             if (_flags.IsFall)
             {
                 _flags.IsRise = false;
-                EntityFall?.Invoke();
+                Falls?.Invoke();
             }
         }
 

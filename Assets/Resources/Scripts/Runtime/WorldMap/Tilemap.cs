@@ -1,7 +1,7 @@
 using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Managers;
 using SavageWorld.Runtime.Physics;
-using SavageWorld.Runtime.Player.Interactions;
+using SavageWorld.Runtime.Entities.Player.Interactions;
 using SavageWorld.Runtime.Utilities.Others;
 using SavageWorld.Runtime.Utilities.Pools;
 using System;

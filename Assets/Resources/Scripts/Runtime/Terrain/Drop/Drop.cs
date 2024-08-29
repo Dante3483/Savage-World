@@ -2,7 +2,7 @@ using SavageWorld.Runtime.Enums.Network;
 using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Network;
 using SavageWorld.Runtime.Network.Messages;
-using SavageWorld.Runtime.Player.Inventory.Items;
+using SavageWorld.Runtime.Entities.Player.Inventory.Items;
 using SavageWorld.Runtime.Utilities;
 using System;
 using System.Collections;

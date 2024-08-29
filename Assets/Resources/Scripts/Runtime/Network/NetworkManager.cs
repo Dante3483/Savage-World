@@ -6,7 +6,7 @@ using SavageWorld.Runtime.Managers;
 using SavageWorld.Runtime.Network.Connection;
 using SavageWorld.Runtime.Network.Messages;
 using SavageWorld.Runtime.Network.Objects;
-using SavageWorld.Runtime.Player;
+using SavageWorld.Runtime.Entities.Player;
 using SavageWorld.Runtime.Utilities;
 using SavageWorld.Runtime.Utilities.Others;
 using System;

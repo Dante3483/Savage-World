@@ -1,5 +1,5 @@
 using SavageWorld.Runtime.Enums.Id;
-using SavageWorld.Runtime.Player.Inventory.Items;
+using SavageWorld.Runtime.Entities.Player.Inventory.Items;
 using System.Collections.Generic;
 using UnityEngine;
 

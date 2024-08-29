@@ -1,6 +1,6 @@
 using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Network;
-using SavageWorld.Runtime.Player.Inventory.Items;
+using SavageWorld.Runtime.Entities.Player.Inventory.Items;
 using SavageWorld.Runtime.Terrain.Drop;
 using SavageWorld.Runtime.Utilities.Others;
 using System;

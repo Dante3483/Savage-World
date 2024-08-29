@@ -5,7 +5,7 @@ namespace SavageWorld.Runtime.Physics
     public class DynamicPhysics : BasePhysics
     {
         #region Fields
-        private float _moveDirection;
+        private int _moveDirection;
         #endregion
 
         #region Properties
@@ -34,7 +34,7 @@ namespace SavageWorld.Runtime.Physics
         #endregion
 
         #region Public Methods
-        public void SetMoveDirection(float value)
+        public void SetMoveDirection(int value)
         {
             _moveDirection = value;
             if (_flags.IsFaceToTheRight && _moveDirection == -1)

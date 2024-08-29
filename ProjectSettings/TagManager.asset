@@ -10,7 +10,7 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - NPC
+  - 
   - Water
   - UI
   - Ground
@@ -20,7 +20,7 @@ TagManager:
   - Drop
   - Block
   - DropPlatform
-  - 
+  - NPC
   - 
   - 
   - 

@@ -1,9 +1,9 @@
 using SavageWorld.Runtime.Atlases;
 using SavageWorld.Runtime.Enums.Others;
 using SavageWorld.Runtime.GameSession.States;
-using SavageWorld.Runtime.Player;
-using SavageWorld.Runtime.Player.Inventory;
-using SavageWorld.Runtime.Player.Research;
+using SavageWorld.Runtime.Entities.Player;
+using SavageWorld.Runtime.Entities.Player.Inventory;
+using SavageWorld.Runtime.Entities.Player.Research;
 using SavageWorld.Runtime.Terrain;
 using SavageWorld.Runtime.Utilities;
 using SavageWorld.Runtime.Utilities.Others;

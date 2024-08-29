@@ -1,4 +1,4 @@
-using SavageWorld.Runtime.Player.CraftStation;
+using SavageWorld.Runtime.Entities.Player.CraftStation;
 using UnityEngine;
 
 namespace SavageWorld.Runtime.Atlases

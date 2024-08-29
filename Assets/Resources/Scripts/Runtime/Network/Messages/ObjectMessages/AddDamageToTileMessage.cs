@@ -1,5 +1,5 @@
 using SavageWorld.Runtime.Enums.Network;
-using SavageWorld.Runtime.Player.Interactions;
+using SavageWorld.Runtime.Entities.Player.Interactions;
 using SavageWorld.Runtime.Utilities;
 using System.IO;
 

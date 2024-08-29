@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace SavageWorld.Runtime.Player.Movement
+namespace SavageWorld.Runtime.Entities.Player.Movement
 {
     [Serializable]
     public struct PhysicStateProperties
