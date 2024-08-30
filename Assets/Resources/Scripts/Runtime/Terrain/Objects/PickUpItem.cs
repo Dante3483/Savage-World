@@ -1,7 +1,6 @@
 using SavageWorld.Runtime.Enums.Id;
 using SavageWorld.Runtime.Enums.Network;
 using SavageWorld.Runtime.GameSession;
-using SavageWorld.Runtime.Managers;
 using SavageWorld.Runtime.Network.Objects;
 using UnityEngine;
 
@@ -78,7 +77,7 @@ namespace SavageWorld.Runtime.Terrain.Objects
 
         private void Update()
         {
-            if (WorldDataManager.Instance.IsEmpty(_intPosition.x, _intPosition.y - 1))
+            if (WorldDataManager.Instance.IsAbstract(_intPosition.x, _intPosition.y - 1))
             {
                 WorldDataManager.Instance.SetOccupiedFlag(_intPosition.x, _intPosition.y, false);
                 DeleteObject();

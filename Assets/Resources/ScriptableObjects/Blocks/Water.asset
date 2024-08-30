@@ -32,5 +32,6 @@ MonoBehaviour:
   _damageToBreak: 0
   _isSurfaceLight: 0
   _isWaterproof: 1
+  _type: 3
   _id: 0
-  _flowTime: 0
+  _timeToFlow: 0.04

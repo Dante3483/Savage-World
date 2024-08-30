@@ -2,6 +2,7 @@ using SavageWorld.Runtime.Enums.Id;
 using SavageWorld.Runtime.Enums.Types;
 using SavageWorld.Runtime.Terrain.Blocks;
 using SavageWorld.Runtime.Utilities;
+using SavageWorld.Runtime.Utilities.Extensions;
 using System.Runtime.InteropServices;
 
 namespace SavageWorld.Runtime.Terrain
@@ -22,11 +23,12 @@ namespace SavageWorld.Runtime.Terrain
         /// </summary>
         public byte TileId;
         /// <summary>
-        /// <br>1 bit of _flags = is unbreakable</br>
-        /// <br>2 bit of _flags = is occupied</br>
-        /// <br>3 bit of _flags = is tree</br>
-        /// <br>4 bit of _flags = is tree trunk</br>
-        /// <br>5 bit of _flags = is collider horizontal flipped</br>
+        /// <br>0 bit of _flags = is unbreakable</br>
+        /// <br>1 bit of _flags = is occupied</br>
+        /// <br>2 bit of _flags = is tree</br>
+        /// <br>3 bit of _flags = is tree trunk</br>
+        /// <br>4 bit of _flags = is collider horizontal flipped</br>
+        /// <br>5 bit of _flags = is liquid settled</br>
         /// </summary>
         public byte Flags;
         #endregion
@@ -36,7 +38,9 @@ namespace SavageWorld.Runtime.Terrain
 
         public int WallTileId => TileId >> 4;
 
-        public bool IsEmpty => BlockType == BlockTypes.Abstract;
+        public bool IsEmpty => IsAbstract && !IsLiquid && !IsWall;
+
+        public bool IsAbstract => BlockType == BlockTypes.Abstract;
 
         public bool IsSolid => BlockType == BlockTypes.Solid;
 
@@ -60,17 +64,19 @@ namespace SavageWorld.Runtime.Terrain
 
         public bool IsColliderHorizontalFlipped => (Flags & StaticParameters.Bit4) == StaticParameters.Bit4;
 
+        public bool IsLiquidSettled => (Flags & StaticParameters.Bit5) == StaticParameters.Bit5;
+
         public bool IsFree => !IsOccupied && !IsTree && !IsTreeTrunk;
 
-        public bool IsValidForTree => IsEmpty || IsPlant;
+        public bool IsValidForTree => IsAbstract || IsPlant;
 
-        public bool IsValidForLiquid => IsEmpty || IsPlant || IsFurniture;
+        public bool IsValidForLiquid => IsAbstract || IsPlant || IsFurniture;
 
-        public bool IsValidForPlant => IsEmpty || IsFurniture;
+        public bool IsValidForPlant => IsAbstract || IsFurniture;
 
         public bool IsDayLightBlock => WallId == (ushort)WallsId.Air;
 
-        public bool IsLiquidFull => IsLiquid && FlowValue == 100;
+        public bool IsLiquidFull => IsLiquid && FlowValue >= 99f;
 
         public bool IsPhysicallySolidBlock => IsSolid || IsDust;
         #endregion
@@ -129,8 +135,26 @@ namespace SavageWorld.Runtime.Terrain
             {
                 return;
             }
-            LiquidId = (byte)data.GetId();
+            if (SetFlowValue(flowValue))
+            {
+                LiquidId = (byte)data.GetId();
+            }
+        }
+
+        public bool SetFlowValue(float flowValue)
+        {
+            bool isStillLiquid = true;
+            if (flowValue == 0f)
+            {
+                LiquidId = byte.MaxValue;
+                isStillLiquid = false;
+            }
+            if (FlowValue != flowValue)
+            {
+                SetLiquidSettledFlag(false);
+            }
             FlowValue = flowValue;
+            return isStillLiquid;
         }
 
         public void SetUnbreakableFlag(bool value)
@@ -191,6 +215,11 @@ namespace SavageWorld.Runtime.Terrain
             {
                 Flags &= StaticParameters.InvertedBit4;
             }
+        }
+
+        public void SetLiquidSettledFlag(bool value)
+        {
+            Flags = Flags.SetBit(5, value);
         }
 
         public void SetBlockTile(byte id)

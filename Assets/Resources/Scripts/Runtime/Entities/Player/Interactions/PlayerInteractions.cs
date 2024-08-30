@@ -6,6 +6,7 @@ using SavageWorld.Runtime.Enums.Others;
 using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Managers;
 using SavageWorld.Runtime.Network;
+using SavageWorld.Runtime.Terrain;
 using SavageWorld.Runtime.Terrain.Drop;
 using SavageWorld.Runtime.Utilities.DebugOnly;
 using SavageWorld.Runtime.Utilities.Raycasts;
@@ -86,6 +87,10 @@ namespace SavageWorld.Runtime.Entities.Player.Interactions
                 _breakWallAction.Configure(ClickPositionToWorldPosition(), _wallDamageMultiplier, 1);
                 _breakWallAction.Execute();
             }
+        }
+
+        private void Update()
+        {
             if (_isMouseInsideArea)
             {
                 CreateWater();
@@ -240,7 +245,7 @@ namespace SavageWorld.Runtime.Entities.Player.Interactions
         //REMOVE
         private void CreateWater()
         {
-            if (Input.GetKeyDown(KeyCode.U))
+            if (Input.GetKeyDown(KeyCode.Y))
             {
                 Vector2Int waterPosition = ClickPositionToWorldPosition();
                 _worldDataManager.SetLiquidData(waterPosition.x, waterPosition.y, _gameManager.BlocksAtlas.Water);

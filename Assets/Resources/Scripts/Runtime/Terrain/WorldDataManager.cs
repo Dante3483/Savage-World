@@ -3,10 +3,9 @@ using SavageWorld.Runtime.Console;
 using SavageWorld.Runtime.Enums.Types;
 using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Network;
-using SavageWorld.Runtime.Terrain;
 using SavageWorld.Runtime.Terrain.Blocks;
-using SavageWorld.Runtime.WorldMap.ColliderRules;
 using SavageWorld.Runtime.Utilities.Others;
+using SavageWorld.Runtime.WorldMap.ColliderRules;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,21 +14,23 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SavageWorld.Runtime.Managers
+namespace SavageWorld.Runtime.Terrain
 {
     public class WorldDataManager : Singleton<WorldDataManager>
     {
         #region Fields
         private GameManager _gameManager;
         private BlocksAtlasSO _blockAtlas;
+        private WorldHandler _worldHandler;
 
         [Header("Collider rules")]
         [SerializeField]
         private ColliderRulesSO _mainRules;
         private WorldCellData[,] _worldData;
+
         private string _blockInfo;
         private Dictionary<Sprite, List<Vector2>> _physicsShapesBySprite;
-        private HashSet<Vector2Int> _hashSetOfCollidersPositions;
+        private HashSet<Vector2Int> _setOfCollidersPositions;
         #endregion
 
         #region Properties
@@ -61,6 +62,11 @@ namespace SavageWorld.Runtime.Managers
             InitializePhysicsShapes();
         }
 
+        private void FixedUpdate()
+        {
+            _worldHandler.Handle();
+        }
+
         private void Update()
         {
             if (!_gameManager.IsInputTextInFocus && Input.GetMouseButtonDown(2))
@@ -75,11 +81,12 @@ namespace SavageWorld.Runtime.Managers
         #region Public Methods
         public void Initialize()
         {
-            _hashSetOfCollidersPositions = new();
+            _setOfCollidersPositions = new();
             TerrainConfigurationSO terrainConfiguration = _gameManager.TerrainConfiguration;
             int terrainWidth = terrainConfiguration.TerrainWidth;
             int terrainHeight = terrainConfiguration.TerrainHeight;
             _worldData = new WorldCellData[terrainWidth, terrainHeight];
+            _worldHandler = new();
             WorldCellData emptyData = WorldCellData.GetEmpty();
             GameConsole.Log($"Size of world cell data: {Marshal.SizeOf(emptyData)}");
             Parallel.For(0, terrainWidth, (index) =>
@@ -123,6 +130,7 @@ namespace SavageWorld.Runtime.Managers
             if (_gameManager.IsPlayingState)
             {
                 SetUpWallData(x, y);
+                CellDataChanged?.Invoke(x, y);
             }
         }
 
@@ -132,7 +140,15 @@ namespace SavageWorld.Runtime.Managers
             if (_gameManager.IsPlayingState)
             {
                 SetUpLiquidData(x, y);
+                CellDataChanged?.Invoke(x, y);
             }
+        }
+
+        public bool SetFlowValue(int x, int y, float flowValue)
+        {
+            bool isStillLiquid = _worldData[x, y].SetFlowValue(flowValue);
+            CellDataChanged?.Invoke(x, y);
+            return isStillLiquid;
         }
 
         public void SetUpBlockData(int x, int y)
@@ -141,7 +157,7 @@ namespace SavageWorld.Runtime.Managers
             {
                 SetRandomBlockTile(x, y);
             }
-            if (IsEmpty(x, y) || IsPhysicallySolidBlock(x, y))
+            if (IsAbstract(x, y) || IsPhysicallySolidBlock(x, y))
             {
                 SetColliderIndex(x, y, byte.MaxValue);
                 UpdateCollidersAround(x, y);
@@ -204,6 +220,11 @@ namespace SavageWorld.Runtime.Managers
             _worldData[x, y].SetColliderHorizontalFlippedFlag(value);
         }
 
+        public void SetLiquidSettledFlag(int x, int y, bool value)
+        {
+            _worldData[x, y].SetLiquidSettledFlag(value);
+        }
+
         public void SetBlockInfoByCoords(Vector2Int position)
         {
             StringBuilder builder = new();
@@ -230,9 +251,10 @@ namespace SavageWorld.Runtime.Managers
             builder.AppendLine($"{tab}Id: {GetLiquidId(x, y)}");
             builder.AppendLine($"{tab}Name: {liquidName}");
             builder.AppendLine($"{tab}FlowValue: {GetFlowValue(x, y)}");
+            builder.AppendLine($"{tab}Settled: {IsLiquidSettled(x, y)}");
             builder.AppendLine($"Collider: {GetColliderIndex(x, y)}");
             builder.AppendLine($"{tab}Index: {IsUnbreakable(x, y)}");
-            builder.AppendLine($"{tab}Horizontal flipped: {IsUnbreakable(x, y)}");
+            builder.AppendLine($"{tab}Horizontal flipped: {IsColliderHorizontalFlipped(x, y)}");
             builder.AppendLine($"Flags:");
             builder.AppendLine($"{tab}Unbreakable: {IsUnbreakable(x, y)}");
             builder.AppendLine($"{tab}Occupied: {IsOccupied(x, y)}");
@@ -375,11 +397,12 @@ namespace SavageWorld.Runtime.Managers
         {
             BlockSO data = GetLiquidData(x, y);
             float flowValue = GetFlowValue(x, y);
+            float topFlowValue = GetFlowValue(x, y + 1);
             if (data == null || data.Sprites.Count == 0)
             {
                 return null;
             }
-            if (flowValue == 100)
+            if (flowValue == 100f || topFlowValue != 0f)
             {
                 return data.Sprites.Last();
             }
@@ -392,17 +415,22 @@ namespace SavageWorld.Runtime.Managers
 
         public float GetDustFallingTime(int x, int y)
         {
-            return (GetBlockData(x, y) as DustBlockSO).FallingTime;
+            return (GetBlockData(x, y) as DustBlockSO).TimeToFall;
         }
 
         public float GetLiquidFlowTime(int x, int y)
         {
-            return (GetLiquidData(x, y) as LiquidBlockSO).FlowTime;
+            return (GetLiquidData(x, y) as LiquidBlockSO).TimeToFlow;
         }
 
         public bool IsEmpty(int x, int y)
         {
             return _worldData[x, y].IsEmpty;
+        }
+
+        public bool IsAbstract(int x, int y)
+        {
+            return _worldData[x, y].IsAbstract;
         }
 
         public bool IsSolid(int x, int y)
@@ -458,6 +486,11 @@ namespace SavageWorld.Runtime.Managers
         public bool IsColliderHorizontalFlipped(int x, int y)
         {
             return _worldData[x, y].IsColliderHorizontalFlipped;
+        }
+
+        public bool IsLiquidSettled(int x, int y)
+        {
+            return _worldData[x, y].IsLiquidSettled;
         }
 
         public bool IsFree(int x, int y)

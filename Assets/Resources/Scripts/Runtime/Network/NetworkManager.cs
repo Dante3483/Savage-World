@@ -2,7 +2,6 @@ using SavageWorld.Runtime.Attributes;
 using SavageWorld.Runtime.Console;
 using SavageWorld.Runtime.Enums.Network;
 using SavageWorld.Runtime.GameSession;
-using SavageWorld.Runtime.Managers;
 using SavageWorld.Runtime.Network.Connection;
 using SavageWorld.Runtime.Network.Messages;
 using SavageWorld.Runtime.Network.Objects;
@@ -13,6 +12,7 @@ using System;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using SavageWorld.Runtime.Terrain;
 
 namespace SavageWorld.Runtime.Network
 {

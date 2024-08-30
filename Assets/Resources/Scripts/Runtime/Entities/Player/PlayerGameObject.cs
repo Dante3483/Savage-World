@@ -8,6 +8,7 @@ using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Managers;
 using SavageWorld.Runtime.Network;
 using SavageWorld.Runtime.Network.Messages;
+using SavageWorld.Runtime.Terrain;
 using SavageWorld.Runtime.Utilities.Others;
 using System.Collections.Generic;
 using UnityEngine;

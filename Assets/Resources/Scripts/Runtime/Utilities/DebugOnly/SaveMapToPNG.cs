@@ -1,5 +1,6 @@
 using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Managers;
+using SavageWorld.Runtime.Terrain;
 using SavageWorld.Runtime.Terrain.Blocks;
 using System.IO;
 using UnityEngine;
@@ -46,7 +47,7 @@ namespace SavageWorld.Runtime.Utilities.DebugOnly
                 {
                     BlockSO data = WorldDataManager.Instance.GetBlockData(x, y);
                     cellColor = data.ColorOnMap;
-                    if (WorldDataManager.Instance.IsEmpty(x, y))
+                    if (WorldDataManager.Instance.IsAbstract(x, y))
                     {
                         data = WorldDataManager.Instance.GetWallData(x, y);
                         cellColor = data.ColorOnMap;

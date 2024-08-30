@@ -115,7 +115,7 @@ namespace SavageWorld.Runtime.Terrain.WorldProcessingPhases
 
         protected bool IsEmpty(int x, int y)
         {
-            return _worldDataManager.IsEmpty(x, y);
+            return _worldDataManager.IsAbstract(x, y);
         }
 
         protected bool IsSolid(int x, int y)

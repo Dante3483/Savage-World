@@ -31,7 +31,7 @@ namespace SavageWorld.Runtime.Entities.Player.Actions
             {
                 return false;
             }
-            if (_worldDataManager.IsEmpty(x, y))
+            if (_worldDataManager.IsAbstract(x, y))
             {
                 return false;
             }

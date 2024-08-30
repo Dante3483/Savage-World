@@ -8,8 +8,10 @@ namespace SavageWorld.Runtime.Terrain.Blocks
     public class LiquidBlockSO : BlockSO
     {
         #region Private fields
-        [SerializeField] private LiquidBlocksId _id;
-        [SerializeField] private ushort _flowTime;
+        [SerializeField]
+        private LiquidBlocksId _id;
+        [SerializeField]
+        private float _timeToFlow;
         #endregion
 
         #region Public fields
@@ -17,16 +19,16 @@ namespace SavageWorld.Runtime.Terrain.Blocks
         #endregion
 
         #region Properties
-        public ushort FlowTime
+        public float TimeToFlow
         {
             get
             {
-                return _flowTime;
+                return _timeToFlow;
             }
 
             set
             {
-                _flowTime = value;
+                _timeToFlow = value;
             }
         }
         #endregion

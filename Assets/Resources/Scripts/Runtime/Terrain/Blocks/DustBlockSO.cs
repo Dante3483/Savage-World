@@ -8,8 +8,10 @@ namespace SavageWorld.Runtime.Terrain.Blocks
     public class DustBlockSO : BlockSO
     {
         #region Private fields
-        [SerializeField] private DustBlocksId _id;
-        [SerializeField] private uint _fallingTime;
+        [SerializeField]
+        private DustBlocksId _id;
+        [SerializeField]
+        private float _timeToFall;
         #endregion
 
         #region Public fields
@@ -17,16 +19,16 @@ namespace SavageWorld.Runtime.Terrain.Blocks
         #endregion
 
         #region Properties
-        public uint FallingTime
+        public float TimeToFall
         {
             get
             {
-                return _fallingTime;
+                return _timeToFall;
             }
 
             set
             {
-                _fallingTime = value;
+                _timeToFall = value;
             }
         }
         #endregion

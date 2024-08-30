@@ -25,4 +25,4 @@ MonoBehaviour:
   _isWaterproof: 1
   _type: 2
   _id: 0
-  _fallingTime: 0
+  _timeToFall: 0.02
