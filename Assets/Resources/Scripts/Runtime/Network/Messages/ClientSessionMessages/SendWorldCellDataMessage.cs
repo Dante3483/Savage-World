@@ -92,7 +92,7 @@ namespace SavageWorld.Runtime.Network.Messages
                 TileBaseSO liquid = liquidId == byte.MaxValue ? null : blockAtlas.GetBlockById(liquidId);
                 MainThreadUtility.Instance.InvokeInNextUpdate(() =>
                 {
-                    worldDataManager.SetFullData(x, y, block, wall, liquid, flowValue, colliderIndex, tileId, blockFlags);
+                    worldDataManager.SetTileData(x, y, block, wall, liquid, flowValue, colliderIndex, tileId, blockFlags);
                     worldDataManager.SetUpBlockData(x, y);
                 });
             }

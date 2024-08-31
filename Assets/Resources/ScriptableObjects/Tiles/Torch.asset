@@ -22,7 +22,7 @@ MonoBehaviour:
   _colorOnMap: {r: 1, g: 0.6903905, b: 0.15471691, a: 1}
   _damageToBreak: 0
   _isSurfaceLight: 0
-  _isWaterproof: 1
+  _isWaterproof: 0
   _type: 6
   _id: 0
   _canPlaceOnSide: 0

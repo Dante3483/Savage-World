@@ -22,8 +22,8 @@ namespace SavageWorld.Runtime.Terrain.Generation.Phases
             {
                 for (int y = 0; y < _terrainHeight; y++)
                 {
-                    _tilesManager.SetRandomBlockTile(x, y);
-                    _tilesManager.SetRandomWallTile(x, y);
+                    _tilesManager.SetRandomBlockSprite(x, y);
+                    _tilesManager.SetRandomWallSprite(x, y);
                 }
             }
         }

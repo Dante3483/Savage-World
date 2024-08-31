@@ -23,12 +23,13 @@ namespace SavageWorld.Runtime.Terrain
         /// </summary>
         public byte SpriteId;
         /// <summary>
-        /// <br>0 bit of _flags = is unbreakable</br>
-        /// <br>1 bit of _flags = is occupied</br>
-        /// <br>2 bit of _flags = is tree</br>
-        /// <br>3 bit of _flags = is tree trunk</br>
-        /// <br>4 bit of _flags = is collider horizontal flipped</br>
-        /// <br>5 bit of _flags = is liquid settled</br>
+        /// <br>0 bit of Flags = is unbreakable</br>
+        /// <br>1 bit of Flags = is occupied</br>
+        /// <br>2 bit of Flags = is tree</br>
+        /// <br>3 bit of Flags = is tree trunk</br>
+        /// <br>4 bit of Flags = is collider horizontal flipped</br>
+        /// <br>5 bit of Flags = is liquid settled</br>
+        /// <br>5 bit of Flags = is waterfall</br>
         /// </summary>
         public byte Flags;
         #endregion
@@ -65,6 +66,8 @@ namespace SavageWorld.Runtime.Terrain
         public bool IsColliderHorizontalFlipped => (Flags & StaticParameters.Bit4) == StaticParameters.Bit4;
 
         public bool IsLiquidSettled => (Flags & StaticParameters.Bit5) == StaticParameters.Bit5;
+
+        public bool IsWaterfall => (Flags & StaticParameters.Bit6) == StaticParameters.Bit6;
 
         public bool IsFree => !IsOccupied && !IsTree && !IsTreeTrunk;
 
@@ -220,6 +223,11 @@ namespace SavageWorld.Runtime.Terrain
         public void SetLiquidSettledFlag(bool value)
         {
             Flags = Flags.SetBit(5, value);
+        }
+
+        public void SetWaterfallFlag(bool value)
+        {
+            Flags = Flags.SetBit(6, value);
         }
 
         public void SetBlockSpriteId(byte id)

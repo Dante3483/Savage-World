@@ -4,6 +4,7 @@ using SavageWorld.Runtime.Enums.Types;
 using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Network;
 using SavageWorld.Runtime.Terrain.Generation;
+using SavageWorld.Runtime.Terrain.Handlers;
 using SavageWorld.Runtime.Terrain.Tiles;
 using SavageWorld.Runtime.Utilities.Others;
 using SavageWorld.Runtime.WorldMap.ColliderRules;
@@ -21,8 +22,7 @@ namespace SavageWorld.Runtime.Terrain
     {
         #region Fields
         private GameManager _gameManager;
-        private TilesAtlasSO _blockAtlas;
-        private WorldHandler _worldHandler;
+        private TilesAtlasSO _tileAtlas;
 
         [Header("Collider rules")]
         [SerializeField]
@@ -59,13 +59,8 @@ namespace SavageWorld.Runtime.Terrain
         {
             base.Awake();
             _gameManager = GameManager.Instance;
-            _blockAtlas = _gameManager.TilesAtlas;
+            _tileAtlas = _gameManager.TilesAtlas;
             InitializePhysicsShapes();
-        }
-
-        private void FixedUpdate()
-        {
-            _worldHandler.Handle();
         }
 
         private void Update()
@@ -87,7 +82,6 @@ namespace SavageWorld.Runtime.Terrain
             int terrainWidth = terrainConfiguration.TerrainWidth;
             int terrainHeight = terrainConfiguration.TerrainHeight;
             _worldData = new Tile[terrainWidth, terrainHeight];
-            _worldHandler = new();
             Tile emptyData = Tile.GetEmpty();
             GameConsole.Log($"Size of world cell data: {Marshal.SizeOf(emptyData)}");
             Parallel.For(0, terrainWidth, (index) =>
@@ -100,7 +94,7 @@ namespace SavageWorld.Runtime.Terrain
             });
         }
 
-        public void SetFullData(int x, int y, TileBaseSO block, TileBaseSO wall, TileBaseSO liquid, float flowValue, byte colliderIndex, byte tileId, byte flags)
+        public void SetTileData(int x, int y, TileBaseSO block, TileBaseSO wall, TileBaseSO liquid, float flowValue, byte colliderIndex, byte tileId, byte flags)
         {
             _worldData[x, y].SetBlockData(block);
             _worldData[x, y].SetWallData(wall);
@@ -156,7 +150,7 @@ namespace SavageWorld.Runtime.Terrain
         {
             if (!NetworkManager.Instance.IsClient)
             {
-                SetRandomBlockTile(x, y);
+                SetRandomBlockSprite(x, y);
             }
             if (IsAbstract(x, y) || IsPhysicallySolidBlock(x, y))
             {
@@ -171,20 +165,14 @@ namespace SavageWorld.Runtime.Terrain
             _worldData[x, y].ColliderIndex = index;
         }
 
-        public void SetRandomBlockTile(int x, int y)
+        public void SetRandomBlockSprite(int x, int y)
         {
             TileBaseSO data = GetBlockData(x, y);
             byte id = (byte)_gameManager.RandomVar.Next(0, data.Sprites.Count);
             _worldData[x, y].SetBlockSpriteId(id);
         }
 
-        public void SetRandomBlockTile(int x, int y, TileBaseSO data)
-        {
-            byte id = (byte)_gameManager.RandomVar.Next(0, data.Sprites.Count);
-            _worldData[x, y].SetBlockSpriteId(id);
-        }
-
-        public void SetRandomWallTile(int x, int y)
+        public void SetRandomWallSprite(int x, int y)
         {
             TileBaseSO data = GetBlockData(x, y);
             byte id = (byte)(_gameManager.RandomVar.Next(0, data.Sprites.Count) << 4);
@@ -226,6 +214,15 @@ namespace SavageWorld.Runtime.Terrain
             _worldData[x, y].SetLiquidSettledFlag(value);
         }
 
+        public void SetWaterfallFlag(int x, int y, bool value)
+        {
+            if (_worldData[x, y].IsWaterfall != value)
+            {
+                _worldData[x, y].SetWaterfallFlag(value);
+                CellDataChanged?.Invoke(x, y);
+            }
+        }
+
         public void SetBlockInfoByCoords(Vector2Int position)
         {
             StringBuilder builder = new();
@@ -253,6 +250,7 @@ namespace SavageWorld.Runtime.Terrain
             builder.AppendLine($"{tab}Name: {liquidName}");
             builder.AppendLine($"{tab}FlowValue: {GetFlowValue(x, y)}");
             builder.AppendLine($"{tab}Settled: {IsLiquidSettled(x, y)}");
+            builder.AppendLine($"{tab}Waterfall: {IsWaterfall(x, y)}");
             builder.AppendLine($"Collider: {GetColliderIndex(x, y)}");
             builder.AppendLine($"{tab}Index: {IsUnbreakable(x, y)}");
             builder.AppendLine($"{tab}Horizontal flipped: {IsColliderHorizontalFlipped(x, y)}");
@@ -333,13 +331,13 @@ namespace SavageWorld.Runtime.Terrain
         {
             ushort id = _worldData[x, y].BlockId;
             TileTypes type = _worldData[x, y].BlockType;
-            return _blockAtlas.GetBlockByTypeAndId(type, id);
+            return _tileAtlas.GetBlockByTypeAndId(type, id);
         }
 
         public TileBaseSO GetWallData(int x, int y)
         {
             ushort id = _worldData[x, y].WallId;
-            return _blockAtlas.GetBlockByTypeAndId(TileTypes.Wall, id);
+            return _tileAtlas.GetBlockByTypeAndId(TileTypes.Wall, id);
         }
 
         public TileBaseSO GetLiquidData(int x, int y)
@@ -349,7 +347,7 @@ namespace SavageWorld.Runtime.Terrain
                 return null;
             }
             ushort id = _worldData[x, y].LiquidId;
-            return _blockAtlas.GetBlockByTypeAndId(TileTypes.Liquid, id);
+            return _tileAtlas.GetBlockByTypeAndId(TileTypes.Liquid, id);
         }
 
         public float GetBlockLightIntensity(int x, int y)
@@ -396,14 +394,25 @@ namespace SavageWorld.Runtime.Terrain
 
         public Sprite GetLiquidSprite(int x, int y)
         {
-            TileBaseSO data = GetLiquidData(x, y);
+            TileBaseSO data;
+            if (IsWaterfall(x, y))
+            {
+                data = _tileAtlas.GetBlockById(TilesHandler.Instance.LiquidTileHandler.GetWaterfallIdByPosition(x, y));
+                if (TilesHandler.Instance.LiquidTileHandler.IsSourceOfWaterfallByPosition(x, y))
+                {
+                    return data.Sprites.First();
+                }
+            }
+            else
+            {
+                data = GetLiquidData(x, y);
+            }
             float flowValue = GetFlowValue(x, y);
-            float topFlowValue = GetFlowValue(x, y + 1);
             if (data == null || data.Sprites.Count == 0)
             {
                 return null;
             }
-            if (flowValue == 100f || topFlowValue != 0f)
+            if (flowValue == 100f || IsWaterfall(x, y))
             {
                 return data.Sprites.Last();
             }
@@ -494,6 +503,11 @@ namespace SavageWorld.Runtime.Terrain
             return _worldData[x, y].IsLiquidSettled;
         }
 
+        public bool IsWaterfall(int x, int y)
+        {
+            return _worldData[x, y].IsWaterfall;
+        }
+
         public bool IsFree(int x, int y)
         {
             return _worldData[x, y].IsFree;
@@ -578,7 +592,7 @@ namespace SavageWorld.Runtime.Terrain
         #region Private Methods
         private void SetUpWallData(int x, int y)
         {
-            SetRandomWallTile(x, y);
+            SetRandomWallSprite(x, y);
         }
 
         private void SetUpLiquidData(int x, int y)
