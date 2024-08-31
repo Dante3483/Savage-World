@@ -2,7 +2,7 @@ using SavageWorld.Runtime.Enums.Id;
 using SavageWorld.Runtime.Enums.Network;
 using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Network.Objects;
-using SavageWorld.Runtime.Terrain.Blocks;
+using SavageWorld.Runtime.Terrain.Tiles;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -32,7 +32,7 @@ namespace SavageWorld.Runtime.Terrain.Objects
         [SerializeField] private int _widthToSpawn;
         [SerializeField] private List<Vector2Int> _treeBlocks;
         [SerializeField] private List<Vector2Int> _trunkBlocks;
-        [SerializeField] private List<BlockSO> _allowedToSpawnOn;
+        [SerializeField] private List<TileBaseSO> _allowedToSpawnOn;
         #endregion
 
         #region Properties
@@ -114,7 +114,7 @@ namespace SavageWorld.Runtime.Terrain.Objects
             }
         }
 
-        public List<BlockSO> AllowedToSpawnOn
+        public List<TileBaseSO> AllowedToSpawnOn
         {
             get
             {
@@ -345,15 +345,15 @@ namespace SavageWorld.Runtime.Terrain.Objects
             Vector2Int treePosition = Vector2Int.FloorToInt(transform.position);
             foreach (Vector2Int position in _treeBlocks)
             {
-                WorldDataManager.Instance.SetTreeFlag(treePosition.x + position.x, treePosition.y + position.y, true);
+                TilesManager.Instance.SetTreeFlag(treePosition.x + position.x, treePosition.y + position.y, true);
             }
             foreach (Vector2Int position in _trunkBlocks)
             {
-                WorldDataManager.Instance.SetTreeTrunkFlag(treePosition.x + position.x, treePosition.y + position.y, true);
+                TilesManager.Instance.SetTreeTrunkFlag(treePosition.x + position.x, treePosition.y + position.y, true);
             }
             for (int i = 0; i < _widthToSpawn; i++)
             {
-                WorldDataManager.Instance.SetUnbreakableFlag(treePosition.x + _start.x + i, treePosition.y + _start.y - 1, true);
+                TilesManager.Instance.SetUnbreakableFlag(treePosition.x + _start.x + i, treePosition.y + _start.y - 1, true);
             }
         }
         #endregion

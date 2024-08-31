@@ -5,7 +5,7 @@ using SavageWorld.Runtime.Enums.Types;
 using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Managers;
 using SavageWorld.Runtime.Terrain;
-using SavageWorld.Runtime.Terrain.Blocks;
+using SavageWorld.Runtime.Terrain.Tiles;
 using SavageWorld.Runtime.Utilities;
 using SavageWorld.Runtime.Utilities.Extensions;
 using System.IO;
@@ -74,7 +74,7 @@ namespace SavageWorld.Runtime.Network.Messages
 
         private void WriteChunkData(MessageData messageData)
         {
-            WorldDataManager worldDataManager = WorldDataManager.Instance;
+            TilesManager worldDataManager = TilesManager.Instance;
             GameManager gameManager = GameManager.Instance;
             int chunkSize = gameManager.TerrainConfiguration.ChunkSize;
             int startX = messageData.IntNumber1 * chunkSize;
@@ -93,7 +93,7 @@ namespace SavageWorld.Runtime.Network.Messages
                     byte tileId = worldDataManager.GetTileId(x, y);
                     byte colliderIndex = worldDataManager.GetColliderIndex(x, y);
                     byte blockFlags = worldDataManager.GetFlags(x, y);
-                    BlockTypes type = worldDataManager.GetBlockType(x, y);
+                    TileTypes type = worldDataManager.GetBlockType(x, y);
 
                     int iterator = 1;
                     int countOfSameObject = 0;
@@ -106,7 +106,7 @@ namespace SavageWorld.Runtime.Network.Messages
                         byte nextTileId = worldDataManager.GetTileId(x, y + iterator);
                         byte nextColliderIndex = worldDataManager.GetColliderIndex(x, y + iterator);
                         byte nextBlockFlags = worldDataManager.GetFlags(x, y + iterator);
-                        BlockTypes nextType = worldDataManager.GetBlockType(x, y + iterator);
+                        TileTypes nextType = worldDataManager.GetBlockType(x, y + iterator);
 
                         if (blockId != nextBlockId)
                         {
@@ -166,7 +166,7 @@ namespace SavageWorld.Runtime.Network.Messages
             }
         }
 
-        private void WrtieBlockData(byte flags, ushort blockId, ushort wallId, byte liquidId, float flowValue, byte tileId, byte colliderIndex, byte blockFlags, BlockTypes type, int countOfSameObject)
+        private void WrtieBlockData(byte flags, ushort blockId, ushort wallId, byte liquidId, float flowValue, byte tileId, byte colliderIndex, byte blockFlags, TileTypes type, int countOfSameObject)
         {
             _writer.Write(flags);
             _writer.Write((byte)(blockId));
@@ -197,10 +197,10 @@ namespace SavageWorld.Runtime.Network.Messages
 
         private void ReadChunkData()
         {
-            WorldDataManager worldDataManager = WorldDataManager.Instance;
+            TilesManager worldDataManager = TilesManager.Instance;
             ChunksManager chunksManager = ChunksManager.Instance;
             GameManager gameManager = GameManager.Instance;
-            BlocksAtlasSO blockAtlas = gameManager.BlocksAtlas;
+            TilesAtlasSO blockAtlas = gameManager.TilesAtlas;
             int chunkSize = gameManager.TerrainConfiguration.ChunkSize;
             int startX = _reader.ReadInt32();
             int startY = _reader.ReadInt32();
@@ -218,11 +218,11 @@ namespace SavageWorld.Runtime.Network.Messages
                     byte tileId;
                     byte colliderIndex;
                     byte blockFlags;
-                    BlockTypes blockType;
+                    TileTypes blockType;
                     int count;
-                    BlockSO block;
-                    BlockSO wall;
-                    BlockSO liquid;
+                    TileBaseSO block;
+                    TileBaseSO wall;
+                    TileBaseSO liquid;
 
                     flags = _reader.ReadByte();
 
@@ -252,7 +252,7 @@ namespace SavageWorld.Runtime.Network.Messages
                     tileId = _reader.ReadByte();
                     colliderIndex = _reader.ReadByte();
                     blockFlags = _reader.ReadByte();
-                    blockType = (BlockTypes)_reader.ReadByte();
+                    blockType = (TileTypes)_reader.ReadByte();
 
                     if ((flags & StaticParameters.Bit3) == StaticParameters.Bit3)
                     {
@@ -266,7 +266,7 @@ namespace SavageWorld.Runtime.Network.Messages
                     }
 
                     block = blockAtlas.GetBlockByTypeAndId(blockType, blockId);
-                    wall = blockAtlas.GetBlockByTypeAndId(BlockTypes.Wall, wallId);
+                    wall = blockAtlas.GetBlockByTypeAndId(TileTypes.Wall, wallId);
                     liquid = liquidId == byte.MaxValue ? null : blockAtlas.GetBlockById(liquidId);
                     for (int i = 0; i < count; i++, y++)
                     {

@@ -36,7 +36,7 @@ namespace SavageWorld.Runtime.Light
 
         public void Execute(int index)
         {
-            WorldDataManager worldDataManager = WorldDataManager.Instance;
+            TilesManager worldDataManager = TilesManager.Instance;
             WorldCellDataGPU data = new();
             int x = index % _width;
             int y = index / _width;

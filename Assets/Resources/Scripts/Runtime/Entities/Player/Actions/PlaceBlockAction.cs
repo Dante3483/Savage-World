@@ -3,7 +3,7 @@ using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Network;
 using SavageWorld.Runtime.Network.Messages;
 using SavageWorld.Runtime.Entities.Player.Inventory;
-using SavageWorld.Runtime.Terrain.Blocks;
+using SavageWorld.Runtime.Terrain.Tiles;
 using System.Collections;
 using UnityEngine;
 
@@ -12,7 +12,7 @@ namespace SavageWorld.Runtime.Entities.Player.Actions
     public class PlaceBlockAction : PlayerActionBase
     {
         #region Fields
-        private BlockSO _block;
+        private TileBaseSO _block;
         private Vector2Int _position;
         private float _placementSpeed;
         private bool _isPlacementAllowed;
@@ -42,7 +42,7 @@ namespace SavageWorld.Runtime.Entities.Player.Actions
             }
         }
 
-        public void Configure(BlockSO block, Vector2Int position, float placementSpeed)
+        public void Configure(TileBaseSO block, Vector2Int position, float placementSpeed)
         {
             _block = block;
             _position = position;
@@ -68,7 +68,7 @@ namespace SavageWorld.Runtime.Entities.Player.Actions
             }
             else
             {
-                _worldDataManager.SetBlockData(x, y, _block);
+                _tilesManager.SetBlockData(x, y, _block);
             }
             //TODO: SYNC INVENTORY
             _inventory.RemoveQuantityFromSelectedItem(1);
@@ -88,15 +88,15 @@ namespace SavageWorld.Runtime.Entities.Player.Actions
             {
                 return false;
             }
-            if (!_worldDataManager.IsFree(x, y))
+            if (!_tilesManager.IsFree(x, y))
             {
                 return false;
             }
-            if (!_worldDataManager.IsAbstract(x, y))
+            if (!_tilesManager.IsAbstract(x, y))
             {
                 return false;
             }
-            if (!_worldDataManager.IsWall(x, y) && !_worldDataManager.IsSolidAnyNeighbor(x, y))
+            if (!_tilesManager.IsWall(x, y) && !_tilesManager.IsSolidAnyNeighbor(x, y))
             {
                 return false;
             }

@@ -8,7 +8,7 @@ namespace SavageWorld.Runtime.Entities.Player.Actions
     {
         #region Fields
         protected GameManager _gameManager;
-        protected WorldDataManager _worldDataManager;
+        protected TilesManager _tilesManager;
         protected PlayerGameObject _player;
         #endregion
 
@@ -24,7 +24,7 @@ namespace SavageWorld.Runtime.Entities.Player.Actions
         public PlayerActionBase()
         {
             _gameManager = GameManager.Instance;
-            _worldDataManager = WorldDataManager.Instance;
+            _tilesManager = TilesManager.Instance;
             _player = _gameManager.Player;
         }
 

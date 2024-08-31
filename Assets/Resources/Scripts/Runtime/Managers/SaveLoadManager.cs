@@ -8,9 +8,9 @@ using SavageWorld.Runtime.Entities.Player.Inventory;
 using SavageWorld.Runtime.Entities.Player.Inventory.Items;
 using SavageWorld.Runtime.Entities.Player.Research;
 using SavageWorld.Runtime.Terrain;
-using SavageWorld.Runtime.Terrain.Blocks;
+using SavageWorld.Runtime.Terrain.Tiles;
 using SavageWorld.Runtime.Terrain.Objects;
-using SavageWorld.Runtime.Terrain.WorldProcessingPhases;
+using SavageWorld.Runtime.Terrain.Generation.Phases;
 using SavageWorld.Runtime.Utilities;
 using SavageWorld.Runtime.Utilities.DebugOnly;
 using SavageWorld.Runtime.Utilities.Others;
@@ -20,6 +20,7 @@ using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
 using Tree = SavageWorld.Runtime.Terrain.Objects.Tree;
+using SavageWorld.Runtime.Terrain.Generation;
 
 namespace SavageWorld.Runtime.Managers
 {
@@ -27,7 +28,7 @@ namespace SavageWorld.Runtime.Managers
     {
         #region Fields
         private GameManager _gameManager;
-        private WorldDataManager _worldDataManager;
+        private TilesManager _tilesManager;
         private ChunksManager _chunksManager;
         private List<int> _worldColumnIndexes;
         private int _worldDataSize;
@@ -46,7 +47,7 @@ namespace SavageWorld.Runtime.Managers
         private void Start()
         {
             _gameManager = GameManager.Instance;
-            _worldDataManager = WorldDataManager.Instance;
+            _tilesManager = TilesManager.Instance;
             _chunksManager = ChunksManager.Instance;
         }
 
@@ -176,12 +177,12 @@ namespace SavageWorld.Runtime.Managers
                     //6 - 
                     //7 - 
                     //8 - 
-                    ushort blockId = _worldDataManager.GetBlockId(x, y);
-                    ushort wallId = _worldDataManager.GetWallId(x, y);
-                    byte liquidId = _worldDataManager.GetLiquidId(x, y);
-                    float flowValue = _worldDataManager.GetFlowValue(x, y);
-                    byte tileId = _worldDataManager.GetTileId(x, y);
-                    BlockTypes type = _worldDataManager.GetBlockType(x, y);
+                    ushort blockId = _tilesManager.GetBlockId(x, y);
+                    ushort wallId = _tilesManager.GetWallId(x, y);
+                    byte liquidId = _tilesManager.GetLiquidId(x, y);
+                    float flowValue = _tilesManager.GetFlowValue(x, y);
+                    byte tileId = _tilesManager.GetTileId(x, y);
+                    TileTypes type = _tilesManager.GetBlockType(x, y);
                     byte flags = 0;
 
                     #region Block ID
@@ -210,12 +211,12 @@ namespace SavageWorld.Runtime.Managers
                     int countOfSameObject = 0;
                     while (_gameManager.IsInMapRange(x, y + iterator))
                     {
-                        ushort nextBlockId = _worldDataManager.GetBlockId(x, y + iterator);
-                        ushort nextWallId = _worldDataManager.GetWallId(x, y + iterator);
-                        byte nextLiquidId = _worldDataManager.GetLiquidId(x, y + iterator);
-                        float nextFlowValue = _worldDataManager.GetFlowValue(x, y + iterator);
-                        byte nextTileId = _worldDataManager.GetTileId(x, y + iterator);
-                        BlockTypes nextType = _worldDataManager.GetBlockType(x, y + iterator);
+                        ushort nextBlockId = _tilesManager.GetBlockId(x, y + iterator);
+                        ushort nextWallId = _tilesManager.GetWallId(x, y + iterator);
+                        byte nextLiquidId = _tilesManager.GetLiquidId(x, y + iterator);
+                        float nextFlowValue = _tilesManager.GetFlowValue(x, y + iterator);
+                        byte nextTileId = _tilesManager.GetTileId(x, y + iterator);
+                        TileTypes nextType = _tilesManager.GetBlockType(x, y + iterator);
 
                         if (blockId != nextBlockId)
                         {
@@ -402,7 +403,7 @@ namespace SavageWorld.Runtime.Managers
         private void LoadWorldData(BinaryReader binaryReader)
         {
             Debug.Log("Load world data");
-            BlocksAtlasSO blockAtlas = _gameManager.BlocksAtlas;
+            TilesAtlasSO blockAtlas = _gameManager.TilesAtlas;
 
             byte[] worldData = binaryReader.ReadBytes(_worldDataSize);
             try
@@ -420,10 +421,10 @@ namespace SavageWorld.Runtime.Managers
                     ushort wallId;
                     int count;
                     float flowValue;
-                    BlockTypes blockType;
-                    BlockSO block;
-                    BlockSO wall;
-                    BlockSO liquid;
+                    TileTypes blockType;
+                    TileBaseSO block;
+                    TileBaseSO wall;
+                    TileBaseSO liquid;
 
                     for (int y = 0; y < _gameManager.CurrentTerrainHeight;)
                     {
@@ -463,7 +464,7 @@ namespace SavageWorld.Runtime.Managers
                         }
 
                         tileId = worldData[start + byteIndex++];
-                        blockType = (BlockTypes)worldData[start + byteIndex++];
+                        blockType = (TileTypes)worldData[start + byteIndex++];
 
                         if ((flags & 0b0000_1000) != 0)
                         {
@@ -473,15 +474,15 @@ namespace SavageWorld.Runtime.Managers
                         }
 
                         block = blockAtlas.GetBlockByTypeAndId(blockType, blockId);
-                        wall = blockAtlas.GetBlockByTypeAndId(BlockTypes.Wall, wallId);
+                        wall = blockAtlas.GetBlockByTypeAndId(TileTypes.Wall, wallId);
                         liquid = liquidId == byte.MaxValue ? null : blockAtlas.GetBlockById(liquidId);
 
                         for (int i = 0; i < count; i++)
                         {
-                            _worldDataManager.SetBlockData(x, y + i, block);
-                            _worldDataManager.SetWallData(x, y + i, wall);
-                            _worldDataManager.SetLiquidData(x, y + i, liquid, flowValue);
-                            _worldDataManager.SetTileId(x, y + i, tileId);
+                            _tilesManager.SetBlockData(x, y + i, block);
+                            _tilesManager.SetWallData(x, y + i, wall);
+                            _tilesManager.SetLiquidData(x, y + i, liquid, flowValue);
+                            _tilesManager.SetTileId(x, y + i, tileId);
                         }
 
                         y += count;

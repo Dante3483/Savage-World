@@ -19,7 +19,7 @@ namespace SavageWorld.Runtime.Entities.Player.Interactions
     {
         #region Fields
         private GameManager _gameManager;
-        private WorldDataManager _worldDataManager;
+        private TilesManager _tilesManager;
         private PlayerInputActions _inputActions;
 
         [Header("Interaction area")]
@@ -65,7 +65,7 @@ namespace SavageWorld.Runtime.Entities.Player.Interactions
         private void Awake()
         {
             _gameManager = GameManager.Instance;
-            _worldDataManager = WorldDataManager.Instance;
+            _tilesManager = TilesManager.Instance;
             _inputActions = _gameManager.InputActions;
             _inputActions.Interactions.Enable();
             _isActive = false;
@@ -248,7 +248,7 @@ namespace SavageWorld.Runtime.Entities.Player.Interactions
             if (Input.GetKeyDown(KeyCode.Y))
             {
                 Vector2Int waterPosition = ClickPositionToWorldPosition();
-                _worldDataManager.SetLiquidData(waterPosition.x, waterPosition.y, _gameManager.BlocksAtlas.Water);
+                _tilesManager.SetLiquidData(waterPosition.x, waterPosition.y, _gameManager.TilesAtlas.Water);
             }
         }
 
@@ -258,7 +258,7 @@ namespace SavageWorld.Runtime.Entities.Player.Interactions
             if (Input.GetKeyDown(KeyCode.L))
             {
                 Vector2Int torchPosition = ClickPositionToWorldPosition();
-                _worldDataManager.SetBlockData(torchPosition.x, torchPosition.y, _gameManager.BlocksAtlas.GetBlockById(FurnitureBlocksId.Torch));
+                _tilesManager.SetBlockData(torchPosition.x, torchPosition.y, _gameManager.TilesAtlas.GetBlockById(FurnitureTilesId.Torch));
             }
         }
 

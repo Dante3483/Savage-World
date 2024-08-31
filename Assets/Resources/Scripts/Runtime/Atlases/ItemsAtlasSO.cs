@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SavageWorld.Runtime.Atlases
 {
     [CreateAssetMenu(fileName = "ItemsAtlas", menuName = "Atlases/ItemsAtlas")]
-    public class ItemsAtlasSO : AtlasSO
+    public class ItemsAtlasSO : AtlasBaseSO
     {
         #region Private fields
         [SerializeField]

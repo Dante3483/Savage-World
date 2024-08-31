@@ -378,7 +378,7 @@ namespace SavageWorld.Runtime.Network
 
         private void ServerStartedEventHandler(INetworkConnection connection)
         {
-            WorldDataManager.Instance.CellDataChanged += (x, y) =>
+            TilesManager.Instance.CellDataChanged += (x, y) =>
             {
                 MessageData messageData = new()
                 {

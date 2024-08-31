@@ -3,7 +3,7 @@ using SavageWorld.Runtime.Enums.Network;
 using SavageWorld.Runtime.Enums.Types;
 using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Terrain;
-using SavageWorld.Runtime.Terrain.Blocks;
+using SavageWorld.Runtime.Terrain.Tiles;
 using SavageWorld.Runtime.Utilities;
 using System.IO;
 
@@ -38,36 +38,36 @@ namespace SavageWorld.Runtime.Network.Messages
         #region Private Methods
         protected override void ReadData()
         {
-            WorldDataManager worldDataManager = WorldDataManager.Instance;
+            TilesManager worldDataManager = TilesManager.Instance;
             GameManager gameManager = GameManager.Instance;
-            BlocksAtlasSO blockAtlas = gameManager.BlocksAtlas;
+            TilesAtlasSO blockAtlas = gameManager.TilesAtlas;
             if (_networkManager.IsServer)
             {
                 int x = _reader.ReadInt32();
                 int y = _reader.ReadInt32();
-                BlockTypes blockType = (BlockTypes)_reader.ReadByte();
+                TileTypes blockType = (TileTypes)_reader.ReadByte();
                 ushort id = _reader.ReadUInt16();
                 switch (blockType)
                 {
-                    case BlockTypes.Abstract:
-                    case BlockTypes.Solid:
-                    case BlockTypes.Dust:
-                    case BlockTypes.Plant:
-                    case BlockTypes.Furniture:
+                    case TileTypes.Abstract:
+                    case TileTypes.Solid:
+                    case TileTypes.Dust:
+                    case TileTypes.Plant:
+                    case TileTypes.Furniture:
                         {
-                            BlockSO block = blockAtlas.GetBlockByTypeAndId(blockType, id);
+                            TileBaseSO block = blockAtlas.GetBlockByTypeAndId(blockType, id);
                             MainThreadUtility.Instance.InvokeInNextUpdate(() => worldDataManager.SetBlockData(x, y, block));
                         }
                         break;
-                    case BlockTypes.Wall:
+                    case TileTypes.Wall:
                         {
-                            BlockSO wall = blockAtlas.GetBlockByTypeAndId(BlockTypes.Wall, id);
+                            TileBaseSO wall = blockAtlas.GetBlockByTypeAndId(TileTypes.Wall, id);
                             worldDataManager.SetWallData(x, y, wall);
                         }
                         break;
-                    case BlockTypes.Liquid:
+                    case TileTypes.Liquid:
                         {
-                            BlockSO liquid = id == byte.MaxValue ? null : blockAtlas.GetBlockById((byte)id);
+                            TileBaseSO liquid = id == byte.MaxValue ? null : blockAtlas.GetBlockById((byte)id);
                             worldDataManager.SetLiquidData(x, y, liquid);
                         }
                         break;
@@ -86,10 +86,10 @@ namespace SavageWorld.Runtime.Network.Messages
                 byte colliderIndex = _reader.ReadByte();
                 byte tileId = _reader.ReadByte();
                 byte blockFlags = _reader.ReadByte();
-                BlockTypes blockType = (BlockTypes)_reader.ReadByte();
-                BlockSO block = blockAtlas.GetBlockByTypeAndId(blockType, blockId);
-                BlockSO wall = blockAtlas.GetBlockByTypeAndId(BlockTypes.Wall, wallId);
-                BlockSO liquid = liquidId == byte.MaxValue ? null : blockAtlas.GetBlockById(liquidId);
+                TileTypes blockType = (TileTypes)_reader.ReadByte();
+                TileBaseSO block = blockAtlas.GetBlockByTypeAndId(blockType, blockId);
+                TileBaseSO wall = blockAtlas.GetBlockByTypeAndId(TileTypes.Wall, wallId);
+                TileBaseSO liquid = liquidId == byte.MaxValue ? null : blockAtlas.GetBlockById(liquidId);
                 MainThreadUtility.Instance.InvokeInNextUpdate(() =>
                 {
                     worldDataManager.SetFullData(x, y, block, wall, liquid, flowValue, colliderIndex, tileId, blockFlags);
@@ -109,7 +109,7 @@ namespace SavageWorld.Runtime.Network.Messages
             }
             if (_networkManager.IsServer)
             {
-                WorldDataManager worldDataManager = WorldDataManager.Instance;
+                TilesManager worldDataManager = TilesManager.Instance;
                 int x = messageData.IntNumber1;
                 int y = messageData.IntNumber2;
                 _writer.Write(x);

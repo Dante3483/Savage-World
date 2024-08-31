@@ -1,4 +1,5 @@
 using SavageWorld.Runtime.GameSession;
+using SavageWorld.Runtime.Terrain.Generation;
 using SavageWorld.Runtime.Utilities.Vectors;
 
 namespace SavageWorld.Runtime.Terrain.Objects

@@ -17,9 +17,9 @@ namespace SavageWorld.Runtime.Entities.Player.Actions
         #region Public Methods
         public BreakBlockAction() : base()
         {
-            _replacment = _gameManager.BlocksAtlas.Air;
+            _replacment = _gameManager.TilesAtlas.Air;
             _addDamage += _miningDamageController.AddDamageToBlock;
-            _replace += _worldDataManager.SetBlockData;
+            _replace += _tilesManager.SetBlockData;
             _miningDamageController.BlockDamageReachedMaxValue += Break;
         }
         #endregion
@@ -31,7 +31,7 @@ namespace SavageWorld.Runtime.Entities.Player.Actions
             {
                 return false;
             }
-            if (_worldDataManager.IsAbstract(x, y))
+            if (_tilesManager.IsAbstract(x, y))
             {
                 return false;
             }

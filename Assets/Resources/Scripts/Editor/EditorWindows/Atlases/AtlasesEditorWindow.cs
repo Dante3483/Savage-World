@@ -1,5 +1,5 @@
 using SavageWorld.Runtime.Atlases;
-using SavageWorld.Runtime.Terrain.Blocks;
+using SavageWorld.Runtime.Terrain.Tiles;
 using SavageWorld.Runtime.Terrain.Objects;
 using System;
 using System.Collections.Generic;
@@ -27,7 +27,7 @@ namespace SavageWorld.Editor.EditorWindows.Atlases
         private class AtlasInfo
         {
             #region Private fields
-            private AtlasSO _atlas;
+            private AtlasBaseSO _atlas;
             private List<CollectionInfo> _collections;
             #endregion
 
@@ -36,7 +36,7 @@ namespace SavageWorld.Editor.EditorWindows.Atlases
             #endregion
 
             #region Properties
-            public AtlasSO Atlas
+            public AtlasBaseSO Atlas
             {
                 get
                 {
@@ -54,7 +54,7 @@ namespace SavageWorld.Editor.EditorWindows.Atlases
             #endregion
 
             #region Methods
-            public AtlasInfo(AtlasSO atlas)
+            public AtlasInfo(AtlasBaseSO atlas)
             {
                 _atlas = atlas;
                 SetCollections();
@@ -212,7 +212,7 @@ namespace SavageWorld.Editor.EditorWindows.Atlases
             /// <param name="atlas">The atlas in which to delete.</param>
             /// <param name="value">The object to delete.</param>
             /// <returns>True if the object is found and removed, false otherwise.</returns>
-            public bool Delete(AtlasSO atlas, ObjectInfo value)
+            public bool Delete(AtlasBaseSO atlas, ObjectInfo value)
             {
                 int index = _objects.IndexOf(value);
                 if (index == -1)
@@ -486,10 +486,10 @@ namespace SavageWorld.Editor.EditorWindows.Atlases
         /// </summary>
         private void GetAllData()
         {
-            string[] allAtlasesGuids = AssetDatabase.FindAssets("t:AtlasSO");
+            string[] allAtlasesGuids = AssetDatabase.FindAssets($"t:{typeof(AtlasBaseSO).Name}");
             foreach (var atlasGuid in allAtlasesGuids)
             {
-                AtlasSO atlas = AssetDatabase.LoadAssetAtPath<AtlasSO>(AssetDatabase.GUIDToAssetPath(atlasGuid));
+                AtlasBaseSO atlas = AssetDatabase.LoadAssetAtPath<AtlasBaseSO>(AssetDatabase.GUIDToAssetPath(atlasGuid));
                 _atlases.Add(new AtlasInfo(atlas));
             }
         }
@@ -1021,7 +1021,7 @@ namespace SavageWorld.Editor.EditorWindows.Atlases
         {
             return obj switch
             {
-                BlockSO block => block.Sprites.Count != 0 ? block.Sprites[0] : null,
+                TileBaseSO block => block.Sprites.Count != 0 ? block.Sprites[0] : null,
                 Tree tree => tree.GetComponent<SpriteRenderer>()?.sprite,
                 PickUpItem pickUpItem => pickUpItem.GetComponent<SpriteRenderer>()?.sprite,
                 _ => null

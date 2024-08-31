@@ -1,5 +1,5 @@
 using SavageWorld.Runtime.Enums.Types;
-using SavageWorld.Runtime.Terrain.Blocks;
+using SavageWorld.Runtime.Terrain.Tiles;
 using UnityEngine;
 
 namespace SavageWorld.Runtime.Entities.Player.Inventory.Items
@@ -9,11 +9,11 @@ namespace SavageWorld.Runtime.Entities.Player.Inventory.Items
     {
         #region Fields
         [SerializeField]
-        private BlockSO _blockToPlace;
+        private TileBaseSO _blockToPlace;
         #endregion
 
         #region Properties
-        public BlockSO BlockToPlace
+        public TileBaseSO BlockToPlace
         {
             get
             {

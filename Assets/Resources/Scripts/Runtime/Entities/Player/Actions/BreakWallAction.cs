@@ -17,9 +17,9 @@ namespace SavageWorld.Runtime.Entities.Player.Actions
         #region Public Methods
         public BreakWallAction() : base()
         {
-            _replacment = _gameManager.BlocksAtlas.AirWall;
+            _replacment = _gameManager.TilesAtlas.AirWall;
             _addDamage += _miningDamageController.AddDamageToWall;
-            _replace += _worldDataManager.SetWallData;
+            _replace += _tilesManager.SetWallData;
         }
         #endregion
 
@@ -30,7 +30,7 @@ namespace SavageWorld.Runtime.Entities.Player.Actions
             {
                 return false;
             }
-            if (!_worldDataManager.IsWall(x, y))
+            if (!_tilesManager.IsWall(x, y))
             {
                 return false;
             }

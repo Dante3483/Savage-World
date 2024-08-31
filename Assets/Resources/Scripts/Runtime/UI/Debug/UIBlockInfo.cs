@@ -19,7 +19,7 @@ namespace SavageWorld.Runtime.UI.Debug
         #region Methods
         private void Update()
         {
-            _debugText.text = WorldDataManager.Instance.BlockInfo;
+            _debugText.text = TilesManager.Instance.BlockInfo;
         }
         #endregion
     }

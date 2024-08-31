@@ -72,14 +72,14 @@ namespace SavageWorld.Runtime.Terrain.Objects
             NetworkObject.Type = NetworkObjectTypes.Environment;
             _intPosition.x = Mathf.FloorToInt(transform.position.x);
             _intPosition.y = Mathf.FloorToInt(transform.position.y);
-            WorldDataManager.Instance.SetOccupiedFlag(_intPosition.x, _intPosition.y, true);
+            TilesManager.Instance.SetOccupiedFlag(_intPosition.x, _intPosition.y, true);
         }
 
         private void Update()
         {
-            if (WorldDataManager.Instance.IsAbstract(_intPosition.x, _intPosition.y - 1))
+            if (TilesManager.Instance.IsAbstract(_intPosition.x, _intPosition.y - 1))
             {
-                WorldDataManager.Instance.SetOccupiedFlag(_intPosition.x, _intPosition.y, false);
+                TilesManager.Instance.SetOccupiedFlag(_intPosition.x, _intPosition.y, false);
                 DeleteObject();
             }
         }

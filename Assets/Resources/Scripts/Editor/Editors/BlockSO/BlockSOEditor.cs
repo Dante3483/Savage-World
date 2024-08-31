@@ -1,4 +1,4 @@
-using SavageWorld.Runtime.Terrain.Blocks;
+using SavageWorld.Runtime.Terrain.Tiles;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 
 namespace SavageWorld.Editor.Editors
 {
-    [CustomEditor(typeof(BlockSO), true)]
+    [CustomEditor(typeof(TileBaseSO), true)]
     [CanEditMultipleObjects]
     public class BlockSOEditor : ObjectsEditor
     {
@@ -90,22 +90,22 @@ namespace SavageWorld.Editor.Editors
 
             switch (serializedObject.targetObject)
             {
-                case DustBlockSO:
+                case DustTileSO:
                     {
                         _advancedTabGroup.ShowTab("Dust");
                     }
                     break;
-                case LiquidBlockSO:
+                case LiquidTileSO:
                     {
                         _advancedTabGroup.ShowTab("Liquid");
                     }
                     break;
-                case PlantSO:
+                case PlantTileSO:
                     {
                         _advancedTabGroup.ShowTab("Plant");
                     }
                     break;
-                case FurnitureSO:
+                case FurnitureTileSO:
                     {
                         _advancedTabGroup.ShowTab("Furniture");
                     }
@@ -117,11 +117,11 @@ namespace SavageWorld.Editor.Editors
             //DELETE
             switch (serializedObject.targetObject)
             {
-                case SolidBlockSO:
-                case DustBlockSO:
-                case PlantSO:
-                case FurnitureSO:
-                case WallSO:
+                case SolidTileSO:
+                case DustTileSO:
+                case PlantTileSO:
+                case FurnitureTileSO:
+                case WallTileSO:
                     {
                         _advancedTabGroup.ShowTab("Breaking");
                     }

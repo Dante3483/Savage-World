@@ -1,5 +1,5 @@
 using SavageWorld.Runtime.GameSession;
-using SavageWorld.Runtime.Terrain.Blocks;
+using SavageWorld.Runtime.Terrain.Tiles;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +8,7 @@ namespace SavageWorld.Runtime.Terrain
     public class WorldHandler
     {
         #region Fields
-        private WorldDataManager _worldDataManager;
+        private TilesManager _tilesManager;
         private GameManager _gameManager;
 
         private HashSet<Vector2Int> _positionsToHandle;
@@ -16,7 +16,7 @@ namespace SavageWorld.Runtime.Terrain
         private Dictionary<Vector2Int, float> _timeByPosition;
         private Dictionary<Vector2Int, int> _settledCountByPosition;
 
-        private BlockSO _air;
+        private TileBaseSO _air;
 
         private float _minFlowValue = 0.01f;
         private float _maxFlowValue = 100f;
@@ -38,11 +38,11 @@ namespace SavageWorld.Runtime.Terrain
             _timeByPosition = new();
             _settledCountByPosition = new();
 
-            _worldDataManager = WorldDataManager.Instance;
+            _tilesManager = TilesManager.Instance;
             _gameManager = GameManager.Instance;
-            _air = _gameManager.BlocksAtlas.Air;
+            _air = _gameManager.TilesAtlas.Air;
 
-            _worldDataManager.CellDataChanged += CellDataChangedEventHandler;
+            _tilesManager.CellDataChanged += CellDataChangedEventHandler;
         }
 
         public void Handle()
@@ -59,48 +59,48 @@ namespace SavageWorld.Runtime.Terrain
                 int x = position.x;
                 int y = position.y;
 
-                BlockSO blockData = _worldDataManager.GetBlockData(x, y);
-                WallSO wallData = _worldDataManager.GetWallData(x, y) as WallSO;
-                LiquidBlockSO liquidData = _worldDataManager.GetLiquidData(x, y) as LiquidBlockSO;
+                TileBaseSO blockData = _tilesManager.GetBlockData(x, y);
+                WallTileSO wallData = _tilesManager.GetWallData(x, y) as WallTileSO;
+                LiquidTileSO liquidData = _tilesManager.GetLiquidData(x, y) as LiquidTileSO;
                 bool isWaterproof = blockData.IsWaterproof;
 
-                if (!isWaterproof && _worldDataManager.IsLiquid(x, y))
+                if (!isWaterproof && _tilesManager.IsLiquid(x, y))
                 {
-                    _worldDataManager.SetBlockData(x, y, _air);
+                    _tilesManager.SetBlockData(x, y, _air);
                 }
-                if (_worldDataManager.IsEmpty(x, y))
+                if (_tilesManager.IsEmpty(x, y))
                 {
                     HandleEmpty(x, y);
                     continue;
                 }
-                if (_worldDataManager.IsSolid(x, y))
+                if (_tilesManager.IsSolid(x, y))
                 {
-                    HandleSolid(x, y, blockData as SolidBlockSO);
+                    HandleSolid(x, y, blockData as SolidTileSO);
                     continue;
                 }
-                if (_worldDataManager.IsDust(x, y))
+                if (_tilesManager.IsDust(x, y))
                 {
-                    HandleDust(x, y, blockData as DustBlockSO);
+                    HandleDust(x, y, blockData as DustTileSO);
                     continue;
                 }
-                if (_worldDataManager.IsLiquid(x, y))
+                if (_tilesManager.IsLiquid(x, y))
                 {
                     HandleLiquid(x, y, liquidData);
                     continue;
                 }
-                if (_worldDataManager.IsPlant(x, y))
+                if (_tilesManager.IsPlant(x, y))
                 {
-                    HandlePlant(x, y, blockData as PlantSO);
+                    HandlePlant(x, y, blockData as PlantTileSO);
                     continue;
                 }
-                if (_worldDataManager.IsWall(x, y))
+                if (_tilesManager.IsWall(x, y))
                 {
                     HandleWall(x, y, wallData);
                     continue;
                 }
-                if (_worldDataManager.IsFurniture(x, y))
+                if (_tilesManager.IsFurniture(x, y))
                 {
-                    HandleFurniture(x, y, blockData as FurnitureSO);
+                    HandleFurniture(x, y, blockData as FurnitureTileSO);
                     continue;
                 }
             }
@@ -130,23 +130,23 @@ namespace SavageWorld.Runtime.Terrain
             {
                 int dirX = x + direction.x;
                 int dirY = y + direction.y;
-                if (_worldDataManager.IsLiquid(dirX, dirY))
+                if (_tilesManager.IsLiquid(dirX, dirY))
                 {
-                    _worldDataManager.SetLiquidSettledFlag(dirX, dirY, false);
+                    _tilesManager.SetLiquidSettledFlag(dirX, dirY, false);
                 }
-                return !_worldDataManager.IsEmpty(dirX, dirY);
+                return !_tilesManager.IsEmpty(dirX, dirY);
             }
         }
 
-        private void HandleSolid(int x, int y, BlockSO data)
+        private void HandleSolid(int x, int y, TileBaseSO data)
         {
 
         }
 
-        private void HandleDust(int x, int y, DustBlockSO data)
+        private void HandleDust(int x, int y, DustTileSO data)
         {
             Vector2Int position = new(x, y);
-            if (!_worldDataManager.IsAbstract(x, y - 1))
+            if (!_tilesManager.IsAbstract(x, y - 1))
             {
                 _timeByPosition.Remove(position);
                 return;
@@ -155,38 +155,38 @@ namespace SavageWorld.Runtime.Terrain
             {
                 return;
             }
-            if (_worldDataManager.IsDust(x, y + 1))
+            if (_tilesManager.IsDust(x, y + 1))
             {
                 _nextPositionsToHandle.Add(position + Vector2Int.up);
             }
-            _worldDataManager.SetBlockData(x, y, _air);
-            _worldDataManager.SetBlockData(x, y - 1, data);
+            _tilesManager.SetBlockData(x, y, _air);
+            _tilesManager.SetBlockData(x, y - 1, data);
         }
 
-        private void HandleLiquid(int x, int y, LiquidBlockSO data)
+        private void HandleLiquid(int x, int y, LiquidTileSO data)
         {
             Vector2Int position = new(x, y);
             if (!CheckTime(position, data.TimeToFlow))
             {
                 return;
             }
-            float startFlowValue = _worldDataManager.GetFlowValue(x, y);
+            float startFlowValue = _tilesManager.GetFlowValue(x, y);
             if (_settledCountByPosition.TryGetValue(position, out int count))
             {
                 if (count >= 20)
                 {
                     if (startFlowValue >= 99f && startFlowValue <= 100f)
                     {
-                        _worldDataManager.SetFlowValue(x, y, 100f);
+                        _tilesManager.SetFlowValue(x, y, 100f);
                     }
-                    _worldDataManager.SetLiquidSettledFlag(x, y, true);
+                    _tilesManager.SetLiquidSettledFlag(x, y, true);
                     _settledCountByPosition.Remove(position);
                     return;
                 }
             }
             else
             {
-                if (_worldDataManager.IsLiquidSettled(x, y))
+                if (_tilesManager.IsLiquidSettled(x, y))
                 {
                     return;
                 }
@@ -195,23 +195,23 @@ namespace SavageWorld.Runtime.Terrain
             float remainingFlowValue = FlowByDirection(data, startFlowValue, position, Vector2Int.down);
             remainingFlowValue = FlowByDirection(data, remainingFlowValue, position, Vector2Int.left);
             remainingFlowValue = FlowByDirection(data, remainingFlowValue, position, Vector2Int.right);
-            _worldDataManager.SetFlowValue(x, y, remainingFlowValue);
+            _tilesManager.SetFlowValue(x, y, remainingFlowValue);
             _nextPositionsToHandle.Add(position);
-            if (_worldDataManager.IsLiquid(x - 1, y) && Mathf.Abs(_worldDataManager.GetFlowValue(x - 1, y) - remainingFlowValue) > _minFlowValue)
+            if (_tilesManager.IsLiquid(x - 1, y) && Mathf.Abs(_tilesManager.GetFlowValue(x - 1, y) - remainingFlowValue) > _minFlowValue)
             {
-                _worldDataManager.SetLiquidSettledFlag(x - 1, y, false);
+                _tilesManager.SetLiquidSettledFlag(x - 1, y, false);
                 _settledCountByPosition.Remove(position + Vector2Int.left);
                 _nextPositionsToHandle.Add(position + Vector2Int.left);
             }
-            if (_worldDataManager.IsLiquid(x + 1, y) && Mathf.Abs(_worldDataManager.GetFlowValue(x + 1, y) - remainingFlowValue) > _minFlowValue)
+            if (_tilesManager.IsLiquid(x + 1, y) && Mathf.Abs(_tilesManager.GetFlowValue(x + 1, y) - remainingFlowValue) > _minFlowValue)
             {
-                _worldDataManager.SetLiquidSettledFlag(x + 1, y, false);
+                _tilesManager.SetLiquidSettledFlag(x + 1, y, false);
                 _settledCountByPosition.Remove(position + Vector2Int.right);
                 _nextPositionsToHandle.Add(position + Vector2Int.right);
             }
-            if (_worldDataManager.IsLiquid(x, y + 1))
+            if (_tilesManager.IsLiquid(x, y + 1))
             {
-                _worldDataManager.SetLiquidSettledFlag(x, y + 1, false);
+                _tilesManager.SetLiquidSettledFlag(x, y + 1, false);
                 _settledCountByPosition.Remove(position + Vector2Int.up);
                 _nextPositionsToHandle.Add(position + Vector2Int.up);
             }
@@ -225,33 +225,33 @@ namespace SavageWorld.Runtime.Terrain
             }
         }
 
-        private void HandlePlant(int x, int y, PlantSO data)
+        private void HandlePlant(int x, int y, PlantTileSO data)
         {
             Vector2Int position = new(x, y);
-            if (data.IsBottomBlockSolid && _worldDataManager.IsAbstract(x, y - 1))
+            if (data.IsBottomBlockSolid && _tilesManager.IsAbstract(x, y - 1))
             {
-                if (_worldDataManager.CompareBlock(x, y + 1, data))
+                if (_tilesManager.CompareBlock(x, y + 1, data))
                 {
                     _nextPositionsToHandle.Add(position + Vector2Int.up);
                 }
-                _worldDataManager.SetBlockData(x, y, _air);
+                _tilesManager.SetBlockData(x, y, _air);
             }
-            else if (data.IsTopBlockSolid && _worldDataManager.IsAbstract(x, y + 1))
+            else if (data.IsTopBlockSolid && _tilesManager.IsAbstract(x, y + 1))
             {
-                if (_worldDataManager.CompareBlock(x, y - 1, data))
+                if (_tilesManager.CompareBlock(x, y - 1, data))
                 {
                     _nextPositionsToHandle.Add(position + Vector2Int.down);
                 }
-                _worldDataManager.SetBlockData(x, y, _air);
+                _tilesManager.SetBlockData(x, y, _air);
             }
         }
 
-        private void HandleWall(int x, int y, BlockSO data)
+        private void HandleWall(int x, int y, TileBaseSO data)
         {
 
         }
 
-        private void HandleFurniture(int x, int y, BlockSO data)
+        private void HandleFurniture(int x, int y, TileBaseSO data)
         {
 
         }
@@ -273,7 +273,7 @@ namespace SavageWorld.Runtime.Terrain
             }
         }
 
-        private float FlowByDirection(LiquidBlockSO data, float starterValue, Vector2Int position, Vector2Int direction)
+        private float FlowByDirection(LiquidTileSO data, float starterValue, Vector2Int position, Vector2Int direction)
         {
             if (starterValue == 0f)
             {
@@ -283,10 +283,10 @@ namespace SavageWorld.Runtime.Terrain
             int y = position.y;
             int dirX = x + direction.x;
             int dirY = y + direction.y;
-            bool isLiquidInDirection = _worldDataManager.IsLiquid(dirX, dirY);
-            float flowValueInDirection = _worldDataManager.GetFlowValue(dirX, dirY);
+            bool isLiquidInDirection = _tilesManager.IsLiquid(dirX, dirY);
+            float flowValueInDirection = _tilesManager.GetFlowValue(dirX, dirY);
             float flowValue;
-            bool isEmpty = !isLiquidInDirection && _worldDataManager.IsValidForLiquid(dirX, dirY);
+            bool isEmpty = !isLiquidInDirection && _tilesManager.IsValidForLiquid(dirX, dirY);
             bool isLiquid = direction == Vector2Int.up ? isLiquidInDirection && flowValueInDirection < 100f : isLiquidInDirection;
 
             if (isEmpty || isLiquid)
@@ -306,21 +306,21 @@ namespace SavageWorld.Runtime.Terrain
                     starterValue -= flowValue;
                     if (!isLiquidInDirection)
                     {
-                        _worldDataManager.SetLiquidData(dirX, dirY, data);
+                        _tilesManager.SetLiquidData(dirX, dirY, data);
                     }
-                    _worldDataManager.SetFlowValue(dirX, dirY, flowValue + flowValueInDirection);
+                    _tilesManager.SetFlowValue(dirX, dirY, flowValue + flowValueInDirection);
                 }
             }
 
             if (starterValue < _minFlowValue)
             {
-                if (direction == Vector2Int.left && _worldDataManager.IsValidForLiquid(x - 1, y - 1))
+                if (direction == Vector2Int.left && _tilesManager.IsValidForLiquid(x - 1, y - 1))
                 {
-                    _worldDataManager.SetFlowValue(x - 1, y, starterValue);
+                    _tilesManager.SetFlowValue(x - 1, y, starterValue);
                 }
-                else if (direction == Vector2Int.right && _worldDataManager.IsValidForLiquid(x + 1, y - 1))
+                else if (direction == Vector2Int.right && _tilesManager.IsValidForLiquid(x + 1, y - 1))
                 {
-                    _worldDataManager.SetFlowValue(x + 1, y, starterValue);
+                    _tilesManager.SetFlowValue(x + 1, y, starterValue);
                 }
                 return 0f;
             }

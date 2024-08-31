@@ -37,7 +37,7 @@ namespace SavageWorld.Runtime.Entities.Player.Interactions
 
         public void AddDamage(Vector2Int position, float damage)
         {
-            float maxDamage = WorldDataManager.Instance.GetBlockData(position.x, position.y).DamageToBreak;
+            float maxDamage = TilesManager.Instance.GetBlockData(position.x, position.y).DamageToBreak;
             if (_damageByPosition.TryGetValue(position, out float currentDamage))
             {
                 currentDamage += damage;

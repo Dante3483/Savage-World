@@ -7,7 +7,7 @@ using Tree = SavageWorld.Runtime.Terrain.Objects.Tree;
 namespace SavageWorld.Runtime.Atlases
 {
     [CreateAssetMenu(fileName = "TreesAtlas", menuName = "Atlases/TreesAtlas")]
-    public class TreesAtlasSO : AtlasSO
+    public class TreesAtlasSO : AtlasBaseSO
     {
         #region Private fields
         [SerializeField] private Tree[] _trees;

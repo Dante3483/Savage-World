@@ -1,6 +1,6 @@
 using SavageWorld.Runtime.Enums.Id;
 using SavageWorld.Runtime.GameSession;
-using SavageWorld.Runtime.Terrain;
+using SavageWorld.Runtime.Terrain.Generation;
 using SavageWorld.Runtime.Terrain.Objects;
 using SavageWorld.Runtime.Utilities.Others;
 using UnityEngine;

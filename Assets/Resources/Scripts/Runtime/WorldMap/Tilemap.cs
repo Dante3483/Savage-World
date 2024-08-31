@@ -53,7 +53,7 @@ namespace SavageWorld.Runtime.WorldMap
         private RectInt _currentAreaRect;
         private RectInt _prevAreaRect;
         private Tile[,] _tiles;
-        private WorldDataManager _worldDataManager;
+        private TilesManager _tilesManager;
         private MiningDamageController _miningDamageController;
         #endregion
 
@@ -69,7 +69,7 @@ namespace SavageWorld.Runtime.WorldMap
         protected override void Awake()
         {
             base.Awake();
-            _worldDataManager = WorldDataManager.Instance;
+            _tilesManager = TilesManager.Instance;
             _miningDamageController = MiningDamageController.Instance;
             InitializeTiles();
             InitializePlatforms();
@@ -94,16 +94,16 @@ namespace SavageWorld.Runtime.WorldMap
 
         private void OnEnable()
         {
-            _worldDataManager.CellDataChanged += CellDataChangedEventHandler;
-            _worldDataManager.CellColliderChanged += CellColliderChangedEventHandler;
+            _tilesManager.CellDataChanged += CellDataChangedEventHandler;
+            _tilesManager.CellColliderChanged += CellColliderChangedEventHandler;
             _miningDamageController.BlockDamageChanged += BlockDamageChangedEventHandler;
             _miningDamageController.WallDamageChanged += WallDamageChangedEventHandler;
         }
 
         private void OnDisable()
         {
-            _worldDataManager.CellDataChanged -= CellDataChangedEventHandler;
-            _worldDataManager.CellColliderChanged -= CellColliderChangedEventHandler;
+            _tilesManager.CellDataChanged -= CellDataChangedEventHandler;
+            _tilesManager.CellColliderChanged -= CellColliderChangedEventHandler;
             _miningDamageController.BlockDamageChanged -= UpdateBlockDamageSprite;
             _miningDamageController.WallDamageChanged -= UpdateWallDamageSprite;
         }
@@ -200,7 +200,7 @@ namespace SavageWorld.Runtime.WorldMap
             Vector2Int tilePositon = GetLocalTilePosition(position);
             try
             {
-                Sprite sprite = _worldDataManager.GetBlockSprite(position.x, position.y);
+                Sprite sprite = _tilesManager.GetBlockSprite(position.x, position.y);
                 _tiles[tilePositon.x, tilePositon.y].UpdateBlockSprite(sprite);
             }
             catch (IndexOutOfRangeException)
@@ -214,7 +214,7 @@ namespace SavageWorld.Runtime.WorldMap
             Vector2Int tilePositon = GetLocalTilePosition(position);
             try
             {
-                Sprite sprite = _worldDataManager.GetWallSprite(position.x, position.y);
+                Sprite sprite = _tilesManager.GetWallSprite(position.x, position.y);
                 _tiles[tilePositon.x, tilePositon.y].UpdateWallSprite(sprite);
             }
             catch (IndexOutOfRangeException)
@@ -228,7 +228,7 @@ namespace SavageWorld.Runtime.WorldMap
             Vector2Int tilePositon = GetLocalTilePosition(position);
             try
             {
-                Sprite sprite = _worldDataManager.GetLiquidSprite(position.x, position.y);
+                Sprite sprite = _tilesManager.GetLiquidSprite(position.x, position.y);
                 _tiles[tilePositon.x, tilePositon.y].UpdateLiquidSprite(sprite);
             }
             catch (IndexOutOfRangeException)
@@ -244,7 +244,7 @@ namespace SavageWorld.Runtime.WorldMap
             {
                 if (rawDamage > 0)
                 {
-                    float maxDamage = _worldDataManager.GetBlockData(position.x, position.y).DamageToBreak;
+                    float maxDamage = _tilesManager.GetBlockData(position.x, position.y).DamageToBreak;
                     int damage = (int)(Mathf.Min(rawDamage / maxDamage, 1) * 100);
                     if (damage != 0)
                     {
@@ -271,7 +271,7 @@ namespace SavageWorld.Runtime.WorldMap
             {
                 if (rawDamage > 0)
                 {
-                    float maxDamage = _worldDataManager.GetWallData(position.x, position.y).DamageToBreak;
+                    float maxDamage = _tilesManager.GetWallData(position.x, position.y).DamageToBreak;
                     int damage = (int)(Mathf.Min(rawDamage / maxDamage, 1) * 100);
                     if (damage != 0)
                     {
@@ -316,8 +316,8 @@ namespace SavageWorld.Runtime.WorldMap
                 _usedPlatformsByPositions.Add(position, platform);
             }
             platform.SetPolygonColliderPoints(
-                _worldDataManager.GetColliderShape(position.x, position.y),
-                _worldDataManager.IsColliderHorizontalFlipped(position.x, position.y));
+                _tilesManager.GetColliderShape(position.x, position.y),
+                _tilesManager.IsColliderHorizontalFlipped(position.x, position.y));
         }
 
         private void RemovePlatform(Vector2Int position)
@@ -367,8 +367,8 @@ namespace SavageWorld.Runtime.WorldMap
             if (_usedPlatformsByPositions.TryGetValue(new(x, y), out SolidPlatform platform))
             {
                 platform.SetPolygonColliderPoints(
-                    _worldDataManager.GetColliderShape(x, y),
-                    _worldDataManager.IsColliderHorizontalFlipped(x, y));
+                    _tilesManager.GetColliderShape(x, y),
+                    _tilesManager.IsColliderHorizontalFlipped(x, y));
                 _compositeCollider.GenerateGeometry();
             }
         }

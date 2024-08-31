@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SavageWorld.Runtime.Atlases
 {
     [CreateAssetMenu(fileName = "PickUpItemsAtlas", menuName = "Atlases/PickUpItemsAtlas")]
-    public class PickUpItemsAtlasSO : AtlasSO
+    public class PickUpItemsAtlasSO : AtlasBaseSO
     {
         #region Private fields
         [SerializeField] private PickUpItem[] _pickUpItems;

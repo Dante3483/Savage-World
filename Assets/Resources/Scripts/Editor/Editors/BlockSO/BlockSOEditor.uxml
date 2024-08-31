@@ -3,7 +3,7 @@
     <ui:VisualElement name="basic" style="flex-direction: row; margin-bottom: 5px; min-height: 100px;">
         <ObjectPreview name="basic-preview" style="width: 100px; height: 100px; margin-right: 5px;" />
         <ui:VisualElement name="basic-properties" class="block__background" style="flex-grow: 1; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 5px; align-items: stretch; justify-content: space-between; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px; height: 100px;">
-            <ui:EnumField label="Id" name="id" binding-path="_id" type="SavageWorld.Runtime.Enums.Id.SolidBlocksId, SavageWorld.Runtime" />
+            <ui:EnumField label="Id" name="id" binding-path="_id" />
             <ui:FloatField label="Light Intensity" value="42,2" name="light-intensity" binding-path="_lightIntensity" />
             <uie:ColorField label="Light Color" value="RGBA(0.000, 1.000, 1.000, 1.000)" name="light-color" binding-path="_lightColor" />
             <uie:ColorField label="Color On Map" value="RGBA(0.000, 1.000, 1.000, 1.000)" name="color-on-map" binding-path="_colorOnMap" />

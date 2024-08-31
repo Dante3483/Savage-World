@@ -36,7 +36,7 @@ namespace SavageWorld.Runtime.Entities.Player
         private List<ItemQuantity> _starterItems;
         private PlayerInputActions _inputActions;
 
-        private WorldDataManager _worldDataManager;
+        private TilesManager _tilesManager;
         #endregion
 
         #region Properties
@@ -65,7 +65,7 @@ namespace SavageWorld.Runtime.Entities.Player
         private void Awake()
         {
             NetworkObject.Type = NetworkObjectTypes.Player;
-            _worldDataManager = WorldDataManager.Instance;
+            _tilesManager = TilesManager.Instance;
             _playerInteractions = GetComponent<PlayerInteractions>();
             _inputActions = GameManager.Instance.InputActions;
             _inputActions.Player.Enable();

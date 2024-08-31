@@ -70,8 +70,8 @@ namespace SavageWorld.Runtime.Physics
                     int positionX = Mathf.FloorToInt(_center.x + x);
                     int positionY = Mathf.FloorToInt(_center.y + y);
                     Vector2Int position = new(positionX, positionY);
-                    if (WorldDataManager.Instance.IsPhysicallySolidBlock(positionX, positionY) ||
-                        WorldDataManager.Instance.GetColliderIndex(positionX, positionY) == 254)
+                    if (TilesManager.Instance.IsPhysicallySolidBlock(positionX, positionY) ||
+                        TilesManager.Instance.GetColliderIndex(positionX, positionY) == 254)
                     {
                         _listOfPlatformsPositions.Add(position);
                         Tilemap.Instance.AddPositionToCreatePlatform(position, this);

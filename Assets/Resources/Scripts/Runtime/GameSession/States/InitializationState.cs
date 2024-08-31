@@ -73,7 +73,7 @@ namespace SavageWorld.Runtime.GameSession.States
 
         private void InitializeAtlases()
         {
-            GameManager.Instance.BlocksAtlas.InitializeAtlas();
+            GameManager.Instance.TilesAtlas.InitializeAtlas();
             GameManager.Instance.TreesAtlas.InitializeAtlas();
             GameManager.Instance.PickUpItemsAtlas.InitializeAtlas();
             GameManager.Instance.ItemsAtlas.InitializeAtlas();
@@ -92,7 +92,7 @@ namespace SavageWorld.Runtime.GameSession.States
 
         private void InitializeData()
         {
-            WorldDataManager.Instance.Initialize();
+            TilesManager.Instance.Initialize();
             ChunksManager.Instance.Initialize();
             _gameManager.Terrain.Initialize();
         }

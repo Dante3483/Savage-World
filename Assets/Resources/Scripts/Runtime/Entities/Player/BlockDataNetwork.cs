@@ -10,7 +10,7 @@ namespace SavageWorld.Runtime.Entities.Player
         private ushort _wallId;
         private byte _liquidId;
         private byte _tileId;
-        private BlockTypes _blockType;
+        private TileTypes _blockType;
         private float _flowValue;
         private byte _colliderIndex;
         private byte _flags;
@@ -73,7 +73,7 @@ namespace SavageWorld.Runtime.Entities.Player
             }
         }
 
-        public BlockTypes BlockType
+        public TileTypes BlockType
         {
             get
             {

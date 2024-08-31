@@ -3,7 +3,7 @@ using SavageWorld.Runtime.Managers;
 using SavageWorld.Runtime.Network;
 using SavageWorld.Runtime.Network.Messages;
 using SavageWorld.Runtime.Entities.Player.Interactions;
-using SavageWorld.Runtime.Terrain.Blocks;
+using SavageWorld.Runtime.Terrain.Tiles;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -19,9 +19,9 @@ namespace SavageWorld.Runtime.Entities.Player.Actions
         private float _damage;
         private bool _isBreakingAllowed;
         protected MiningDamageController _miningDamageController;
-        protected BlockSO _replacment;
+        protected TileBaseSO _replacment;
         protected Action<Vector2Int, float> _addDamage;
-        protected Action<int, int, BlockSO> _replace;
+        protected Action<int, int, TileBaseSO> _replace;
         #endregion
 
         #region Properties
@@ -80,7 +80,7 @@ namespace SavageWorld.Runtime.Entities.Player.Actions
         {
             int x = position.x;
             int y = position.y;
-            BlockSO data = _worldDataManager.GetBlockData(x, y);
+            TileBaseSO data = _tilesManager.GetBlockData(x, y);
             Vector3 dropPosition = new(x + 0.5f, y + 0.5f);
 
             if (!NetworkManager.Instance.IsClient)
@@ -92,7 +92,7 @@ namespace SavageWorld.Runtime.Entities.Player.Actions
 
         protected virtual bool CanBreak(int x, int y)
         {
-            if (_worldDataManager.IsUnbreakable(x, y))
+            if (_tilesManager.IsUnbreakable(x, y))
             {
                 return false;
             }

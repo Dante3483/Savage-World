@@ -130,7 +130,7 @@ namespace SavageWorld.Runtime.Terrain.Drop
 
         private bool CheckAdjacentBlock(int x, int y)
         {
-            return WorldDataManager.Instance.IsPhysicallySolidBlock(_intPosition.x + x, _intPosition.y + y);
+            return TilesManager.Instance.IsPhysicallySolidBlock(_intPosition.x + x, _intPosition.y + y);
         }
 
         public void AddForce(Vector3 direction)

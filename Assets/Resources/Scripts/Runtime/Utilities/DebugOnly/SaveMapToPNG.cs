@@ -1,7 +1,7 @@
 using SavageWorld.Runtime.GameSession;
 using SavageWorld.Runtime.Managers;
 using SavageWorld.Runtime.Terrain;
-using SavageWorld.Runtime.Terrain.Blocks;
+using SavageWorld.Runtime.Terrain.Tiles;
 using System.IO;
 using UnityEngine;
 
@@ -45,16 +45,16 @@ namespace SavageWorld.Runtime.Utilities.DebugOnly
             {
                 for (int y = 0; y < terrainHeight; y++)
                 {
-                    BlockSO data = WorldDataManager.Instance.GetBlockData(x, y);
+                    TileBaseSO data = TilesManager.Instance.GetBlockData(x, y);
                     cellColor = data.ColorOnMap;
-                    if (WorldDataManager.Instance.IsAbstract(x, y))
+                    if (TilesManager.Instance.IsAbstract(x, y))
                     {
-                        data = WorldDataManager.Instance.GetWallData(x, y);
+                        data = TilesManager.Instance.GetWallData(x, y);
                         cellColor = data.ColorOnMap;
                     }
-                    if (WorldDataManager.Instance.IsLiquid(x, y))
+                    if (TilesManager.Instance.IsLiquid(x, y))
                     {
-                        data = WorldDataManager.Instance.GetLiquidData(x, y);
+                        data = TilesManager.Instance.GetLiquidData(x, y);
                         cellColor = data.ColorOnMap;
                     }
 

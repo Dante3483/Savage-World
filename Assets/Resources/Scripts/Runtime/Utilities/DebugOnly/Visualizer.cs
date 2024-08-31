@@ -1,4 +1,4 @@
-using SavageWorld.Runtime.Terrain.Objects;
+using SavageWorld.Runtime.Terrain.Generation;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
