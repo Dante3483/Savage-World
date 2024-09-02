@@ -1,9 +1,11 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <Style src="project://database/Assets/Resources/Scripts/Editor/EditorWindows/FSM/FSMEditorWindow.uss?fileID=7433441132597879392&amp;guid=c3922d55911463f4393908ec35e370be&amp;type=3#FSMEditorWindow" />
     <SplitView fixed-pane-initial-dimension="150" name="SplitView" orientation="Horizontal">
-        <ui:VisualElement name="left-panel" />
+        <ui:VisualElement name="left-panel">
+            <FSMInspectorView style="flex-grow: 1;" />
+        </ui:VisualElement>
         <ui:VisualElement name="right-panel">
-            <FSMGraphView name="grah-view" style="flex-grow: 1;" />
+            <FSMGraphView name="grah-view" focusable="true" style="flex-grow: 1;" />
         </ui:VisualElement>
     </SplitView>
 </ui:UXML>
