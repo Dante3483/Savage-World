@@ -1,3 +1,4 @@
+using SavageWorld.Runtime.Attributes;
 using UnityEngine;
 
 namespace SavageWorld.Runtime.Physics
@@ -125,6 +126,12 @@ namespace SavageWorld.Runtime.Physics
             {
                 SetMaterial(_noFriction);
             }
+        }
+
+        [Button("Debug")]
+        public void DebugBtn()
+        {
+            Debug.Log("Button clicked");
         }
         #endregion
     }

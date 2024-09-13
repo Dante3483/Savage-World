@@ -24,20 +24,26 @@ public class FSMEditorWindow : EditorWindow
         _fsmGraphView = root.Q<FSMGraphView>();
         _fsmInspectorView = root.Q<FSMInspectorView>();
         _fsmGraphView.StateSelected = OnStateSelectionChanged;
+        _fsmGraphView.EdgeSelected = OnEdgeSelectionChanged;
         OnSelectionChange();
     }
 
     private void OnSelectionChange()
     {
-        FiniteStateMachineSO finiteStateMachine = Selection.activeObject as FiniteStateMachineSO;
+        FSMDataSO finiteStateMachine = Selection.activeObject as FSMDataSO;
         if (finiteStateMachine)
         {
             _fsmGraphView.PopulateView(finiteStateMachine);
         }
     }
 
-    private void OnStateSelectionChanged(StateView stateView)
+    private void OnStateSelectionChanged(FSMStateView stateView)
     {
         _fsmInspectorView.UpdateSelection(stateView);
+    }
+
+    private void OnEdgeSelectionChanged(FSMEdge edge)
+    {
+        _fsmInspectorView.UpdateSelection(edge);
     }
 }
