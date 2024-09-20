@@ -1,3 +1,4 @@
+using SavageWorld.Runtime.Attributes;
 using SavageWorld.Runtime.Utilities.FSM.Actions;
 using SavageWorld.Runtime.Utilities.FSM.Conditions;
 using SavageWorld.Runtime.Utilities.SerializedDictionary;
@@ -8,42 +9,40 @@ using UnityEngine;
 namespace SavageWorld.Runtime.Utilities.FSM
 {
     [CreateAssetMenu(fileName = "NewState", menuName = "FSM/State")]
+    [FSMComponent("State", "")]
     public class FSMStateSO : ScriptableObject
     {
         #region Fields
         [SerializeField]
-        private string _stateName;
+        private string _name;
+        [SerializeField]
+        private string _guid;
+        [SerializeField]
+        private Vector2 _position;
         [SerializeField]
         private List<FSMStateSO> _listOfChildren = new();
         [SerializeField]
         private SerializedDictionary<FSMStateSO, FSMConditionBase> _conditionByChild = new();
-        //private Dictionary<FSMStateSO, FSMConditionBase> _conditionByChild = new();
-
         [SerializeField]
         [SerializeReference]
-        private List<FSMActionBase> _listOfActionOnEnter = new();
+        private List<FSMActionBase> _listOfActionsOnEnter = new();
         [SerializeField]
         [SerializeReference]
-        private List<FSMActionBase> _listOfActionOnExit = new();
+        private List<FSMActionBase> _listOfActionsOnExit = new();
         [SerializeField]
         [SerializeReference]
-        private List<FSMActionBase> _listOfActionOnFixedUpdate = new();
+        private List<FSMActionBase> _listOfActionsOnFixedUpdate = new();
         [SerializeField]
         [SerializeReference]
-        private List<FSMActionBase> _listOfActionOnUpdate = new();
-        [SerializeField]
-        private string _guid;
-        [SerializeField]
-        public Vector2 Position;
-        private Vector2 _prevPosition;
+        private List<FSMActionBase> _listOfActionsOnUpdate = new();
         #endregion
 
         #region Properties
-        public string StateName
+        public string Name
         {
             get
             {
-                return _stateName;
+                return _name;
             }
         }
 
@@ -76,35 +75,48 @@ namespace SavageWorld.Runtime.Utilities.FSM
             }
         }
 
-        public List<FSMActionBase> ListOfActionOnEnter
+        public List<FSMActionBase> ListOfActionsOnEnter
         {
             get
             {
-                return _listOfActionOnEnter;
+                return _listOfActionsOnEnter;
             }
         }
 
-        public List<FSMActionBase> ListOfActionOnExit
+        public List<FSMActionBase> ListOfActionsOnExit
         {
             get
             {
-                return _listOfActionOnExit;
+                return _listOfActionsOnExit;
             }
         }
 
-        public List<FSMActionBase> ListOfActionOnFixedUpdate
+        public List<FSMActionBase> ListOfActionsOnFixedUpdate
         {
             get
             {
-                return _listOfActionOnFixedUpdate;
+                return _listOfActionsOnFixedUpdate;
             }
         }
 
-        public List<FSMActionBase> ListOfActionOnUpdate
+        public List<FSMActionBase> ListOfActionsOnUpdate
         {
             get
             {
-                return _listOfActionOnUpdate;
+                return _listOfActionsOnUpdate;
+            }
+        }
+
+        public Vector2 Position
+        {
+            get
+            {
+                return _position;
+            }
+
+            set
+            {
+                _position = value;
             }
         }
         #endregion
@@ -114,35 +126,28 @@ namespace SavageWorld.Runtime.Utilities.FSM
         #endregion
 
         #region Monobehaviour Methods
-        private void OnValidate()
-        {
-            if (_prevPosition != Position)
-            {
-                PositionChanged?.Invoke(Position);
-                _prevPosition = Position;
-            }
-        }
+
         #endregion
 
         #region Public Methods
         public void Enter()
         {
-            _listOfActionOnEnter.ForEach(action => action.Invoke());
+            _listOfActionsOnEnter.ForEach(action => action.Invoke());
         }
 
         public void Exit()
         {
-            _listOfActionOnExit.ForEach(action => action.Invoke());
+            _listOfActionsOnExit.ForEach(action => action.Invoke());
         }
 
         public void FixedUpdate()
         {
-            _listOfActionOnFixedUpdate.ForEach(action => action.Invoke());
+            _listOfActionsOnFixedUpdate.ForEach(action => action.Invoke());
         }
 
         public void Update()
         {
-            _listOfActionOnUpdate.ForEach(action => action.Invoke());
+            _listOfActionsOnUpdate.ForEach(action => action.Invoke());
         }
 
         public FSMStateSO Clone(GameObject gameObject)
@@ -166,10 +171,10 @@ namespace SavageWorld.Runtime.Utilities.FSM
         #region Private Methods
         private void Initialize(GameObject gameObject)
         {
-            _listOfActionOnEnter.ForEach(action => action.Initialize(gameObject));
-            _listOfActionOnExit.ForEach(action => action.Initialize(gameObject));
-            _listOfActionOnFixedUpdate.ForEach(action => action.Initialize(gameObject));
-            _listOfActionOnUpdate.ForEach(action => action.Initialize(gameObject));
+            _listOfActionsOnEnter.ForEach(action => action.Initialize(gameObject));
+            _listOfActionsOnExit.ForEach(action => action.Initialize(gameObject));
+            _listOfActionsOnFixedUpdate.ForEach(action => action.Initialize(gameObject));
+            _listOfActionsOnUpdate.ForEach(action => action.Initialize(gameObject));
         }
         #endregion
     }

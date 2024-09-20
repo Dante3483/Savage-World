@@ -1,7 +1,9 @@
+using SavageWorld.Runtime.Attributes;
 using SavageWorld.Runtime.Entities.NPC;
 
 namespace SavageWorld.Runtime.Utilities.FSM.Conditions
 {
+    [FSMComponent("No condition", "")]
     public class NoCondition : FSMConditionBase
     {
         #region Fields

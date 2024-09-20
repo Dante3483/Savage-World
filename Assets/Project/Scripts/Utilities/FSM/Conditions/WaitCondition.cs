@@ -1,3 +1,4 @@
+using SavageWorld.Runtime.Attributes;
 using SavageWorld.Runtime.Entities.NPC;
 using System;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine;
 namespace SavageWorld.Runtime.Utilities.FSM.Conditions
 {
     [Serializable]
+    [FSMComponent("Wait", "")]
     public class WaitCondition : FSMConditionBase
     {
         #region Fields

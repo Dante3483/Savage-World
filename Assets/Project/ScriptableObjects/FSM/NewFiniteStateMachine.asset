@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _stateName: 
   _listOfChildren: []
+  _conditionByChild:
+    _listOfKeyValuePair: []
   _listOfActionOnEnter: []
   _listOfActionOnExit: []
   _listOfActionOnFixedUpdate: []

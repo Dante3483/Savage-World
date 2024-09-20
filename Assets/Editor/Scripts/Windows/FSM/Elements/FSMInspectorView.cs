@@ -42,12 +42,22 @@ public class FSMInspectorView : VisualElement
     {
         Clear();
         SerializedObject serializedObject = new(stateView.State);
-        Add(new PropertyField(serializedObject.FindProperty("_stateName")));
-        Add(new PropertyField(serializedObject.FindProperty("_guid")));
-        Add(new FSMActionView(serializedObject.FindProperty("_listOfActionOnEnter"), stateView.State.ListOfActionOnEnter));
-        Add(new FSMActionView(serializedObject.FindProperty("_listOfActionOnExit"), stateView.State.ListOfActionOnExit));
-        Add(new FSMActionView(serializedObject.FindProperty("_listOfActionOnFixedUpdate"), stateView.State.ListOfActionOnFixedUpdate));
-        Add(new FSMActionView(serializedObject.FindProperty("_listOfActionOnUpdate"), stateView.State.ListOfActionOnUpdate));
+
+        PropertyField namePropertyField = new(serializedObject.FindProperty("_name"));
+        PropertyField positionPropertyField = new(serializedObject.FindProperty("_position"));
+        PropertyField guidPropertyField = new(serializedObject.FindProperty("_guid"));
+
+        namePropertyField.RegisterCallback<SerializedPropertyChangeEvent>(evt => stateView.SetTitleOfNode(evt.changedProperty.stringValue));
+        positionPropertyField.RegisterCallback<SerializedPropertyChangeEvent>(evt => stateView.SetPositionOfNode(evt.changedProperty.vector2Value));
+        guidPropertyField.RegisterCallback<SerializedPropertyChangeEvent>(evt => stateView.SetGuidOfNode(evt.changedProperty.stringValue));
+
+        Add(namePropertyField);
+        Add(positionPropertyField);
+        Add(guidPropertyField);
+        Add(new FSMActionView(serializedObject.FindProperty("_listOfActionsOnEnter"), stateView.State.ListOfActionsOnEnter));
+        Add(new FSMActionView(serializedObject.FindProperty("_listOfActionsOnExit"), stateView.State.ListOfActionsOnExit));
+        Add(new FSMActionView(serializedObject.FindProperty("_listOfActionsOnFixedUpdate"), stateView.State.ListOfActionsOnFixedUpdate));
+        Add(new FSMActionView(serializedObject.FindProperty("_listOfActionsOnUpdate"), stateView.State.ListOfActionsOnUpdate));
         this.Bind(new(stateView.State));
     }
 

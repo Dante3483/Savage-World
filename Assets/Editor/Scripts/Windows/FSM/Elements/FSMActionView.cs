@@ -2,6 +2,8 @@ using SavageWorld.Runtime.Utilities.FSM.Actions;
 using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public class FSMActionView : VisualElement
@@ -19,6 +21,7 @@ public class FSMActionView : VisualElement
     #region Fields
     private ListView _listView;
     private List<FSMActionBase> _listOfActions;
+    private FSMGraphSearchProvider _searchProvider;
     #endregion
 
     #region Properties
@@ -41,6 +44,11 @@ public class FSMActionView : VisualElement
 
     public FSMActionView(SerializedProperty serializedProperty, List<FSMActionBase> listOfActions) : base()
     {
+        _searchProvider = ScriptableObject.CreateInstance<FSMGraphSearchProvider>();
+        _searchProvider.Name = "Actions";
+        _searchProvider.Type = typeof(FSMActionBase);
+        _searchProvider.OnSelect = CreateAction;
+
         _listOfActions = listOfActions;
         _listView = new(listOfActions);
         _listView.headerTitle = serializedProperty.displayName;
@@ -50,18 +58,7 @@ public class FSMActionView : VisualElement
         _listView.showFoldoutHeader = true;
         _listView.virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight;
         _listView.reorderMode = ListViewReorderMode.Animated;
-        _listView.Q<Toggle>().AddManipulator(new ContextualMenuManipulator((evt) =>
-        {
-            evt.menu.ClearItems();
-            TypeCache.TypeCollection types = TypeCache.GetTypesDerivedFrom<FSMActionBase>();
-            foreach (Type type in types)
-            {
-                if (!type.IsAbstract)
-                {
-                    evt.menu.AppendAction($"[{type.BaseType.Name}] {type.Name}", (ation) => CreateAction(type), DropdownMenuAction.AlwaysEnabled);
-                }
-            }
-        }));
+        _listView.Q<Toggle>().AddManipulator(new ContextualMenuManipulator(ShowSearchWindow));
         Add(_listView);
     }
 
@@ -72,6 +69,11 @@ public class FSMActionView : VisualElement
     #endregion
 
     #region Private Methods
+    private void ShowSearchWindow(ContextualMenuPopulateEvent evt)
+    {
+        SearchWindow.Open(new(GUIUtility.GUIToScreenPoint(evt.mousePosition)), _searchProvider);
+    }
+
     private void CreateAction(Type type)
     {
         if (_listOfActions != null)

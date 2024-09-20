@@ -1,8 +1,8 @@
 using SavageWorld.Runtime.Utilities.FSM;
 using SavageWorld.Runtime.Utilities.FSM.Conditions;
 using System;
-using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public class FSMEdge : Edge
@@ -21,6 +21,7 @@ public class FSMEdge : Edge
     private FSMStateSO _parent;
     private FSMStateSO _child;
     private FSMConditionBase _condition;
+    private FSMGraphSearchProvider _searchProvider;
     #endregion
 
     #region Properties
@@ -49,21 +50,12 @@ public class FSMEdge : Edge
     #region Public Methods
     public FSMEdge() : base()
     {
-        this.AddManipulator(new ContextualMenuManipulator(evt =>
-        {
-            if (evt.target is FSMEdge)
-            {
-                evt.menu.ClearItems();
-                TypeCache.TypeCollection types = TypeCache.GetTypesDerivedFrom<FSMConditionBase>();
-                foreach (Type type in types)
-                {
-                    if (!type.IsAbstract)
-                    {
-                        evt.menu.AppendAction($"[{type.BaseType.Name}] {type.Name}", (ation) => CreateCondition(type), DropdownMenuAction.AlwaysEnabled);
-                    }
-                }
-            }
-        }));
+        _searchProvider = ScriptableObject.CreateInstance<FSMGraphSearchProvider>();
+        _searchProvider.Name = "Conditions";
+        _searchProvider.Type = typeof(FSMConditionBase);
+        _searchProvider.OnSelect = CreateCondition;
+
+        RegisterCallback<MouseDownEvent>(ShowSearchWindow);
     }
 
     public override void OnSelected()
@@ -74,6 +66,14 @@ public class FSMEdge : Edge
     #endregion
 
     #region Private Methods
+    private void ShowSearchWindow(MouseDownEvent evt)
+    {
+        if (evt.button == (int)MouseButton.RightMouse)
+        {
+            SearchWindow.Open(new(GUIUtility.GUIToScreenPoint(evt.mousePosition)), _searchProvider);
+        }
+    }
+
     private void CreateCondition(Type type)
     {
         FSMStateView parentView = output.node as FSMStateView;

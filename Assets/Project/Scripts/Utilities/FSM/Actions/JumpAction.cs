@@ -1,5 +1,8 @@
+using SavageWorld.Runtime.Attributes;
+
 namespace SavageWorld.Runtime.Utilities.FSM.Actions
 {
+    [FSMComponent("Jump", "")]
     public class JumpAction : FSMPhysicsActionBase
     {
         #region Fields

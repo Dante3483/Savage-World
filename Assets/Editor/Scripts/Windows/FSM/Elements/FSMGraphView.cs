@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public class FSMGraphView : GraphView
@@ -18,7 +19,6 @@ public class FSMGraphView : GraphView
     }
 
     #region Fields
-    //private static readonly string _styleResource = StaticInfo.StyleSheetsDirectory + "";
     private FSMDataSO _finiteStateMachine;
     #endregion
 
@@ -38,15 +38,17 @@ public class FSMGraphView : GraphView
     #region Public Methods
     public FSMGraphView() : base()
     {
-        //styleSheets.Add(Resources.Load<StyleSheet>(_styleResource));
-        GridBackground gridBackground = new();
-        gridBackground.name = "grid-background";
-        Insert(0, gridBackground);
+        GridBackground gridBackground = new()
+        {
+            name = "grid-background"
+        };
 
+        RegisterCallback<MouseDownEvent>(CheckDoubleClick);
         this.AddManipulator(new ContentZoomer());
         this.AddManipulator(new ContentDragger());
         this.AddManipulator(new SelectionDragger());
         this.AddManipulator(new RectangleSelector());
+        Insert(0, gridBackground);
     }
 
     public void PopulateView(FSMDataSO finiteStateMachine)
@@ -59,16 +61,13 @@ public class FSMGraphView : GraphView
         _finiteStateMachine.ListOfStates.ForEach(state => CreateEdges(state));
         if (_finiteStateMachine.RootState == null)
         {
-            CreateNode();
+            CreateState();
         }
     }
 
     public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
     {
-        if (evt.target is FSMGraphView)
-        {
-            evt.menu.AppendAction("Add state", (action) => CreateNode());
-        }
+
     }
 
     public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
@@ -78,17 +77,34 @@ public class FSMGraphView : GraphView
     #endregion
 
     #region Private Methods
-    private void CreateNode()
+    private void CheckDoubleClick(MouseDownEvent evt)
     {
-        FSMStateSO state = _finiteStateMachine.CreateState();
-        CreateStateView(state);
+        if (evt.button == (int)MouseButton.LeftMouse && evt.clickCount == 2)
+        {
+            CreateState(contentViewContainer.WorldToLocal(evt.mousePosition));
+            evt.StopPropagation();
+        }
     }
 
-    private void CreateStateView(FSMStateSO state)
+    private void CreateState()
+    {
+        CreateState(new(0, 0));
+    }
+
+    private void CreateState(Vector2 position)
+    {
+        FSMStateSO state = _finiteStateMachine.CreateState();
+        state.Position = position;
+        ClearSelection();
+        AddToSelection(CreateStateView(state));
+    }
+
+    private FSMStateView CreateStateView(FSMStateSO state)
     {
         FSMStateView stateView = new(state);
         stateView.StateSelected = StateSelected;
         AddElement(stateView);
+        return stateView;
     }
 
     private void CreateEdges(FSMStateSO state)
@@ -114,14 +130,12 @@ public class FSMGraphView : GraphView
         {
             graphViewChange.elementsToRemove.ForEach(element =>
             {
-                FSMStateView stateView = element as FSMStateView;
-                if (stateView != null)
+                if (element is FSMStateView stateView)
                 {
                     _finiteStateMachine.DeleteState(stateView.State);
                 }
 
-                Edge edge = element as Edge;
-                if (edge != null)
+                if (element is Edge edge)
                 {
                     FSMStateView parentView = edge.output.node as FSMStateView;
                     FSMStateView childView = edge.input.node as FSMStateView;

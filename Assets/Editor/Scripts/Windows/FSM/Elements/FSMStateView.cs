@@ -17,7 +17,6 @@ public class FSMStateView : Node
     }
 
     #region Fields
-    //private static readonly string _styleResource = StaticInfo.StyleSheetsDirectory + "";
     private FSMStateSO _state;
     private Port _input;
     private Port _output;
@@ -75,22 +74,39 @@ public class FSMStateView : Node
 
     public FSMStateView(FSMStateSO state) : base()
     {
-        //styleSheets.Add(Resources.Load<StyleSheet>(_styleResource));
         _state = state;
-        title = state.name;
-        viewDataKey = state.Guid;
-        state.PositionChanged = OnPositionValueChanged;
-        style.left = state.Position.x;
-        style.top = state.Position.y;
         CreateInputPorts();
         CreateOutputPorts();
+        SetTitleOfNode(_state.Name);
+        SetGuidOfNode(_state.Guid);
+        SetPositionOfNode(_state.Position);
+    }
+
+    public void SetTitleOfNode(string value)
+    {
+        title = value;
+    }
+
+    public void SetGuidOfNode(string value)
+    {
+        viewDataKey = value;
+    }
+
+    public void SetPositionOfNode(Vector2 value)
+    {
+        style.left = value.x;
+        style.top = value.y;
+    }
+
+    public void SetPositionOfState(Vector2 value)
+    {
+        _state.Position = value;
     }
 
     public override void SetPosition(Rect newPos)
     {
         base.SetPosition(newPos);
-        _state.Position.x = newPos.xMin;
-        _state.Position.y = newPos.yMin;
+        SetPositionOfState(newPos.min);
     }
 
     public override void OnSelected()
@@ -128,8 +144,7 @@ public class FSMStateView : Node
 
     private void OnPositionValueChanged(Vector2 position)
     {
-        style.left = position.x;
-        style.top = position.y;
+        SetPositionOfNode(position);
     }
     #endregion
 }

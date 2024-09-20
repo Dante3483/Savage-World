@@ -1,3 +1,4 @@
+using SavageWorld.Runtime.Attributes;
 using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -5,6 +6,7 @@ using Random = UnityEngine.Random;
 namespace SavageWorld.Runtime.Utilities.FSM.Actions
 {
     [Serializable]
+    [FSMComponent("Set direction", "")]
     public class SetDirectionAction : FSMPhysicsActionBase
     {
         #region Fields
