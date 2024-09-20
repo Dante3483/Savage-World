@@ -1,6 +1,5 @@
 using SavageWorld.Runtime.Attributes;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -29,7 +28,6 @@ namespace SavageWorld.Editor.Editors
         public override VisualElement CreateInspectorGUI()
         {
             _root = new VisualElement();
-            _root.RegisterCallback<GeometryChangedEvent>(evt => FixListView());
             AddFields();
             AddButtons();
             return _root;
@@ -37,18 +35,21 @@ namespace SavageWorld.Editor.Editors
 
         private void AddFields()
         {
-            InspectorElement.FillDefaultInspector(_root, serializedObject, this);
-        }
+            //SerializedProperty iterator = serializedObject.GetIterator();
+            //if (iterator.NextVisible(true))
+            //{
+            //    do
+            //    {
+            //        PropertyField propertyField = new(iterator.Copy()) { name = "PropertyField:" + iterator.propertyPath };
 
-        private void FixListView()
-        {
-            List<ListView> listViews = _root.Query<ListView>().Where(l => l.virtualizationMethod == CollectionVirtualizationMethod.DynamicHeight).ToList();
-            foreach (ListView listView in listViews)
-            {
-                listView.RegisterCallback<SerializedPropertyChangeEvent>(evt => listView.ClearSelection());
-                listView.selectionChanged += (items) => listView.ClearSelection();
-            }
-            _root.UnregisterCallback<GeometryChangedEvent>(evt => FixListView());
+            //        if (iterator.propertyPath == "m_Script" && serializedObject.targetObject != null)
+            //            propertyField.SetEnabled(value: false);
+
+            //        _root.Add(propertyField);
+            //    }
+            //    while (iterator.NextVisible(false));
+            //}
+            InspectorElement.FillDefaultInspector(_root, serializedObject, this);
         }
 
         private void AddButtons()

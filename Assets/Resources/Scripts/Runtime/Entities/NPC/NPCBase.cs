@@ -21,11 +21,32 @@ namespace SavageWorld.Runtime.Entities.NPC
         [SerializeField]
         protected Transform _target;
         protected int _moveDirection;
-
         #endregion
 
         #region Properties
+        public DynamicPhysics Physic
+        {
+            get
+            {
+                return _physic;
+            }
+        }
 
+        public PhysicsFlags Flags
+        {
+            get
+            {
+                return _flags;
+            }
+        }
+
+        public EntityStats Stats
+        {
+            get
+            {
+                return _stats;
+            }
+        }
         #endregion
 
         #region Events / Delegates

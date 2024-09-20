@@ -32,6 +32,7 @@ namespace SavageWorld.Runtime.Physics
         [Header("Checks")]
         [SerializeField]
         private bool _isGrounded;
+        private bool _prevGrounded;
         [SerializeField]
         private bool _isWallInFront;
         [SerializeField]
@@ -241,6 +242,10 @@ namespace SavageWorld.Runtime.Physics
 
             set
             {
+                if (_isGrounded != value)
+                {
+                    _prevGrounded = _isGrounded;
+                }
                 _isGrounded = value;
             }
         }
@@ -359,6 +364,14 @@ namespace SavageWorld.Runtime.Physics
             set
             {
                 _isStartSlide = value;
+            }
+        }
+
+        public bool PrevGrounded
+        {
+            get
+            {
+                return _prevGrounded;
             }
         }
         #endregion

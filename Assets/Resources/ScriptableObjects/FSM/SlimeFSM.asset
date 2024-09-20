@@ -1,0 +1,174 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6371970374610992358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e2191397f9cde24e87643f2302ea3d1, type: 3}
+  m_Name: FSMStateSO
+  m_EditorClassIdentifier: 
+  _stateName: Start
+  _listOfChildren:
+  - {fileID: 6353194602871686526}
+  _conditionByChild:
+    _listOfKeyValuePair:
+    - _key: {fileID: 6353194602871686526}
+      _value:
+        rid: 1530037792657375287
+  _listOfActionOnEnter: []
+  _listOfActionOnExit: []
+  _listOfActionOnFixedUpdate: []
+  _listOfActionOnUpdate: []
+  _guid: 63b7a1deb4e43364689e9cfb82ffb3f8
+  Position: {x: -254.4414, y: -257.167}
+  references:
+    version: 2
+    RefIds:
+    - rid: 1530037792657375287
+      type: {class: NoCondition, ns: SavageWorld.Runtime.Utilities.FSM.Conditions, asm: SavageWorld.Runtime}
+      data: 
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 896e3e52761a9e34a94f7ce1973f18c0, type: 3}
+  m_Name: SlimeFSM
+  m_EditorClassIdentifier: 
+  _rootState: {fileID: -6371970374610992358}
+  _currentState: {fileID: 0}
+  _listOfStates:
+  - {fileID: 6353194602871686526}
+  - {fileID: 5577256302320223499}
+  - {fileID: 697089507386084960}
+  - {fileID: -6371970374610992358}
+--- !u!114 &697089507386084960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e2191397f9cde24e87643f2302ea3d1, type: 3}
+  m_Name: FSMStateSO
+  m_EditorClassIdentifier: 
+  _stateName: Wait
+  _listOfChildren:
+  - {fileID: 5577256302320223499}
+  _conditionByChild:
+    _listOfKeyValuePair:
+    - _key: {fileID: 5577256302320223499}
+      _value:
+        rid: 1530037792657375280
+  _listOfActionOnEnter: []
+  _listOfActionOnExit: []
+  _listOfActionOnFixedUpdate: []
+  _listOfActionOnUpdate: []
+  _guid: 93edadd065eb332418323afd647f0285
+  Position: {x: 73, y: -1}
+  references:
+    version: 2
+    RefIds:
+    - rid: 1530037792657375280
+      type: {class: WaitCondition, ns: SavageWorld.Runtime.Utilities.FSM.Conditions, asm: SavageWorld.Runtime}
+      data:
+        _timeToWait: 2
+--- !u!114 &5577256302320223499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e2191397f9cde24e87643f2302ea3d1, type: 3}
+  m_Name: FSMStateSO
+  m_EditorClassIdentifier: 
+  _stateName: Jump
+  _listOfChildren:
+  - {fileID: 6353194602871686526}
+  _conditionByChild:
+    _listOfKeyValuePair:
+    - _key: {fileID: 6353194602871686526}
+      _value:
+        rid: 1530037792657375281
+  _listOfActionOnEnter:
+  - rid: 1530037792657375276
+  - rid: 1530037792657375290
+  _listOfActionOnExit: []
+  _listOfActionOnFixedUpdate:
+  - rid: 1530037792657375277
+  _listOfActionOnUpdate: []
+  _guid: 97ea88f8df924bd4d96143d26b56bcc3
+  Position: {x: -113, y: 157}
+  references:
+    version: 2
+    RefIds:
+    - rid: 1530037792657375276
+      type: {class: JumpAction, ns: SavageWorld.Runtime.Utilities.FSM.Actions, asm: SavageWorld.Runtime}
+      data:
+        _name: Jump
+    - rid: 1530037792657375277
+      type: {class: MoveAction, ns: SavageWorld.Runtime.Utilities.FSM.Actions, asm: SavageWorld.Runtime}
+      data:
+        _name: Move
+    - rid: 1530037792657375281
+      type: {class: GroundedCondition, ns: SavageWorld.Runtime.Utilities.FSM.Conditions, asm: SavageWorld.Runtime}
+      data: 
+    - rid: 1530037792657375290
+      type: {class: SetDirectionAction, ns: SavageWorld.Runtime.Utilities.FSM.Actions, asm: SavageWorld.Runtime}
+      data:
+        _name: Set direction
+        _isRandom: 1
+        _direction: 0
+--- !u!114 &6353194602871686526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e2191397f9cde24e87643f2302ea3d1, type: 3}
+  m_Name: FSMStateSO
+  m_EditorClassIdentifier: 
+  _stateName: Idle
+  _listOfChildren:
+  - {fileID: 697089507386084960}
+  _conditionByChild:
+    _listOfKeyValuePair:
+    - _key: {fileID: 697089507386084960}
+      _value:
+        rid: 1530037792657375279
+  _listOfActionOnEnter:
+  - rid: 1530037792657375289
+  _listOfActionOnExit: []
+  _listOfActionOnFixedUpdate: []
+  _listOfActionOnUpdate: []
+  _guid: f1ced4cdac524f240a4ecb58535540f8
+  Position: {x: -112.72, y: -102}
+  references:
+    version: 2
+    RefIds:
+    - rid: 1530037792657375279
+      type: {class: NoCondition, ns: SavageWorld.Runtime.Utilities.FSM.Conditions, asm: SavageWorld.Runtime}
+      data: 
+    - rid: 1530037792657375289
+      type: {class: SetDirectionAction, ns: SavageWorld.Runtime.Utilities.FSM.Actions, asm: SavageWorld.Runtime}
+      data:
+        _name: Set direction
+        _isRandom: 0
+        _direction: 0

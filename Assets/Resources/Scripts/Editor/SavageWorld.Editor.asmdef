@@ -2,7 +2,8 @@
     "name": "SavageWorld.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:e3227ce0409a0fe4e867bb6d2bdfbb63"
+        "GUID:e3227ce0409a0fe4e867bb6d2bdfbb63",
+        "GUID:d525ad6bd40672747bde77962f1c401e"
     ],
     "includePlatforms": [
         "Editor"
