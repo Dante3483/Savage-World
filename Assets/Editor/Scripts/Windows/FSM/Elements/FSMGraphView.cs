@@ -56,6 +56,7 @@ public class FSMGraphView : GraphView
         {
             graphViewChanged += OnGraphViewChanged;
             _fsm.ListOfStates.ForEach(state => CreateStateNode(state));
+            _fsm.ListOfStates.ForEach(state => EnableStateVisualization(state));
             _fsm.ListOfStates.ForEach(state => CreateEdges(state));
             if (_fsm.RootState == null)
             {
@@ -95,6 +96,14 @@ public class FSMGraphView : GraphView
         stateNode.StateSelected = StateSelected;
         AddElement(stateNode);
         return stateNode;
+    }
+
+    private void EnableStateVisualization(FSMStateSO state)
+    {
+        state.Entered -= OnStateEntered;
+        state.Exited -= OnStateExited;
+        state.Entered += OnStateEntered;
+        state.Exited += OnStateExited;
     }
 
     private void CreateEdges(FSMStateSO state)
@@ -168,6 +177,18 @@ public class FSMGraphView : GraphView
     {
         PopulateView(_fsm);
         AssetDatabase.SaveAssets();
+    }
+
+    private void OnStateEntered(FSMStateSO state)
+    {
+        FindStateNode(state).AddToClassList("current-node");
+        state.ListOfChildren.ForEach(child => FindStateNode(child).AddToClassList("next-node"));
+    }
+
+    private void OnStateExited(FSMStateSO state)
+    {
+        FindStateNode(state).RemoveFromClassList("current-node");
+        state.ListOfChildren.ForEach(child => FindStateNode(child).RemoveFromClassList("next-node"));
     }
     #endregion
 }

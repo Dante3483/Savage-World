@@ -19,6 +19,11 @@ namespace SavageWorld.Runtime.Utilities.FSM.Conditions
 
         #region Public Methods
         public abstract bool Check(NPCBase entity);
+
+        public virtual void Reset()
+        {
+
+        }
         #endregion
 
         #region Private Methods

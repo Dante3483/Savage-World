@@ -1,5 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <Style src="project://database/Assets/Editor/Scripts/Windows/FSM/FSMRunnerEditor.uss?fileID=7433441132597879392&amp;guid=d175432c978ac42409dda1790431d74d&amp;type=3#FSMRunnerEditor" />
+    <Style src="project://database/Assets/Editor/Styles/FSMStateNode.uss?fileID=7433441132597879392&amp;guid=a2730515822a1894aac9dffe438ed38f&amp;type=3#FSMStateNode" />
     <ui:VisualElement name="container" class="fsm-runner__container">
         <uie:ObjectField label="NPC AI" type="SavageWorld.Runtime.Utilities.FSM.FSMDataSO, SavageWorld.Runtime" binding-path="_fsm" name="fsm-object-field" allow-scene-objects="true" class="fsm-runner_object-field" />
         <ui:Button text="Open" parse-escape-sequences="true" display-tooltip-when-elided="true" name="open-btn" class="fsm-runner__open-btn" />

@@ -14,3 +14,25 @@
     min-width: auto;
     width: 75px;
 }
+
+.current-node #node-border {
+    border-left-color: rgb(13, 164, 0);
+    border-right-color: rgb(13, 164, 0);
+    border-top-color: rgb(13, 164, 0);
+    border-bottom-color: rgb(13, 164, 0);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+}
+
+.next-node #node-border {
+    border-left-color: rgb(233, 166, 3);
+    border-right-color: rgb(233, 166, 3);
+    border-top-color: rgb(233, 166, 3);
+    border-bottom-color: rgb(233, 166, 3);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+}

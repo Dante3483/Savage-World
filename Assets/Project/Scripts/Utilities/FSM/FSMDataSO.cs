@@ -73,6 +73,7 @@ namespace SavageWorld.Runtime.Utilities.FSM
                 {
                     if (condition.Check(_entity))
                     {
+
                         CurrentState = state;
                         return;
                     }

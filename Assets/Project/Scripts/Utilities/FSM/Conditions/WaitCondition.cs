@@ -29,10 +29,14 @@ namespace SavageWorld.Runtime.Utilities.FSM.Conditions
             _time += Time.fixedDeltaTime;
             if (_time >= _timeToWait)
             {
-                _time = 0f;
                 return true;
             }
             return false;
+        }
+
+        public override void Reset()
+        {
+            _time = 0f;
         }
         #endregion
 

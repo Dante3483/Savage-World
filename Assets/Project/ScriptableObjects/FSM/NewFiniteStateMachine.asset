@@ -58,7 +58,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: 
   _guid: e40f460fa0046af4bbde6a7f3a507fbd
-  _position: {x: -189.12, y: 131}
+  _position: {x: -100.79998, y: 144.15}
   _listOfChildren: []
   _conditionByChild:
     _listOfKeyValuePair: []

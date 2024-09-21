@@ -125,6 +125,8 @@ namespace SavageWorld.Runtime.Utilities.FSM
 
         #region Events / Delegates
         public Action<Vector2> PositionChanged;
+        public Action<FSMStateSO> Entered;
+        public Action<FSMStateSO> Exited;
         #endregion
 
         #region Monobehaviour Methods
@@ -142,11 +144,17 @@ namespace SavageWorld.Runtime.Utilities.FSM
         public void Enter()
         {
             _listOfActionsOnEnter.ForEach(action => action.Invoke());
+            Entered?.Invoke(this);
         }
 
         public void Exit()
         {
             _listOfActionsOnExit.ForEach(action => action.Invoke());
+            foreach (FSMConditionBase condition in _conditionByChild.Values)
+            {
+                condition.Reset();
+            }
+            Exited?.Invoke(this);
         }
 
         public void FixedUpdate()
