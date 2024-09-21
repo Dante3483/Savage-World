@@ -8,24 +8,36 @@ namespace SavageWorld.Editor.Windows.FSM
 {
     public class FSMEditorWindow : EditorWindow
     {
+        #region Fields
         [SerializeField]
         private VisualTreeAsset _visualTreeAsset;
-        private FSMGraphView _fsmGraphView;
-        private FSMInspectorView _fsmInspectorView;
+        private static FSMGraphView _fsmGraphView;
+        private static FSMInspectorView _fsmInspectorView;
+        #endregion
 
-        [MenuItem("Utils/FSM")]
-        public static void OpenWindow()
+        #region Properties
+
+        #endregion
+
+        #region Events / Delegates
+
+        #endregion
+
+        #region Public Methods
+        [MenuItem("SavageWorld/FSM")]
+        public static FSMEditorWindow OpenWindow()
         {
-            FSMEditorWindow wnd = GetWindow<FSMEditorWindow>();
-            wnd.titleContent = new GUIContent("FSMEditorWindow");
+            return GetWindow<FSMEditorWindow>("FSM");
         }
 
         [OnOpenAsset]
         public static bool OnOpenAsset(int instanceId, int line)
         {
-            if (Selection.activeObject is FSMDataSO)
+            if (Selection.activeObject is FSMDataSO fsm)
             {
-                OpenWindow();
+                FSMEditorWindow window = OpenWindow();
+                window.titleContent = new(fsm.name);
+                _fsmGraphView.PopulateView(fsm);
                 return true;
             }
             return false;
@@ -35,20 +47,22 @@ namespace SavageWorld.Editor.Windows.FSM
         {
             VisualElement root = rootVisualElement;
             _visualTreeAsset.CloneTree(root);
+            SetUpGraphView(root);
+            SetUpInspectorView(root);
+        }
+        #endregion
+
+        #region Private Methods
+        private void SetUpGraphView(VisualElement root)
+        {
             _fsmGraphView = root.Q<FSMGraphView>();
-            _fsmInspectorView = root.Q<FSMInspectorView>();
             _fsmGraphView.StateSelected = OnStateSelectionChanged;
             _fsmGraphView.EdgeSelected = OnEdgeSelectionChanged;
-            OnSelectionChange();
         }
 
-        private void OnSelectionChange()
+        private void SetUpInspectorView(VisualElement root)
         {
-            FSMDataSO finiteStateMachine = Selection.activeObject as FSMDataSO;
-            if (finiteStateMachine)
-            {
-                _fsmGraphView.PopulateView(finiteStateMachine);
-            }
+            _fsmInspectorView = root.Q<FSMInspectorView>();
         }
 
         private void OnStateSelectionChanged(FSMStateView stateView)
@@ -60,5 +74,6 @@ namespace SavageWorld.Editor.Windows.FSM
         {
             _fsmInspectorView.UpdateSelection(edge);
         }
+        #endregion
     }
 }

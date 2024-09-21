@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Start
   _guid: 63b7a1deb4e43364689e9cfb82ffb3f8
-  _position: {x: -195.35999, y: 0}
+  _position: {x: -196, y: 0}
   _listOfChildren:
   - {fileID: 6353194602871686526}
   _conditionByChild:

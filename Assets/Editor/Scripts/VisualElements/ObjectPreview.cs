@@ -1,4 +1,5 @@
 using SavageWorld.Runtime.Utilities;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -15,7 +16,8 @@ public class ObjectPreview : VisualElement
     }
 
     #region Private fields
-    private static readonly string _styleResource = StaticParameters.StyleSheetsDirectory + "ObjectPreview";
+    private static readonly string _styleName = "ObjectPreview";
+    private static readonly string _stylePath = StaticParameters.StylesPath + _styleName + StaticParameters.StyleExtension;
     private static readonly string _ussObjectPreview = "object-preview";
 
     private Image _preview;
@@ -32,7 +34,7 @@ public class ObjectPreview : VisualElement
     #region Methods
     public ObjectPreview() : base()
     {
-        styleSheets.Add(Resources.Load<StyleSheet>(_styleResource));
+        styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(_stylePath));
         AddToClassList(_ussObjectPreview);
 
         _preview = new Image();

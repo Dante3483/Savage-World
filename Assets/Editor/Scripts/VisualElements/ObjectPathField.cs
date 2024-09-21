@@ -1,6 +1,5 @@
 using SavageWorld.Runtime.Utilities;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 public abstract class ObjectPathField : BaseField<DefaultAsset>
@@ -11,7 +10,8 @@ public abstract class ObjectPathField : BaseField<DefaultAsset>
     }
 
     #region Private fields
-    private static readonly string _styleResource = StaticParameters.StyleSheetsDirectory + "ObjectPathField";
+    private static readonly string _styleName = "ObjectPathField";
+    private static readonly string _stylePath = StaticParameters.StylesPath + _styleName + StaticParameters.StyleExtension;
     private static readonly string _ussObjectPathField = "object-path-field";
     private static readonly string _ussInput = _ussObjectPathField + "__input";
     private static readonly string _ussOpenPanel = _ussObjectPathField + "__open-panel";
@@ -34,7 +34,7 @@ public abstract class ObjectPathField : BaseField<DefaultAsset>
     #region Methods
     public ObjectPathField(SerializedProperty property, string label) : base(label, null)
     {
-        styleSheets.Add(Resources.Load<StyleSheet>(_styleResource));
+        styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(_stylePath));
         AddToClassList(_ussObjectPathField);
 
         _pathTextField = new TextField();

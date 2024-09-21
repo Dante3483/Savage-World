@@ -2,7 +2,6 @@ using SavageWorld.Runtime.Utilities;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 public class TabGroup : VisualElement
@@ -18,7 +17,8 @@ public class TabGroup : VisualElement
     }
 
     #region Private fields
-    private static readonly string _styleResource = StaticParameters.StyleSheetsDirectory + "TabGroup";
+    private static readonly string _styleName = "TabGroup";
+    private static readonly string _stylePath = StaticParameters.StylesPath + _styleName + StaticParameters.StyleExtension;
     private static readonly string _ussTabGroup = "tab-group";
     private static readonly string _ussTabs = _ussTabGroup + "__tabs";
     private static readonly string _ussTab = _ussTabGroup + "__tab";
@@ -45,7 +45,7 @@ public class TabGroup : VisualElement
     #region Methods
     public TabGroup() : base()
     {
-        styleSheets.Add(Resources.Load<StyleSheet>(_styleResource));
+        styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(_stylePath));
         AddToClassList(_ussTabGroup);
 
         _tabs = new VisualElement();

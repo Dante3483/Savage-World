@@ -10,7 +10,13 @@ namespace SavageWorld.Runtime.Utilities
         #endregion
 
         #region Public fields
-        public readonly static string StyleSheetsDirectory = "Scripts/Editor/StyleSheets/";
+        public readonly static string AssetsPath = "Assets/";
+        public readonly static string EditorPath = AssetsPath + "Editor/";
+        public readonly static string ProjectPath = AssetsPath + "Project/";
+        public readonly static string StylesPath = EditorPath + "Styles/";
+
+        public readonly static string StyleExtension = ".uss";
+
         public readonly static char[] DigitsCharArray = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ' };
         public readonly static byte Bit0 = 0b0000_0001;
         public readonly static byte Bit1 = 0b0000_0010;

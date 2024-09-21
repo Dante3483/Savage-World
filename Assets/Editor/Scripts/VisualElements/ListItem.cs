@@ -1,4 +1,5 @@
 using SavageWorld.Runtime.Utilities;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -15,7 +16,8 @@ public class ListItem : VisualElement
     }
 
     #region Private fields
-    private static readonly string _styleResource = StaticParameters.StyleSheetsDirectory + "ListItem";
+    private static readonly string _styleName = "ListItem";
+    private static readonly string _stylePath = StaticParameters.StylesPath + _styleName + StaticParameters.StyleExtension;
     private static readonly string _ussListItem = "list_item";
     private static readonly string _ussIcon = _ussListItem + "__icon";
     private static readonly string _ussName = _ussListItem + "__name";
@@ -48,7 +50,7 @@ public class ListItem : VisualElement
     #region Methods
     public ListItem()
     {
-        styleSheets.Add(Resources.Load<StyleSheet>(_styleResource));
+        styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(_stylePath));
 
         _icon = new Image();
         _name = new Label();
