@@ -12,19 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e2191397f9cde24e87643f2302ea3d1, type: 3}
   m_Name: FSMStateSO
   m_EditorClassIdentifier: 
-  _stateName: 
-  _listOfChildren: []
-  _conditionByChild:
-    _listOfKeyValuePair: []
-  _listOfActionOnEnter: []
-  _listOfActionOnExit: []
-  _listOfActionOnFixedUpdate: []
-  _listOfActionOnUpdate: []
+  _name: TestName
   _guid: 0a12249b68252d449a3041d4e1e9611c
-  Position: {x: 0, y: 0}
+  _position: {x: -57, y: 103}
+  _listOfChildren:
+  - {fileID: 5818696387864064180}
+  _conditionByChild:
+    _listOfKeyValuePair:
+    - _key: {fileID: 5818696387864064180}
+      _value:
+        rid: 1530037986571583502
+  _listOfActionsOnEnter: []
+  _listOfActionsOnExit: []
+  _listOfActionsOnFixedUpdate: []
+  _listOfActionsOnUpdate: []
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 1530037986571583502
+      type: {class: GroundedCondition, ns: SavageWorld.Runtime.Utilities.FSM.Conditions, asm: SavageWorld.Runtime}
+      data: 
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41,3 +48,29 @@ MonoBehaviour:
   _currentState: {fileID: 0}
   _listOfStates:
   - {fileID: -4261298635887609575}
+  - {fileID: 5818696387864064180}
+--- !u!114 &5818696387864064180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e2191397f9cde24e87643f2302ea3d1, type: 3}
+  m_Name: FSMStateSO
+  m_EditorClassIdentifier: 
+  _name: Idle
+  _guid: 5782ec69f5d18a742a73a83e9a40cd8e
+  _position: {x: 248, y: 103}
+  _listOfChildren: []
+  _conditionByChild:
+    _listOfKeyValuePair: []
+  _listOfActionsOnEnter: []
+  _listOfActionsOnExit: []
+  _listOfActionsOnFixedUpdate: []
+  _listOfActionsOnUpdate: []
+  references:
+    version: 2
+    RefIds: []

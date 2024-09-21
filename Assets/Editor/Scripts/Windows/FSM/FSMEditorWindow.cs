@@ -11,8 +11,11 @@ namespace SavageWorld.Editor.Windows.FSM
         #region Fields
         [SerializeField]
         private VisualTreeAsset _visualTreeAsset;
+        private static FSMEditorWindow _window;
+        private static VisualElement _root;
         private static FSMGraphView _fsmGraphView;
         private static FSMInspectorView _fsmInspectorView;
+        private static FSMDataSO _fsm;
         #endregion
 
         #region Properties
@@ -25,9 +28,21 @@ namespace SavageWorld.Editor.Windows.FSM
 
         #region Public Methods
         [MenuItem("SavageWorld/FSM")]
-        public static FSMEditorWindow OpenWindow()
+        public static void OpenWindow()
         {
-            return GetWindow<FSMEditorWindow>("FSM");
+            _fsm = null;
+            _window = GetWindow<FSMEditorWindow>("FSM");
+        }
+
+        public static void OpenWindow(FSMDataSO fsm)
+        {
+            if (fsm == null)
+            {
+                return;
+            }
+            _fsm = fsm;
+            _window = GetWindow<FSMEditorWindow>("FSM");
+            _window.ResetWindow();
         }
 
         [OnOpenAsset]
@@ -35,9 +50,7 @@ namespace SavageWorld.Editor.Windows.FSM
         {
             if (Selection.activeObject is FSMDataSO fsm)
             {
-                FSMEditorWindow window = OpenWindow();
-                window.titleContent = new(fsm.name);
-                _fsmGraphView.PopulateView(fsm);
+                OpenWindow(fsm);
                 return true;
             }
             return false;
@@ -45,34 +58,40 @@ namespace SavageWorld.Editor.Windows.FSM
 
         public void CreateGUI()
         {
-            VisualElement root = rootVisualElement;
-            _visualTreeAsset.CloneTree(root);
-            SetUpGraphView(root);
-            SetUpInspectorView(root);
+            _root = rootVisualElement;
+            _visualTreeAsset.CloneTree(_root);
+            ResetContent();
         }
         #endregion
 
         #region Private Methods
-        private void SetUpGraphView(VisualElement root)
+        private void ResetWindow()
         {
-            _fsmGraphView = root.Q<FSMGraphView>();
+            _window.titleContent = new(_fsm.name);
+            ResetContent();
+        }
+
+        private void ResetContent()
+        {
+            SetUpGraphView();
+            SetUpInspectorView();
+        }
+
+        private void SetUpGraphView()
+        {
+            _fsmGraphView = _root.Q<FSMGraphView>();
+            _fsmGraphView.PopulateView(_fsm);
             _fsmGraphView.StateSelected = OnStateSelectionChanged;
-            _fsmGraphView.EdgeSelected = OnEdgeSelectionChanged;
         }
 
-        private void SetUpInspectorView(VisualElement root)
+        private void SetUpInspectorView()
         {
-            _fsmInspectorView = root.Q<FSMInspectorView>();
+            _fsmInspectorView = _root.Q<FSMInspectorView>();
         }
 
-        private void OnStateSelectionChanged(FSMStateView stateView)
+        private void OnStateSelectionChanged(FSMStateNode stateView)
         {
             _fsmInspectorView.UpdateSelection(stateView);
-        }
-
-        private void OnEdgeSelectionChanged(FSMEdge edge)
-        {
-            _fsmInspectorView.UpdateSelection(edge);
         }
         #endregion
     }

@@ -1,0 +1,13 @@
+.fsm-runner__container {
+    flex-direction: row;
+}
+
+.fsm-runner_object-field {
+    flex-grow: 1;
+    margin-right: 0;
+}
+
+.fsm-runner__open-btn {
+    width: 75px;
+    margin-right: -2px;
+}

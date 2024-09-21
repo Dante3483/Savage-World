@@ -10,16 +10,23 @@ namespace SavageWorld.Editor.Editors
     [CanEditMultipleObjects]
     public class BlockSOEditor : ObjectsEditor
     {
-        #region Private fields
-        [SerializeField] private VisualTreeAsset _editorTreeAsset;
-        [SerializeField] private VisualTreeAsset _spritesSectionTreeAsset;
-        [SerializeField] private VisualTreeAsset _breakingSectionTreeAsset;
-        [SerializeField] private VisualTreeAsset _dustSectionTreeAsset;
-        [SerializeField] private VisualTreeAsset _liquidSectionTreeAsset;
-        [SerializeField] private VisualTreeAsset _plantSectionTreeAsset;
-        [SerializeField] private VisualTreeAsset _furnitureSectionTreeAsset;
-        [SerializeField] private VisualTreeAsset _otherSectionTreeAsset;
-
+        #region Fields
+        [SerializeField]
+        private VisualTreeAsset _editorTreeAsset;
+        [SerializeField]
+        private VisualTreeAsset _spritesSectionTreeAsset;
+        [SerializeField]
+        private VisualTreeAsset _breakingSectionTreeAsset;
+        [SerializeField]
+        private VisualTreeAsset _dustSectionTreeAsset;
+        [SerializeField]
+        private VisualTreeAsset _liquidSectionTreeAsset;
+        [SerializeField]
+        private VisualTreeAsset _plantSectionTreeAsset;
+        [SerializeField]
+        private VisualTreeAsset _furnitureSectionTreeAsset;
+        [SerializeField]
+        private VisualTreeAsset _otherSectionTreeAsset;
         private VisualElement _spritesSection;
         private VisualElement _breakingSection;
         private VisualElement _dustSection;
@@ -30,19 +37,22 @@ namespace SavageWorld.Editor.Editors
         private TabGroup _advancedTabGroup;
         private ObjectPreview _preview;
         private ListView _spritesListView;
-
         private SerializedProperty _sprites;
-        #endregion
-
-        #region Public fields
-
         #endregion
 
         #region Properties
 
         #endregion
 
-        #region Methods
+        #region Events / Delegates
+
+        #endregion
+
+        #region Monobehaviour Methods
+
+        #endregion
+
+        #region Public Methods
         public override void Compose()
         {
             _editorTreeAsset.CloneTree(_root);
@@ -51,6 +61,24 @@ namespace SavageWorld.Editor.Editors
             SetUpList();
         }
 
+        public override void FindSerializedProperties()
+        {
+            _sprites = serializedObject.FindProperty("_sprites");
+        }
+
+        public override void InitializeEditorElements()
+        {
+            _spritesSection = new VisualElement();
+            _breakingSection = new VisualElement();
+            _dustSection = new VisualElement();
+            _liquidSection = new VisualElement();
+            _plantSection = new VisualElement();
+            _furnitureSection = new VisualElement();
+            _otherSection = new VisualElement();
+        }
+        #endregion
+
+        #region Private Methods
         private void AddPreview()
         {
             _preview = _root.Q<ObjectPreview>("basic-preview");
@@ -156,22 +184,6 @@ namespace SavageWorld.Editor.Editors
                 serializedPropertyChangeEvent.target = _root;
                 _root.SendEvent(serializedPropertyChangeEvent);
             }
-        }
-
-        public override void FindSerializedProperties()
-        {
-            _sprites = serializedObject.FindProperty("_sprites");
-        }
-
-        public override void InitializeEditorElements()
-        {
-            _spritesSection = new VisualElement();
-            _breakingSection = new VisualElement();
-            _dustSection = new VisualElement();
-            _liquidSection = new VisualElement();
-            _plantSection = new VisualElement();
-            _furnitureSection = new VisualElement();
-            _otherSection = new VisualElement();
         }
         #endregion
     }

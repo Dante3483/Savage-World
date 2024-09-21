@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Start
   _guid: 63b7a1deb4e43364689e9cfb82ffb3f8
-  _position: {x: -196, y: 0}
+  _position: {x: -427.4791, y: -0.0000104904175}
   _listOfChildren:
   - {fileID: 6353194602871686526}
   _conditionByChild:
     _listOfKeyValuePair:
     - _key: {fileID: 6353194602871686526}
       _value:
-        rid: 1530037792657375287
+        rid: 1530037986571583514
   _listOfActionsOnEnter: []
   _listOfActionsOnExit: []
   _listOfActionsOnFixedUpdate: []
@@ -29,7 +29,7 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 1530037792657375287
+    - rid: 1530037986571583514
       type: {class: NoCondition, ns: SavageWorld.Runtime.Utilities.FSM.Conditions, asm: SavageWorld.Runtime}
       data: 
 --- !u!114 &11400000
@@ -65,7 +65,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Wait
   _guid: 93edadd065eb332418323afd647f0285
-  _position: {x: 81, y: 0}
+  _position: {x: 250, y: 0}
   _listOfChildren:
   - {fileID: 5577256302320223499}
   _conditionByChild:
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Jump
   _guid: 97ea88f8df924bd4d96143d26b56bcc3
-  _position: {x: 3, y: 120}
+  _position: {x: 55, y: 188}
   _listOfChildren:
   - {fileID: 6353194602871686526}
   _conditionByChild:
@@ -147,14 +147,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Idle
   _guid: f1ced4cdac524f240a4ecb58535540f8
-  _position: {x: -72, y: 0}
+  _position: {x: -158.358, y: -0.0000023841858}
   _listOfChildren:
   - {fileID: 697089507386084960}
   _conditionByChild:
     _listOfKeyValuePair:
     - _key: {fileID: 697089507386084960}
       _value:
-        rid: 1530037792657375279
+        rid: 1530037986571583515
   _listOfActionsOnEnter:
   - rid: 1530037972653047810
   _listOfActionsOnExit: []
@@ -163,12 +163,12 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 1530037792657375279
-      type: {class: NoCondition, ns: SavageWorld.Runtime.Utilities.FSM.Conditions, asm: SavageWorld.Runtime}
-      data: 
     - rid: 1530037972653047810
       type: {class: SetDirectionAction, ns: SavageWorld.Runtime.Utilities.FSM.Actions, asm: SavageWorld.Runtime}
       data:
         _name: Set direction
         _isRandom: 0
         _direction: 0
+    - rid: 1530037986571583515
+      type: {class: NoCondition, ns: SavageWorld.Runtime.Utilities.FSM.Conditions, asm: SavageWorld.Runtime}
+      data: 

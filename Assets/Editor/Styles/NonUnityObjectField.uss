@@ -1,0 +1,40 @@
+.non-unity-object-field {
+    flex-direction: row;
+    margin-right: 3px;
+    margin-left: 3px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+
+.non-unity-object-field__label {
+    margin-right: 2px;
+    overflow: hidden;
+    min-width: 120px;
+    color: rgb(196, 196, 196);
+    padding-right: 2px;
+    padding-top: 2px;
+    padding-left: 1px;
+}
+
+.non-unity-object-field__input {
+    border-left-color: rgb(32, 32, 32);
+    border-right-color: rgb(32, 32, 32);
+    border-top-color: rgb(32, 32, 32);
+    border-bottom-color: rgb(32, 32, 32);
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    flex-grow: 1;
+    background-color: rgb(40, 40, 40);
+}
+
+.non-unity-object-field__object-name {
+    margin-left: 2px;
+    padding-right: 2px;
+    overflow: hidden;
+}

@@ -1,9 +1,10 @@
 fileFormatVersion: 2
-guid: 5fba0beb09220d54589cbc5310b484d8
+guid: f19f27eddda2a2c4995f5d64ceb1c01e
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - _editorTreeAsset: {fileID: 9197481963319205126, guid: a6225d5fcfef23144bcfaee1ef4dbffd, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

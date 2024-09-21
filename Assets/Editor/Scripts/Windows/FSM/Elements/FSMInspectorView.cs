@@ -1,5 +1,3 @@
-using SavageWorld.Runtime.Utilities.FSM;
-using SavageWorld.Runtime.Utilities.FSM.Conditions;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
@@ -38,7 +36,7 @@ public class FSMInspectorView : VisualElement
 
     }
 
-    public void UpdateSelection(FSMStateView stateView)
+    public void UpdateSelection(FSMStateNode stateView)
     {
         Clear();
         SerializedObject serializedObject = new(stateView.State);
@@ -59,18 +57,6 @@ public class FSMInspectorView : VisualElement
         Add(new FSMActionView(serializedObject.FindProperty("_listOfActionsOnFixedUpdate"), stateView.State.ListOfActionsOnFixedUpdate));
         Add(new FSMActionView(serializedObject.FindProperty("_listOfActionsOnUpdate"), stateView.State.ListOfActionsOnUpdate));
         this.Bind(new(stateView.State));
-    }
-
-    public void UpdateSelection(FSMEdge edge)
-    {
-        Clear();
-        FSMStateView parentStateView = edge.output.node as FSMStateView;
-        FSMStateView childStateView = edge.input.node as FSMStateView;
-        FSMStateSO state = parentStateView.State;
-        state.ConditionByChild.TryGetValue(childStateView.State, out FSMConditionBase condition);
-        string labelText = condition == null ? "No condition" : condition.GetType().Name;
-        Label label = new(labelText);
-        Add(label);
     }
     #endregion
 

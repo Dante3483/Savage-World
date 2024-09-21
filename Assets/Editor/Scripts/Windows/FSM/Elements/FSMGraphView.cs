@@ -19,7 +19,7 @@ public class FSMGraphView : GraphView
     }
 
     #region Fields
-    private FSMDataSO _fsm;
+    private static FSMDataSO _fsm;
     #endregion
 
     #region Properties
@@ -27,8 +27,7 @@ public class FSMGraphView : GraphView
     #endregion
 
     #region Events / Delegates
-    public Action<FSMStateView> StateSelected;
-    public Action<FSMEdge> EdgeSelected;
+    public Action<FSMStateNode> StateSelected;
     #endregion
 
     #region Monobehaviour Methods
@@ -38,30 +37,28 @@ public class FSMGraphView : GraphView
     #region Public Methods
     public FSMGraphView() : base()
     {
-        GridBackground gridBackground = new()
-        {
-            name = "grid-background"
-        };
-
         RegisterCallback<MouseDownEvent>(CheckDoubleClick);
         this.AddManipulator(new ContentZoomer());
         this.AddManipulator(new ContentDragger());
         this.AddManipulator(new SelectionDragger());
         this.AddManipulator(new RectangleSelector());
-        Insert(0, gridBackground);
+        Insert(0, new GridBackground { name = "grid-background" });
     }
 
-    public void PopulateView(FSMDataSO finiteStateMachine)
+    public void PopulateView(FSMDataSO fsm)
     {
-        _fsm = finiteStateMachine;
+        _fsm = fsm;
         graphViewChanged -= OnGraphViewChanged;
         DeleteElements(graphElements);
-        graphViewChanged += OnGraphViewChanged;
-        _fsm.ListOfStates.ForEach(state => CreateStateView(state));
-        _fsm.ListOfStates.ForEach(state => CreateEdges(state));
-        if (_fsm.RootState == null)
+        if (_fsm != null)
         {
-            CreateState();
+            graphViewChanged += OnGraphViewChanged;
+            _fsm.ListOfStates.ForEach(state => CreateStateNode(state));
+            _fsm.ListOfStates.ForEach(state => CreateEdges(state));
+            if (_fsm.RootState == null)
+            {
+                CreateState();
+            }
         }
     }
 
@@ -93,35 +90,38 @@ public class FSMGraphView : GraphView
 
     private void CreateState(Vector2 position)
     {
+        if (_fsm == null)
+        {
+            return;
+        }
         FSMStateSO state = _fsm.CreateState();
         state.Position = position;
         ClearSelection();
-        AddToSelection(CreateStateView(state));
+        AddToSelection(CreateStateNode(state));
     }
 
-    private FSMStateView CreateStateView(FSMStateSO state)
+    private FSMStateNode CreateStateNode(FSMStateSO state)
     {
-        FSMStateView stateView = new(state);
-        stateView.StateSelected = StateSelected;
-        AddElement(stateView);
-        return stateView;
+        FSMStateNode stateNode = new(state);
+        stateNode.StateSelected = StateSelected;
+        AddElement(stateNode);
+        return stateNode;
     }
 
     private void CreateEdges(FSMStateSO state)
     {
         state.ListOfChildren.ForEach(child =>
         {
-            FSMStateView parentView = FindStateView(state);
-            FSMStateView childView = FindStateView(child);
-            FSMEdge edge = parentView.Output.ConnectTo<FSMEdge>(childView.Input);
-            edge.EdgeSelected = EdgeSelected;
+            FSMStateNode parentView = FindStateNode(state);
+            FSMStateNode childView = FindStateNode(child);
+            FSMEdge edge = parentView.OutputPort.ConnectTo<FSMEdge>(childView.InputPort);
             AddElement(edge);
         });
     }
 
-    private FSMStateView FindStateView(FSMStateSO state)
+    private FSMStateNode FindStateNode(FSMStateSO state)
     {
-        return GetNodeByGuid(state.Guid) as FSMStateView;
+        return GetNodeByGuid(state.Guid) as FSMStateNode;
     }
 
     private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
@@ -130,16 +130,17 @@ public class FSMGraphView : GraphView
         {
             graphViewChange.elementsToRemove.ForEach(element =>
             {
-                if (element is FSMStateView stateView)
+                if (element is FSMStateNode stateNode)
                 {
-                    _fsm.DeleteState(stateView.State);
+                    _fsm.DeleteState(stateNode.State);
                 }
 
                 if (element is Edge edge)
                 {
-                    FSMStateView parentView = edge.output.node as FSMStateView;
-                    FSMStateView childView = edge.input.node as FSMStateView;
-                    _fsm.RemoveChild(parentView.State, childView.State);
+                    FSMStateNode parent = edge.output.node as FSMStateNode;
+                    FSMStateNode child = edge.input.node as FSMStateNode;
+                    _fsm.RemoveChild(parent.State, child.State);
+                    parent.UpdateExtensionContainer();
                 }
             });
         }
@@ -149,10 +150,10 @@ public class FSMGraphView : GraphView
             graphViewChange.edgesToCreate.ForEach(edge =>
             {
                 FSMEdge fsmEdge = edge as FSMEdge;
-                fsmEdge.EdgeSelected = EdgeSelected;
-                FSMStateView parentView = edge.output.node as FSMStateView;
-                FSMStateView childView = edge.input.node as FSMStateView;
-                _fsm.AddChild(parentView.State, childView.State);
+                FSMStateNode parent = edge.output.node as FSMStateNode;
+                FSMStateNode child = edge.input.node as FSMStateNode;
+                _fsm.AddChild(parent.State, child.State);
+                parent.UpdateExtensionContainer();
             });
         }
         return graphViewChange;

@@ -7,7 +7,7 @@ namespace SavageWorld.Runtime.Utilities.FSM
     {
         #region Fields
         [SerializeField]
-        private FSMDataSO _finiteStateMachine;
+        private FSMDataSO _fsm;
         #endregion
 
         #region Properties
@@ -21,13 +21,13 @@ namespace SavageWorld.Runtime.Utilities.FSM
         #region Monobehaviour Methods
         private void Awake()
         {
-            _finiteStateMachine = _finiteStateMachine.Clone(GetComponent<NPCBase>(), gameObject);
+            _fsm = _fsm.Clone(GetComponent<NPCBase>(), gameObject);
         }
 
         private void FixedUpdate()
         {
-            _finiteStateMachine.CurrentState.FixedUpdate();
-            _finiteStateMachine.MoveToNextState();
+            _fsm.CurrentState.FixedUpdate();
+            _fsm.MoveToNextState();
         }
         #endregion
 

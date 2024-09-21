@@ -1,0 +1,16 @@
+#title {
+}
+
+#extension {
+    background-color: rgb(51, 51, 51);
+}
+
+#extension #label {
+    min-width: auto;
+    width: 75px;
+}
+
+#extension #input {
+    min-width: auto;
+    width: 75px;
+}
