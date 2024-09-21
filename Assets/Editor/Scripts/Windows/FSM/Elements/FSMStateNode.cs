@@ -15,7 +15,7 @@ public class FSMStateNode : Node
     private static readonly string _styleName = "FSMStateNode";
     private static readonly string _stylePath = StaticParameters.StylesPath + _styleName + StaticParameters.StyleExtension;
 
-    private FSMGraphSearchProvider _searchProvider;
+    private FSMSearchProvider _searchProvider;
     private FSMStateSO _state;
     private FSMStateSO _stateInEdit;
     private Port _inputPort;
@@ -76,7 +76,7 @@ public class FSMStateNode : Node
     {
         styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(_stylePath));
         _state = state;
-        _searchProvider = ScriptableObject.CreateInstance<FSMGraphSearchProvider>();
+        _searchProvider = ScriptableObject.CreateInstance<FSMSearchProvider>();
         _searchProvider.Name = "Conditions";
         _searchProvider.Type = typeof(FSMConditionBase);
         _searchProvider.OnSelect = CreateCondition;
@@ -130,13 +130,17 @@ public class FSMStateNode : Node
 
     public void SetPositionOfNode(Vector2 value)
     {
+        Undo.RecordObject(_state, "FSM (Set Position)");
         style.left = value.x;
         style.top = value.y;
+        EditorUtility.SetDirty(_state);
     }
 
     public void SetPositionOfState(Vector2 value)
     {
+        Undo.RecordObject(_state, "FSM (Set Position)");
         _state.Position = value;
+        EditorUtility.SetDirty(_state);
     }
 
     public override void SetPosition(Rect newPos)
@@ -149,6 +153,12 @@ public class FSMStateNode : Node
     {
         base.OnSelected();
         StateSelected?.Invoke(this);
+    }
+
+    public override void OnUnselected()
+    {
+        base.OnUnselected();
+        StateSelected?.Invoke(null);
     }
 
     public override Port InstantiatePort(Orientation orientation, Direction direction, Port.Capacity capacity, Type type)
@@ -187,6 +197,10 @@ public class FSMStateNode : Node
 
     private void FillExtensionContainer()
     {
+        if (_state == null)
+        {
+            return;
+        }
         VisualElement container = new();
         foreach (var kvp in _state.ConditionByChild)
         {
@@ -218,7 +232,7 @@ public class FSMStateNode : Node
 
     private void CreateCondition(Type type)
     {
-        _state.ConditionByChild[_stateInEdit] = (FSMConditionBase)Activator.CreateInstance(type);
+        _state.AddCondition(_stateInEdit, (FSMConditionBase)Activator.CreateInstance(type));
         UpdateExtensionContainer();
     }
     #endregion

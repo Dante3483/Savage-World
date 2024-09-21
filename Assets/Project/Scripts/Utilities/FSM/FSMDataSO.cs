@@ -1,7 +1,6 @@
 using SavageWorld.Runtime.Entities.NPC;
 using SavageWorld.Runtime.Utilities.FSM.Conditions;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -94,33 +93,38 @@ namespace SavageWorld.Runtime.Utilities.FSM
             {
                 _rootState = state;
             }
+
+            Undo.RecordObject(this, "FSM (Add State)");
             _listOfStates.Add(state);
             AssetDatabase.AddObjectToAsset(state, this);
+            Undo.RegisterCreatedObjectUndo(state, "FSM (Add State)");
             AssetDatabase.SaveAssets();
             return state;
         }
 
         public void DeleteState(FSMStateSO state)
         {
+            Undo.RecordObject(this, "FSM (Remove State)");
             _listOfStates.Remove(state);
-            if (state == _rootState)
-            {
-                _rootState = _listOfStates.FirstOrDefault();
-            }
-            AssetDatabase.RemoveObjectFromAsset(state);
+            //AssetDatabase.RemoveObjectFromAsset(state);
+            Undo.DestroyObjectImmediate(state);
             AssetDatabase.SaveAssets();
         }
 
         public void AddChild(FSMStateSO parent, FSMStateSO child)
         {
+            Undo.RecordObject(parent, "FSM (Add Child)");
             parent.ListOfChildren.Add(child);
             parent.ConditionByChild.Add(child, new NoCondition());
+            EditorUtility.SetDirty(parent);
         }
 
         public void RemoveChild(FSMStateSO parent, FSMStateSO child)
         {
+            Undo.RecordObject(parent, "FSM (Remove Child)");
             parent.ListOfChildren.Remove(child);
             parent.ConditionByChild.Remove(child);
+            EditorUtility.SetDirty(parent);
         }
 
         public FSMDataSO Clone(NPCBase entity, GameObject gameObject)

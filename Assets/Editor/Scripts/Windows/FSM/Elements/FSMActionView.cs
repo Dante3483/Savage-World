@@ -21,7 +21,7 @@ public class FSMActionView : VisualElement
     #region Fields
     private ListView _listView;
     private List<FSMActionBase> _listOfActions;
-    private FSMGraphSearchProvider _searchProvider;
+    private FSMSearchProvider _searchProvider;
     #endregion
 
     #region Properties
@@ -44,7 +44,7 @@ public class FSMActionView : VisualElement
 
     public FSMActionView(SerializedProperty serializedProperty, List<FSMActionBase> listOfActions) : base()
     {
-        _searchProvider = ScriptableObject.CreateInstance<FSMGraphSearchProvider>();
+        _searchProvider = ScriptableObject.CreateInstance<FSMSearchProvider>();
         _searchProvider.Name = "Actions";
         _searchProvider.Type = typeof(FSMActionBase);
         _searchProvider.OnSelect = CreateAction;

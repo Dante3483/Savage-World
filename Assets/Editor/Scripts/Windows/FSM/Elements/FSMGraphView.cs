@@ -2,6 +2,7 @@ using SavageWorld.Runtime.Utilities.FSM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -37,12 +38,13 @@ public class FSMGraphView : GraphView
     #region Public Methods
     public FSMGraphView() : base()
     {
-        RegisterCallback<MouseDownEvent>(CheckDoubleClick);
+        RegisterCallback<MouseDownEvent>(OnMouseDown);
         this.AddManipulator(new ContentZoomer());
         this.AddManipulator(new ContentDragger());
         this.AddManipulator(new SelectionDragger());
         this.AddManipulator(new RectangleSelector());
         Insert(0, new GridBackground { name = "grid-background" });
+        Undo.undoRedoPerformed += OnUndoRedo;
     }
 
     public void PopulateView(FSMDataSO fsm)
@@ -74,15 +76,6 @@ public class FSMGraphView : GraphView
     #endregion
 
     #region Private Methods
-    private void CheckDoubleClick(MouseDownEvent evt)
-    {
-        if (evt.button == (int)MouseButton.LeftMouse && evt.clickCount == 2)
-        {
-            CreateState(contentViewContainer.WorldToLocal(evt.mousePosition));
-            evt.StopPropagation();
-        }
-    }
-
     private void CreateState()
     {
         CreateState(new(0, 0));
@@ -90,10 +83,6 @@ public class FSMGraphView : GraphView
 
     private void CreateState(Vector2 position)
     {
-        if (_fsm == null)
-        {
-            return;
-        }
         FSMStateSO state = _fsm.CreateState();
         state.Position = position;
         ClearSelection();
@@ -112,9 +101,9 @@ public class FSMGraphView : GraphView
     {
         state.ListOfChildren.ForEach(child =>
         {
-            FSMStateNode parentView = FindStateNode(state);
-            FSMStateNode childView = FindStateNode(child);
-            FSMEdge edge = parentView.OutputPort.ConnectTo<FSMEdge>(childView.InputPort);
+            FSMStateNode parentNode = FindStateNode(state);
+            FSMStateNode childNode = FindStateNode(child);
+            FSMEdge edge = parentNode.OutputPort.ConnectTo<FSMEdge>(childNode.InputPort);
             AddElement(edge);
         });
     }
@@ -132,7 +121,14 @@ public class FSMGraphView : GraphView
             {
                 if (element is FSMStateNode stateNode)
                 {
-                    _fsm.DeleteState(stateNode.State);
+                    if (stateNode.State == _fsm.RootState)
+                    {
+                        CreateStateNode(stateNode.State);
+                    }
+                    else
+                    {
+                        _fsm.DeleteState(stateNode.State);
+                    }
                 }
 
                 if (element is Edge edge)
@@ -157,6 +153,21 @@ public class FSMGraphView : GraphView
             });
         }
         return graphViewChange;
+    }
+
+    private void OnMouseDown(MouseDownEvent evt)
+    {
+        if (evt.button == (int)MouseButton.LeftMouse && evt.clickCount == 2)
+        {
+            CreateState(contentViewContainer.WorldToLocal(evt.mousePosition));
+            evt.StopPropagation();
+        }
+    }
+
+    private void OnUndoRedo()
+    {
+        PopulateView(_fsm);
+        AssetDatabase.SaveAssets();
     }
     #endregion
 }

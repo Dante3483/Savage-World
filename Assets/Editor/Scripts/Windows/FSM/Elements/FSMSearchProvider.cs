@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-public class FSMGraphSearchProvider : ScriptableObject, ISearchWindowProvider
+public class FSMSearchProvider : ScriptableObject, ISearchWindowProvider
 {
     #region Fields
     private string _name;

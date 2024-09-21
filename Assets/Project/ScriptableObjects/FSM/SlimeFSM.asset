@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Start
   _guid: 63b7a1deb4e43364689e9cfb82ffb3f8
-  _position: {x: -427.4791, y: -0.0000104904175}
+  _position: {x: -400, y: 0}
   _listOfChildren:
   - {fileID: 6353194602871686526}
   _conditionByChild:
@@ -65,14 +65,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Wait
   _guid: 93edadd065eb332418323afd647f0285
-  _position: {x: 250, y: 0}
+  _position: {x: 174, y: 0}
   _listOfChildren:
   - {fileID: 5577256302320223499}
   _conditionByChild:
     _listOfKeyValuePair:
     - _key: {fileID: 5577256302320223499}
       _value:
-        rid: 1530037972653047809
+        rid: 1530037986571583540
   _listOfActionsOnEnter: []
   _listOfActionsOnExit: []
   _listOfActionsOnFixedUpdate: []
@@ -80,10 +80,10 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 1530037972653047809
+    - rid: 1530037986571583540
       type: {class: WaitCondition, ns: SavageWorld.Runtime.Utilities.FSM.Conditions, asm: SavageWorld.Runtime}
       data:
-        _timeToWait: 1.5
+        _timeToWait: 0
 --- !u!114 &5577256302320223499
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Jump
   _guid: 97ea88f8df924bd4d96143d26b56bcc3
-  _position: {x: 55, y: 188}
+  _position: {x: 8, y: 160}
   _listOfChildren:
   - {fileID: 6353194602871686526}
   _conditionByChild:

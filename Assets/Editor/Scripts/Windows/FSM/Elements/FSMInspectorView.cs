@@ -39,24 +39,27 @@ public class FSMInspectorView : VisualElement
     public void UpdateSelection(FSMStateNode stateView)
     {
         Clear();
-        SerializedObject serializedObject = new(stateView.State);
+        if (stateView != null)
+        {
+            SerializedObject serializedObject = new(stateView.State);
 
-        PropertyField namePropertyField = new(serializedObject.FindProperty("_name"));
-        PropertyField positionPropertyField = new(serializedObject.FindProperty("_position"));
-        PropertyField guidPropertyField = new(serializedObject.FindProperty("_guid"));
+            PropertyField namePropertyField = new(serializedObject.FindProperty("_name"));
+            PropertyField positionPropertyField = new(serializedObject.FindProperty("_position"));
+            PropertyField guidPropertyField = new(serializedObject.FindProperty("_guid"));
 
-        namePropertyField.RegisterCallback<SerializedPropertyChangeEvent>(evt => stateView.SetTitleOfNode(evt.changedProperty.stringValue));
-        positionPropertyField.RegisterCallback<SerializedPropertyChangeEvent>(evt => stateView.SetPositionOfNode(evt.changedProperty.vector2Value));
-        guidPropertyField.RegisterCallback<SerializedPropertyChangeEvent>(evt => stateView.SetGuidOfNode(evt.changedProperty.stringValue));
+            namePropertyField.RegisterCallback<SerializedPropertyChangeEvent>(evt => stateView.SetTitleOfNode(evt.changedProperty.stringValue));
+            positionPropertyField.RegisterCallback<SerializedPropertyChangeEvent>(evt => stateView.SetPositionOfNode(evt.changedProperty.vector2Value));
+            guidPropertyField.RegisterCallback<SerializedPropertyChangeEvent>(evt => stateView.SetGuidOfNode(evt.changedProperty.stringValue));
 
-        Add(namePropertyField);
-        Add(positionPropertyField);
-        Add(guidPropertyField);
-        Add(new FSMActionView(serializedObject.FindProperty("_listOfActionsOnEnter"), stateView.State.ListOfActionsOnEnter));
-        Add(new FSMActionView(serializedObject.FindProperty("_listOfActionsOnExit"), stateView.State.ListOfActionsOnExit));
-        Add(new FSMActionView(serializedObject.FindProperty("_listOfActionsOnFixedUpdate"), stateView.State.ListOfActionsOnFixedUpdate));
-        Add(new FSMActionView(serializedObject.FindProperty("_listOfActionsOnUpdate"), stateView.State.ListOfActionsOnUpdate));
-        this.Bind(new(stateView.State));
+            Add(namePropertyField);
+            Add(positionPropertyField);
+            Add(guidPropertyField);
+            Add(new FSMActionView(serializedObject.FindProperty("_listOfActionsOnEnter"), stateView.State.ListOfActionsOnEnter));
+            Add(new FSMActionView(serializedObject.FindProperty("_listOfActionsOnExit"), stateView.State.ListOfActionsOnExit));
+            Add(new FSMActionView(serializedObject.FindProperty("_listOfActionsOnFixedUpdate"), stateView.State.ListOfActionsOnFixedUpdate));
+            Add(new FSMActionView(serializedObject.FindProperty("_listOfActionsOnUpdate"), stateView.State.ListOfActionsOnUpdate));
+            this.Bind(new(stateView.State));
+        }
     }
     #endregion
 

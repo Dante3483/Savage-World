@@ -4,6 +4,7 @@ using SavageWorld.Runtime.Utilities.FSM.Conditions;
 using SavageWorld.Runtime.Utilities.SerializedDictionary;
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace SavageWorld.Runtime.Utilities.FSM
@@ -23,6 +24,7 @@ namespace SavageWorld.Runtime.Utilities.FSM
         private List<FSMStateSO> _listOfChildren = new();
         [SerializeField]
         private SerializedDictionary<FSMStateSO, FSMConditionBase> _conditionByChild = new();
+
         [SerializeField]
         [SerializeReference]
         private List<FSMActionBase> _listOfActionsOnEnter = new();
@@ -130,6 +132,13 @@ namespace SavageWorld.Runtime.Utilities.FSM
         #endregion
 
         #region Public Methods
+        public void AddCondition(FSMStateSO child, FSMConditionBase condition)
+        {
+            Undo.RecordObject(this, "FSM (Add Condition)");
+            _conditionByChild[child] = condition;
+            EditorUtility.SetDirty(this);
+        }
+
         public void Enter()
         {
             _listOfActionsOnEnter.ForEach(action => action.Invoke());
