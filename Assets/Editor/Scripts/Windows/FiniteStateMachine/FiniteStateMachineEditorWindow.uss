@@ -1,0 +1,18 @@
+#split-view {
+}
+
+#left-panel {
+    min-width: 250px;
+}
+
+#right-panel {
+    min-width: 500px;
+}
+
+#inspecotr-view {
+    flex-grow: 1;
+}
+
+#graph-view {
+    flex-grow: 1;
+}
