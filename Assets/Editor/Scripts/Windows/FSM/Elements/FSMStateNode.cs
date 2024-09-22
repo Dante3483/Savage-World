@@ -6,6 +6,7 @@ using System;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -75,78 +76,44 @@ public class FSMStateNode : Node
     public FSMStateNode(FSMStateSO state) : base()
     {
         styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(_stylePath));
-        _state = state;
-        _searchProvider = ScriptableObject.CreateInstance<FSMSearchProvider>();
-        _searchProvider.Name = "Conditions";
-        _searchProvider.Type = typeof(FSMConditionBase);
-        _searchProvider.OnSelect = CreateCondition;
-        FillContent();
-        SetTitleOfNode(_state.Name);
-        SetGuidOfNode(_state.Guid);
-        SetPositionOfNode(_state.Position);
+        Initialize(state);
+        this.Bind(new(_state));
     }
 
     public void UpdateTitleContainer()
     {
         titleContainer.Clear();
-        FillTitleContainer();
+        InitializeTitleContainer();
+        this.Bind(new(_state));
     }
 
     public void UpdateInputContainer()
     {
         inputContainer.Clear();
-        FillOutputContainer();
+        InitializeOutputContainer();
+        this.Bind(new(_state));
     }
 
     public void UpdateOutputContainer()
     {
         outputContainer.Clear();
-        FillOutputContainer();
+        InitializeOutputContainer();
+        this.Bind(new(_state));
     }
 
     public void UpdateExtensionContainer()
     {
         extensionContainer.Clear();
-        FillExtensionContainer();
-    }
-
-    public void SetTitleOfNode(string value)
-    {
-        if (title != value)
-        {
-            foreach (FSMEdge edge in _inputPort.connections)
-            {
-                FSMStateNode parent = edge.output.node as FSMStateNode;
-                parent.UpdateExtensionContainer();
-            }
-        }
-        title = value;
-    }
-
-    public void SetGuidOfNode(string value)
-    {
-        viewDataKey = value;
-    }
-
-    public void SetPositionOfNode(Vector2 value)
-    {
-        Undo.RecordObject(_state, "FSM (Set Position)");
-        style.left = value.x;
-        style.top = value.y;
-        EditorUtility.SetDirty(_state);
-    }
-
-    public void SetPositionOfState(Vector2 value)
-    {
-        Undo.RecordObject(_state, "FSM (Set Position)");
-        _state.Position = value;
-        EditorUtility.SetDirty(_state);
+        InitializeExtensionContainer();
+        this.Bind(new(_state));
     }
 
     public override void SetPosition(Rect newPos)
     {
         base.SetPosition(newPos);
-        SetPositionOfState(newPos.min);
+        Undo.RecordObject(_state, "FSM (Set Position)");
+        _state.Position = newPos.min;
+        EditorUtility.SetDirty(_state);
     }
 
     public override void OnSelected()
@@ -168,64 +135,99 @@ public class FSMStateNode : Node
     #endregion
 
     #region Private Methods
-    private void FillContent()
+    private void Initialize(FSMStateSO state)
     {
-        FillTitleContainer();
-        FillInputContainer();
-        FillOutputContainer();
-        FillExtensionContainer();
+        _state = state;
+        viewDataKey = _state.Guid;
+        style.left = _state.Position.x;
+        style.top = _state.Position.y;
+        InitializeSearchWindow();
+        InitializeTitleContainer();
+        InitializeInputContainer();
+        InitializeOutputContainer();
+        InitializeExtensionContainer();
     }
 
-    private void FillTitleContainer()
+    private void InitializeSearchWindow()
     {
-
+        _searchProvider = ScriptableObject.CreateInstance<FSMSearchProvider>();
+        _searchProvider.Name = "Conditions";
+        _searchProvider.Type = typeof(FSMConditionBase);
+        _searchProvider.OnSelect = CreateCondition;
     }
 
-    private void FillInputContainer()
+    private void InitializeTitleContainer()
+    {
+        TextField titleTextField = new()
+        {
+            bindingPath = "_name",
+            name = "state-name"
+        };
+        titleContainer.Insert(0, titleTextField);
+    }
+
+    private void InitializeInputContainer()
     {
         _inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(bool));
         _inputPort.portName = "";
         inputContainer.Add(_inputPort);
     }
 
-    private void FillOutputContainer()
+    private void InitializeOutputContainer()
     {
         _outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(bool));
         _outputPort.portName = "";
         outputContainer.Add(_outputPort);
     }
 
-    private void FillExtensionContainer()
+    private void InitializeExtensionContainer()
     {
         if (_state == null)
         {
             return;
         }
         VisualElement container = new();
-        foreach (var kvp in _state.ConditionByChild)
-        {
-            FSMStateSO child = kvp.Key;
-            FSMConditionBase condition = kvp.Value;
-            NonUnityObjectField conditionObjectField = new(child.Name);
-            conditionObjectField.SelectingObject += (evt) =>
-            {
-                _stateInEdit = child;
-                ShowSearchWindow(evt);
-            };
 
-            Type conditionType = condition.GetType();
-            FSMComponentAttribute fsmAttribute = conditionType.GetCustomAttribute<FSMComponentAttribute>();
-            if (fsmAttribute != null)
+        if (_state.ListOfChildren.Count > 0)
+        {
+            Foldout transitionsFoldout = new()
             {
-                conditionObjectField.SetObjectName(fsmAttribute.Name);
+                text = "Transitions",
+                value = false
+            };
+            SerializedProperty conditionsByChild = new SerializedObject(_state).FindProperty("_conditionByChild");
+            SerializedProperty listOfKeyValuePair = conditionsByChild.FindPropertyRelative("_listOfKeyValuePair");
+            for (int i = 0; i < listOfKeyValuePair.arraySize; i++)
+            {
+                SerializedProperty arrayElement = listOfKeyValuePair.GetArrayElementAtIndex(i);
+                SerializedProperty keyProperty = arrayElement.FindPropertyRelative("_key");
+                SerializedProperty valueProperty = arrayElement.FindPropertyRelative("_value");
+                FSMStateSO child = (FSMStateSO)keyProperty.objectReferenceValue;
+                FSMConditionBase condition = (FSMConditionBase)valueProperty.managedReferenceValue;
+
+
+                NonUnityObjectField conditionObjectField = new();
+                conditionObjectField.BindLabel("_name", new(child));
+                conditionObjectField.SelectingObject += (evt) => OnConditionObjectFieldSelectingObject(evt, child);
+                FSMComponentAttribute fsmAttribute = condition.GetType().GetCustomAttribute<FSMComponentAttribute>();
+                conditionObjectField.SetObjectName(fsmAttribute == null ? condition.GetType().Name : fsmAttribute.Name);
+
+                PropertyField valuePropertyField = new(valueProperty);
+                valuePropertyField.RegisterCallback<GeometryChangedEvent>(OnTransitionPropertyFieldGeometryChanged);
+
+                VisualElement transitionContainer = new() { name = "transition-container" };
+                transitionContainer.Add(conditionObjectField);
+                transitionContainer.Add(valuePropertyField);
+                transitionsFoldout.Add(transitionContainer);
             }
-            container.Add(conditionObjectField);
+            container.Add(transitionsFoldout);
         }
+
         extensionContainer.Add(container);
         RefreshExpandedState();
     }
 
-    private void ShowSearchWindow(MouseDownEvent evt)
+    private void OpenSearchWindow(MouseDownEvent evt)
     {
         SearchWindow.Open(new(GUIUtility.GUIToScreenPoint(evt.mousePosition)), _searchProvider);
     }
@@ -234,6 +236,21 @@ public class FSMStateNode : Node
     {
         _state.AddCondition(_stateInEdit, (FSMConditionBase)Activator.CreateInstance(type));
         UpdateExtensionContainer();
+    }
+
+    private void OnConditionObjectFieldSelectingObject(MouseDownEvent evt, FSMStateSO child)
+    {
+        _stateInEdit = child;
+        OpenSearchWindow(evt);
+    }
+
+    private void OnTransitionPropertyFieldGeometryChanged(GeometryChangedEvent evt)
+    {
+        PropertyField propertyField = (evt.currentTarget as PropertyField);
+        if (propertyField.Q<Foldout>() == null)
+        {
+            propertyField.RemoveFromHierarchy();
+        }
     }
     #endregion
 }

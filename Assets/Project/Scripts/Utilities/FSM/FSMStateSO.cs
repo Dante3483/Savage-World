@@ -170,16 +170,6 @@ namespace SavageWorld.Runtime.Utilities.FSM
         public FSMStateSO Clone(GameObject gameObject)
         {
             FSMStateSO instance = Instantiate(this);
-            //_listOfChildren.ForEach(child =>
-            //{
-            //    FSMStateSO clone = child.Clone(gameObject);
-            //    if (_conditionByChild.TryGetValue(child, out FSMConditionBase condition))
-            //    {
-            //        instance._conditionByChild.Add(clone, (FSMConditionBase)condition.Clone());
-            //    }
-            //    instance._listOfChildren.Add(clone);
-            //});
-            //instance._listOfChildren = _listOfChildren.ConvertAll(child => child.Clone(gameObject));
             instance.Initialize(gameObject);
             return instance;
         }

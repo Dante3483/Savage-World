@@ -1,6 +1,7 @@
 using SavageWorld.Runtime.Utilities;
 using System;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 public class NonUnityObjectField : VisualElement
@@ -62,6 +63,14 @@ public class NonUnityObjectField : VisualElement
             if (_labelElement.text != value)
             {
                 _labelElement.text = value;
+                if (string.IsNullOrEmpty(_labelElement.text))
+                {
+                    _labelElement.RemoveFromHierarchy();
+                }
+                else if (!Contains(_labelElement))
+                {
+                    Insert(0, _labelElement);
+                }
             }
         }
     }
@@ -116,9 +125,8 @@ public class NonUnityObjectField : VisualElement
         styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(_stylePath));
         AddToClassList(_ussClassName);
 
-        _labelElement = new(label);
+        _labelElement = new();
         _labelElement.name = "label";
-        _labelElement.AddToClassList(_labelUssClassName);
 
         _inputElement = new();
         _inputElement.name = "input";
@@ -130,13 +138,19 @@ public class NonUnityObjectField : VisualElement
         _objectName.AddToClassList(_objectNameUssClassName);
         _inputElement.Add(_objectName);
 
-        Add(_labelElement);
+        Label = label;
         Add(_inputElement);
     }
 
     public void SetObjectName(string name)
     {
         _objectName.text = name;
+    }
+
+    public void BindLabel(string bindingPath, SerializedObject serializedObject)
+    {
+        _labelElement.bindingPath = bindingPath;
+        _labelElement.Bind(serializedObject);
     }
     #endregion
 
