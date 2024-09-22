@@ -513,7 +513,11 @@ namespace SavageWorld.Runtime.GameSession
         {
             ChangeState(_quitGameState);
             _currentGameState = GameState.CloseApplication;
-            GetPlayerInventory().IsInitialized = false;
+            InventoryModel playerInventory = GetPlayerInventory();
+            if (playerInventory != null)
+            {
+                playerInventory.IsInitialized = false;
+            }
         }
 
         protected override void Awake()
@@ -571,7 +575,7 @@ namespace SavageWorld.Runtime.GameSession
 
         public InventoryModel GetPlayerInventory()
         {
-            return _player.Inventory;
+            return _player != null ? _player.Inventory : null;
         }
 
         public ResearchesModelSO GetResearches()

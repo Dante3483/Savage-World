@@ -40,6 +40,11 @@ namespace SavageWorld.Runtime.Utilities.Others
         {
             Instance = this as T;
         }
+
+        private void OnDestroy()
+        {
+            _instance = null;
+        }
         #endregion
 
         #region Public Methods
