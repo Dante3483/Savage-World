@@ -1,0 +1,129 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6215954090241253822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 386e346c9f247644aaa76b2799b3c4ed, type: 3}
+  m_Name: State
+  m_EditorClassIdentifier: 
+  _position: {x: 223.99998, y: 0.0000076293945}
+  _name: Idle
+  _guid: 95715715744a4074992f575e5f424dcb
+  _listOfTransitions:
+  - _state: {fileID: 8701584585845277376}
+    _condition:
+      rid: 1530038019001417741
+  _listOfEnterActions:
+  - rid: 1530038019001417747
+  _listOfExitActions: []
+  _listOfFixedUpdateActions: []
+  _listOfUpdateActions: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 1530038019001417741
+      type: {class: WaitCondition, ns: SavageWorld.Runtime.Utilities.FiniteStateMachine.Conditions, asm: SavageWorld.Runtime}
+      data:
+        _timeToWait: 2
+        _time: 0
+    - rid: 1530038019001417747
+      type: {class: SetDirectionAction, ns: SavageWorld.Runtime.Utilities.FiniteStateMachine.Actions, asm: SavageWorld.Runtime}
+      data:
+        _isRandom: 0
+        _direction: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd49129607e82d344aa1fe064f383250, type: 3}
+  m_Name: SlimeAI
+  m_EditorClassIdentifier: 
+  _starterState: {fileID: 4567515484515325932}
+  _currentState: {fileID: 0}
+  _listOfStates:
+  - {fileID: 4567515484515325932}
+  - {fileID: -6215954090241253822}
+  - {fileID: 8701584585845277376}
+--- !u!114 &4567515484515325932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 386e346c9f247644aaa76b2799b3c4ed, type: 3}
+  m_Name: State
+  m_EditorClassIdentifier: 
+  _position: {x: 23, y: 0}
+  _name: Start
+  _guid: 819b43c63caf3ca4d8ee5240f862b45b
+  _listOfTransitions:
+  - _state: {fileID: -6215954090241253822}
+    _condition:
+      rid: 1530038019001417743
+  _listOfEnterActions: []
+  _listOfExitActions: []
+  _listOfFixedUpdateActions: []
+  _listOfUpdateActions: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 1530038019001417743
+      type: {class: GroundedCondition, ns: SavageWorld.Runtime.Utilities.FiniteStateMachine.Conditions, asm: SavageWorld.Runtime}
+      data: 
+--- !u!114 &8701584585845277376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 386e346c9f247644aaa76b2799b3c4ed, type: 3}
+  m_Name: State
+  m_EditorClassIdentifier: 
+  _position: {x: 223.99998, y: 179}
+  _name: Jump
+  _guid: ea1397e99ed42384da58718072d3351c
+  _listOfTransitions:
+  - _state: {fileID: -6215954090241253822}
+    _condition:
+      rid: 1530038019001417742
+  _listOfEnterActions:
+  - rid: 1530038019001417748
+  - rid: 1530038019001417749
+  _listOfExitActions: []
+  _listOfFixedUpdateActions:
+  - rid: 1530038019001417750
+  _listOfUpdateActions: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 1530038019001417742
+      type: {class: GroundedCondition, ns: SavageWorld.Runtime.Utilities.FiniteStateMachine.Conditions, asm: SavageWorld.Runtime}
+      data: 
+    - rid: 1530038019001417748
+      type: {class: JumpAction, ns: SavageWorld.Runtime.Utilities.FiniteStateMachine.Actions, asm: SavageWorld.Runtime}
+      data: 
+    - rid: 1530038019001417749
+      type: {class: SetDirectionAction, ns: SavageWorld.Runtime.Utilities.FiniteStateMachine.Actions, asm: SavageWorld.Runtime}
+      data:
+        _isRandom: 1
+        _direction: 0
+    - rid: 1530038019001417750
+      type: {class: MoveAction, ns: SavageWorld.Runtime.Utilities.FiniteStateMachine.Actions, asm: SavageWorld.Runtime}
+      data: 

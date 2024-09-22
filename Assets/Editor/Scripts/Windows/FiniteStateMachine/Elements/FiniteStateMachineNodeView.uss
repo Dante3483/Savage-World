@@ -1,0 +1,118 @@
+#state-name {
+    flex-grow: 1;
+    margin-top: 6px;
+    margin-left: 6px;
+    margin-bottom: 6px;
+    margin-right: 0;
+    flex-shrink: 1;
+    min-width: 75px;
+}
+
+#state-name > #unity-text-input {
+    background-color: rgba(58, 58, 58, 0.8);
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+}
+
+#state-name:focus > #unity-text-input {
+    background-color: rgb(42, 42, 42);
+    border-left-color: rgb(33, 33, 33);
+    border-right-color: rgb(33, 33, 33);
+    border-top-color: rgb(33, 33, 33);
+    border-bottom-color: rgb(33, 33, 33);
+}
+
+#title #title-label {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#extension {
+    background-color: rgba(51, 51, 51, 0.8);
+}
+
+#transition-container {
+    background-color: rgba(58, 58, 58, 0.8);
+    margin-bottom: 5px;
+    border-left-color: rgba(35, 35, 35, 0.8);
+    border-right-color: rgba(35, 35, 35, 0.8);
+    border-top-color: rgba(35, 35, 35, 0.8);
+    border-bottom-color: rgba(35, 35, 35, 0.8);
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    margin-right: 15px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    padding-top: 2px;
+    padding-right: 2px;
+    padding-bottom: 2px;
+    padding-left: 2px;
+}
+
+#extension #label {
+    min-width: auto;
+    width: 75px;
+}
+
+#extension #input {
+    min-width: auto;
+    width: 75px;
+}
+
+.starter-node #title {
+    background-color: rgba(0, 135, 25, 0.8);
+}
+
+.starter-node #state-name > #unity-text-input {
+    background-color: rgb(8, 116, 28);
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+}
+
+.starter-node #state-name:focus > #unity-text-input {
+    background-color: rgb(3, 63, 14);
+    border-left-color: rgb(2, 36, 8);
+    border-right-color: rgb(2, 36, 8);
+    border-top-color: rgb(2, 36, 8);
+    border-bottom-color: rgb(2, 36, 8);
+}
+
+.current-node #node-border {
+    border-left-color: rgb(13, 164, 0);
+    border-right-color: rgb(13, 164, 0);
+    border-top-color: rgb(13, 164, 0);
+    border-bottom-color: rgb(13, 164, 0);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+}
+
+.next-node #node-border {
+    border-left-color: rgb(233, 166, 3);
+    border-right-color: rgb(233, 166, 3);
+    border-top-color: rgb(233, 166, 3);
+    border-bottom-color: rgb(233, 166, 3);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+}
+
+.node {
+    max-width: 300px;
+}

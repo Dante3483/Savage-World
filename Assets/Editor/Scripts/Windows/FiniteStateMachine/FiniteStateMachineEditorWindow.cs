@@ -12,7 +12,7 @@ public class FiniteStateMachineEditorWindow : EditorWindow
     private VisualElement _root;
     private FiniteStateMachineInspectorView _inspectorView;
     private FiniteStateMachineGraphView _graphView;
-    private FiniteStateMachineBase _finiteStateMachine;
+    private FiniteStateMachine _finiteStateMachine;
     #endregion
 
     #region Properties
@@ -33,7 +33,7 @@ public class FiniteStateMachineEditorWindow : EditorWindow
     [OnOpenAsset]
     public static bool Open(int instanceId, int line)
     {
-        if (Selection.activeObject is FiniteStateMachineBase finiteStateMachine)
+        if (Selection.activeObject is FiniteStateMachine finiteStateMachine)
         {
             Open(finiteStateMachine);
             return true;
@@ -41,11 +41,12 @@ public class FiniteStateMachineEditorWindow : EditorWindow
         return false;
     }
 
-    public static void Open(FiniteStateMachineBase finiteStateMachine)
+    public static void Open(FiniteStateMachine finiteStateMachine)
     {
         string windowName = finiteStateMachine != null ? finiteStateMachine.name : "FiniteStateMachine";
-        FiniteStateMachineEditorWindow window = GetWindow<FiniteStateMachineEditorWindow>(windowName);
+        FiniteStateMachineEditorWindow window = GetWindow<FiniteStateMachineEditorWindow>();
         window._finiteStateMachine = finiteStateMachine;
+        window.titleContent = new(windowName);
         window.PopulateWindow();
     }
 
@@ -62,6 +63,12 @@ public class FiniteStateMachineEditorWindow : EditorWindow
     private void PopulateWindow()
     {
         _graphView.PopulateView(_finiteStateMachine);
+        _graphView.StateSelected += StateSelectedHandler;
+    }
+
+    private void StateSelectedHandler(FiniteStateMachineNodeView node)
+    {
+        _inspectorView.UpdateSelection(node);
     }
     #endregion
 }

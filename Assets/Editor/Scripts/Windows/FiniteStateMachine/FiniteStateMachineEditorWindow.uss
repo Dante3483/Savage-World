@@ -9,7 +9,7 @@
     min-width: 500px;
 }
 
-#inspecotr-view {
+#inspector-view {
     flex-grow: 1;
 }
 

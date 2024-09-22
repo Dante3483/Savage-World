@@ -1,3 +1,4 @@
+using SavageWorld.Runtime.Entities.NPC;
 using SavageWorld.Runtime.Utilities.FiniteStateMachine.Conditions;
 using System;
 using UnityEngine;
@@ -9,14 +10,14 @@ namespace SavageWorld.Runtime.Utilities.FiniteStateMachine
     {
         #region Fields
         [SerializeField]
-        private StateBase _state;
+        private State _state;
         [SerializeField]
         [SerializeReference]
         private TransitionConditionBase _condition;
         #endregion
 
         #region Properties
-        public StateBase State
+        public State State
         {
             get
             {
@@ -48,9 +49,20 @@ namespace SavageWorld.Runtime.Utilities.FiniteStateMachine
         #endregion
 
         #region Public Methods
-        public bool CheckTransition()
+        public StateTransition(State state, TransitionConditionBase condition)
         {
-            return _condition.Check();
+            _state = state;
+            _condition = condition;
+        }
+
+        public bool CheckTransition(NPCBase entityData)
+        {
+            return _condition.Check(entityData);
+        }
+
+        public void ResetCondition()
+        {
+            _condition.Reset();
         }
         #endregion
 

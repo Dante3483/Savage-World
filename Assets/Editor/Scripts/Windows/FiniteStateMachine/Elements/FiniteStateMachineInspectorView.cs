@@ -1,4 +1,5 @@
-using UnityEngine;
+using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 public class FiniteStateMachineInspectorView : VisualElement
@@ -14,8 +15,7 @@ public class FiniteStateMachineInspectorView : VisualElement
     }
 
     #region Fields
-    //private static readonly string _styleName = "";
-    //private static readonly string _stylePath = StaticParameters.StylesPath + _styleName + StaticParameters.StyleExtension;
+    private Editor _editor;
     #endregion
 
     #region Properties
@@ -33,7 +33,21 @@ public class FiniteStateMachineInspectorView : VisualElement
     #region Public Methods
     public FiniteStateMachineInspectorView() : base()
     {
-        //styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(_stylePath));
+
+    }
+
+    public void UpdateSelection(FiniteStateMachineNodeView node)
+    {
+        Clear();
+        if (node != null)
+        {
+            SerializedObject serializedObject = new(node.Data);
+            Add(new FiniteStateMachineActionsView(serializedObject.FindProperty("_listOfEnterActions"), node.Data.ListOfEnterActions));
+            Add(new FiniteStateMachineActionsView(serializedObject.FindProperty("_listOfExitActions"), node.Data.ListOfExitActions));
+            Add(new FiniteStateMachineActionsView(serializedObject.FindProperty("_listOfFixedUpdateActions"), node.Data.ListOfFixedUpdateActions));
+            Add(new FiniteStateMachineActionsView(serializedObject.FindProperty("_listOfUpdateActions"), node.Data.ListOfUpdateActions));
+            this.Bind(new(node.Data));
+        }
     }
     #endregion
 

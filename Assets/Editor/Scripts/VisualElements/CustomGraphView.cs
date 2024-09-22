@@ -10,6 +10,7 @@ public class CustomGraphView : GraphView
     #region Fields
     private static readonly string _styleName = "CustomGraphView";
     private static readonly string _stylePath = StaticParameters.StylesPath + _styleName + StaticParameters.StyleExtension;
+    protected GridBackground _gridBackground;
     #endregion
 
     #region Properties
@@ -60,9 +61,9 @@ public class CustomGraphView : GraphView
 
     protected virtual void InsertGridBackground()
     {
-        GridBackground gridBackground = new();
-        gridBackground.name = "grid-background";
-        Insert(0, gridBackground);
+        _gridBackground = new();
+        _gridBackground.name = "grid-background";
+        Insert(0, _gridBackground);
     }
     #endregion
 }

@@ -1,3 +1,4 @@
+using SavageWorld.Runtime.Entities.NPC;
 using UnityEngine;
 
 namespace SavageWorld.Runtime.Utilities.FiniteStateMachine
@@ -7,7 +8,7 @@ namespace SavageWorld.Runtime.Utilities.FiniteStateMachine
     {
         #region Fields
         [SerializeField]
-        private FiniteStateMachineBase _finiteStateMachine;
+        private FiniteStateMachine _finiteStateMachine;
         #endregion
 
         #region Properties
@@ -22,6 +23,7 @@ namespace SavageWorld.Runtime.Utilities.FiniteStateMachine
         private void Awake()
         {
             _finiteStateMachine = _finiteStateMachine.Clone();
+            _finiteStateMachine.Initialize(GetComponent<NPCBase>());
         }
         #endregion
 

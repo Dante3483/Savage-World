@@ -1,11 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <Style src="project://database/Assets/Editor/Scripts/Windows/FiniteStateMachine/FiniteStateMachineEditorWindow.uss?fileID=7433441132597879392&amp;guid=544a00a47ffc6914fa0bd3e3a336877a&amp;type=3#FiniteStateMachineEditorWindow" />
+    <Style src="project://database/Assets/Editor/Scripts/Windows/FiniteStateMachine/Elements/FiniteStateMachineNodeView.uss?fileID=7433441132597879392&amp;guid=b0e5bbc1cd9f398458647c4e66facb51&amp;type=3#FiniteStateMachineNodeView" />
     <SplitView fixed-pane-initial-dimension="250" name="split-view">
         <ui:VisualElement name="left-panel">
             <FiniteStateMachineInspectorView name="inspector-view" />
         </ui:VisualElement>
         <ui:VisualElement name="right-panel">
-            <FiniteStateMachineGraphView name="graph-view" />
+            <FiniteStateMachineGraphView name="graph-view" focusable="true" />
         </ui:VisualElement>
     </SplitView>
 </ui:UXML>
