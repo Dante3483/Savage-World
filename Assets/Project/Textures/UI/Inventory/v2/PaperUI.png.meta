@@ -445,6 +445,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: PaperUI_16
+      rect:
+        serializedVersion: 2
+        x: 2096
+        y: 3696
+        width: 224
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 14, y: 11, z: 17, w: 11}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: df18cfa348d91ef4da036c832f359671
+      internalID: -1672608010
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -464,6 +485,7 @@ TextureImporter:
       PaperUI_13: -1936805760
       PaperUI_14: 473205736
       PaperUI_15: -1680182812
+      PaperUI_16: -1672608010
       PaperUI_2: -1268454277
       PaperUI_3: -1405196987
       PaperUI_4: 437917871
