@@ -220,7 +220,7 @@ namespace SavageWorld.Runtime.Physics
 
         private void CheckRising()
         {
-            if (_rigidbody.velocity.y <= 0)
+            if (_rigidbody.linearVelocity.y <= 0)
             {
                 _flags.IsRise = false;
             }
@@ -228,7 +228,7 @@ namespace SavageWorld.Runtime.Physics
 
         private void CheckFalling()
         {
-            _flags.IsFall = _rigidbody.velocity.y < 0.1f && !_flags.IsGrounded && !_flags.IsOnSlope;
+            _flags.IsFall = _rigidbody.linearVelocity.y < 0.1f && !_flags.IsGrounded && !_flags.IsOnSlope;
             if (_flags.IsFall)
             {
                 _flags.IsRise = false;

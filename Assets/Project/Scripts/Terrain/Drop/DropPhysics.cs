@@ -106,11 +106,11 @@ namespace SavageWorld.Runtime.Terrain.Drop
 
         private void HorizontalVelocityCheck()
         {
-            if (_drop.Rigidbody.velocity.x == 0)
+            if (_drop.Rigidbody.linearVelocity.x == 0)
             {
                 _isKinematic = true;
-                _yVelocity = _drop.Rigidbody.velocity.y;
-                _drop.Rigidbody.velocity = Vector2.zero;
+                _yVelocity = _drop.Rigidbody.linearVelocity.y;
+                _drop.Rigidbody.linearVelocity = Vector2.zero;
                 _drop.Rigidbody.bodyType = RigidbodyType2D.Kinematic;
                 foreach (GameObject platform in _platforms)
                 {

@@ -71,7 +71,7 @@ namespace SavageWorld.Runtime.Entities.NPC
             {
                 _movementDirection = -1;
             }
-            _rigidbody.velocity = new Vector2(_movementDirection * horizontalForce, _npcStats.JumpForce);
+            _rigidbody.linearVelocity = new Vector2(_movementDirection * horizontalForce, _npcStats.JumpForce);
             _npcFlags.IsRise = true;
         }
 

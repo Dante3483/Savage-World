@@ -52,7 +52,7 @@ namespace SavageWorld.Runtime.Physics
 
         public void Move(float speed)
         {
-            Vector2 newVelocity = _rigidbody.velocity;
+            Vector2 newVelocity = _rigidbody.linearVelocity;
             if (_flags.IsGrounded && !_flags.IsOnSlope && !_flags.IsRise && newVelocity.y >= -0.05f)
             {
                 newVelocity.x = speed * _moveDirection;
@@ -67,7 +67,7 @@ namespace SavageWorld.Runtime.Physics
             {
                 newVelocity.x = speed * _moveDirection;
             }
-            _rigidbody.velocity = newVelocity;
+            _rigidbody.linearVelocity = newVelocity;
         }
 
         public void Jump(float speed, bool stop)
@@ -75,11 +75,11 @@ namespace SavageWorld.Runtime.Physics
             if (!stop && _flags.IsGrounded)
             {
                 _flags.IsRise = true;
-                _rigidbody.velocity = new(_rigidbody.velocity.x, speed);
+                _rigidbody.linearVelocity = new(_rigidbody.linearVelocity.x, speed);
             }
-            else if (stop && _rigidbody.velocity.y > 0)
+            else if (stop && _rigidbody.linearVelocity.y > 0)
             {
-                _rigidbody.velocity = new(_rigidbody.velocity.x, _rigidbody.velocity.y * 0.5f);
+                _rigidbody.linearVelocity = new(_rigidbody.linearVelocity.x, _rigidbody.linearVelocity.y * 0.5f);
             }
         }
 
@@ -97,22 +97,22 @@ namespace SavageWorld.Runtime.Physics
 
         public Vector2 GetVelocity()
         {
-            return _rigidbody.velocity;
+            return _rigidbody.linearVelocity;
         }
         #endregion
 
         #region Private Methods
         private void FixVelocity()
         {
-            float xVelocity = _rigidbody.velocity.x;
-            float yVelocity = _rigidbody.velocity.y;
+            float xVelocity = _rigidbody.linearVelocity.x;
+            float yVelocity = _rigidbody.linearVelocity.y;
             if (yVelocity < 0)
             {
-                _rigidbody.velocity = new(xVelocity, Mathf.Max(yVelocity, _maxFallingSpeed));
+                _rigidbody.linearVelocity = new(xVelocity, Mathf.Max(yVelocity, _maxFallingSpeed));
             }
             else if (yVelocity > 0 && _flags.IsOnSlope && !_flags.IsRise)
             {
-                _rigidbody.velocity *= 1.5f;
+                _rigidbody.linearVelocity *= 1.5f;
             }
         }
 

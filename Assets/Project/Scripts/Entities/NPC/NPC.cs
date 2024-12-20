@@ -113,7 +113,7 @@ namespace SavageWorld.Runtime.Entities.NPC
         {
             if (_npcFlags.IsMovementBlocked)
             {
-                _rigidbody.velocity = new Vector2(0, _rigidbody.velocity.y);
+                _rigidbody.linearVelocity = new Vector2(0, _rigidbody.linearVelocity.y);
                 return;
             }
 
@@ -121,17 +121,17 @@ namespace SavageWorld.Runtime.Entities.NPC
 
             float currentMovementDirection = _movementDirection;
 
-            if (_npcFlags.IsGrounded && !_npcFlags.IsOnSlope && !_npcFlags.IsRise && _rigidbody.velocity.y >= -0.05f)
+            if (_npcFlags.IsGrounded && !_npcFlags.IsOnSlope && !_npcFlags.IsRise && _rigidbody.linearVelocity.y >= -0.05f)
             {
-                _rigidbody.velocity = new Vector2(xSpeed * currentMovementDirection, 0.0f);
+                _rigidbody.linearVelocity = new Vector2(xSpeed * currentMovementDirection, 0.0f);
             }
             else if (_npcFlags.IsGrounded && _npcFlags.IsOnSlope && !_npcFlags.IsRise)
             {
-                _rigidbody.velocity = new Vector2(xSpeed * _slopeNormalPerpendicular.x * -currentMovementDirection, xSpeed * _slopeNormalPerpendicular.y * -currentMovementDirection);
+                _rigidbody.linearVelocity = new Vector2(xSpeed * _slopeNormalPerpendicular.x * -currentMovementDirection, xSpeed * _slopeNormalPerpendicular.y * -currentMovementDirection);
             }
             else if (!_npcFlags.IsGrounded)
             {
-                _rigidbody.velocity = new Vector2(xSpeed * currentMovementDirection, _rigidbody.velocity.y);
+                _rigidbody.linearVelocity = new Vector2(xSpeed * currentMovementDirection, _rigidbody.linearVelocity.y);
             }
         }
 
@@ -142,7 +142,7 @@ namespace SavageWorld.Runtime.Entities.NPC
                 return;
             }
 
-            _rigidbody.velocity = Vector2.up * _npcStats.JumpForce;
+            _rigidbody.linearVelocity = Vector2.up * _npcStats.JumpForce;
             _npcFlags.IsRise = true;
         }
 
@@ -181,7 +181,7 @@ namespace SavageWorld.Runtime.Entities.NPC
         //
         protected void RiseCheck()
         {
-            if (_rigidbody.velocity.y <= 0)
+            if (_rigidbody.linearVelocity.y <= 0)
             {
                 _npcFlags.IsRise = false;
             }
@@ -190,7 +190,7 @@ namespace SavageWorld.Runtime.Entities.NPC
         //
         protected void FallCheck()
         {
-            _npcFlags.IsFall = _rigidbody.velocity.y < 0.1f && !_npcFlags.IsGrounded; //&& !_npcFlags.IsOnSlope;
+            _npcFlags.IsFall = _rigidbody.linearVelocity.y < 0.1f && !_npcFlags.IsGrounded; //&& !_npcFlags.IsOnSlope;
             if (_npcFlags.IsFall)
             {
                 _npcFlags.IsRise = false;
