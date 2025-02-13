@@ -1,3 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <ui:FloatField label="Time to fall" value="0" name="time-to-fall" binding-path="_timeToFall" style="height: 20px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
-</ui:UXML>
